@@ -1,0 +1,134 @@
+/* =============================================================================
+   Shared styles for Story Bible entity list pages.
+   Used by lore, plot-threads, timeline, and any future entity pages.
+   ============================================================================= */
+
+.bible-page {
+	padding: var(--space-4) 0;
+}
+
+.bible-page-header {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	margin-bottom: var(--space-6);
+}
+
+.bible-page-header h1 {
+	margin: 0;
+}
+
+.bible-back-link {
+	display: block;
+	font-size: var(--text-sm);
+	color: var(--color-text-muted);
+	margin-bottom: var(--space-2);
+}
+
+.bible-back-link:hover {
+	color: var(--color-text-secondary);
+	text-decoration: none;
+}
+
+.bible-form-section {
+	margin-bottom: var(--space-6);
+}
+
+.bible-empty-state {
+	padding: var(--space-10);
+	text-align: center;
+	color: var(--color-text-secondary);
+}
+
+.bible-empty-state p {
+	margin-bottom: var(--space-4);
+}
+
+.bible-entity-list {
+	list-style: none;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-2);
+}
+
+.bible-entity-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: var(--space-3) var(--space-4);
+	background-color: var(--color-surface-overlay);
+	border: 1px solid var(--color-border-default);
+	border-radius: var(--radius-md);
+}
+
+.bible-item-body {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-1);
+}
+
+.bible-item-name {
+	font-size: var(--text-base);
+	font-weight: var(--font-weight-medium);
+	color: var(--color-text-primary);
+}
+
+.bible-item-actions {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+}
+
+.bible-btn-sm {
+	padding: var(--space-1) var(--space-2);
+	font-size: var(--text-xs);
+	border-radius: var(--radius-sm);
+	border: 1px solid var(--color-border-default);
+	background: none;
+	cursor: pointer;
+	color: var(--color-text-secondary);
+	transition: var(--transition-color), var(--transition-border);
+}
+
+.bible-btn-sm:hover {
+	color: var(--color-text-primary);
+	border-color: var(--color-border-strong);
+}
+
+.bible-btn-danger {
+	color: var(--color-error);
+	border-color: var(--color-error);
+}
+
+.bible-btn-primary {
+	background-color: var(--color-nova-blue);
+	color: #ffffff;
+	border: none;
+	padding: var(--space-2) var(--space-4);
+	border-radius: var(--radius-sm);
+	font-size: var(--text-sm);
+	font-weight: var(--font-weight-medium);
+	cursor: pointer;
+	transition: var(--transition-opacity);
+}
+
+.bible-btn-primary:hover {
+	opacity: 0.85;
+}
+
+.bible-btn-secondary {
+	background: none;
+	border: 1px solid var(--color-border-default);
+	color: var(--color-text-secondary);
+	padding: var(--space-2) var(--space-4);
+	border-radius: var(--radius-sm);
+	font-size: var(--text-sm);
+	cursor: pointer;
+	transition: var(--transition-color), var(--transition-border);
+}
+
+.bible-btn-secondary:hover {
+	color: var(--color-text-primary);
+	border-color: var(--color-border-strong);
+}

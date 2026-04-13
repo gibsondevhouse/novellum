@@ -1,0 +1,44 @@
+name: AI Task Request
+about: Use this template to request AI-specific tasks or research.
+title: 'AI Task: [Brief Description]'
+labels: 'ai, task'
+assignees: ''
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## AI Task Request
+
+        Please describe the AI-related task or research required. Provide as much detail as possible.
+
+---
+- type: input
+  id: task_description
+  name: Task Description
+  description: "What needs to be done by the AI Agent? (e.g., 'Generate user personas based on market research', 'Analyze user feedback for sentiment')"
+  placeholder: 'Describe the AI task here'
+  is_required: true
+- type: input
+  id: context_needed
+  name: Context Needed
+  description: 'What information or data does the AI Agent need? (e.g., links to research papers, user feedback reports, `GEMINI.md` section)'
+  placeholder: 'Provide relevant context'
+  is_required: false
+- type: choice
+  id: priority
+  name: Priority
+  description: 'How urgent is this AI task?'
+  options:
+    - Low
+    - Medium
+    - High
+    - Urgent
+  default: Medium
+  is_required: true
+- type: textarea
+  id: expected_output
+  name: Expected Output
+  description: "What should the AI Agent deliver? (e.g., 'A JSON file of user personas', 'A sentiment analysis report', 'Code snippets for AI integration')"
+  placeholder: 'Describe the expected outcome'
+  is_required: true

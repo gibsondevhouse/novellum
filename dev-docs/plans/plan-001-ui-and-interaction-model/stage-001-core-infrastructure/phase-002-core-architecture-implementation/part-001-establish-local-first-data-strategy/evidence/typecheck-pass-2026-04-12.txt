@@ -1,0 +1,18 @@
+## pnpm run check
+
+> novellum@0.0.1 check /Users/gibdevlite/Dev/novellum
+> svelte-kit sync && svelte-check --tsconfig ./tsconfig.json
+
+Loading svelte-check in workspace: /Users/gibdevlite/Dev/novellum
+Getting Svelte diagnostics...
+
+svelte-check found 0 errors and 0 warnings
+
+---
+
+## pnpm run lint
+
+> novellum@0.0.1 lint /Users/gibdevlite/Dev/novellum
+> eslint .
+
+(no output — exit code 0, lint clean)

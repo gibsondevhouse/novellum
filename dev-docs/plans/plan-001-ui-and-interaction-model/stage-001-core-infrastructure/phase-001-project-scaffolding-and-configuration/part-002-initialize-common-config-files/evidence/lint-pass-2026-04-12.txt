@@ -1,0 +1,4 @@
+
+> novellum@0.0.1 lint /Users/gibdevlite/Dev/novellum
+> eslint .
+

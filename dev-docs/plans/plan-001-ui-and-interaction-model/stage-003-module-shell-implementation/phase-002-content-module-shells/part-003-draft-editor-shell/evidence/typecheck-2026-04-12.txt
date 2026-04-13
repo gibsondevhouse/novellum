@@ -1,0 +1,12 @@
+> novellum@0.0.1 check /Users/gibdevlite/Dev/novellum
+> svelte-kit sync && svelte-check --tsconfig ./tsconfig.json
+
+Loading svelte-check in workspace: /Users/gibdevlite/Dev/novellum
+Getting Svelte diagnostics...
+
+svelte-check found 0 errors and 0 warnings
+
+> novellum@0.0.1 lint /Users/gibdevlite/Dev/novellum
+> eslint .
+
+(exit 0 — no issues)
