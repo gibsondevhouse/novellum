@@ -1,0 +1,138 @@
+/* =============================================================================
+   Novellum Design System — CSS Custom Properties (tokens.css)
+   Single source of truth for all visual constants.
+   ============================================================================= */
+
+:root {
+	/* ── Surface Layers (luminance hierarchy) ── */
+	--color-surface-base: #0a0a0a; /* absolute background              */
+	--color-surface-ground: #111111; /* sidebar, navigation rail         */
+	--color-surface-raised: #191917; /* primary content panels           */
+	--color-surface-overlay: #222222; /* cards, floating panels           */
+	--color-surface-elevated: #2c2c2c; /* hover states, highlighted rows   */
+	--color-surface-glass: rgba(255, 255, 255, 0.04); /* frosted-glass overlays           */
+
+	/* ── Legacy surface aliases (backwards compat) ── */
+	--color-charcoal: var(--color-surface-raised);
+	--color-slate: var(--color-surface-ground);
+
+	/* ── Accents ── */
+	--color-nova-blue: #3b82f6; /* primary action / interactive        */
+	--color-teal: #06b6d4; /* AI indicators / secondary accent    */
+	--color-ai-tint: rgba(99, 102, 241, 0.08); /* AI-context panel surface            */
+	--color-selection: rgba(245, 240, 235, 0.08); /* editorial selection / active row    */
+
+	/* ── Text ── */
+	--color-text-primary: #e5e5e5;
+	--color-text-secondary: #9ca3af;
+	--color-text-muted: #6b7280;
+
+	/* ── Borders (rgba — breathable hairlines) ── */
+	--color-border-default: rgba(255, 255, 255, 0.08); /* standard dividers                */
+	--color-border-subtle: rgba(255, 255, 255, 0.04); /* intra-panel hairlines            */
+	--color-border-strong: rgba(255, 255, 255, 0.16); /* emphasis borders, separators     */
+	--color-border-focus: rgba(59, 130, 246, 0.6); /* keyboard focus rings             */
+
+	/* ── Legacy border alias ── */
+	--color-border: var(--color-border-default);
+
+	/* ── States ── */
+	--color-error: #ef4444;
+	--color-success: #22c55e;
+	--color-warning: #f59e0b;
+
+	/* ── Spacing (4 px base grid) ── */
+	--space-1: 4px;
+	--space-2: 8px;
+	--space-3: 12px;
+	--space-4: 16px;
+	--space-5: 20px;
+	--space-6: 24px;
+	--space-8: 32px;
+	--space-10: 40px;
+	--space-12: 48px;
+	--space-16: 64px;
+
+	/* ── Typography ── */
+	--font-sans: 'Inter', system-ui, sans-serif;
+	--font-display: 'DM Serif Display', Georgia, serif;
+	--font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+	/* UI scale */
+	--text-xs: 0.75rem; /* 12px */
+	--text-sm: 0.875rem; /* 14px */
+	--text-base: 1rem; /* 16px */
+	--text-lg: 1.125rem; /* 18px */
+	--text-xl: 1.25rem; /* 20px */
+	--text-2xl: 1.5rem; /* 24px */
+	--text-3xl: 1.875rem; /* 30px */
+	/* Editorial / display scale */
+	--text-4xl: 2.25rem; /* 36px */
+	--text-5xl: 3rem; /* 48px */
+	--text-6xl: 3.75rem; /* 60px */
+
+	--font-weight-normal: 400;
+	--font-weight-medium: 500;
+	--font-weight-semibold: 600;
+	--font-weight-bold: 700;
+
+	--leading-tight: 1.25;
+	--leading-normal: 1.5;
+	--leading-relaxed: 1.75;
+
+	/* ── Letter-spacing ── */
+	--tracking-tight: -0.03em;
+	--tracking-normal: 0em;
+	--tracking-wide: 0.04em;
+	--tracking-widest: 0.12em;
+
+	/* ── Prose ── */
+	--prose-gap-line: 1.75rem; /* paragraph-to-paragraph gap     */
+	--prose-gap-block: 2.5rem; /* section break before headings  */
+	--prose-width-max: 68ch; /* optimal measure for body copy  */
+	--prose-inset: var(--space-6); /* horizontal prose padding       */
+
+	/* ── Layout ── */
+	--sidebar-width: 220px;
+	--panel-padding: var(--space-4);
+
+	/* ── Radius ── */
+	--radius-none: 0px;
+	--radius-xs: 2px;
+	--radius-sm: 4px;
+	--radius-md: 6px;
+	--radius-lg: 10px;
+	--radius-full: 9999px;
+
+	/* ── Shadows (dark-surface tuned) ── */
+	--shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.5);
+	--shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
+	--shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.4);
+	--shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
+	--shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.7), 0 4px 16px rgba(0, 0, 0, 0.5);
+
+	/* ── Motion ── */
+	--duration-instant: 80ms;
+	--duration-fast: 100ms;
+	--duration-base: 150ms;
+	--duration-enter: 200ms;
+	--duration-slow: 250ms;
+	--duration-page: 320ms;
+
+	--ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+	--ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+	--ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
+	--ease-exit: cubic-bezier(0.4, 0, 1, 1);
+	--ease-editorial: cubic-bezier(0.16, 1, 0.3, 1); /* spring-like panel settle */
+
+	--transition-color:
+		color var(--duration-base) var(--ease-standard),
+		background-color var(--duration-base) var(--ease-standard);
+	--transition-border: border-color var(--duration-base) var(--ease-standard);
+	--transition-opacity: opacity var(--duration-base) var(--ease-standard);
+	--transition-transform: transform var(--duration-slow) var(--ease-decelerate);
+
+	/* ── Focus ── */
+	--focus-ring: 0 0 0 2px var(--color-border-focus);
+	--focus-ring-offset: 0 0 0 4px var(--color-surface-raised), 0 0 0 6px var(--color-border-focus);
+}
