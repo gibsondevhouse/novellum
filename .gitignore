@@ -39,3 +39,6 @@ src-tauri/gen/
 
 # Misc
 *.local
+
+# Docs
+dev-docs/
