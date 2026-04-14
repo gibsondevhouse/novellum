@@ -3,6 +3,7 @@
 export interface Project {
 	id: string;
 	title: string;
+	coverUrl?: string;
 	genre: string;
 	logline: string;
 	synopsis: string;
@@ -19,6 +20,8 @@ export interface Chapter {
 	order: number;
 	summary: string;
 	wordCount: number;
+	actId?: string;
+	arcRefs?: ArcRef[];
 	createdAt: string;
 	updatedAt: string;
 }
@@ -37,6 +40,7 @@ export interface Scene {
 	wordCount: number;
 	characterIds: string[];
 	locationIds: string[];
+	arcRefs?: ArcRef[];
 	createdAt: string;
 	updatedAt: string;
 }
@@ -155,4 +159,43 @@ export interface SceneSnapshot {
 	projectId: string;
 	text: string;
 	createdAt: string;
+}
+
+export interface ArcRef {
+	arcId: string;
+	arcLabel?: string;
+	role?: 'primary' | 'secondary' | 'background';
+}
+
+export interface StoryFrame {
+	id: string;
+	projectId: string;
+	premise: string;
+	theme: string;
+	toneNotes: string;
+	updatedAt: string;
+}
+
+export interface Act {
+	id: string;
+	projectId: string;
+	title: string;
+	order: number;
+	planningNotes: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export type ArcType = 'character' | 'plot' | 'relationship' | 'thematic' | 'world';
+
+export interface Arc {
+	id: string;
+	projectId: string;
+	title: string;
+	description: string;
+	purpose: string;
+	arcType?: ArcType;
+	order: number;
+	createdAt: string;
+	updatedAt: string;
 }

@@ -1,30 +1,32 @@
-import { db } from '$lib/db/index.js';
+import { apiGet, apiPost, apiPut, apiDel, ApiError } from '$lib/api-client.js';
 import type { TimelineEvent } from '$lib/db/types.js';
 
 export async function createTimelineEvent(
 	data: Omit<TimelineEvent, 'id' | 'createdAt' | 'updatedAt'>,
 ): Promise<TimelineEvent> {
-	const now = new Date().toISOString();
-	const event: TimelineEvent = { ...data, id: crypto.randomUUID(), createdAt: now, updatedAt: now };
-	await db.timeline_events.add(event);
-	return event;
+	return apiPost<TimelineEvent>('/api/db/timeline_events', data);
 }
 
 export async function getTimelineEventById(id: string): Promise<TimelineEvent | undefined> {
-	return db.timeline_events.get(id);
+	try {
+		return await apiGet<TimelineEvent>(`/api/db/timeline_events/${id}`);
+	} catch (err) {
+		if (err instanceof ApiError && err.status === 404) return undefined;
+		throw err;
+	}
 }
 
 export async function getTimelineEventsByProjectId(projectId: string): Promise<TimelineEvent[]> {
-	return db.timeline_events.where('projectId').equals(projectId).toArray();
+	return apiGet<TimelineEvent[]>('/api/db/timeline_events', { projectId });
 }
 
 export async function updateTimelineEvent(
 	id: string,
 	data: Partial<Omit<TimelineEvent, 'id' | 'createdAt'>>,
 ): Promise<void> {
-	await db.timeline_events.update(id, { ...data, updatedAt: new Date().toISOString() });
+	await apiPut(`/api/db/timeline_events/${id}`, data);
 }
 
 export async function removeTimelineEvent(id: string): Promise<void> {
-	await db.timeline_events.delete(id);
+	await apiDel(`/api/db/timeline_events/${id}`);
 }

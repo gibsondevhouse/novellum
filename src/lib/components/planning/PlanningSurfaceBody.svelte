@@ -84,7 +84,9 @@
 		line-height: var(--leading-relaxed);
 		width: 100%;
 		resize: vertical;
-		transition: border-color 0.15s, background 0.15s;
+		transition:
+			border-color 0.15s,
+			background 0.15s;
 	}
 
 	:global(.planning-field-textarea:focus) {

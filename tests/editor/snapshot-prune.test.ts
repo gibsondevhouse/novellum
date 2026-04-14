@@ -1,32 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// We test the pruning logic without Dexie by testing the repository with mocked db
-const mockSnapshots: {
-	id: string;
-	sceneId: string;
-	projectId: string;
-	text: string;
-	createdAt: string;
-}[] = [];
+const mockApiGet = vi.fn();
+const mockApiPost = vi.fn();
+const mockApiDel = vi.fn();
 
-vi.mock('../../src/lib/db/index.js', () => ({
-	db: {
-		scene_snapshots: {
-			add: vi.fn(async (s) => {
-				mockSnapshots.push(s);
-			}),
-			where: vi.fn(() => ({
-				equals: vi.fn(() => ({
-					sortBy: vi.fn(async () => [...mockSnapshots]),
-				})),
-			})),
-			bulkDelete: vi.fn(async (ids: string[]) => {
-				ids.forEach((id) => {
-					const idx = mockSnapshots.findIndex((s) => s.id === id);
-					if (idx !== -1) mockSnapshots.splice(idx, 1);
-				});
-			}),
-		},
+vi.mock('$lib/api-client.js', () => ({
+	apiGet: (...args: unknown[]) => mockApiGet(...args),
+	apiPost: (...args: unknown[]) => mockApiPost(...args),
+	apiDel: (...args: unknown[]) => mockApiDel(...args),
+	ApiError: class extends Error {
+		status: number;
+		constructor(message: string, status: number) {
+			super(message);
+			this.status = status;
+		}
 	},
 }));
 
@@ -35,22 +22,41 @@ describe('snapshot pruning', async () => {
 		await import('../../src/modules/editor/services/snapshot-repository.js');
 
 	beforeEach(() => {
-		mockSnapshots.length = 0;
 		vi.clearAllMocks();
 	});
 
 	it('prunes to max 20 snapshots when over limit', async () => {
-		// Pre-populate 20 snapshots
-		for (let i = 0; i < 20; i++) {
-			mockSnapshots.push({
-				id: `id-${i}`,
-				sceneId: 'sc1',
-				projectId: 'p1',
-				text: `v${i}`,
-				createdAt: new Date(i * 1000).toISOString(),
-			});
-		}
+		// createSnapshot does:
+		// 1. apiPost to create
+		// 2. apiGet to list all snapshots for scene (sorted newest first)
+		// 3. if > 20, apiDel for each excess
+
+		// Mock the POST (create snapshot)
+		mockApiPost.mockResolvedValueOnce({});
+
+		// Mock the GET (list snapshots) — return 21 snapshots (over limit)
+		const snapshots = Array.from({ length: 21 }, (_, i) => ({
+			id: `snap-${i}`,
+			sceneId: 'sc1',
+			projectId: 'p1',
+			text: `v${i}`,
+			createdAt: new Date((20 - i) * 1000).toISOString(), // newest first
+		}));
+		mockApiGet.mockResolvedValueOnce(snapshots);
+
+		// Mock the DEL for the one excess snapshot (index 20)
+		mockApiDel.mockResolvedValue(undefined);
+
 		await createSnapshot('sc1', 'p1', 'new snapshot');
-		expect(mockSnapshots.length).toBeLessThanOrEqual(20);
+
+		expect(mockApiPost).toHaveBeenCalledWith('/api/db/scene_snapshots', {
+			sceneId: 'sc1',
+			projectId: 'p1',
+			text: 'new snapshot',
+		});
+		expect(mockApiGet).toHaveBeenCalledWith('/api/db/scene_snapshots', { sceneId: 'sc1' });
+		// Should delete 1 excess snapshot (21 - 20 = 1)
+		expect(mockApiDel).toHaveBeenCalledTimes(1);
+		expect(mockApiDel).toHaveBeenCalledWith('/api/db/scene_snapshots/snap-20');
 	});
 });

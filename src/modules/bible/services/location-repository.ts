@@ -1,30 +1,32 @@
-import { db } from '$lib/db/index.js';
+import { apiGet, apiPost, apiPut, apiDel, ApiError } from '$lib/api-client.js';
 import type { Location } from '$lib/db/types.js';
 
 export async function createLocation(
 	data: Omit<Location, 'id' | 'createdAt' | 'updatedAt'>,
 ): Promise<Location> {
-	const now = new Date().toISOString();
-	const location: Location = { ...data, id: crypto.randomUUID(), createdAt: now, updatedAt: now };
-	await db.locations.add(location);
-	return location;
+	return apiPost<Location>('/api/db/locations', data);
 }
 
 export async function getLocationById(id: string): Promise<Location | undefined> {
-	return db.locations.get(id);
+	try {
+		return await apiGet<Location>(`/api/db/locations/${id}`);
+	} catch (err) {
+		if (err instanceof ApiError && err.status === 404) return undefined;
+		throw err;
+	}
 }
 
 export async function getLocationsByProjectId(projectId: string): Promise<Location[]> {
-	return db.locations.where('projectId').equals(projectId).toArray();
+	return apiGet<Location[]>('/api/db/locations', { projectId });
 }
 
 export async function updateLocation(
 	id: string,
 	data: Partial<Omit<Location, 'id' | 'createdAt'>>,
 ): Promise<void> {
-	await db.locations.update(id, { ...data, updatedAt: new Date().toISOString() });
+	await apiPut(`/api/db/locations/${id}`, data);
 }
 
 export async function removeLocation(id: string): Promise<void> {
-	await db.locations.delete(id);
+	await apiDel(`/api/db/locations/${id}`);
 }

@@ -103,7 +103,6 @@
 </div>
 
 <style>
-
 	.check-list {
 		display: flex;
 		flex-direction: column;

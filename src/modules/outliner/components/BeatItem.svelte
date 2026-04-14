@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
 	import type { Beat } from '$lib/db/types.js';
 
 	let { beat, index, onDelete, onSelect, onDragStart } = $props<{
@@ -40,7 +39,9 @@
 		background: var(--color-surface-ground);
 		border-radius: var(--radius-sm);
 		border: 1px solid var(--color-border-subtle);
-		transition: border-color 0.1s, background 0.1s;
+		transition:
+			border-color 0.1s,
+			background 0.1s;
 	}
 
 	.beat-item:hover {
@@ -100,7 +101,9 @@
 		font-size: var(--text-xs);
 		padding: 0 var(--space-1);
 		opacity: 0;
-		transition: opacity 0.1s, color 0.1s;
+		transition:
+			opacity 0.1s,
+			color 0.1s;
 	}
 
 	.beat-item:hover .btn-delete {

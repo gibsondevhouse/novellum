@@ -10,9 +10,14 @@
 		onUpdateNotes: (notes: string) => void;
 	};
 
-	let { chapter, onBeatSelect } = $props<{
+	let {
+		chapter,
+		onBeatSelect,
+		onUpdate: _onUpdate,
+	} = $props<{
 		chapter: Chapter;
 		onBeatSelect?: (focus: BeatFocus) => void;
+		onUpdate?: (id: string, patch: Partial<Omit<Chapter, 'id' | 'createdAt'>>) => void;
 	}>();
 
 	const storageKey = $derived(`novellum_outline_chapter_beats_${chapter.id}`);
@@ -57,9 +62,11 @@
 				persist();
 			},
 			onUpdateNotes: (notes: string) => {
-				notes.trim()
-					? localStorage.setItem(notesKey, notes)
-					: localStorage.removeItem(notesKey);
+				if (notes.trim()) {
+					localStorage.setItem(notesKey, notes);
+				} else {
+					localStorage.removeItem(notesKey);
+				}
 			},
 		});
 	}
@@ -73,7 +80,9 @@
 	<!-- Sequence context bar -->
 	<div class="planning-context">
 		<span class="planning-context-label">Sequence</span>
-		<span class="planning-context-desc">Map the structural beats — the key events that must happen, in order.</span>
+		<span class="planning-context-desc"
+			>Map the structural beats — the key events that must happen, in order.</span
+		>
 	</div>
 
 	<!-- Beat section tray: list + add row together -->
@@ -85,13 +94,11 @@
 					<button
 						class="beat-text"
 						onclick={() => openBeat(beat, i)}
-						aria-label="Open beat: {beat.text}"
-					>{beat.text}</button>
-					<button
-						class="beat-del"
-						onclick={() => deleteBeat(beat.id)}
-						aria-label="Remove beat"
-					>✕</button>
+						aria-label="Open beat: {beat.text}">{beat.text}</button
+					>
+					<button class="beat-del" onclick={() => deleteBeat(beat.id)} aria-label="Remove beat"
+						>✕</button
+					>
 				</div>
 			{/each}
 		{:else}
@@ -121,7 +128,9 @@
 		border-radius: var(--radius-sm);
 		background: color-mix(in srgb, var(--color-text-primary) 3%, transparent);
 		border: 1px solid var(--color-border-subtle);
-		transition: border-color 0.1s, background 0.1s;
+		transition:
+			border-color 0.1s,
+			background 0.1s;
 	}
 
 	.beat-item:hover {

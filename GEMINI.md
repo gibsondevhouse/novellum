@@ -10,87 +10,76 @@
 
 ## Project Overview
 
-Novellum is an AI-assisted novel production system designed to be integrated with the Gemini CLI. Its primary purpose is to empower users to leverage AI capabilities for novel writing and related tasks directly from their terminal. The project utilizes a structured system of agents, skills, and workflows, with a strong emphasis on documentation to ensure clarity, maintainability, and ease of use.
+Novellum is an AI-assisted novel production system designed to be integrated with the Gemini CLI. Its primary purpose is to empower users to leverage AI capabilities for novel writing and related tasks directly from their terminal and a modern web interface. The project utilizes a structured system of agents, skills, and workflows, with a strong emphasis on documentation and modular architecture.
 
 ## Key Components and Structure
 
-The project is organized to facilitate the development and management of AI agents and their functionalities.
+The project is organized into two distinct layers: the **Meta-Agent Layer** (for development) and the **Product Agent Layer** (for user features).
 
-- **`.github/`**: This directory houses critical configuration and definitions for the Gemini CLI and its agents.
-  - `agents/`: Defines specialized AI agents responsible for distinct tasks. Key agents include:
-        -   `ai.agent.md`: Manages AI models, prompts, context, and AI-specific tasks.
-        -   `planner.agent.md`: Orchestrates development tasks, interprets requests, and generates detailed plans from `dev-docs/plans/`.
-        -   `backend.agent.md`: (Assumed) Handles backend-related operations.
-        -   `frontend.agent.md`: (Assumed) Handles frontend-related operations.
-        -   `reviewer.agent.md`: (Assumed) Handles code or content review.
-    - `skills/`: Contains reusable modules or capabilities that agents can leverage (e.g., `ai-context/`, `editor/`, `story-bible/`).
-    - `instructions/`: Provides high-level guidance and conventions for agent development.
-    - `prompts/`: Stores pre-defined prompts for various agent tasks.
-    - `workflows/`: Defines sequences of agent interactions for complex operations (e.g., `feature-flow.md`).
-- **`dev-docs/`**: Contains all project documentation and developer planning artifacts.
-  - `plans/`: Holds strategic plans and execution templates for multi-tier development.
-  - Core docs: `architecture.md`, `agents-map.md`, `ai-pipeline.md`, `context-engine.md`, `data-model.md`, `design-system.md`, `dev-workflow.md`, `feature-spec-template.md`, `project-overview.md`, `prompt-system.md`, `repo-structure.md`, `roadmap.md`, `modules/`.
+### 1. Meta-Agent Layer (`.github/`)
+This directory houses critical configuration and definitions for the Gemini CLI and its development agents.
+- **`agents/`**: Defines specialized AI agents for development tasks.
+  - `planner.agent.md`: Orchestrates development tasks and generates multi-tier plans.
+  - `backend.agent.md`: Manages server-side logic, SQLite, and services.
+  - `frontend.agent.md`: Senior UI architect for SvelteKit and component systems.
+  - `reviewer.agent.md`: Ensures code quality and modular boundary compliance.
+  - `ai.agent.md`: Manages AI models, prompts, and context logic.
+- **`skills/`**: Reusable modules or capabilities for dev-agents (e.g., `ai-context/`, `svelte5-runes/`, `modular-boundaries/`).
+- **`instructions/`**, **`prompts/`**, **`workflows/`**: High-level guidance for agent interactions.
+
+### 2. Product Agent Layer (`src/lib/ai/`)
+Runtime agents that power the Novellum application features.
+- **Core Agents**: `ContinuityAgent`, `EditAgent`, `RewriteAgent`, `StyleAgent`, etc.
+- **Infrastructure**: `ContextEngine`, `PromptBuilder`, `ModelRouter`, `Orchestrator`.
+- **See also**: [`AGENTS.md`](./AGENTS.md) for a comprehensive breakdown of all agents.
+
+### 3. Documentation & Planning (`dev-docs/`)
+- **`plans/`**: Holds strategic plans (Plan -> Stage -> Phase -> Part).
+- **Core Docs**: `architecture.md`, `agents-map.md`, `ai-pipeline.md`, `context-engine.md`, `modular-boundaries.md`, `prompt-system.md`.
 
 ## Development Conventions and Workflow
 
-The project follows an agent-centric development model, where distinct AI agents are responsible for specific functionalities. These agents collaborate using defined skills and workflows. Key conventions include:
+### Modular Architecture
+Functionality is organized by **vertical domain slices** (e.g., `bible`, `workspace`, `editor`).
+- **Strict Boundaries**: Import boundaries are enforced via ESLint to prevent cross-module leakage.
+- **Rules**: Every module owns its components, services, and stores. Read `dev-docs/modular-boundaries.md` before coding.
 
-- **Modular Design:** Functionality is broken down into agents and skills for reusability and maintainability. Source code is organized by vertical domain slice (not technical layer) — each module owns its components, services, and stores. Import boundaries between modules are strictly enforced. Full rules: `dev-docs/modular-boundaries.md`.
-
-- **Clear Documentation:** Extensive Markdown documentation is maintained in `dev-docs/` and `.github/` to explain architecture, usage, and development practices.
-
-- **CLI Integration:** The project is designed to integrate with and extend the Gemini CLI, leveraging its capabilities for task execution and interaction.
-
-- **Structured Workflows:** Complex tasks are managed through defined workflows that orchestrate agent interactions.
-
-- **AI Focus:** The core purpose revolves around AI-assisted novel production, with specific agents and skills dedicated to AI model integration, prompt engineering, and data processing for AI.
+### Technical Stack Standards
+- **Svelte 5 Runes**: All new UI components MUST use `$state`, `$derived`, and `.svelte.ts` patterns.
+- **SQLite Persistence**: The live data store is a server-side SQLite database accessed via `/api/db/*`.
+- **AI Pipeline**: Follows the `ROLE -> TASK -> CONTEXT -> CONSTRAINTS -> OUTPUT FORMAT` prompt pattern.
 
 ## Building and Running
 
 - **Package Manager**: pnpm ≥ 9
+- **Node**: ≥ 20 (required for `better-sqlite3`)
 - **Dev server**: `pnpm run dev` → <http://localhost:5173>
-- **Lint**: `pnpm run lint`
-- **Format**: `pnpm run format`
-- **Type check**: `pnpm run check`
-- **Build**: `pnpm run build`
+- **Lint**: `pnpm run lint` (checks boundaries and types)
+- **Tests**: `pnpm test` (Vitest)
 
-## Planning Standards
+### Environment Variables
 
-- Define the required plan hierarchy: Plan -> Stage -> Phase -> Part.
-- Require YAML frontmatter in every plan artifact.
-- Require measurable acceptance criteria per part.
-- Require quality gates before closure: lint, typecheck, tests, docs sync.
-- Require explicit evidence links: commits, PRs, test output, QA notes.
+| Variable           | Default         | Description                       |
+| ------------------ | --------------- | --------------------------------- |
+| `NOVELLUM_DB_PATH` | `./novellum.db` | File path for the SQLite database |
+| `VITE_OPENROUTER_API_KEY` | (none) | Required for AI features (OpenRouter) |
 
-## Development Paths
+## Planning & Quality Gates
 
-- [x] Path 1: UI and interaction model evolution.
-- [x] Path 2: Service-layer and state architecture hardening.
-- [ ] Path 3: Domain feature deepening and workflow parity.
-- [ ] Path 4: Local-first data, indexing, and retrieval capabilities.
-- [ ] Path 5: Observability, reliability, and model-budget optimization.
+- **Hierarchy**: Plan -> Stage -> Phase -> Part.
+- **Verification**: Every part requires explicit evidence (commits, test output, lint status).
+- **Quality Gates**: No plan closure without passing `lint`, `typecheck`, and `tests`.
 
 ## Vulnerabilities and Fragilities
 
-- Identify known reliability, UX, performance, or compliance risks.
-- For each risk include: risk, impact, detection signal, mitigation owner.
-- Track temporary workarounds and target removal milestones.
+- **AI Implementation Stub**: `OpenRouterClient` in `src/lib/ai/openrouter.ts` is currently a stub. AI features require the HTTP layer and real API keys.
+- **Transition State**: The project is migrating from Svelte 4 to Svelte 5 and from Dexie to SQLite. Be vigilant about reactivity and persistence patterns.
+- **Data Model Complexity**: Large projects with many entities (Beats, Lore) may hit performance bottlenecks; use scoped context loading.
 
 ## Plan Completion and Continuity Checklist
 
-Use markdown checkboxes so agents can mark progress:
-
 - [ ] All plan parts marked complete with evidence links.
-- [ ] Required quality gates passed.
-- [ ] Documentation mirror synchronized.
-- [ ] Security and data-boundary checks passed.
-- [ ] Manual QA scenarios executed and captured.
-- [ ] MASTER-PLAN updated with completion status.
+- [ ] Required quality gates (`lint`, `check`, `test`) passed.
+- [ ] Documentation (`dev-docs/`) synchronized with code changes.
+- [ ] `GEMINI.md` and `AGENTS.md` updated if architectural shifts occurred.
 - [ ] Next candidate plan identified and queued.
-
-Continuity rule:
-
-- When all checklist items are checked, revise planning artifacts to keep delivery flowing:
-  - Mark completed work as closed or archived.
-  - Promote or generate the next highest-priority plan.
-  - Update dependencies and target milestones.

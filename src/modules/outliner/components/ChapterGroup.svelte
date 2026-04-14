@@ -3,27 +3,40 @@
 	import type { ChapterWithScenes } from '$modules/outliner/types.js';
 	import type { Chapter, Scene } from '$lib/db/types.js';
 	import { updateChapter } from '$modules/project/services/chapter-repository.js';
+	import { updateScene } from '$modules/editor/services/scene-repository.js';
 	import {
-		createScene,
-		updateScene,
-		removeScene,
-		reorderScenes,
-	} from '$modules/editor/services/scene-repository.js';
-	import { getExpandedChapterIds, toggleChapter } from '$modules/outliner/stores/outliner.svelte.js';
+		getExpandedChapterIds,
+		toggleChapter,
+	} from '$modules/outliner/stores/outliner.svelte.js';
+	import PacingSignal from './PacingSignal.svelte';
 	import SceneRow from './SceneRow.svelte';
 	import AddSceneForm from './AddSceneForm.svelte';
 
-	let { chapter, onDelete, onRename, onSelectChapter, onSelectScene, selectedId, onDragStart } =
-		$props<{
-			chapter: ChapterWithScenes;
-			onDelete: (id: string) => void;
-			onRename: (id: string, title: string) => void;
-			onSelectChapter: (chapter: Chapter) => void;
-			onSelectScene: (scene: Scene) => void;
-			selectedId: string | null;
-			onDragStart: (e: DragEvent, id: string) => void;
-		}>();
+	let {
+		chapter,
+		onDelete,
+		onRename,
+		onSelectChapter,
+		onSelectScene,
+		selectedId,
+		onDragStart,
+		onAddScene,
+		onDeleteScene,
+		onReorderScenes,
+	} = $props<{
+		chapter: ChapterWithScenes;
+		onDelete?: (id: string) => void;
+		onRename?: (id: string, title: string) => void;
+		onSelectChapter: (chapter: Chapter) => void;
+		onSelectScene: (scene: Scene) => void;
+		selectedId: string | null;
+		onDragStart?: (e: DragEvent, id: string) => void;
+		onAddScene?: (title: string) => void;
+		onDeleteScene?: (id: string) => void;
+		onReorderScenes?: (ids: string[]) => void;
+	}>();
 
+	// eslint-disable-next-line svelte/prefer-writable-derived
 	let scenes = $state<Scene[]>(untrack(() => chapter.scenes));
 	let editing = $state(false);
 	let draft = $state(untrack(() => chapter.title));
@@ -32,6 +45,14 @@
 	let sceneDragOverIdx = $state<number | null>(null);
 
 	const expanded = $derived(getExpandedChapterIds().has(chapter.id));
+
+	const scenePacingSparsity = $derived<'healthy' | 'sparse' | 'very-sparse'>(
+		scenes.length === 0 ? 'very-sparse' : scenes.length === 1 ? 'sparse' : 'healthy',
+	);
+
+	$effect(() => {
+		scenes = chapter.scenes;
+	});
 
 	$effect(() => {
 		if (editing && titleInputEl) titleInputEl.focus();
@@ -52,7 +73,7 @@
 		const t = draft.trim();
 		if (t && t !== chapter.title) {
 			updateChapter(chapter.id, { title: t });
-			onRename(chapter.id, t);
+			onRename?.(chapter.id, t);
 		} else {
 			draft = chapter.title;
 		}
@@ -68,29 +89,15 @@
 
 	function handleDelete(e: Event) {
 		e.stopPropagation();
-		if (confirm(`Delete "${chapter.title}" and all its scenes?`)) onDelete(chapter.id);
+		if (confirm(`Delete "${chapter.title}" and all its scenes?`)) onDelete?.(chapter.id);
 	}
 
-	async function addScene(title: string) {
-		const s = await createScene({
-			chapterId: chapter.id,
-			projectId: chapter.projectId,
-			title,
-			summary: '',
-			content: '',
-			wordCount: 0,
-			order: scenes.length,
-			povCharacterId: null,
-			locationId: null,
-			timelineEventId: null,
-			characterIds: [],
-			locationIds: [],
-		});
-		scenes = [...scenes, s];
+	function handleAddScene(title: string) {
+		onAddScene?.(title);
 	}
 
-	async function deleteScene(id: string) {
-		await removeScene(id);
+	function deleteScene(id: string) {
+		onDeleteScene?.(id);
 		scenes = scenes.filter((s) => s.id !== id);
 	}
 
@@ -104,7 +111,7 @@
 		e.dataTransfer?.setData('text/plain', id);
 	}
 
-	async function onSceneDrop(i: number) {
+	function onSceneDrop(i: number) {
 		if (sceneDragId === null) return;
 		const from = scenes.findIndex((s) => s.id === sceneDragId);
 		if (from === i) {
@@ -116,10 +123,7 @@
 		const [item] = arr.splice(from, 1);
 		arr.splice(i, 0, item);
 		scenes = arr;
-		await reorderScenes(
-			chapter.id,
-			arr.map((s) => s.id),
-		);
+		onReorderScenes?.(arr.map((s) => s.id));
 		sceneDragId = null;
 		sceneDragOverIdx = null;
 	}
@@ -129,18 +133,21 @@
 	class="chapter-group"
 	class:is-expanded={expanded}
 	class:is-selected={selectedId === chapter.id}
-	draggable="true"
+	draggable={onDragStart !== undefined}
 	role="listitem"
 	ondragstart={(e) => {
 		e.stopPropagation();
-		onDragStart(e, chapter.id);
+		onDragStart?.(e, chapter.id);
 	}}
 >
 	<div class="chapter-header">
 		<!-- Expand/collapse chevron — separate from selection -->
 		<button
 			class="expand-btn"
-			onclick={(e) => { e.stopPropagation(); toggleChapter(chapter.id); }}
+			onclick={(e) => {
+				e.stopPropagation();
+				toggleChapter(chapter.id);
+			}}
 			aria-expanded={expanded}
 			aria-label="{expanded ? 'Collapse' : 'Expand'} chapter"
 		>
@@ -165,19 +172,31 @@
 			>
 				<span class="chapter-title">{chapter.title}</span>
 				<span class="scene-count">{scenes.length} {scenes.length === 1 ? 'scene' : 'scenes'}</span>
+				{#if scenePacingSparsity !== 'healthy'}
+					<PacingSignal
+						sparsity={scenePacingSparsity}
+						label={scenes.length === 0 ? 'No scenes yet' : 'Could use more scenes'}
+					/>
+				{/if}
 			</button>
 		{/if}
 
 		<!-- Quiet utility cluster — only visible on hover -->
 		<div class="chapter-utils" role="toolbar" aria-label="Chapter actions">
-			<button class="util-btn" onclick={startEditing} aria-label="Rename chapter" title="Rename">✎</button>
-			<button class="util-btn util-btn--danger" onclick={handleDelete} aria-label="Delete chapter" title="Delete">✕</button>
+			<button class="util-btn" onclick={startEditing} aria-label="Rename chapter" title="Rename"
+				>✎</button
+			>
+			<button
+				class="util-btn util-btn--danger"
+				onclick={handleDelete}
+				aria-label="Delete chapter"
+				title="Delete">✕</button
+			>
 		</div>
 	</div>
 
 	{#if expanded}
 		<div class="scene-region">
-
 			<div class="scene-list" role="list">
 				{#each scenes as scene, i (scene.id)}
 					<div
@@ -203,7 +222,7 @@
 				{/each}
 			</div>
 			<div class="add-scene-row">
-				<AddSceneForm onAdd={addScene} />
+				<AddSceneForm onAdd={handleAddScene} />
 			</div>
 		</div>
 	{/if}
@@ -270,7 +289,9 @@
 		border-radius: var(--radius-sm);
 		color: var(--color-text-muted);
 		flex-shrink: 0;
-		transition: color 0.1s, background 0.1s;
+		transition:
+			color 0.1s,
+			background 0.1s;
 	}
 
 	.expand-btn:hover {
@@ -418,8 +439,6 @@
 	.scene-region {
 		padding: var(--space-2) var(--space-3) var(--space-3) var(--space-7);
 	}
-
-
 
 	.scene-list {
 		display: flex;

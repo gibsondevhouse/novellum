@@ -25,8 +25,8 @@
 			aria-selected={active === mode.key}
 			tabindex={active === mode.key ? 0 : -1}
 			onclick={() => onChange(mode.key)}
-			onkeydown={(e) => handleKeydown(e, i)}
-		>{mode.label}</button>
+			onkeydown={(e) => handleKeydown(e, i)}>{mode.label}</button
+		>
 	{/each}
 </div>
 

@@ -1,30 +1,32 @@
-import { db } from '$lib/db/index.js';
+import { apiGet, apiPost, apiPut, apiDel, ApiError } from '$lib/api-client.js';
 import type { Project } from '$lib/db/types.js';
 
 export async function createProject(
 	data: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>,
 ): Promise<Project> {
-	const now = new Date().toISOString();
-	const project: Project = { ...data, id: crypto.randomUUID(), createdAt: now, updatedAt: now };
-	await db.projects.add(project);
-	return project;
+	return apiPost<Project>('/api/db/projects', data);
 }
 
 export async function getProjectById(id: string): Promise<Project | undefined> {
-	return db.projects.get(id);
+	try {
+		return await apiGet<Project>(`/api/db/projects/${id}`);
+	} catch (err) {
+		if (err instanceof ApiError && err.status === 404) return undefined;
+		throw err;
+	}
 }
 
 export async function getAllProjects(): Promise<Project[]> {
-	return db.projects.orderBy('createdAt').reverse().toArray();
+	return apiGet<Project[]>('/api/db/projects');
 }
 
 export async function updateProject(
 	id: string,
 	data: Partial<Omit<Project, 'id' | 'createdAt'>>,
 ): Promise<void> {
-	await db.projects.update(id, { ...data, updatedAt: new Date().toISOString() });
+	await apiPut(`/api/db/projects/${id}`, data);
 }
 
 export async function removeProject(id: string): Promise<void> {
-	await db.projects.delete(id);
+	await apiDel(`/api/db/projects/${id}`);
 }

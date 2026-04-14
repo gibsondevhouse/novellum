@@ -1,38 +1,36 @@
-import { db } from '$lib/db/index.js';
+import { apiGet, apiPost, apiPut, apiDel, ApiError } from '$lib/api-client.js';
 import type { Chapter } from '$lib/db/types.js';
 
 export async function createChapter(
 	data: Omit<Chapter, 'id' | 'createdAt' | 'updatedAt'>,
 ): Promise<Chapter> {
-	const now = new Date().toISOString();
-	const chapter: Chapter = { ...data, id: crypto.randomUUID(), createdAt: now, updatedAt: now };
-	await db.chapters.add(chapter);
-	return chapter;
+	return apiPost<Chapter>('/api/db/chapters', data);
 }
 
 export async function getChapterById(id: string): Promise<Chapter | undefined> {
-	return db.chapters.get(id);
+	try {
+		return await apiGet<Chapter>(`/api/db/chapters/${id}`);
+	} catch (err) {
+		if (err instanceof ApiError && err.status === 404) return undefined;
+		throw err;
+	}
 }
 
 export async function getChaptersByProjectId(projectId: string): Promise<Chapter[]> {
-	return db.chapters.where('projectId').equals(projectId).sortBy('order');
+	return apiGet<Chapter[]>('/api/db/chapters', { projectId });
 }
 
 export async function updateChapter(
 	id: string,
 	data: Partial<Omit<Chapter, 'id' | 'createdAt'>>,
 ): Promise<void> {
-	await db.chapters.update(id, { ...data, updatedAt: new Date().toISOString() });
+	await apiPut(`/api/db/chapters/${id}`, data);
 }
 
 export async function removeChapter(id: string): Promise<void> {
-	await db.chapters.delete(id);
+	await apiDel(`/api/db/chapters/${id}`);
 }
 
 export async function reorderChapters(_projectId: string, orderedIds: string[]): Promise<void> {
-	await db.transaction('rw', db.chapters, async () => {
-		for (let i = 0; i < orderedIds.length; i++) {
-			await db.chapters.update(orderedIds[i], { order: i, updatedAt: new Date().toISOString() });
-		}
-	});
+	await apiPut('/api/db/chapters/reorder', { orderedIds });
 }

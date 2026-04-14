@@ -1,4 +1,4 @@
-import { db } from '$lib/db/index.js';
+import { apiGet, apiPost, apiDel } from '$lib/api-client.js';
 import type { SceneSnapshot } from '$lib/db/types.js';
 
 const MAX_SNAPSHOTS = 20;
@@ -8,27 +8,18 @@ export async function createSnapshot(
 	projectId: string,
 	text: string,
 ): Promise<void> {
-	const snapshot: SceneSnapshot = {
-		id: crypto.randomUUID(),
-		sceneId,
-		projectId,
-		text,
-		createdAt: new Date().toISOString(),
-	};
-	await db.scene_snapshots.add(snapshot);
+	await apiPost('/api/db/scene_snapshots', { sceneId, projectId, text });
 
-	const allSnapshots = await db.scene_snapshots
-		.where('sceneId')
-		.equals(sceneId)
-		.sortBy('createdAt');
+	const allSnapshots = await apiGet<SceneSnapshot[]>('/api/db/scene_snapshots', { sceneId });
 
 	if (allSnapshots.length > MAX_SNAPSHOTS) {
-		const excess = allSnapshots.slice(0, allSnapshots.length - MAX_SNAPSHOTS);
-		await db.scene_snapshots.bulkDelete(excess.map((s) => s.id));
+		const excess = allSnapshots.slice(MAX_SNAPSHOTS);
+		for (const s of excess) {
+			await apiDel(`/api/db/scene_snapshots/${s.id}`);
+		}
 	}
 }
 
 export async function listByScene(sceneId: string): Promise<SceneSnapshot[]> {
-	const snapshots = await db.scene_snapshots.where('sceneId').equals(sceneId).sortBy('createdAt');
-	return snapshots.reverse();
+	return apiGet<SceneSnapshot[]>('/api/db/scene_snapshots', { sceneId });
 }

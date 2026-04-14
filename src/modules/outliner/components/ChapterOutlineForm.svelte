@@ -3,15 +3,13 @@
 	import { untrack } from 'svelte';
 	import { updateChapter } from '$modules/project/services/chapter-repository.js';
 	import StructuredSection from '$lib/components/planning/StructuredSection.svelte';
+	import ArcTagHint from './ArcTagHint.svelte';
 
-	let {
-		chapter,
-		onUpdate,
-	} = $props<{
+	let { chapter, onUpdate } = $props<{
 		chapter: Chapter;
 		onUpdate: (id: string, data: Partial<Omit<Chapter, 'id' | 'createdAt'>>) => void;
 	}>();
-
+	// eslint-disable-next-line svelte/prefer-writable-derived
 	let summary = $state(untrack(() => chapter.summary));
 
 	const notesKey = $derived(`novellum_outline_chapter_notes_${chapter.id}`);
@@ -44,27 +42,35 @@
 	}
 
 	function saveNotes() {
-		notes.trim()
-			? localStorage.setItem(notesKey, notes)
-			: localStorage.removeItem(notesKey);
+		if (notes.trim()) {
+			localStorage.setItem(notesKey, notes);
+		} else {
+			localStorage.removeItem(notesKey);
+		}
 	}
 
 	function saveChapterFunction() {
-		chapterFunction.trim()
-			? localStorage.setItem(functionKey, chapterFunction)
-			: localStorage.removeItem(functionKey);
+		if (chapterFunction.trim()) {
+			localStorage.setItem(functionKey, chapterFunction);
+		} else {
+			localStorage.removeItem(functionKey);
+		}
 	}
 
 	function saveMajorTurn() {
-		majorTurn.trim()
-			? localStorage.setItem(turnKey, majorTurn)
-			: localStorage.removeItem(turnKey);
+		if (majorTurn.trim()) {
+			localStorage.setItem(turnKey, majorTurn);
+		} else {
+			localStorage.removeItem(turnKey);
+		}
 	}
 
 	function saveRevelation() {
-		revelation.trim()
-			? localStorage.setItem(revelationKey, revelation)
-			: localStorage.removeItem(revelationKey);
+		if (revelation.trim()) {
+			localStorage.setItem(revelationKey, revelation);
+		} else {
+			localStorage.removeItem(revelationKey);
+		}
 	}
 </script>
 
@@ -72,13 +78,17 @@
 	<!-- Panel context bar -->
 	<div class="planning-context">
 		<span class="planning-context-label">Intent</span>
-		<span class="planning-context-desc">What does this chapter accomplish and why does it belong here?</span>
+		<span class="planning-context-desc"
+			>What does this chapter accomplish and why does it belong here?</span
+		>
 	</div>
 
 	<!-- Summary & Purpose ─ primary field -->
 	<div class="planning-field">
 		<label class="planning-field-label" for="ch-summary">Summary &amp; Purpose</label>
-		<p class="planning-field-hint">What does this chapter accomplish? What changes for the reader?</p>
+		<p class="planning-field-hint">
+			What does this chapter accomplish? What changes for the reader?
+		</p>
 		<textarea
 			id="ch-summary"
 			class="planning-field-textarea"
@@ -94,7 +104,9 @@
 	<StructuredSection label="Chapter Role">
 		<div class="planning-field">
 			<label class="planning-field-label" for="ch-function">Function in the Story</label>
-			<p class="planning-field-hint">What work does this chapter do? Setup, escalation, reversal, resolution?</p>
+			<p class="planning-field-hint">
+				What work does this chapter do? Setup, escalation, reversal, resolution?
+			</p>
 			<textarea
 				id="ch-function"
 				class="planning-field-textarea"
@@ -146,4 +158,7 @@
 			></textarea>
 		</div>
 	</StructuredSection>
+
+	<!-- Arc tags -->
+	<ArcTagHint arcRefs={chapter.arcRefs} />
 </div>

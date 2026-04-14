@@ -29,7 +29,12 @@
 	<div class="field">
 		<div class="label-row">
 			<label class="label" for="create-logline">Logline</label>
-			<button type="button" class="ai-hint-btn" aria-label="Generate logline (coming soon)" disabled>
+			<button
+				type="button"
+				class="ai-hint-btn"
+				aria-label="Generate logline (coming soon)"
+				disabled
+			>
 				✦ Generate Logline
 			</button>
 		</div>

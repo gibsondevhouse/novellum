@@ -1,15 +1,32 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { db } from '../../src/lib/db/index.js';
-import {
-	createBeat,
-	getBeatById,
-	getBeatsBySceneId,
-	updateBeat,
-	removeBeat,
-} from '../../src/modules/editor/services/beat-repository.js';
 
-const projectId = crypto.randomUUID();
-const sceneId = crypto.randomUUID();
+const mockApiGet = vi.fn();
+const mockApiPost = vi.fn();
+const mockApiPut = vi.fn();
+const mockApiDel = vi.fn();
+
+class MockApiError extends Error {
+	status: number;
+	constructor(message: string, status: number) {
+		super(message);
+		this.name = 'ApiError';
+		this.status = status;
+	}
+}
+
+vi.mock('$lib/api-client.js', () => ({
+	apiGet: (...args: unknown[]) => mockApiGet(...args),
+	apiPost: (...args: unknown[]) => mockApiPost(...args),
+	apiPut: (...args: unknown[]) => mockApiPut(...args),
+	apiDel: (...args: unknown[]) => mockApiDel(...args),
+	ApiError: MockApiError,
+}));
+
+const { createBeat, getBeatById, getBeatsBySceneId, updateBeat, removeBeat } =
+	await import('../../src/modules/editor/services/beat-repository.js');
+
+const projectId = 'proj-1';
+const sceneId = 'sc-1';
 
 const baseBeat = {
 	sceneId,
@@ -20,61 +37,67 @@ const baseBeat = {
 	notes: 'Hero discovers the letter.',
 };
 
-beforeEach(async () => {
-	await db.beats.clear();
+beforeEach(() => {
+	vi.clearAllMocks();
 });
 
 describe('beat-repository', () => {
 	it('creates a beat with auto-generated id and timestamps', async () => {
+		const returned = { id: 'b1', ...baseBeat, createdAt: '2026-01-01', updatedAt: '2026-01-01' };
+		mockApiPost.mockResolvedValueOnce(returned);
+
 		const b = await createBeat(baseBeat);
-		expect(b.id).toBeDefined();
+		expect(b.id).toBe('b1');
 		expect(b.title).toBe('Inciting Incident');
-		expect(b.createdAt).toBeDefined();
-		expect(b.updatedAt).toBeDefined();
+		expect(mockApiPost).toHaveBeenCalledWith('/api/db/beats', baseBeat);
 	});
 
 	it('retrieves a beat by id', async () => {
-		const created = await createBeat(baseBeat);
-		const found = await getBeatById(created.id);
+		const beat = { id: 'b1', ...baseBeat, createdAt: '2026-01-01', updatedAt: '2026-01-01' };
+		mockApiGet.mockResolvedValueOnce(beat);
+
+		const found = await getBeatById('b1');
 		expect(found).toBeDefined();
-		expect(found!.id).toBe(created.id);
+		expect(found!.id).toBe('b1');
 	});
 
 	it('returns undefined for a nonexistent id', async () => {
+		mockApiGet.mockRejectedValueOnce(new MockApiError('Not found', 404));
+
 		const found = await getBeatById('nonexistent-beat-id');
 		expect(found).toBeUndefined();
 	});
 
 	it('returns beats by sceneId', async () => {
-		await createBeat({ ...baseBeat, title: 'Beat 1', order: 1 });
-		await createBeat({ ...baseBeat, title: 'Beat 2', order: 2 });
-		const beats = await getBeatsBySceneId(sceneId);
-		expect(beats.length).toBeGreaterThanOrEqual(2);
-		expect(beats.every((b) => b.sceneId === sceneId)).toBe(true);
+		const beats = [
+			{ id: 'b1', sceneId, title: 'Beat 1' },
+			{ id: 'b2', sceneId, title: 'Beat 2' },
+		];
+		mockApiGet.mockResolvedValueOnce(beats);
+
+		const result = await getBeatsBySceneId(sceneId);
+		expect(result.length).toBe(2);
+		expect(mockApiGet).toHaveBeenCalledWith('/api/db/beats', { sceneId });
 	});
 
 	it('does not return beats from a different scene', async () => {
-		const otherId = crypto.randomUUID();
-		await createBeat({ ...baseBeat, sceneId: otherId, title: 'Other Beat' });
+		mockApiGet.mockResolvedValueOnce([]);
+
 		const beats = await getBeatsBySceneId(sceneId);
-		expect(beats.every((b) => b.sceneId === sceneId)).toBe(true);
+		expect(beats).toEqual([]);
 	});
 
 	it('updates a beat field', async () => {
-		const b = await createBeat(baseBeat);
-		vi.useFakeTimers({ toFake: ['Date'] });
-		vi.setSystemTime(new Date(Date.now() + 1000));
-		await updateBeat(b.id, { title: 'Updated Beat' });
-		vi.useRealTimers();
-		const updated = await getBeatById(b.id);
-		expect(updated!.title).toBe('Updated Beat');
-		expect(updated!.updatedAt).not.toBe(b.updatedAt);
+		mockApiPut.mockResolvedValueOnce({});
+
+		await updateBeat('b1', { title: 'Updated Beat' });
+		expect(mockApiPut).toHaveBeenCalledWith('/api/db/beats/b1', { title: 'Updated Beat' });
 	});
 
 	it('removes a beat', async () => {
-		const b = await createBeat(baseBeat);
-		await removeBeat(b.id);
-		const found = await getBeatById(b.id);
-		expect(found).toBeUndefined();
+		mockApiDel.mockResolvedValueOnce(undefined);
+
+		await removeBeat('b1');
+		expect(mockApiDel).toHaveBeenCalledWith('/api/db/beats/b1');
 	});
 });

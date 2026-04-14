@@ -5,10 +5,8 @@
 		getLoading,
 		loadProjects,
 	} from '../modules/project/stores/project-hub.svelte.ts';
-	import ProjectCard from '../modules/project/components/ProjectCard.svelte';
-	import ProjectCreateCard from '../modules/project/components/ProjectCreateCard.svelte';
-
-	let showCreateForm = $state(false);
+	import LibraryHeroCard from '../modules/project/components/LibraryHeroCard.svelte';
+	import LibraryHeroCardSkeleton from '../modules/project/components/LibraryHeroCardSkeleton.svelte';
 
 	onMount(async () => {
 		await loadProjects();
@@ -16,79 +14,136 @@
 </script>
 
 <svelte:head>
-	<title>Projects — Novellum</title>
+	<title>Library — Novellum</title>
 </svelte:head>
 
-<div class="project-hub">
-	<header class="hub-header">
-		<h1>Projects</h1>
-		<button class="btn-primary" onclick={() => (showCreateForm = true)}>New Project</button>
+<div class="library-hub">
+	<header class="library-header">
+		<div class="library-heading">
+			<h1 class="library-title">Literary Library</h1>
+			<p class="library-subtitle">
+				A living shelf of works-in-progress and completed manuscripts. Select a book to open the
+				reader.
+			</p>
+		</div>
 	</header>
 
 	{#if getLoading()}
-		<p class="loading-text">Loading projects…</p>
+		<ul class="library-column" role="list" aria-label="Loading projects">
+			<LibraryHeroCardSkeleton />
+			<LibraryHeroCardSkeleton />
+			<LibraryHeroCardSkeleton />
+		</ul>
 	{:else if getProjects().length === 0}
 		<div class="empty-state">
-			<p class="empty-title">No projects yet</p>
-			<p class="empty-subtitle">Start writing your novel.</p>
-			<button class="btn-primary" onclick={() => (showCreateForm = true)}>
-				Create Your First Project
-			</button>
+			<div class="empty-text-block">
+				<h2 class="empty-title">The shelf is empty.</h2>
+				<p class="empty-subtitle">No books are currently available for reading.</p>
+			</div>
 		</div>
 	{:else}
-		<ul class="project-grid" role="list">
-			{#each getProjects() as project (project.id)}
-				<ProjectCard {project} />
+		<ul class="library-column" role="list" aria-label="Project library">
+			{#each getProjects() as project, i (project.id)}
+				<LibraryHeroCard {project} cardIndex={i} />
 			{/each}
 		</ul>
-	{/if}
-
-	{#if showCreateForm}
-		<ProjectCreateCard oncancel={() => (showCreateForm = false)} />
 	{/if}
 </div>
 
 <style>
-	.project-hub {
-		max-width: 960px;
+	.library-hub {
+		max-width: 1100px;
 		margin: 0 auto;
+		padding: var(--space-10) var(--panel-padding) var(--space-10);
 	}
 
-	.hub-header {
+	.library-header {
 		display: flex;
-		align-items: center;
+		align-items: flex-end;
 		justify-content: space-between;
-		margin-bottom: var(--space-6);
+		flex-wrap: wrap;
+		gap: var(--space-4);
+		margin-bottom: var(--space-8);
 	}
 
+	.library-heading {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+		max-width: 560px;
+	}
+
+	.library-title {
+		font-family: var(--font-display);
+		font-size: var(--text-5xl);
+		font-weight: var(--font-weight-normal);
+		letter-spacing: var(--tracking-tight);
+		color: var(--color-text-primary);
+		line-height: 1.1;
+		margin: 0;
+	}
+
+	.library-subtitle {
+		font-family: var(--font-sans);
+		font-size: var(--text-base);
+		color: var(--color-text-muted);
+		line-height: var(--leading-relaxed);
+		margin: 0;
+	}
+
+	.library-column {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-5);
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	/* ── Empty state ── */
 	.empty-state {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		min-height: 60vh;
 		text-align: center;
-		padding: var(--space-16) var(--space-8);
-		color: var(--color-text-secondary);
+		padding: var(--space-8) var(--panel-padding);
+	}
+
+	.empty-text-block {
+		max-width: 440px;
+		margin-bottom: var(--space-6);
 	}
 
 	.empty-title {
-		font-size: var(--text-xl);
+		font-family: var(--font-display);
+		font-size: var(--text-4xl);
+		font-weight: var(--font-weight-normal);
+		letter-spacing: var(--tracking-tight);
 		color: var(--color-text-primary);
-		margin-bottom: var(--space-2);
+		line-height: 1.2;
+		margin: 0 0 var(--space-3);
 	}
 
 	.empty-subtitle {
-		margin-bottom: var(--space-6);
-	}
-
-	.loading-text {
+		font-family: var(--font-sans);
+		font-size: var(--text-base);
 		color: var(--color-text-muted);
-		padding: var(--space-8);
-		text-align: center;
+		margin: 0;
 	}
 
-	.project-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-		gap: var(--space-4);
-		list-style: none;
-		padding: 0;
-	}
+	@media (max-width: 640px) {
+		.library-title {
+			font-size: var(--text-4xl);
+		}
 
+		.library-subtitle {
+			font-size: var(--text-sm);
+		}
+
+		.empty-state {
+			min-height: 40vh;
+		}
+	}
 </style>

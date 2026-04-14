@@ -1,4 +1,4 @@
-export type ExportFormat = 'markdown' | 'docx' | 'epub';
+export type ExportFormat = 'markdown' | 'docx' | 'epub' | 'backup_zip';
 
 export interface ExportOptions {
 	format: ExportFormat;

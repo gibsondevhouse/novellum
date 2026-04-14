@@ -1,54 +1,48 @@
-import { db } from '$lib/db/index.js';
+import { apiGet, apiPost, apiPut, apiDel, ApiError } from '$lib/api-client.js';
 import type { Character, CharacterRelationship } from '$lib/db/types.js';
 
 export async function createCharacter(
 	data: Omit<Character, 'id' | 'createdAt' | 'updatedAt'>,
 ): Promise<Character> {
-	const now = new Date().toISOString();
-	const character: Character = { ...data, id: crypto.randomUUID(), createdAt: now, updatedAt: now };
-	await db.characters.add(character);
-	return character;
+	return apiPost<Character>('/api/db/characters', data);
 }
 
 export async function getCharacterById(id: string): Promise<Character | undefined> {
-	return db.characters.get(id);
+	try {
+		return await apiGet<Character>(`/api/db/characters/${id}`);
+	} catch (err) {
+		if (err instanceof ApiError && err.status === 404) return undefined;
+		throw err;
+	}
 }
 
 export async function getCharactersByProjectId(projectId: string): Promise<Character[]> {
-	return db.characters.where('projectId').equals(projectId).toArray();
+	return apiGet<Character[]>('/api/db/characters', { projectId });
 }
 
 export async function updateCharacter(
 	id: string,
 	data: Partial<Omit<Character, 'id' | 'createdAt'>>,
 ): Promise<void> {
-	await db.characters.update(id, { ...data, updatedAt: new Date().toISOString() });
+	await apiPut(`/api/db/characters/${id}`, data);
 }
 
 export async function removeCharacter(id: string): Promise<void> {
-	await db.characters.delete(id);
+	await apiDel(`/api/db/characters/${id}`);
 }
 
 export async function createRelationship(
 	data: Omit<CharacterRelationship, 'id' | 'createdAt' | 'updatedAt'>,
 ): Promise<CharacterRelationship> {
-	const now = new Date().toISOString();
-	const relationship: CharacterRelationship = {
-		...data,
-		id: crypto.randomUUID(),
-		createdAt: now,
-		updatedAt: now,
-	};
-	await db.character_relationships.add(relationship);
-	return relationship;
+	return apiPost<CharacterRelationship>('/api/db/character_relationships', data);
 }
 
 export async function getRelationshipsByProjectId(
 	projectId: string,
 ): Promise<CharacterRelationship[]> {
-	return db.character_relationships.where('projectId').equals(projectId).toArray();
+	return apiGet<CharacterRelationship[]>('/api/db/character_relationships', { projectId });
 }
 
 export async function removeRelationship(id: string): Promise<void> {
-	await db.character_relationships.delete(id);
+	await apiDel(`/api/db/character_relationships/${id}`);
 }

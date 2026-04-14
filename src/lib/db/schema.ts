@@ -52,3 +52,16 @@ export const schemaV6 = {
 	...schemaV5,
 	scene_snapshots: 'id, sceneId, projectId, createdAt',
 };
+
+// Version 7 — adds story_frames and acts tables.
+export const schemaV7 = {
+	...schemaV6,
+	story_frames: 'id, projectId',
+	acts: 'id, projectId, order',
+};
+
+// Version 8 — adds arcs table.
+export const schemaV8 = {
+	...schemaV7,
+	arcs: 'id, projectId, order',
+};

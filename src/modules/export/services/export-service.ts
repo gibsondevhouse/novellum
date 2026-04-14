@@ -27,5 +27,13 @@ export async function exportProject(
 		return { filename: `${safeName}.epub`, blob };
 	}
 
+	if (options.format === 'backup_zip') {
+		const { buildBackupArchive, createBackupFilename } =
+			await import('./portability/zip-export.js');
+		const { blob, manifest } = await buildBackupArchive(projectId);
+		const filename = createBackupFilename(assembled.title, manifest.exportedAt);
+		return { filename, blob };
+	}
+
 	throw new Error(`Format not yet implemented: ${options.format}`);
 }

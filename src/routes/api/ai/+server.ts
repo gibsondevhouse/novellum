@@ -12,7 +12,7 @@ export const GET: RequestHandler = () => {
 	});
 };
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, url }) => {
 	let body: { action?: unknown; uiContext?: unknown; projectId?: unknown } | null = null;
 	try {
 		body = await request.json();
@@ -50,7 +50,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		headers: {
 			Authorization: `Bearer ${OPENROUTER_API_KEY}`,
 			'Content-Type': 'application/json',
-			'HTTP-Referer': 'http://localhost:5173',
+			'HTTP-Referer': url.origin,
 			'X-Title': 'Novellum',
 		},
 		body: JSON.stringify({

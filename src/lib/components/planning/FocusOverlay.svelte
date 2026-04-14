@@ -34,12 +34,7 @@
 
 {#if open}
 	<!-- Dimming backdrop — click to dismiss -->
-	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-	<div
-		class="fo-backdrop"
-		role="presentation"
-		onclick={handleBackdropClick}
-	></div>
+	<div class="fo-backdrop" role="presentation" onclick={handleBackdropClick}></div>
 
 	<!-- Overlay panel — positioned absolutely inside the parent card -->
 	<div

@@ -1,11 +1,18 @@
 import { error } from '@sveltejs/kit';
-import { db } from '$lib/db';
 import type { LayoutLoad } from './$types';
+import type { Project } from '$lib/db/types.js';
 
-export const load: LayoutLoad = async ({ params }) => {
-	const project = await db.projects.get(params.id);
-	if (!project) {
+export const load: LayoutLoad = async ({ params, fetch }) => {
+	const response = await fetch(`/api/db/projects/${params.id}`);
+
+	if (response.status === 404) {
 		error(404, `Project "${params.id}" not found`);
 	}
+
+	if (!response.ok) {
+		error(response.status, 'Failed to load project');
+	}
+
+	const project = (await response.json()) as Project;
 	return { project };
 };

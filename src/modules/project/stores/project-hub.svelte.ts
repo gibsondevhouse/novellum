@@ -6,7 +6,6 @@ import {
 	updateProject,
 	removeProject,
 } from '../services/project-repository.js';
-import { setActiveProject, clearActiveProject } from '$lib/stores/active-project.svelte.js';
 import type { Project } from '$lib/db/types.js';
 
 // --- List state ---
@@ -75,7 +74,7 @@ export async function submitCreate(data: {
 			targetWordCount: data.targetWordCount ?? 80000,
 			status: 'draft',
 		});
-		setActiveProject(project.id, project.title);
+		// active project store update removed as it's now reactively derived from URL
 		goto(`/projects/${project.id}`);
 	} catch {
 		createError = 'Failed to create project. Please try again.';
@@ -85,7 +84,7 @@ export async function submitCreate(data: {
 }
 
 export function selectProject(project: Project): void {
-	setActiveProject(project.id, project.title);
+	// active project store update removed as it's now reactively derived from URL
 	goto(`/projects/${project.id}`);
 }
 
@@ -116,7 +115,6 @@ export async function submitDelete(id: string): Promise<void> {
 	deleting = true;
 	try {
 		await removeProject(id);
-		clearActiveProject();
 		goto('/');
 	} finally {
 		deleting = false;

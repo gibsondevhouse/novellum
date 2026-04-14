@@ -4,8 +4,8 @@
 	import { onNavigate } from '$app/navigation';
 	import favicon from '$lib/assets/favicon.svg';
 	import { db } from '$lib/db';
-	import { page } from '$app/state';
-	import Sidebar from '$lib/components/Sidebar.svelte';
+
+	import AppSidebar from '$lib/components/AppSidebar.svelte';
 
 	let { children } = $props();
 
@@ -45,7 +45,7 @@
 <a class="skip-link" href="#main-content">Skip to content</a>
 
 <div class="app-shell">
-	<Sidebar />
+	<AppSidebar />
 	<main id="main-content" class="main-content" aria-label="Main content">
 		{@render children()}
 	</main>
@@ -78,7 +78,9 @@
 
 	.main-content {
 		flex: 1;
-		overflow: auto;
+		min-width: 0;
+		overflow-y: auto;
+		height: 100vh;
 		padding: var(--panel-padding);
 		color: var(--color-text-primary);
 	}

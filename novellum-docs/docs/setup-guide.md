@@ -6,7 +6,7 @@ This guide describes how to install and setup Novellum for your local developmen
 
 Before starting, ensure you have the following installed on your machine:
 
-- Node.js ≥ 20
+- Node.js ≥ 20 (Required to build the `better-sqlite3` native module)
 - pnpm ≥ 9
 - (Optional) Gemini CLI globally installed for integrated command-line intelligence
 
@@ -20,14 +20,14 @@ Before starting, ensure you have the following installed on your machine:
    ```
 
 2. **Install dependencies:**
-   Using pnpm, install all required Node modules.
+   Using pnpm, install all required Node modules. This step will also compile the SQLite native bindings.
 
    ```sh
    pnpm install
    ```
 
 3. **Start the Development Server:**
-   Launch the SvelteKit development server.
+   Launch the SvelteKit development server. The `novellum.db` SQLite database file will be automatically created in the project root on the first start.
 
    ```sh
    pnpm run dev
