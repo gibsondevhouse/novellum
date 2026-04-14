@@ -4,7 +4,6 @@
 
 <div class="coming-soon-hub">
 	<header class="cs-header">
-		<p class="cs-eyebrow">Coming Soon</p>
 		<h1 class="cs-title">Stories</h1>
 		<p class="cs-subtitle">
 			Short-form narratives, serialised fiction, and single-scene pieces — optimised for brevity and
@@ -37,16 +36,6 @@
 	.cs-header {
 		max-width: 520px;
 		margin-bottom: var(--space-8);
-	}
-
-	.cs-eyebrow {
-		font-family: var(--font-sans);
-		font-size: var(--text-xs);
-		font-weight: var(--font-weight-medium);
-		letter-spacing: var(--tracking-widest);
-		text-transform: uppercase;
-		color: var(--color-teal);
-		margin: 0 0 var(--space-3);
 	}
 
 	.cs-title {

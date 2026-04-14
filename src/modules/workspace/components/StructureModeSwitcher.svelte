@@ -4,76 +4,81 @@
 -->
 <script lang="ts">
 	import { WORKSPACE_MODES, WORKSPACE_MODE_LABELS, type WorkspaceMode } from '../types.js';
+	import { setMode } from '$modules/workspace/stores/workspace-mode.svelte.js';
 
 	let {
 		activeMode,
-		onPrev,
-		onNext,
 	}: {
 		activeMode: WorkspaceMode;
-		onPrev: () => void;
-		onNext: () => void;
 	} = $props();
 
-	import { setMode } from '$modules/workspace/stores/workspace-mode.svelte.js';
+	function handleKeydown(e: KeyboardEvent, i: number) {
+		if (e.key === 'ArrowLeft' && i > 0) {
+			e.preventDefault();
+			setMode(WORKSPACE_MODES[i - 1]);
+		} else if (e.key === 'ArrowRight' && i < WORKSPACE_MODES.length - 1) {
+			e.preventDefault();
+			setMode(WORKSPACE_MODES[i + 1]);
+		}
+	}
 </script>
 
-<nav class="mode-tabs" aria-label="Structural mode">
-	{#each WORKSPACE_MODES as m, i}
-		{#if i > 0}<span class="mode-sep" aria-hidden="true">·</span>{/if}
+<nav class="ps-mode-switcher" aria-label="Structural mode">
+	{#each WORKSPACE_MODES as m, i (m)}
 		<button
 			class="mode-tab"
-			class:mode-tab--active={m === activeMode}
+			class:is-active={m === activeMode}
 			onclick={() => setMode(m)}
+			onkeydown={(e) => handleKeydown(e, i)}
 			type="button"
 			aria-current={m === activeMode ? 'page' : undefined}
 		>
-			{WORKSPACE_MODE_LABELS[m].toUpperCase()}
+			{WORKSPACE_MODE_LABELS[m]}
 		</button>
 	{/each}
 </nav>
 
 <style>
-	.mode-tabs {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--space-2);
-	}
-
-	.mode-sep {
-		color: var(--color-text-muted);
-		opacity: 0.2;
-		font-size: var(--text-xs);
-		user-select: none;
+	.ps-mode-switcher {
+		display: flex;
+		gap: 2px;
+		background: var(--color-surface-ground);
+		border: 1px solid rgba(255, 255, 255, 0.07);
+		border-radius: var(--radius-full);
+		padding: 3px;
 	}
 
 	.mode-tab {
+		padding: 5px 14px;
+		border-radius: var(--radius-full);
 		background: none;
 		border: none;
-		padding: 0;
-		font-family: var(--font-sans);
 		font-size: var(--text-xs);
-		font-weight: var(--font-weight-semibold);
-		letter-spacing: var(--tracking-widest);
+		font-weight: var(--font-weight-medium);
 		color: var(--color-text-muted);
-		opacity: 0.35;
 		cursor: pointer;
-		transition: opacity var(--duration-base) var(--ease-standard);
-		line-height: 1;
+		white-space: nowrap;
+		font-family: inherit;
+		transition:
+			color var(--duration-base) var(--ease-standard),
+			background var(--duration-base) var(--ease-standard),
+			box-shadow var(--duration-base) var(--ease-standard);
 	}
 
 	.mode-tab:hover {
-		opacity: 0.65;
+		color: var(--color-text-primary);
 	}
 
-	.mode-tab--active {
+	.mode-tab.is-active {
+		background: var(--color-surface-elevated);
 		color: var(--color-text-primary);
-		opacity: 1;
+		box-shadow:
+			0 1px 3px rgba(0, 0, 0, 0.6),
+			0 0 0 1px rgba(255, 255, 255, 0.07);
 	}
 
 	.mode-tab:focus-visible {
 		outline: none;
 		box-shadow: var(--focus-ring);
-		border-radius: var(--radius-xs);
 	}
 </style>

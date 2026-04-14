@@ -1,5 +1,8 @@
-import { describe, it, expect } from 'vitest';
-import { parseConsistencyIssues } from '../../src/lib/ai/continuity-agent.js';
+import { describe, it, expect, vi } from 'vitest';
+import { parseConsistencyIssues, executeContinuityCheck } from '../../src/lib/ai/continuity-agent.js';
+import * as contextEngine from '../../src/lib/ai/context-engine.js';
+import * as openrouter from '../../src/lib/ai/openrouter.js';
+import type { AiTask } from '../../src/lib/ai/types.js';
 
 describe('parseConsistencyIssues', () => {
 	it('parses a well-formed JSON issue list', () => {
@@ -52,3 +55,47 @@ describe('parseConsistencyIssues', () => {
 		expect(result[0].type).toBe('lore');
 	});
 });
+
+vi.mock('../../src/lib/ai/openrouter.js', () => ({
+	OpenRouterClient: class MockOpenRouterClient {
+		complete() {}
+	},
+	MissingCredentialsError: class MissingCredentialsError extends Error {}
+}));
+
+vi.mock('../../src/lib/ai/context-engine.js', () => ({
+	buildContext: vi.fn()
+}));
+
+const mockTask: AiTask = {
+	taskType: 'continuity_check',
+	role: 'tester',
+	targetEntityId: null,
+	contextPolicy: 'continuity_scope',
+	outputFormat: 'json_issue_list'
+};
+
+describe('executeContinuityCheck', () => {
+	it('integrates context, prompt, and openrouter perfectly', async () => {
+		vi.mocked(contextEngine.buildContext).mockResolvedValueOnce({
+			policy: 'continuity_scope',
+			scene: null, adjacentScenes: [], chapter: null, beats: [], characters: [], locations: [], loreEntries: [], plotThreads: []
+		});
+
+		const completeMock = vi.fn().mockResolvedValue({
+			text: '[\n{"type":"character","severity":"warning","description":"Hair color","entityIds":[]}\n]',
+			model: 'openai/gpt-4o',
+			tokensUsed: 10
+		});
+		
+		openrouter.OpenRouterClient.prototype.complete = completeMock;
+
+		const res = await executeContinuityCheck('proj1', mockTask);
+		
+		expect(contextEngine.buildContext).toHaveBeenCalledWith(mockTask, 'proj1');
+		expect(completeMock).toHaveBeenCalled();
+		expect(res).toHaveLength(1);
+		expect(res[0].description).toBe('Hair color');
+	});
+});
+

@@ -46,6 +46,7 @@ Functionality is organized by **vertical domain slices** (e.g., `bible`, `worksp
 
 ### Technical Stack Standards
 - **Svelte 5 Runes**: All new UI components MUST use `$state`, `$derived`, and `.svelte.ts` patterns.
+- **Linearization UI**: All UI components must adhere to the Linear-inspired UI design system. Use `SurfaceCard`, `SurfacePanel`, `SectionHeader`, and standard buttons (`PrimaryButton`, `GhostButton`). Do not use hardcoded pixel values for padding or margins (use `--space-*` tokens). Respect tonal layering and `prefers-reduced-motion`.
 - **SQLite Persistence**: The live data store is a server-side SQLite database accessed via `/api/db/*`.
 - **AI Pipeline**: Follows the `ROLE -> TASK -> CONTEXT -> CONSTRAINTS -> OUTPUT FORMAT` prompt pattern.
 

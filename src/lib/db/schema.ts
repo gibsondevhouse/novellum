@@ -65,3 +65,9 @@ export const schemaV8 = {
 	...schemaV7,
 	arcs: 'id, projectId, order',
 };
+
+// Version 9 — adds assets table.
+export const schemaV9 = {
+    ...schemaV8,
+    assets: 'id, projectId, createdAt'
+};

@@ -28,7 +28,7 @@
 		if (!editing) onSelect(id);
 	}
 
-	function startRename(e: MouseEvent) {
+	function _startRename(e: MouseEvent) {
 		e.stopPropagation();
 		editValue = title;
 		editing = true;
@@ -51,7 +51,7 @@
 		else if (e.key === 'Escape') cancelRename();
 	}
 
-	function handleDelete(e: MouseEvent) {
+	function _handleDelete(e: MouseEvent) {
 		e.stopPropagation();
 		onDelete(id);
 	}

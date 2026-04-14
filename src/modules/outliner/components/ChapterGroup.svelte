@@ -23,6 +23,7 @@
 		onAddScene,
 		onDeleteScene,
 		onReorderScenes,
+		onMoveScene,
 	} = $props<{
 		chapter: ChapterWithScenes;
 		onDelete?: (id: string) => void;
@@ -34,6 +35,7 @@
 		onAddScene?: (title: string) => void;
 		onDeleteScene?: (id: string) => void;
 		onReorderScenes?: (ids: string[]) => void;
+		onMoveScene?: (sceneId: string, fromChapterId: string, toChapterId: string, index: number) => void;
 	}>();
 
 	// eslint-disable-next-line svelte/prefer-writable-derived
@@ -41,7 +43,6 @@
 	let editing = $state(false);
 	let draft = $state(untrack(() => chapter.title));
 	let titleInputEl = $state<HTMLInputElement | undefined>(undefined);
-	let sceneDragId = $state<string | null>(null);
 	let sceneDragOverIdx = $state<number | null>(null);
 
 	const expanded = $derived(getExpandedChapterIds().has(chapter.id));
@@ -107,25 +108,48 @@
 	}
 
 	function onSceneDragStart(e: DragEvent, id: string) {
-		sceneDragId = id;
-		e.dataTransfer?.setData('text/plain', id);
+		e.stopPropagation();
+		if (e.dataTransfer) {
+			e.dataTransfer.setData('application/json', JSON.stringify({ type: 'scene', id, fromChapterId: chapter.id }));
+			e.dataTransfer.effectAllowed = 'move';
+		}
 	}
 
-	function onSceneDrop(i: number) {
-		if (sceneDragId === null) return;
-		const from = scenes.findIndex((s) => s.id === sceneDragId);
-		if (from === i) {
-			sceneDragId = null;
-			sceneDragOverIdx = null;
-			return;
-		}
-		const arr = [...scenes];
-		const [item] = arr.splice(from, 1);
-		arr.splice(i, 0, item);
-		scenes = arr;
-		onReorderScenes?.(arr.map((s) => s.id));
-		sceneDragId = null;
+	function handleSceneDragOver(e: DragEvent, i: number) {
+		e.preventDefault();
+		e.stopPropagation();
+		sceneDragOverIdx = i;
+	}
+
+	function handleSceneDrop(e: DragEvent, i: number) {
+		e.preventDefault();
+		e.stopPropagation();
 		sceneDragOverIdx = null;
+		
+		const data = e.dataTransfer?.getData('application/json');
+		if (data) {
+			try {
+				const payload = JSON.parse(data);
+				if (payload.type === 'scene' && payload.fromChapterId) {
+					if (payload.fromChapterId === chapter.id) {
+						// Internal Reorder
+						const from = scenes.findIndex((s) => s.id === payload.id);
+						if (from !== -1 && from !== i) {
+							const arr = [...scenes];
+							const [item] = arr.splice(from, 1);
+							arr.splice(i, 0, item);
+							scenes = arr;
+							onReorderScenes?.(arr.map((s) => s.id));
+						}
+					} else {
+						// External Drop
+						onMoveScene?.(payload.id, payload.fromChapterId, chapter.id, i);
+					}
+				}
+			} catch {
+				// empty catch block
+			}
+		}
 	}
 </script>
 
@@ -203,12 +227,9 @@
 						class="scene-slot"
 						class:drag-over={sceneDragOverIdx === i}
 						role="listitem"
-						ondragover={(e) => {
-							e.preventDefault();
-							sceneDragOverIdx = i;
-						}}
+						ondragover={(e) => handleSceneDragOver(e, i)}
 						ondragleave={() => (sceneDragOverIdx = null)}
-						ondrop={() => onSceneDrop(i)}
+						ondrop={(e) => handleSceneDrop(e, i)}
 					>
 						<SceneRow
 							{scene}
@@ -221,7 +242,13 @@
 					</div>
 				{/each}
 			</div>
-			<div class="add-scene-row">
+			<div class="add-scene-row"
+				role="presentation"
+				class:drag-over={sceneDragOverIdx === scenes.length}
+				ondragover={(e) => handleSceneDragOver(e, scenes.length)}
+				ondragleave={() => (sceneDragOverIdx = null)}
+				ondrop={(e) => handleSceneDrop(e, scenes.length)}
+			>
 				<AddSceneForm onAdd={handleAddScene} />
 			</div>
 		</div>

@@ -1,50 +1,63 @@
+<script lang="ts">
+	import ThemeSelector from '$modules/settings/components/ThemeSelector.svelte';
+</script>
+
 <svelte:head>
 	<title>Styles — Novellum</title>
 </svelte:head>
 
-<div class="surface-stub">
-	<div class="surface-stub__icon" aria-hidden="true">🎨</div>
-	<h1 class="surface-stub__title">Styles</h1>
-	<p class="surface-stub__description">
-		Global writing style tokens — define tone, voice, and prose conventions that apply across all
-		projects or collections.
-	</p>
-	<span class="surface-stub__badge">Coming soon</span>
+<div class="styles-page">
+	<div class="styles-header">
+		<span class="styles-header__icon" aria-hidden="true">🎨</span>
+		<h1 class="styles-header__title">Styles & Settings</h1>
+		<p class="styles-header__description">
+			Configure your workspace appearance.
+		</p>
+	</div>
+
+	<div class="styles-content">
+		<ThemeSelector />
+	</div>
 </div>
 
 <style>
-	.surface-stub {
+	.styles-page {
+		max-width: 800px;
+		margin: 0 auto;
+		padding: var(--space-8) var(--space-6);
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-12);
+	}
+
+	.styles-header {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
-		min-height: 60vh;
 		text-align: center;
 		gap: var(--space-4);
-		padding: var(--space-12);
-		color: var(--color-text-primary);
 	}
-	.surface-stub__icon {
+
+	.styles-header__icon {
 		font-size: var(--text-4xl);
-		opacity: 0.3;
 	}
-	.surface-stub__title {
+
+	.styles-header__title {
 		font-family: var(--font-display);
 		font-size: var(--text-3xl);
 		margin: 0;
 	}
-	.surface-stub__description {
-		font-size: var(--text-sm);
-		color: var(--color-text-muted);
-		max-width: 400px;
-		line-height: var(--leading-relaxed);
+
+	.styles-header__description {
+		font-size: var(--text-base);
+		color: var(--color-text-secondary);
+		max-width: 500px;
 		margin: 0;
 	}
-	.surface-stub__badge {
-		font-size: var(--text-xs);
-		padding: var(--space-1) var(--space-3);
-		background: var(--color-surface-overlay);
-		border-radius: var(--radius-full);
-		color: var(--color-text-muted);
+
+	.styles-content {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-8);
 	}
 </style>

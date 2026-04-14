@@ -10,6 +10,19 @@
 			href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap"
 			rel="stylesheet"
 		/>
+		<script>
+			(function() {
+				try {
+					var theme = localStorage.getItem('novellum-theme') || 'system';
+					if (theme === 'system') {
+						var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+						document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+					} else {
+						document.documentElement.setAttribute('data-theme', theme);
+					}
+				} catch (e) {}
+			})();
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover" data-sveltekit-preload-code="eager">

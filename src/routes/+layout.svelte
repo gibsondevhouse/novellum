@@ -6,6 +6,7 @@
 	import { db } from '$lib/db';
 
 	import AppSidebar from '$lib/components/AppSidebar.svelte';
+	import OnboardingModal from '$lib/components/OnboardingModal.svelte';
 
 	let { children } = $props();
 
@@ -50,6 +51,8 @@
 		{@render children()}
 	</main>
 </div>
+
+<OnboardingModal />
 
 <style>
 	.skip-link {

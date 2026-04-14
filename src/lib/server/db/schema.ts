@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS projects (
 	synopsis TEXT NOT NULL DEFAULT '',
 	targetWordCount INTEGER NOT NULL DEFAULT 0,
 	status TEXT NOT NULL DEFAULT '',
+	systemPrompt TEXT NOT NULL DEFAULT '',
+	negativePrompt TEXT NOT NULL DEFAULT '',
 	createdAt TEXT NOT NULL,
 	updatedAt TEXT NOT NULL
 );

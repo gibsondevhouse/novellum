@@ -61,27 +61,6 @@
 		<img class="hero-cover-img" src={displayUrl} alt="Book cover" />
 		<div class="hero-cover-overlay" role="group" aria-label="Cover options">
 			<button
-				class="cover-action-btn cover-action-btn--ai"
-				disabled
-				title="AI cover generation — coming soon"
-				aria-label="Generate cover with AI (coming soon)"
-			>
-				<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-					<path
-						d="M8 2l.9 2.6L11.5 5.5l-2.6.9L8 9l-.9-2.6L4.5 5.5l2.6-.9L8 2z"
-						fill="currentColor"
-					/>
-					<path
-						d="M13 9l.5 1.5L15 11l-1.5.5L13 13l-.5-1.5L11 11l1.5-.5L13 9z"
-						fill="currentColor"
-					/>
-					<path
-						d="M4 11l.4 1.1 1.1.4-1.1.4L4 14l-.4-1.1L2.5 12.5l1.1-.4L4 11z"
-						fill="currentColor"
-					/>
-				</svg>
-			</button>
-			<button
 				class="cover-action-btn cover-action-btn--upload"
 				onclick={openFilePicker}
 				title="Change cover image"
@@ -108,27 +87,6 @@
 		<div class="hero-cover-placeholder">
 			<span class="hero-cover-label">Add Cover</span>
 			<div class="cover-actions" role="group" aria-label="Cover options">
-				<button
-					class="cover-action-btn cover-action-btn--ai"
-					disabled
-					title="AI cover generation — coming soon"
-					aria-label="Generate cover with AI (coming soon)"
-				>
-					<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-						<path
-							d="M8 2l.9 2.6L11.5 5.5l-2.6.9L8 9l-.9-2.6L4.5 5.5l2.6-.9L8 2z"
-							fill="currentColor"
-						/>
-						<path
-							d="M13 9l.5 1.5L15 11l-1.5.5L13 13l-.5-1.5L11 11l1.5-.5L13 9z"
-							fill="currentColor"
-						/>
-						<path
-							d="M4 11l.4 1.1 1.1.4-1.1.4L4 14l-.4-1.1L2.5 12.5l1.1-.4L4 11z"
-							fill="currentColor"
-						/>
-					</svg>
-				</button>
 				<button
 					class="cover-action-btn cover-action-btn--upload"
 					onclick={openFilePicker}

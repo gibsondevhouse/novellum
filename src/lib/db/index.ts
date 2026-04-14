@@ -17,6 +17,7 @@ import type {
 	Act,
 	Arc,
 	ArcRef,
+	Asset,
 } from './types.js';
 import {
 	schemaV1,
@@ -27,6 +28,7 @@ import {
 	schemaV6,
 	schemaV7,
 	schemaV8,
+	schemaV9,
 } from './schema.js';
 
 export class AppDB extends Dexie {
@@ -46,6 +48,7 @@ export class AppDB extends Dexie {
 	story_frames!: Table<StoryFrame, string>;
 	acts!: Table<Act, string>;
 	arcs!: Table<Arc, string>;
+	assets!: Table<Asset, string>;
 
 	constructor() {
 		super('novellum');
@@ -85,6 +88,8 @@ export class AppDB extends Dexie {
 		this.version(7).stores(schemaV7);
 		// v8 → adds arcs table
 		this.version(8).stores(schemaV8);
+		// v9 → adds assets table
+		this.version(9).stores(schemaV9);
 	}
 }
 
@@ -118,4 +123,5 @@ export type {
 	Act,
 	Arc,
 	ArcRef,
+	Asset,
 };

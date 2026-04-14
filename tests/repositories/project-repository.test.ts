@@ -38,6 +38,8 @@ describe('project-repository', () => {
 			logline: '',
 			synopsis: '',
 			targetWordCount: 80000,
+			systemPrompt: '',
+			negativePrompt: '',
 		};
 		const returned = { id: 'p1', ...data, createdAt: '2026-01-01', updatedAt: '2026-01-01' };
 		mockApiPost.mockResolvedValueOnce(returned);
@@ -57,6 +59,8 @@ describe('project-repository', () => {
 			logline: '',
 			synopsis: '',
 			targetWordCount: 0,
+			systemPrompt: '',
+			negativePrompt: '',
 			createdAt: '2026-01-01',
 			updatedAt: '2026-01-01',
 		};

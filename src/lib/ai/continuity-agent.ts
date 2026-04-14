@@ -1,4 +1,9 @@
 import type { ConsistencyIssue } from '$lib/db/types.js';
+import type { AiTask } from './types.js';
+import { buildContext } from './context-engine.js';
+import { buildPrompt } from './prompt-builder.js';
+import { OpenRouterClient } from './openrouter.js';
+import { selectModel } from './model-router.js';
 
 interface RawIssue {
 	type: string;
@@ -44,3 +49,27 @@ export function parseConsistencyIssues(
 		return [];
 	}
 }
+
+/**
+ * Executes a continuity check by building the context, fetching from AI,
+ * and parsing the structural issues.
+ * Throws MissingCredentialsError or general Error if the API request fails.
+ */
+export async function executeContinuityCheck(
+	projectId: string,
+	task: AiTask,
+): Promise<
+	Omit<ConsistencyIssue, 'id' | 'projectId' | 'sceneId' | 'status' | 'createdAt' | 'updatedAt'>[]
+> {
+	const context = await buildContext(task, projectId);
+	const prompt = buildPrompt(task, context);
+
+	const client = new OpenRouterClient();
+	const response = await client.complete({
+		model: selectModel(task.taskType),
+		messages: [{ role: 'system', content: prompt }],
+	});
+
+	return parseConsistencyIssues(response.text);
+}
+

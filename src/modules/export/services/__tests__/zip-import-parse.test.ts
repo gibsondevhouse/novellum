@@ -20,6 +20,8 @@ describe('zip-import-parse', () => {
 			logline: '',
 			synopsis: '',
 			targetWordCount: 60000,
+			systemPrompt: '',
+			negativePrompt: '',
 			status: 'draft',
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString(),

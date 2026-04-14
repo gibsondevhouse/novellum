@@ -9,6 +9,8 @@ export interface Project {
 	synopsis: string;
 	targetWordCount: number;
 	status: string;
+	systemPrompt: string;
+	negativePrompt: string;
 	createdAt: string; // ISO 8601
 	updatedAt: string;
 }
@@ -198,4 +200,15 @@ export interface Arc {
 	order: number;
 	createdAt: string;
 	updatedAt: string;
+}
+
+export interface Asset {
+    id: string;
+    projectId: string;
+    name: string;
+    mimeType: string;
+    data: string; // base64
+    sizeBytes: number;
+    createdAt: string;
+    updatedAt: string;
 }

@@ -98,4 +98,11 @@ describe('prompt-builder', () => {
 		const prompt = buildPrompt(task, largeCtx);
 		expect(prompt.length).toBeLessThanOrEqual(8000);
 	});
+
+        it('includes SPECIFIC COMMAND when instruction is provided', () => {
+                const instructionTask: AiTask = { ...task, instruction: 'Make the dialogue snappier.' };
+                const prompt = buildPrompt(instructionTask, richCtx);
+                expect(prompt).toContain('## SPECIFIC COMMAND');
+                expect(prompt).toContain('Make the dialogue snappier.');
+        });
 });

@@ -116,6 +116,42 @@
 		onChaptersChange(next);
 	}
 
+	async function handleMoveSceneToChapter(sceneId: string, fromChapterId: string, toChapterId: string, index: number) {
+		const fromChapter = localChapters.find((ch) => ch.id === fromChapterId);
+		const toChapter = localChapters.find((ch) => ch.id === toChapterId);
+		if (!fromChapter || !toChapter) return;
+
+		const sceneToMove = fromChapter.scenes.find((s) => s.id === sceneId);
+		if (!sceneToMove) return;
+
+		// Optimistic UI updates
+		const next = localChapters.map((ch) => {
+			if (ch.id === fromChapterId) {
+				return { ...ch, scenes: ch.scenes.filter((s) => s.id !== sceneId) };
+			}
+			if (ch.id === toChapterId) {
+				const updatedScene = { ...sceneToMove, chapterId: toChapterId };
+				const newScenes = [...ch.scenes];
+				newScenes.splice(index, 0, updatedScene);
+				return { ...ch, scenes: newScenes };
+			}
+			return ch;
+		});
+		localChapters = next;
+		onChaptersChange(next);
+
+		// Apply changes
+		const updatedToChapter = next.find((c) => c.id === toChapterId)!;
+		const updatedFromChapter = next.find((c) => c.id === fromChapterId)!;
+		
+		const { updateScene, reorderScenes } = await import('$modules/editor/services/scene-repository.js');
+		await updateScene(sceneId, { chapterId: toChapterId });
+		await Promise.all([
+			reorderScenes(fromChapterId, updatedFromChapter.scenes.map((s) => s.id)),
+			reorderScenes(toChapterId, updatedToChapter.scenes.map((s) => s.id))
+		]);
+	}
+
 	async function handleDeleteChapter(id: string) {
 		const ch = localChapters.find((c) => c.id === id);
 		if (ch) await Promise.all(ch.scenes.map((s) => removeScene(s.id)));
@@ -181,6 +217,7 @@
 				onAddScene={handleAddScene}
 				onDeleteScene={handleDeleteScene}
 				onReorderScenes={handleReorderScenes}
+				onMoveScene={handleMoveSceneToChapter}
 			/>
 		{/each}
 		{#if unassignedChapters.length > 0}
@@ -197,6 +234,7 @@
 						onAddScene={(title) => handleAddScene(chapter, title)}
 						onDeleteScene={(id) => handleDeleteScene(chapter, id)}
 						onReorderScenes={(ids) => handleReorderScenes(chapter, ids)}
+						onMoveScene={handleMoveSceneToChapter}
 						{onDragStart}
 					/>
 				{/each}
@@ -227,6 +265,7 @@
 						onAddScene={(title) => handleAddScene(chapter, title)}
 						onDeleteScene={(id) => handleDeleteScene(chapter, id)}
 						onReorderScenes={(ids) => handleReorderScenes(chapter, ids)}
+						onMoveScene={handleMoveSceneToChapter}
 						{onDragStart}
 					/>
 				</div>

@@ -6,8 +6,6 @@
 	import {
 		getActiveMode,
 		getActiveSelectedId,
-		nextMode,
-		prevMode,
 		selectItem,
 		setMode,
 		resetSelections,
@@ -64,7 +62,7 @@
 	const selectedId = $derived(getActiveSelectedId());
 
 	$effect(() => {
-		mode;
+		void mode;
 		focusedArcType = null;
 	});
 
@@ -234,8 +232,6 @@
 <div class="workspace-surface">
 	<WorkspaceHeroShell
 		activeMode={mode}
-		onPrev={prevMode}
-		onNext={nextMode}
 		items={railItems}
 		{activeIndex}
 		onNavigate={handleNavigate}

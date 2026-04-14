@@ -13,8 +13,6 @@
 
 	let {
 		activeMode,
-		onPrev,
-		onNext,
 		items,
 		activeIndex,
 		onNavigate,
@@ -24,8 +22,6 @@
 		children,
 	}: {
 		activeMode: WorkspaceMode;
-		onPrev: () => void;
-		onNext: () => void;
 		items: { id: string; title: string }[];
 		activeIndex: number;
 		onNavigate: (index: number) => void;
@@ -42,7 +38,7 @@
 
 <section class="workspace-hero" aria-label="Structure overview">
 	<header class="workspace-hero__nav">
-		<StructureModeSwitcher {activeMode} {onPrev} {onNext} />
+		<StructureModeSwitcher {activeMode} />
 		<button
 			class="workspace-hero__new"
 			onclick={onCreate}
