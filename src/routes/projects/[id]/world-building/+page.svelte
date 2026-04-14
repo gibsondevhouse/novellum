@@ -1,27 +1,43 @@
 <script lang="ts">
+	import { SurfaceCard, SectionHeader } from '$lib/components/ui/index.js';
+
 	let { data } = $props<{ data: { projectId: string } }>();
 
 	const sections = $derived([
 		{
 			id: 'characters',
 			label: 'Characters',
+			description: 'Dramatis personae, arcs, and traits.',
 			href: `/projects/${data.projectId}/world-building/characters`,
+			icon: '👤',
 		},
 		{
 			id: 'locations',
 			label: 'Locations',
+			description: 'Key settings and environmental details.',
 			href: `/projects/${data.projectId}/world-building/locations`,
+			icon: '📍',
 		},
-		{ id: 'lore', label: 'Lore', href: `/projects/${data.projectId}/world-building/lore` },
+		{
+			id: 'lore',
+			label: 'Lore',
+			description: 'History, myths, and world rules.',
+			href: `/projects/${data.projectId}/world-building/lore`,
+			icon: '📜',
+		},
 		{
 			id: 'plot-threads',
 			label: 'Plot Threads',
+			description: 'Subplots and narrative tracking.',
 			href: `/projects/${data.projectId}/world-building/plot-threads`,
+			icon: '🧵',
 		},
 		{
 			id: 'timeline',
 			label: 'Timeline',
+			description: 'Chronological order of events.',
 			href: `/projects/${data.projectId}/world-building/timeline`,
+			icon: '⏳',
 		},
 	]);
 </script>
@@ -31,52 +47,68 @@
 </svelte:head>
 
 <div class="wb-hub">
-	<h1>World Building</h1>
-	<p class="subtitle">Select a section to manage your world-building entities.</p>
+	<SectionHeader
+		title="World Building"
+		description="Select a section to manage your world-building entities."
+	/>
+
 	<nav class="section-grid" aria-label="World Building sections">
 		{#each sections as section (section.id)}
-			<a class="section-card" href={section.href}>
-				<span class="section-label">{section.label}</span>
-			</a>
+			<SurfaceCard href={section.href} class="section-card">
+				<div class="section-icon">{section.icon}</div>
+				<div class="section-content">
+					<span class="section-label">{section.label}</span>
+					<span class="section-desc">{section.description}</span>
+				</div>
+			</SurfaceCard>
 		{/each}
 	</nav>
 </div>
 
 <style>
 	.wb-hub {
-		padding: var(--space-4) 0;
+		padding: var(--space-6) 0;
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-8);
 	}
-	.wb-hub h1 {
-		margin-bottom: var(--space-2);
-	}
-	.subtitle {
-		color: var(--color-text-secondary);
-		font-size: var(--text-sm);
-		margin-bottom: var(--space-6);
-	}
+
 	.section-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-		gap: var(--space-3);
+		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		gap: var(--space-4);
 	}
-	.section-card {
+
+	:global(.section-card) {
+		display: flex !important;
+		flex-direction: row !important;
+		align-items: flex-start !important;
+		gap: var(--space-4) !important;
+		padding: var(--space-6) !important;
+		text-decoration: none !important;
+	}
+
+	.section-icon {
+		font-size: var(--text-2xl);
+		line-height: 1;
+		padding-top: var(--space-1);
+	}
+
+	.section-content {
 		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: var(--space-6) var(--space-4);
-		background-color: var(--color-surface-overlay);
-		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-md);
-		text-decoration: none;
-		transition: var(--transition-border), var(--transition-color);
+		flex-direction: column;
+		gap: var(--space-1);
 	}
-	.section-card:hover {
-		border-color: var(--color-teal);
-		text-decoration: none;
-	}
+
 	.section-label {
 		font-size: var(--text-base);
-		font-weight: var(--font-weight-medium);
+		font-weight: var(--font-weight-semibold);
 		color: var(--color-text-primary);
+	}
+
+	.section-desc {
+		font-size: var(--text-xs);
+		color: var(--color-text-muted);
+		line-height: var(--leading-normal);
 	}
 </style>

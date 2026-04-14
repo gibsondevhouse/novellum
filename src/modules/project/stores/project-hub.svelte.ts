@@ -62,6 +62,7 @@ export async function submitCreate(data: {
 	logline?: string;
 	synopsis?: string;
 	targetWordCount?: number;
+	projectType?: 'novel' | 'story' | 'collection';
 }): Promise<void> {
 	creating = true;
 	createError = null;
@@ -75,6 +76,7 @@ export async function submitCreate(data: {
 			systemPrompt: '',
 			negativePrompt: '',
 			status: 'draft',
+			projectType: data.projectType ?? 'novel',
 		});
 		// active project store update removed as it's now reactively derived from URL
 		goto(`/projects/${project.id}`);

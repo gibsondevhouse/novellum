@@ -34,7 +34,8 @@ describe('project-repository', () => {
 		const data = {
 			title: 'Test Novel',
 			genre: 'Fantasy',
-			status: 'draft',
+			status: 'draft', projectType: 'novel' as 'novel',
+
 			logline: '',
 			synopsis: '',
 			targetWordCount: 80000,
@@ -55,7 +56,8 @@ describe('project-repository', () => {
 			id: 'p1',
 			title: 'Found',
 			genre: 'Sci-Fi',
-			status: 'draft',
+			status: 'draft', projectType: 'novel' as 'novel',
+
 			logline: '',
 			synopsis: '',
 			targetWordCount: 0,

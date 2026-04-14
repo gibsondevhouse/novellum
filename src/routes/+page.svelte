@@ -11,6 +11,8 @@
 	onMount(async () => {
 		await loadProjects();
 	});
+
+	const novels = $derived(getProjects().filter(p => p.projectType === 'novel' || !p.projectType));
 </script>
 
 <svelte:head>
@@ -34,7 +36,7 @@
 			<LibraryHeroCardSkeleton />
 			<LibraryHeroCardSkeleton />
 		</ul>
-	{:else if getProjects().length === 0}
+	{:else if novels.length === 0}
 		<div class="empty-state">
 			<div class="empty-text-block">
 				<h2 class="empty-title">The shelf is empty.</h2>
@@ -43,7 +45,7 @@
 		</div>
 	{:else}
 		<ul class="library-column" role="list" aria-label="Project library">
-			{#each getProjects() as project, i (project.id)}
+			{#each novels as project, i (project.id)}
 				<LibraryHeroCard {project} cardIndex={i} />
 			{/each}
 		</ul>

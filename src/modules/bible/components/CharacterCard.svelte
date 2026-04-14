@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Character } from '$lib/db/types.js';
+	import { GhostButton, DestructiveButton, SurfaceCard } from '$lib/components/ui/index.js';
 
 	let { character, onEdit, onDelete } = $props<{
 		character: Character;
@@ -10,7 +11,7 @@
 	let confirmDelete = $state(false);
 </script>
 
-<li class="char-card">
+<SurfaceCard class="char-card" element="li">
 	<div class="card-body">
 		<span class="char-name">{character.name}</span>
 		{#if character.role}
@@ -18,31 +19,25 @@
 		{/if}
 	</div>
 	<div class="card-actions">
-		<button class="btn-ghost btn-sm" onclick={() => onEdit(character)}>Edit</button>
+		<GhostButton onclick={() => onEdit(character)}>Edit</GhostButton>
 		{#if confirmDelete}
 			<span class="confirm-text">Delete?</span>
-			<button class="btn-danger btn-sm" onclick={() => onDelete(character.id)}>Yes</button>
-			<button class="btn-ghost btn-sm" onclick={() => (confirmDelete = false)}>No</button>
+			<DestructiveButton onclick={() => onDelete(character.id)}>Yes</DestructiveButton>
+			<GhostButton onclick={() => (confirmDelete = false)}>No</GhostButton>
 		{:else}
-			<button class="btn-ghost btn-sm" onclick={() => (confirmDelete = true)}>Delete</button>
+			<GhostButton onclick={() => (confirmDelete = true)}>Delete</GhostButton>
 		{/if}
 	</div>
-</li>
+</SurfaceCard>
 
 <style>
-	.char-card {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: var(--space-3) var(--space-4);
-		background-color: var(--color-surface-overlay);
-		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-md);
-		list-style: none;
-	}
-
-	.char-card:hover {
-		border-color: var(--color-border-strong);
+	:global(.char-card) {
+		display: flex !important;
+		flex-direction: row !important;
+		align-items: center !important;
+		justify-content: space-between !important;
+		padding: var(--space-3) var(--space-4) !important;
+		list-style: none !important;
 	}
 
 	.card-body {
@@ -72,31 +67,5 @@
 	.confirm-text {
 		font-size: var(--text-sm);
 		color: var(--color-warning);
-	}
-
-	.btn-sm {
-		padding: var(--space-1) var(--space-2);
-		font-size: var(--text-xs);
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--color-border-default);
-		background: none;
-		cursor: pointer;
-		color: var(--color-text-secondary);
-		transition: var(--transition-color), var(--transition-border);
-	}
-
-	.btn-sm:hover {
-		color: var(--color-text-primary);
-		border-color: var(--color-border-strong);
-	}
-
-	.btn-danger {
-		color: var(--color-error);
-		border-color: var(--color-error);
-	}
-
-	.btn-danger:hover {
-		background-color: var(--color-error);
-		color: var(--color-surface-base);
 	}
 </style>

@@ -26,13 +26,14 @@ export const POST: RequestHandler = async ({ request }) => {
 		status: '',
 		systemPrompt: '',
 		negativePrompt: '',
+		projectType: body.projectType || 'novel',
 		createdAt: now,
 		updatedAt: now,
 	};
 
 	db.prepare(
-		`INSERT INTO projects (id, title, coverUrl, genre, logline, synopsis, targetWordCount, status, systemPrompt, negativePrompt, createdAt, updatedAt)
-		 VALUES (@id, @title, @coverUrl, @genre, @logline, @synopsis, @targetWordCount, @status, @systemPrompt, @negativePrompt, @createdAt, @updatedAt)`,
+		`INSERT INTO projects (id, title, coverUrl, genre, logline, synopsis, targetWordCount, status, systemPrompt, negativePrompt, projectType, createdAt, updatedAt)
+		 VALUES (@id, @title, @coverUrl, @genre, @logline, @synopsis, @targetWordCount, @status, @systemPrompt, @negativePrompt, @projectType, @createdAt, @updatedAt)`,
 	).run(project);
 
 	return json(project, { status: 201 });

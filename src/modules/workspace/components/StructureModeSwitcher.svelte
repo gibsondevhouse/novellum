@@ -41,15 +41,15 @@
 <style>
 	.ps-mode-switcher {
 		display: flex;
-		gap: 2px;
+		gap: var(--space-1);
 		background: var(--color-surface-ground);
 		border: 1px solid var(--color-border-default);
 		border-radius: var(--radius-full);
-		padding: 3px;
+		padding: var(--space-1);
 	}
 
 	.mode-tab {
-		padding: 5px 14px;
+		padding: var(--space-1) var(--space-4);
 		border-radius: var(--radius-full);
 		background: none;
 		border: none;

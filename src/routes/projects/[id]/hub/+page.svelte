@@ -1,14 +1,32 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
+	import { getContext, tick } from 'svelte';
 	import type { Project } from '$lib/db/types.js';
 	import ProjectHubHero from '$modules/project/components/ProjectHubHero.svelte';
 	import StructuralMetricsCarousel from '$modules/project/components/StructuralMetricsCarousel.svelte';
+	import { SurfacePanel, SectionHeader, PrimaryButton, GhostButton, Input } from '$lib/components/ui/index.js';
+	import { submitUpdate } from '$modules/project/stores/project-hub.svelte.js';
 
 	let { data } = $props<{ data: { project: Project; currentWordCount: number } }>();
 
 	const { openExport, openDelete } = getContext<{ openExport: () => void; openDelete: () => void }>(
 		'projectActions',
 	);
+
+	let editingTarget = $state(false);
+
+	async function startEditTarget() {
+		targetValue = project.targetWordCount;
+		editingTarget = true;
+		await tick();
+		const el = document.querySelector<HTMLInputElement>('.target-input input');
+		el?.focus();
+	}
+
+	async function confirmTarget() {
+		await submitUpdate(project.id, { targetWordCount: Number(targetValue) });
+		editingTarget = false;
+	}
+	let targetValue = $state(0);
 
 	const project = $derived(data.project);
 	const hasProgress = $derived(data.currentWordCount > 0);
@@ -39,8 +57,8 @@
 
 	<!-- Hero utility actions -->
 	<div class="hub-hero-actions">
-		<button class="hub-util-btn" onclick={openExport}>Export</button>
-		<button class="hub-util-btn hub-util-btn--danger" onclick={openDelete}>Delete</button>
+		<GhostButton onclick={openExport}>Export</GhostButton>
+		<GhostButton onclick={openDelete} class="hub-util-btn--danger">Delete</GhostButton>
 	</div>
 
 	<!-- Layer 2: Structural Metrics -->
@@ -96,25 +114,55 @@
 		</a>
 
 		<!-- Details card -->
-		<section class="hub-card hub-card--wide" aria-labelledby="mod-details">
-			<span class="hub-card__label" id="mod-details">Details</span>
+		<SurfacePanel class="hub-card hub-card--wide">
+			<SectionHeader title="Details" />
 			<dl class="details-list">
 				<div class="details-row">
 					<dt class="details-key">Status</dt>
-					<dd class="details-val">{project.status}</dd>
+					<dd class="details-val">
+						<select
+							value={project.status}
+							onchange={(e) => submitUpdate(project.id, { status: e.currentTarget.value as any })}
+							class="details-select"
+						>
+							<option value="draft">Drafting</option>
+							<option value="revision">In Revision</option>
+							<option value="completed">Completed</option>
+							<option value="archived">Archived</option>
+						</select>
+					</dd>
 				</div>
 				<div class="details-row">
 					<dt class="details-key">Created</dt>
 					<dd class="details-val">{formatDate(project.createdAt)}</dd>
 				</div>
-				{#if hasTarget}
-					<div class="details-row">
-						<dt class="details-key">Target</dt>
-						<dd class="details-val">{formatWords(project.targetWordCount)} words</dd>
-					</div>
-				{/if}
+				<div class="details-row">
+					<dt class="details-key">Target Word Count</dt>
+					<dd class="details-val">
+						{#if editingTarget}
+							<div class="target-edit">
+								<Input
+									type="number"
+									bind:value={targetValue as any}
+									min="0"
+									step="1000"
+									class="target-input"
+									onkeydown={(e) => {
+										if (e.key === 'Enter') confirmTarget();
+										if (e.key === 'Escape') editingTarget = false;
+									}}
+								/>
+								<PrimaryButton onclick={confirmTarget} class="target-btn">Save</PrimaryButton>
+							</div>
+						{:else}
+							<button class="details-val-btn" onclick={startEditTarget}>
+								{hasTarget ? `${formatWords(project.targetWordCount)} words` : 'Set target'}
+							</button>
+						{/if}
+					</dd>
+				</div>
 			</dl>
-		</section>
+		</SurfacePanel>
 	</div>
 </div>
 
@@ -136,30 +184,9 @@
 		gap: var(--space-2);
 		margin-top: calc(-1 * var(--space-3));
 	}
-	.hub-util-btn {
-		background: none;
-		border: none;
-		font-size: var(--text-xs);
-		color: var(--color-text-muted);
-		cursor: pointer;
-		padding: var(--space-1) var(--space-2);
-		border-radius: var(--radius-sm);
-		opacity: 0.6;
-		transition:
-			color var(--duration-base) var(--ease-standard),
-			opacity var(--duration-base) var(--ease-standard);
-	}
-	.hub-util-btn:hover {
-		opacity: 1;
-		color: var(--color-text-secondary);
-	}
-	.hub-util-btn:focus-visible {
-		outline: none;
-		box-shadow: var(--focus-ring);
-		opacity: 1;
-	}
-	.hub-util-btn--danger:hover {
-		color: var(--color-error);
+	:global(.hub-util-btn--danger:hover) {
+		color: var(--color-error) !important;
+		border-color: var(--color-error) !important;
 	}
 
 	/* ── Dashboard grid (rows 2+) ── */
@@ -170,17 +197,14 @@
 	}
 
 	/* ── Shared card chrome ── */
-	.hub-card {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-2);
-		padding: var(--space-6);
-		background: var(--color-surface-overlay);
-		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-lg);
+	:global(.hub-card) {
+		display: flex !important;
+		flex-direction: column !important;
+		gap: var(--space-2) !important;
+		padding: var(--space-6) !important;
 	}
-	.hub-card--wide {
-		grid-column: span 2;
+	:global(.hub-card--wide) {
+		grid-column: span 2 !important;
 	}
 	.hub-card__label {
 		font-family: var(--font-sans);
@@ -262,7 +286,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0;
-		margin: var(--space-2) 0 0;
+		margin: 0;
 		padding: 0;
 	}
 	.details-row {
@@ -284,8 +308,54 @@
 	.details-val {
 		font-size: var(--text-xs);
 		color: var(--color-text-secondary);
-		text-transform: capitalize;
 		text-align: right;
+	}
+
+	.details-select {
+		background: none;
+		border: none;
+		color: var(--color-text-secondary);
+		font-size: var(--text-xs);
+		font-family: inherit;
+		cursor: pointer;
+		padding: var(--space-1) var(--space-2);
+		border-radius: var(--radius-sm);
+		transition: background-color var(--duration-base) var(--ease-standard);
+	}
+
+	.details-select:hover {
+		background: var(--color-surface-hover);
+	}
+
+	.details-val-btn {
+		background: none;
+		border: none;
+		color: var(--color-text-secondary);
+		font-size: var(--text-xs);
+		font-family: inherit;
+		cursor: pointer;
+		padding: var(--space-1) var(--space-2);
+		border-radius: var(--radius-sm);
+		transition: background-color var(--duration-base) var(--ease-standard);
+	}
+
+	.details-val-btn:hover {
+		background: var(--color-surface-hover);
+	}
+
+	.target-edit {
+		display: flex;
+		gap: var(--space-2);
+		align-items: center;
+	}
+
+	:global(.target-input) {
+		width: 120px !important;
+	}
+
+	:global(.target-btn) {
+		padding: var(--space-1) var(--space-2) !important;
+		font-size: var(--text-xs) !important;
 	}
 
 	/* ── Responsive ── */
@@ -301,8 +371,8 @@
 		.hub-grid {
 			grid-template-columns: 1fr;
 		}
-		.hub-card--wide {
-			grid-column: span 1;
+		:global(.hub-card--wide) {
+			grid-column: span 1 !important;
 		}
 	}
 </style>
