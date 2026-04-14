@@ -1,14 +1,10 @@
 <script lang="ts">
-	import { db } from '$lib/db';
 	import type { Scene } from '$lib/db';
 	import AiPanel from '$lib/components/AiPanel.svelte';
 	import { pushState } from '$app/navigation';
 	import { page } from '$app/state';
-	import { requestSuggestion, toggleAiPanel, aiIsOpen } from '$lib/stores/ai';
-	import {
-		getActiveSceneId,
-		setActiveScene,
-	} from '../../../../modules/editor/stores/editor.svelte.ts';
+	import { aiPanel } from '$lib/stores/ai-panel.svelte';
+	import { editorState } from '../../../../modules/editor/stores/editor.svelte.ts';
 	import * as autosaveService from '$modules/editor/services/autosave-service.js';
 
 	let { data } = $props<{ data: { scenes: Scene[] } }>();
@@ -17,13 +13,13 @@
 	let currentSceneId = $state<string | null>(null);
 
 	$effect(() => {
-		if (data.scenes.length > 0 && getActiveSceneId() === null) {
-			setActiveScene(data.scenes[0].id);
+		if (data.scenes.length > 0 && editorState.activeSceneId === null) {
+			editorState.setActiveSceneId(data.scenes[0].id);
 		}
 	});
 
 	$effect(() => {
-		const sceneId = getActiveSceneId();
+		const sceneId = editorState.activeSceneId;
 		const scene = data.scenes.find((s: Scene) => s.id === sceneId);
 		if (scene && sceneId !== currentSceneId) {
 			if (currentSceneId) autosaveService.flushNow();
@@ -41,7 +37,7 @@
 	});
 
 	function handleContentInput() {
-		const sceneId = getActiveSceneId();
+		const sceneId = editorState.activeSceneId;
 		if (!sceneId) return;
 		const scene = data.scenes.find((s: Scene) => s.id === sceneId);
 		if (scene) {
@@ -52,17 +48,17 @@
 
 	// Close AI panel when user navigates back via browser history
 	$effect(() => {
-		if (!page.state?.aiPanelOpen && $aiIsOpen) {
-			aiIsOpen.set(false);
+		if (!page.state?.aiPanelOpen && aiPanel.isOpen) {
+			aiPanel.isOpen = false;
 		}
 	});
 
 	async function handleAccept(text: string) {
-		const sceneId = getActiveSceneId();
+		const sceneId = editorState.activeSceneId;
 		if (!sceneId) return;
 		const updated = activeContent + '\n\n' + text;
 		activeContent = updated;
-		
+
 		const scene = data.scenes.find((s: Scene) => s.id === sceneId);
 		if (scene) {
 			scene.content = updated;
@@ -71,15 +67,15 @@
 	}
 
 	function handleAskAi() {
-		if (!$aiIsOpen) {
+		if (!aiPanel.isOpen) {
 			// Shallow-route: push history entry so browser back closes the panel
 			pushState('', { ...page.state, aiPanelOpen: true });
-			toggleAiPanel();
+			aiPanel.toggle();
 		}
 		const prompt = activeContent
 			? `Continue this scene naturally:\n\n${activeContent.slice(-500)}`
 			: 'Help me start a new scene.';
-		requestSuggestion(prompt);
+		aiPanel.requestSuggestion(prompt);
 	}
 </script>
 
@@ -87,7 +83,7 @@
 	<title>Editor — Novellum</title>
 </svelte:head>
 
-<div class="editor-page" class:ai-open={$aiIsOpen}>
+<div class="editor-page" class:ai-open={aiPanel.isOpen}>
 	<!-- Document list (left panel) -->
 	<aside class="doc-list">
 		<div class="doc-list-header">
@@ -101,9 +97,9 @@
 					<li>
 						<button
 							class="scene-item"
-							class:active={getActiveSceneId() === scene.id}
+							class:active={editorState.activeSceneId === scene.id}
 							onclick={() => {
-								setActiveScene(scene.id);
+								editorState.setActiveSceneId(scene.id);
 							}}
 						>
 							{scene.title}
@@ -126,9 +122,9 @@
 				<p>No scenes yet — add one from the Outline.</p>
 			</div>
 		{:else}
-			<textarea 
-				class="editor-textarea" 
-				bind:value={activeContent} 
+			<textarea
+				class="editor-textarea"
+				bind:value={activeContent}
 				oninput={handleContentInput}
 				placeholder="Start writing..."
 			></textarea>

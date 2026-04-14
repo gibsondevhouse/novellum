@@ -1,66 +1,34 @@
 import type { Scene } from '$lib/db/types.js';
 
-// Svelte 5 rune store for Editor module
-let activeProjectId: string | null = $state(null);
-let activeChapterId: string | null = $state(null);
-let activeSceneId: string | null = $state(null);
-let activeBeatId: string | null = $state(null);
-let isLoading: boolean = $state(false);
+class EditorStore {
+	activeProjectId: string | null = $state(null);
+	activeChapterId: string | null = $state(null);
+	activeSceneId: string | null = $state(null);
+	activeBeatId: string | null = $state(null);
+	isLoading: boolean = $state(false);
 
-// Full scene object and pending editor content
-let activeScene: Scene | null = $state(null);
-let pendingText: string = $state('');
+	activeScene: Scene | null = $state(null);
+	pendingText: string = $state('');
 
-const hasActiveScene = $derived(activeSceneId !== null);
+	get hasActiveScene() {
+		return this.activeSceneId !== null;
+	}
 
-export function setActiveScene(sceneId: string | null): void {
-	activeSceneId = sceneId;
-}
-export function setActiveBeat(beatId: string | null): void {
-	activeBeatId = beatId;
-}
-export function setActiveProject(projectId: string | null): void {
-	activeProjectId = projectId;
-}
-export function setActiveChapter(chapterId: string | null): void {
-	activeChapterId = chapterId;
-}
-export function setLoading(v: boolean): void {
-	isLoading = v;
-}
+	setActiveSceneId(sceneId: string | null): void {
+		this.activeSceneId = sceneId;
+	}
 
-export function getActiveSceneId() {
-	return activeSceneId;
-}
-export function getActiveProjectId() {
-	return activeProjectId;
-}
-export function getActiveChapterId() {
-	return activeChapterId;
-}
-export function getActiveBeatId() {
-	return activeBeatId;
-}
-export function getIsLoading() {
-	return isLoading;
-}
-export function getHasActiveScene() {
-	return hasActiveScene;
+	setActiveScene(scene: Scene | null): void {
+		if (scene) {
+			this.activeScene = scene;
+			this.activeSceneId = scene.id;
+			this.pendingText = scene.content ?? '';
+		} else {
+			this.activeScene = null;
+			this.activeSceneId = null;
+			this.pendingText = '';
+		}
+	}
 }
 
-export const editorStore = {
-	get activeScene() {
-		return activeScene;
-	},
-	get pendingText() {
-		return pendingText;
-	},
-	setActiveScene(scene: Scene): void {
-		activeScene = scene;
-		activeSceneId = scene.id;
-		pendingText = scene.content ?? '';
-	},
-	setPendingText(text: string): void {
-		pendingText = text;
-	},
-};
+export const editorState = new EditorStore();

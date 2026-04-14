@@ -1,7 +1,7 @@
 <script lang="ts">
 	import DocumentEditorFrame from '$modules/editor/components/DocumentEditorFrame.svelte';
 	import VersionHistoryPanel from '$modules/editor/components/VersionHistoryPanel.svelte';
-	import { editorStore } from '$modules/editor/stores/editor.svelte.js';
+	import { editorState } from '$modules/editor/stores/editor.svelte.js';
 	import * as autosaveService from '$modules/editor/services/autosave-service.js';
 
 	let { data } = $props();
@@ -10,20 +10,20 @@
 	let showHistory = $state(false);
 
 	$effect(() => {
-		editorStore.setActiveScene(data.scene);
+		editorState.setActiveScene(data.scene);
 		autosaveService.mount(data.scene.id, data.scene.projectId, (s) => (saveStatus = s));
 		return () => autosaveService.unmount();
 	});
 
 	$effect(() => {
-		const text = editorStore.pendingText;
+		const text = editorState.pendingText;
 		if (text !== (data.scene.content ?? '')) {
 			autosaveService.schedule(text);
 		}
 	});
 
 	function handleRestore(text: string) {
-		editorStore.setPendingText(text);
+		editorState.pendingText = text;
 		autosaveService.flushNow();
 		showHistory = false;
 	}
@@ -53,14 +53,14 @@
 	<div class="editor-body">
 		<DocumentEditorFrame
 			initialContent={data.scene.content ?? ''}
-			onContentChange={(html) => editorStore.setPendingText(html)}
+			onContentChange={(html) => editorState.pendingText = html}
 		/>
 
 		{#if showHistory}
 			<VersionHistoryPanel
 				sceneId={data.scene.id}
 				projectId={data.scene.projectId}
-				currentText={editorStore.pendingText}
+				currentText={editorState.pendingText}
 				onRestore={handleRestore}
 				onClose={() => (showHistory = false)}
 			/>

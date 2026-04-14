@@ -16,8 +16,17 @@
 			return;
 		}
 		titleError = '';
-		const parsedGenre = genre.split(',').map((g) => g.trim()).filter(Boolean);
-		await submitCreate({ title: title.trim(), genre: parsedGenre, logline, synopsis, targetWordCount });
+		const parsedGenre = genre
+			.split(',')
+			.map((g) => g.trim())
+			.filter(Boolean);
+		await submitCreate({
+			title: title.trim(),
+			genre: parsedGenre,
+			logline,
+			synopsis,
+			targetWordCount,
+		});
 	}
 </script>
 
@@ -119,5 +128,4 @@
 	.form-title {
 		margin-bottom: var(--space-6);
 	}
-
 </style>

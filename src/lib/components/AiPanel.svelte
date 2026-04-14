@@ -1,15 +1,5 @@
 <script lang="ts">
-	import {
-		aiIsOpen,
-		aiIsLoading,
-		aiSuggestion,
-		aiError,
-		toggleAiPanel,
-		rejectSuggestion,
-		requestSuggestion,
-		aiLastPrompt,
-	} from '$lib/stores/ai';
-	import { get } from 'svelte/store';
+	import { aiPanel } from '$lib/stores/ai-panel.svelte';
 	import { tick } from 'svelte';
 
 	let { onAccept }: { onAccept?: (text: string) => void } = $props();
@@ -19,21 +9,21 @@
 	let triggerEl: HTMLElement | null = null;
 
 	function handleAccept() {
-		const text = get(aiSuggestion);
+		const text = aiPanel.suggestion;
 		if (text && onAccept) {
 			onAccept(text);
-			aiSuggestion.set(null);
-			aiIsOpen.set(false);
+			aiPanel.suggestion = null;
+			aiPanel.isOpen = false;
 		}
 	}
 
 	function handleReject() {
-		rejectSuggestion();
+		aiPanel.rejectSuggestion();
 	}
 
 	async function handleRegenerate() {
-		const prompt = get(aiLastPrompt);
-		if (prompt) await requestSuggestion(prompt);
+		const prompt = aiPanel.lastPrompt;
+		if (prompt) await aiPanel.requestSuggestion(prompt);
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -58,7 +48,7 @@
 
 	// Move focus into panel when opened; return focus to trigger when closed
 	$effect(() => {
-		if ($aiIsOpen) {
+		if (aiPanel.isOpen) {
 			triggerEl = document.activeElement as HTMLElement;
 			tick().then(() => closeButtonEl?.focus());
 		} else if (triggerEl) {
@@ -70,15 +60,15 @@
 	});
 </script>
 
-<svelte:window on:keydown={handleKeydown} />
+<svelte:window onkeydown={handleKeydown} />
 
-{#if $aiIsOpen}
+{#if aiPanel.isOpen}
 	<aside class="ai-panel" aria-label="AI Assistant" bind:this={panelEl}>
 		<div class="panel-header">
 			<span class="panel-title" id="ai-panel-heading">AI Assistant</span>
 			<button
 				class="btn-close"
-				onclick={toggleAiPanel}
+				onclick={() => aiPanel.toggle()}
 				aria-label="Close AI panel"
 				bind:this={closeButtonEl}>✕</button
 			>
@@ -90,18 +80,18 @@
 			aria-atomic="false"
 			aria-labelledby="ai-panel-heading"
 		>
-			{#if $aiIsLoading}
+			{#if aiPanel.isLoading}
 				<div class="loading" role="status" aria-label="AI is generating a suggestion">
 					<span class="spinner" aria-hidden="true"></span>
 					<span>Generating...</span>
 				</div>
-			{:else if $aiError}
+			{:else if aiPanel.error}
 				<div class="error-message" role="alert">
-					<p>{$aiError}</p>
+					<p>{aiPanel.error}</p>
 				</div>
-			{:else if $aiSuggestion}
+			{:else if aiPanel.suggestion}
 				<div class="suggestion">
-					<p class="suggestion-text">{$aiSuggestion}</p>
+					<p class="suggestion-text">{aiPanel.suggestion}</p>
 				</div>
 				<div class="action-row">
 					<button class="btn-accept" onclick={handleAccept}>Accept <kbd>⌘↩</kbd></button>

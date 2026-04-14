@@ -1,7 +1,11 @@
 <script lang="ts">
-	let { chapterCount, sceneCount } = $props<{
+	import type { PacingMetrics } from '$modules/outliner/services/pacing-telemetry.js';
+	import PacingSignal from './PacingSignal.svelte';
+
+	let { chapterCount, sceneCount, metrics } = $props<{
 		chapterCount: number;
 		sceneCount: number;
+		metrics?: PacingMetrics;
 	}>();
 </script>
 
@@ -10,6 +14,13 @@
 		<span class="header-label">Structure</span>
 		{#if chapterCount > 0}
 			<div class="stats" role="status" aria-live="polite">
+				{#if metrics && metrics.actCount > 0}
+					<span class="stat">
+						<strong>{metrics.actCount}</strong>
+						{metrics.actCount === 1 ? 'act' : 'acts'}
+					</span>
+					<span class="sep" aria-hidden="true">·</span>
+				{/if}
 				<span class="stat">
 					<strong>{chapterCount}</strong>
 					{chapterCount === 1 ? 'chapter' : 'chapters'}
@@ -19,6 +30,15 @@
 					<strong>{sceneCount}</strong>
 					{sceneCount === 1 ? 'scene' : 'scenes'}
 				</span>
+				{#if metrics && metrics.sparsity !== 'healthy'}
+					<span class="sep" aria-hidden="true">·</span>
+					<PacingSignal
+						sparsity={metrics.sparsity}
+						label={metrics.sparsity === 'very-sparse'
+							? 'Very sparse — consider adding scenes'
+							: 'Sparse — chapters could use more scenes'}
+					/>
+				{/if}
 			</div>
 		{:else}
 			<span class="stat stat--empty" role="status">No chapters yet</span>

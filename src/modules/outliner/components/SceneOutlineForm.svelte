@@ -3,15 +3,14 @@
 	import { untrack } from 'svelte';
 	import { updateScene } from '$modules/editor/services/scene-repository.js';
 	import StructuredSection from '$lib/components/planning/StructuredSection.svelte';
+	import ArcTagHint from './ArcTagHint.svelte';
 
-	let {
-		scene,
-		onUpdate,
-	} = $props<{
+	let { scene, onUpdate } = $props<{
 		scene: Scene;
 		onUpdate: (id: string, data: Partial<Omit<Scene, 'id' | 'createdAt'>>) => void;
 	}>();
 
+	// eslint-disable-next-line svelte/prefer-writable-derived
 	let summary = $state(untrack(() => scene.summary));
 
 	const goalKey = $derived(`novellum_outline_scene_goal_${scene.id}`);
@@ -44,27 +43,35 @@
 	}
 
 	function saveGoal() {
-		goal.trim()
-			? localStorage.setItem(goalKey, goal)
-			: localStorage.removeItem(goalKey);
+		if (goal.trim()) {
+			localStorage.setItem(goalKey, goal);
+		} else {
+			localStorage.removeItem(goalKey);
+		}
 	}
 
 	function saveConflict() {
-		conflict.trim()
-			? localStorage.setItem(conflictKey, conflict)
-			: localStorage.removeItem(conflictKey);
+		if (conflict.trim()) {
+			localStorage.setItem(conflictKey, conflict);
+		} else {
+			localStorage.removeItem(conflictKey);
+		}
 	}
 
 	function saveOutcome() {
-		outcome.trim()
-			? localStorage.setItem(outcomeKey, outcome)
-			: localStorage.removeItem(outcomeKey);
+		if (outcome.trim()) {
+			localStorage.setItem(outcomeKey, outcome);
+		} else {
+			localStorage.removeItem(outcomeKey);
+		}
 	}
 
 	function saveNotes() {
-		notes.trim()
-			? localStorage.setItem(notesKey, notes)
-			: localStorage.removeItem(notesKey);
+		if (notes.trim()) {
+			localStorage.setItem(notesKey, notes);
+		} else {
+			localStorage.removeItem(notesKey);
+		}
 	}
 </script>
 
@@ -72,7 +79,9 @@
 	<!-- Panel context bar -->
 	<div class="planning-context">
 		<span class="planning-context-label">Intent</span>
-		<span class="planning-context-desc">What does this scene accomplish, and how does it move the story forward?</span>
+		<span class="planning-context-desc"
+			>What does this scene accomplish, and how does it move the story forward?</span
+		>
 	</div>
 
 	<!-- Summary: primary field -->
@@ -146,4 +155,7 @@
 			></textarea>
 		</div>
 	</StructuredSection>
+
+	<!-- Arc tags -->
+	<ArcTagHint arcRefs={scene.arcRefs} />
 </div>

@@ -1,0 +1,82 @@
+<script lang="ts">
+	import { page } from '$app/stores';
+</script>
+
+<div class="coming-soon">
+	<div class="coming-soon__content">
+		<span class="coming-soon__eyebrow">Arc Dashboard</span>
+		<h1 class="coming-soon__heading">Coming Soon</h1>
+		<p class="coming-soon__body">The arc development workspace is being built. Check back soon.</p>
+		<a class="coming-soon__back" href="/projects/{$page.params.id}/workspace">
+			← Back to Workspace
+		</a>
+	</div>
+</div>
+
+<style>
+	.coming-soon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 60vh;
+		padding: var(--space-8);
+	}
+
+	.coming-soon__content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--space-4);
+		text-align: center;
+		max-width: 420px;
+	}
+
+	.coming-soon__eyebrow {
+		font-family: var(--font-sans);
+		font-size: var(--text-xs);
+		font-weight: var(--font-weight-semibold);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-widest);
+		color: var(--color-nova-blue);
+		opacity: 0.7;
+	}
+
+	.coming-soon__heading {
+		font-family: var(--font-display);
+		font-size: var(--text-3xl);
+		font-weight: var(--font-weight-normal);
+		color: var(--color-text-primary);
+		letter-spacing: var(--tracking-tight);
+		margin: 0;
+	}
+
+	.coming-soon__body {
+		font-size: var(--text-sm);
+		color: var(--color-text-muted);
+		line-height: var(--leading-relaxed);
+		margin: 0;
+	}
+
+	.coming-soon__back {
+		font-size: var(--text-sm);
+		color: var(--color-text-secondary);
+		text-decoration: none;
+		padding: var(--space-2) var(--space-4);
+		border: 1px solid var(--color-border-default);
+		border-radius: var(--radius-md);
+		transition:
+			color var(--duration-fast) var(--ease-standard),
+			border-color var(--duration-fast) var(--ease-standard);
+		margin-top: var(--space-2);
+	}
+
+	.coming-soon__back:hover {
+		color: var(--color-text-primary);
+		border-color: var(--color-border-strong);
+	}
+
+	.coming-soon__back:focus-visible {
+		outline: none;
+		box-shadow: var(--focus-ring);
+	}
+</style>

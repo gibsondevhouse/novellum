@@ -140,12 +140,10 @@
 				{:else}
 					<SceneOutlineForm scene={selection.scene} onUpdate={onSceneUpdate} />
 				{/if}
+			{:else if selection.type === 'chapter'}
+				<ChapterOutlinePanel chapter={selection.chapter} onBeatSelect={openBeat} />
 			{:else}
-				{#if selection.type === 'chapter'}
-					<ChapterOutlinePanel chapter={selection.chapter} onBeatSelect={openBeat} />
-				{:else}
-					<SceneOutlinePanel scene={selection.scene} onBeatSelect={openBeat} />
-				{/if}
+				<SceneOutlinePanel scene={selection.scene} onBeatSelect={openBeat} />
 			{/if}
 		</div>
 	</PlanningSurfaceBody>
@@ -299,7 +297,9 @@
 		border-radius: var(--radius-sm);
 		line-height: 1;
 		flex-shrink: 0;
-		transition: color 0.1s, background 0.1s;
+		transition:
+			color 0.1s,
+			background 0.1s;
 	}
 
 	.beat-focus-close:hover {
@@ -332,7 +332,9 @@
 		font-family: inherit;
 		line-height: var(--leading-relaxed);
 		resize: vertical;
-		transition: border-color 0.15s, background 0.15s;
+		transition:
+			border-color 0.15s,
+			background 0.15s;
 	}
 
 	.beat-content-textarea:focus {
@@ -372,7 +374,9 @@
 		font-family: inherit;
 		line-height: var(--leading-relaxed);
 		resize: vertical;
-		transition: border-color 0.15s, background 0.15s;
+		transition:
+			border-color 0.15s,
+			background 0.15s;
 	}
 
 	.beat-notes-textarea:focus {

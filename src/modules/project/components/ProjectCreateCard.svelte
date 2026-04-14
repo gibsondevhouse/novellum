@@ -47,7 +47,11 @@
 	}
 
 	function handleCancel() {
-		try { sessionStorage.removeItem('novellum:create-draft'); } catch { /* ignore */ }
+		try {
+			sessionStorage.removeItem('novellum:create-draft');
+		} catch {
+			/* ignore */
+		}
 		oncancel();
 	}
 
@@ -64,16 +68,15 @@
 			targetWordCount: draft.targetWordCount ?? undefined,
 		});
 
-		try { sessionStorage.removeItem('novellum:create-draft'); } catch { /* ignore */ }
+		try {
+			sessionStorage.removeItem('novellum:create-draft');
+		} catch {
+			/* ignore */
+		}
 	}
 </script>
 
-<div
-	class="overlay"
-	role="dialog"
-	aria-modal="true"
-	aria-labelledby="create-dialog-title"
->
+<div class="overlay" role="dialog" aria-modal="true" aria-labelledby="create-dialog-title">
 	<!-- Backdrop dismiss -->
 	<button class="backdrop" tabindex="-1" aria-hidden="true" onclick={handleCancel}></button>
 
@@ -81,29 +84,17 @@
 		<!-- Header -->
 		<div class="card-header">
 			<h2 class="card-title" id="create-dialog-title">New Project</h2>
-			<button
-				type="button"
-				class="btn-close"
-				onclick={handleCancel}
-				aria-label="Close"
-			>✕</button>
+			<button type="button" class="btn-close" onclick={handleCancel} aria-label="Close">✕</button>
 		</div>
 
 		<!-- Form -->
-		<form
-			class="card-body"
-			onsubmit={handleSubmit}
-			novalidate
-		>
+		<form class="card-body" onsubmit={handleSubmit} novalidate>
 			<!-- ── Section: Core ─────────────────────────────────────── -->
 			<section class="form-section" aria-label="Core identity">
 				<header class="section-header">
 					<span class="section-label">Your Story</span>
 				</header>
-				<ProjectCoreFields
-					{draft}
-					onchange={patchDraft}
-				/>
+				<ProjectCoreFields {draft} onchange={patchDraft} />
 				{#if titleError}
 					<p class="error-text" role="alert">{titleError}</p>
 				{/if}
@@ -111,10 +102,7 @@
 
 			<!-- ── Section: Story ───────────────────────────────────── -->
 			{#if showStory}
-				<section
-					class="form-section story-section"
-					aria-label="Story intent"
-				>
+				<section class="form-section story-section" aria-label="Story intent">
 					<header class="section-header">
 						<span class="section-label">Story</span>
 					</header>
@@ -156,11 +144,7 @@
 				<button type="button" class="btn-ghost" onclick={handleCancel} disabled={getCreating()}>
 					Cancel
 				</button>
-				<button
-					type="submit"
-					class="btn-primary"
-					disabled={!canSubmit}
-				>
+				<button type="submit" class="btn-primary" disabled={!canSubmit}>
 					{getCreating() ? 'Creating…' : 'Start Writing'}
 				</button>
 			</div>

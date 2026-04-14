@@ -1,18 +1,9 @@
-let activeProjectId: string | null = $state(null);
-let activeProjectName: string | null = $state(null);
+import { page } from '$app/state';
 
-export function getActiveProjectId() {
-	return activeProjectId;
-}
-export function getActiveProjectName() {
-	return activeProjectName;
+class ActiveProjectStore {
+	get id(): string | null {
+		return page.params.id ?? null;
+	}
 }
 
-export function setActiveProject(id: string, name: string): void {
-	activeProjectId = id;
-	activeProjectName = name;
-}
-export function clearActiveProject(): void {
-	activeProjectId = null;
-	activeProjectName = null;
-}
+export const activeProject = new ActiveProjectStore();

@@ -23,6 +23,7 @@
 	let exportError = $state<string | null>(null);
 
 	const isMarkdown = $derived(format === 'markdown');
+	const isBackup = $derived(format === 'backup_zip');
 
 	$effect(() => {
 		if (open) {
@@ -127,7 +128,7 @@
 					<div class="field-group">
 						<span class="field-label">Format</span>
 						<div class="format-tabs" role="radiogroup" aria-label="Export format">
-							{#each ['markdown', 'docx', 'epub'] as fmt (fmt)}
+							{#each ['markdown', 'docx', 'epub', 'backup_zip'] as fmt (fmt)}
 								<button
 									role="radio"
 									aria-checked={format === fmt}
@@ -137,82 +138,101 @@
 										format = fmt as ExportFormat;
 									}}
 								>
-									{fmt === 'markdown' ? 'Markdown' : fmt === 'docx' ? 'DOCX' : 'EPUB'}
+									{fmt === 'markdown'
+										? 'Markdown'
+										: fmt === 'docx'
+											? 'DOCX'
+											: fmt === 'epub'
+												? 'EPUB'
+												: 'Backup ZIP'}
 								</button>
 							{/each}
 						</div>
 					</div>
 
-					<div class="field-group">
-						<label class="field-label field-label--inline">
+					{#if isBackup}
+						<div class="backup-hint">
+							<p class="backup-hint-title">Portable Backup</p>
+							<p class="backup-hint-text">
+								Export a complete snapshot of this project including all story data, characters,
+								locations, and planning notes. Use this to restore your project in another browser
+								or as a safety backup.
+							</p>
+						</div>
+					{/if}
+
+					{#if !isBackup}
+						<div class="field-group">
+							<label class="field-label field-label--inline">
+								<input
+									type="checkbox"
+									checked={settings.titlePage}
+									onchange={handleTitlePageChange}
+								/>
+								Title Page
+							</label>
+						</div>
+
+						<div class="field-group">
+							<label class="field-label" for="chapter-style">Chapter Style</label>
+							<select
+								id="chapter-style"
+								class="field-select"
+								value={settings.chapterStyle}
+								onchange={handleChapterStyleChange}
+							>
+								<option value="heading">Heading text</option>
+								<option value="chapter_number">Chapter number</option>
+								<option value="both">Both</option>
+							</select>
+						</div>
+
+						<div class="field-group">
+							<label class="field-label" for="font-family">Font Family</label>
+							<select
+								id="font-family"
+								class="field-select"
+								value={settings.fontFamily}
+								disabled={isMarkdown}
+								onchange={handleFontFamilyChange}
+							>
+								<option value="Georgia">Georgia</option>
+								<option value="Times New Roman">Times New Roman</option>
+								<option value="Arial">Arial</option>
+								<option value="Courier New">Courier New</option>
+							</select>
+						</div>
+
+						<div class="field-group">
+							<label class="field-label" for="font-size">Font Size (pt)</label>
 							<input
-								type="checkbox"
-								checked={settings.titlePage}
-								onchange={handleTitlePageChange}
+								id="font-size"
+								type="number"
+								class="field-input"
+								min="10"
+								max="18"
+								value={settings.fontSize}
+								disabled={isMarkdown}
+								onchange={handleFontSizeChange}
 							/>
-							Title Page
-						</label>
-					</div>
+						</div>
 
-					<div class="field-group">
-						<label class="field-label" for="chapter-style">Chapter Style</label>
-						<select
-							id="chapter-style"
-							class="field-select"
-							value={settings.chapterStyle}
-							onchange={handleChapterStyleChange}
-						>
-							<option value="heading">Heading text</option>
-							<option value="chapter_number">Chapter number</option>
-							<option value="both">Both</option>
-						</select>
-					</div>
-
-					<div class="field-group">
-						<label class="field-label" for="font-family">Font Family</label>
-						<select
-							id="font-family"
-							class="field-select"
-							value={settings.fontFamily}
-							disabled={isMarkdown}
-							onchange={handleFontFamilyChange}
-						>
-							<option value="Georgia">Georgia</option>
-							<option value="Times New Roman">Times New Roman</option>
-							<option value="Arial">Arial</option>
-							<option value="Courier New">Courier New</option>
-						</select>
-					</div>
-
-					<div class="field-group">
-						<label class="field-label" for="font-size">Font Size (pt)</label>
-						<input
-							id="font-size"
-							type="number"
-							class="field-input"
-							min="10"
-							max="18"
-							value={settings.fontSize}
-							disabled={isMarkdown}
-							onchange={handleFontSizeChange}
-						/>
-					</div>
-
-					<div class="field-group">
-						<label class="field-label" for="line-spacing">Line Spacing</label>
-						<select
-							id="line-spacing"
-							class="field-select"
-							value={String(settings.lineSpacing)}
-							disabled={isMarkdown}
-							onchange={handleLineSpacingChange}
-						>
-							<option value="1">1.0</option>
-							<option value="1.15">1.15</option>
-							<option value="1.5">1.5</option>
-							<option value="2">2.0</option>
-						</select>
-					</div>
+						<div class="field-group">
+							<label class="field-label" for="line-spacing">Line Spacing</label>
+							<select
+								id="line-spacing"
+								class="field-select"
+								value={String(settings.lineSpacing)}
+								disabled={isMarkdown}
+								onchange={handleLineSpacingChange}
+							>
+								<option value="1">1.0</option>
+								<option value="1.15">1.15</option>
+								<option value="1.5">1.5</option>
+								<option value="2">2.0</option>
+							</select>
+						</div>
+					{/if}
 
 					{#if exportError}
 						<p class="error-text" role="alert">{exportError}</p>
@@ -223,7 +243,7 @@
 			<div class="modal-footer">
 				<button class="btn-ghost" onclick={onClose} disabled={exporting}> Cancel </button>
 				<button class="btn-primary" onclick={handleExport} disabled={exporting || !settings}>
-					{exporting ? 'Exporting…' : 'Export'}
+					{exporting ? 'Exporting…' : isBackup ? 'Export Backup ZIP' : 'Export'}
 				</button>
 			</div>
 		</div>
@@ -349,5 +369,26 @@
 	.field-input:disabled {
 		opacity: 0.4;
 		cursor: not-allowed;
+	}
+
+	.backup-hint {
+		background-color: var(--color-surface-overlay);
+		border: 1px solid var(--color-border-default);
+		border-radius: var(--radius-sm);
+		padding: var(--space-3) var(--space-4);
+	}
+
+	.backup-hint-title {
+		font-size: var(--text-sm);
+		font-weight: var(--font-weight-medium);
+		color: var(--color-text-primary);
+		margin: 0 0 var(--space-1) 0;
+	}
+
+	.backup-hint-text {
+		font-size: var(--text-xs);
+		color: var(--color-text-muted);
+		line-height: 1.5;
+		margin: 0;
 	}
 </style>

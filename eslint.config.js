@@ -49,6 +49,9 @@ export default tseslint.config(
 				{ type: 'module-ai', pattern: ['src/modules/ai/**'] },
 				{ type: 'module-consistency', pattern: ['src/modules/consistency/**'] },
 				{ type: 'module-export', pattern: ['src/modules/export/**'] },
+				{ type: 'module-workspace', pattern: ['src/modules/workspace/**'] },
+				{ type: 'module-world-building', pattern: ['src/modules/world-building/**'] },
+				{ type: 'module-continuity', pattern: ['src/modules/continuity/**'] },
 				{ type: 'routes', pattern: ['src/routes/**'] },
 			],
 		},
@@ -69,6 +72,9 @@ export default tseslint.config(
 								{ to: { type: 'module-ai' } },
 								{ to: { type: 'module-consistency' } },
 								{ to: { type: 'module-export' } },
+								{ to: { type: 'module-workspace' } },
+								{ to: { type: 'module-world-building' } },
+								{ to: { type: 'module-continuity' } },
 							],
 						},
 						{
@@ -92,6 +98,18 @@ export default tseslint.config(
 						{ from: [{ type: 'module-project' }], allow: [{ to: { type: 'lib' } }] },
 						{ from: [{ type: 'module-ai' }], allow: [{ to: { type: 'lib' } }] },
 						{ from: [{ type: 'module-consistency' }], allow: [{ to: { type: 'lib' } }] },
+						{
+							from: [{ type: 'module-workspace' }],
+							allow: [{ to: { type: 'module-outliner' } }],
+						},
+						{
+							from: [{ type: 'module-world-building' }],
+							allow: [{ to: { type: 'module-bible' } }],
+						},
+						{
+							from: [{ type: 'module-continuity' }],
+							allow: [{ to: { type: 'module-consistency' } }],
+						},
 						{
 							from: [{ type: 'lib' }],
 							allow: [{ to: { type: 'lib' } }, { to: { type: 'module-consistency' } }],

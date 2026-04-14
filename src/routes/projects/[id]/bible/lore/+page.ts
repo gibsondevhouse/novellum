@@ -1,7 +1,6 @@
-import { getLoreEntriesByProjectId } from '$modules/bible/services/lore-entry-repository.js';
+import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 
-export const load: PageLoad = async ({ params }) => {
-	const loreEntries = await getLoreEntriesByProjectId(params.id);
-	return { projectId: params.id, loreEntries };
+export const load: PageLoad = ({ params }) => {
+	redirect(307, `/projects/${params.id}/world-building/lore`);
 };

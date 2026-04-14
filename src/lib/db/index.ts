@@ -13,8 +13,21 @@ import type {
 	ConsistencyIssue,
 	ExportSettings,
 	SceneSnapshot,
+	StoryFrame,
+	Act,
+	Arc,
+	ArcRef,
 } from './types.js';
-import { schemaV1, schemaV2, schemaV3, schemaV4, schemaV5, schemaV6 } from './schema.js';
+import {
+	schemaV1,
+	schemaV2,
+	schemaV3,
+	schemaV4,
+	schemaV5,
+	schemaV6,
+	schemaV7,
+	schemaV8,
+} from './schema.js';
 
 export class AppDB extends Dexie {
 	projects!: Table<Project, string>;
@@ -30,6 +43,9 @@ export class AppDB extends Dexie {
 	consistency_issues!: Table<ConsistencyIssue, string>;
 	export_settings!: Table<ExportSettings, string>;
 	scene_snapshots!: Table<SceneSnapshot, string>;
+	story_frames!: Table<StoryFrame, string>;
+	acts!: Table<Act, string>;
+	arcs!: Table<Arc, string>;
 
 	constructor() {
 		super('novellum');
@@ -65,6 +81,10 @@ export class AppDB extends Dexie {
 		this.version(5).stores(schemaV5);
 		// v6 → adds scene_snapshots table
 		this.version(6).stores(schemaV6);
+		// v7 → adds story_frames and acts tables
+		this.version(7).stores(schemaV7);
+		// v8 → adds arcs table
+		this.version(8).stores(schemaV8);
 	}
 }
 
@@ -94,4 +114,8 @@ export type {
 	ConsistencyIssue,
 	ExportSettings,
 	SceneSnapshot,
+	StoryFrame,
+	Act,
+	Arc,
+	ArcRef,
 };

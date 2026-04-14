@@ -1,7 +1,9 @@
 import { defineConfig } from 'vitest/config';
 import { resolve } from 'path';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
 
 export default defineConfig({
+	plugins: [svelte({ hot: false })],
 	test: {
 		environment: 'jsdom',
 		globals: true,
@@ -24,6 +26,8 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			$lib: resolve(__dirname, 'src/lib'),
+			$modules: resolve(__dirname, 'src/modules'),
+			$modules: resolve(__dirname, 'src/modules'),
 		},
 	},
 });

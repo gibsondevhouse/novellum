@@ -1,7 +1,15 @@
 <script lang="ts">
 	import type { ProjectDraft } from '../types/project-draft.js';
 
-	const GENRE_SUGGESTIONS = ['Fantasy', 'Sci-Fi', 'Romance', 'Thriller', 'Literary', 'Horror', 'Mystery'] as const;
+	const GENRE_SUGGESTIONS = [
+		'Fantasy',
+		'Sci-Fi',
+		'Romance',
+		'Thriller',
+		'Literary',
+		'Horror',
+		'Mystery',
+	] as const;
 
 	let {
 		draft,
@@ -74,8 +82,8 @@
 							type="button"
 							class="tag-remove"
 							onclick={() => removeGenre(tag)}
-							aria-label="Remove {tag}"
-						>✕</button>
+							aria-label="Remove {tag}">✕</button
+						>
 					</span>
 				{/each}
 			</div>
@@ -87,7 +95,9 @@
 			type="text"
 			bind:value={genreInput}
 			onkeydown={handleGenreKeydown}
-			onblur={() => { if (genreInput.trim()) addGenre(genreInput); }}
+			onblur={() => {
+				if (genreInput.trim()) addGenre(genreInput);
+			}}
 			placeholder="e.g. Fantasy, Thriller"
 			aria-describedby="genre-suggestions-hint"
 			autocomplete="off"

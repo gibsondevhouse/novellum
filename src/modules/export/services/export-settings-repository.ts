@@ -1,4 +1,4 @@
-import { db } from '$lib/db/index.js';
+import { apiGet, apiPost, apiPut } from '$lib/api-client.js';
 import type { ExportSettings } from '$lib/db/types.js';
 
 const DEFAULTS: Omit<ExportSettings, 'id' | 'projectId' | 'createdAt' | 'updatedAt'> = {
@@ -10,23 +10,20 @@ const DEFAULTS: Omit<ExportSettings, 'id' | 'projectId' | 'createdAt' | 'updated
 };
 
 export async function getExportSettings(projectId: string): Promise<ExportSettings> {
-	const existing = await db.export_settings.get(projectId);
-	if (existing) return existing;
-	const now = new Date().toISOString();
-	const settings: ExportSettings = {
+	const result = await apiGet<{ data: ExportSettings | null }>(
+		`/api/db/export_settings/${projectId}`,
+	);
+	if (result.data) return result.data;
+	return apiPost<ExportSettings>('/api/db/export_settings', {
 		id: projectId,
 		projectId,
 		...DEFAULTS,
-		createdAt: now,
-		updatedAt: now,
-	};
-	await db.export_settings.add(settings);
-	return settings;
+	});
 }
 
 export async function updateExportSettings(
 	projectId: string,
 	updates: Partial<Omit<ExportSettings, 'id' | 'projectId' | 'createdAt'>>,
 ): Promise<void> {
-	await db.export_settings.update(projectId, { ...updates, updatedAt: new Date().toISOString() });
+	await apiPut(`/api/db/export_settings/${projectId}`, updates);
 }

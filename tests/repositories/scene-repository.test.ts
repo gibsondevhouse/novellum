@@ -1,15 +1,32 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { db } from '../../src/lib/db/index.js';
-import {
-	createScene,
-	getSceneById,
-	getScenesByProjectId,
-	updateScene,
-	removeScene,
-} from '../../src/modules/editor/services/scene-repository.js';
 
-const projectId = crypto.randomUUID();
-const chapterId = crypto.randomUUID();
+const mockApiGet = vi.fn();
+const mockApiPost = vi.fn();
+const mockApiPut = vi.fn();
+const mockApiDel = vi.fn();
+
+class MockApiError extends Error {
+	status: number;
+	constructor(message: string, status: number) {
+		super(message);
+		this.name = 'ApiError';
+		this.status = status;
+	}
+}
+
+vi.mock('$lib/api-client.js', () => ({
+	apiGet: (...args: unknown[]) => mockApiGet(...args),
+	apiPost: (...args: unknown[]) => mockApiPost(...args),
+	apiPut: (...args: unknown[]) => mockApiPut(...args),
+	apiDel: (...args: unknown[]) => mockApiDel(...args),
+	ApiError: MockApiError,
+}));
+
+const { createScene, getSceneById, getScenesByProjectId, updateScene, removeScene } =
+	await import('../../src/modules/editor/services/scene-repository.js');
+
+const projectId = 'proj-1';
+const chapterId = 'ch-1';
 
 const baseScene = {
 	chapterId,
@@ -26,61 +43,67 @@ const baseScene = {
 	locationIds: [] as string[],
 };
 
-beforeEach(async () => {
-	await db.scenes.clear();
+beforeEach(() => {
+	vi.clearAllMocks();
 });
 
 describe('scene-repository', () => {
 	it('creates a scene with auto-generated id and timestamps', async () => {
+		const returned = { id: 's1', ...baseScene, createdAt: '2026-01-01', updatedAt: '2026-01-01' };
+		mockApiPost.mockResolvedValueOnce(returned);
+
 		const s = await createScene(baseScene);
-		expect(s.id).toBeDefined();
+		expect(s.id).toBe('s1');
 		expect(s.title).toBe('Opening');
-		expect(s.createdAt).toBeDefined();
-		expect(s.updatedAt).toBeDefined();
+		expect(mockApiPost).toHaveBeenCalledWith('/api/db/scenes', baseScene);
 	});
 
 	it('retrieves a scene by id', async () => {
-		const created = await createScene(baseScene);
-		const found = await getSceneById(created.id);
+		const scene = { id: 's1', ...baseScene, createdAt: '2026-01-01', updatedAt: '2026-01-01' };
+		mockApiGet.mockResolvedValueOnce(scene);
+
+		const found = await getSceneById('s1');
 		expect(found).toBeDefined();
-		expect(found!.id).toBe(created.id);
+		expect(found!.id).toBe('s1');
 	});
 
 	it('returns undefined for a nonexistent id', async () => {
+		mockApiGet.mockRejectedValueOnce(new MockApiError('Not found', 404));
+
 		const found = await getSceneById('nonexistent-scene-id');
 		expect(found).toBeUndefined();
 	});
 
 	it('returns scenes by projectId', async () => {
-		await createScene({ ...baseScene, title: 'Scene 1', order: 1 });
-		await createScene({ ...baseScene, title: 'Scene 2', order: 2 });
-		const scenes = await getScenesByProjectId(projectId);
-		expect(scenes.length).toBeGreaterThanOrEqual(2);
-		expect(scenes.every((s) => s.projectId === projectId)).toBe(true);
+		const scenes = [
+			{ id: 's1', projectId, title: 'Scene 1' },
+			{ id: 's2', projectId, title: 'Scene 2' },
+		];
+		mockApiGet.mockResolvedValueOnce(scenes);
+
+		const result = await getScenesByProjectId(projectId);
+		expect(result.length).toBe(2);
+		expect(mockApiGet).toHaveBeenCalledWith('/api/db/scenes', { projectId });
 	});
 
 	it('does not return scenes from a different project', async () => {
-		const otherId = crypto.randomUUID();
-		await createScene({ ...baseScene, projectId: otherId, title: 'Other' });
+		mockApiGet.mockResolvedValueOnce([]);
+
 		const scenes = await getScenesByProjectId(projectId);
-		expect(scenes.every((s) => s.projectId === projectId)).toBe(true);
+		expect(scenes).toEqual([]);
 	});
 
 	it('updates a scene field', async () => {
-		const s = await createScene(baseScene);
-		vi.useFakeTimers({ toFake: ['Date'] });
-		vi.setSystemTime(new Date(Date.now() + 1000));
-		await updateScene(s.id, { title: 'Updated Title' });
-		vi.useRealTimers();
-		const updated = await getSceneById(s.id);
-		expect(updated!.title).toBe('Updated Title');
-		expect(updated!.updatedAt).not.toBe(s.updatedAt);
+		mockApiPut.mockResolvedValueOnce({});
+
+		await updateScene('s1', { title: 'Updated Title' });
+		expect(mockApiPut).toHaveBeenCalledWith('/api/db/scenes/s1', { title: 'Updated Title' });
 	});
 
 	it('removes a scene', async () => {
-		const s = await createScene(baseScene);
-		await removeScene(s.id);
-		const found = await getSceneById(s.id);
-		expect(found).toBeUndefined();
+		mockApiDel.mockResolvedValueOnce(undefined);
+
+		await removeScene('s1');
+		expect(mockApiDel).toHaveBeenCalledWith('/api/db/scenes/s1');
 	});
 });

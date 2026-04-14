@@ -112,7 +112,13 @@
 			ondragleave={() => (dragOverIdx = null)}
 			ondrop={() => onDrop(i)}
 		>
-			<BeatItem {beat} index={i} onDelete={handleDelete} onSelect={(b) => handleSelectBeat(b, i)} {onDragStart} />
+			<BeatItem
+				{beat}
+				index={i}
+				onDelete={handleDelete}
+				onSelect={(b) => handleSelectBeat(b, i)}
+				{onDragStart}
+			/>
 		</div>
 	{/each}
 	<div class="planning-beat-add">

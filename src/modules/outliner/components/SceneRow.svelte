@@ -50,7 +50,7 @@
 		if (confirm(`Delete scene "${scene.title}"?`)) onDelete(scene.id);
 	}
 
-	const editorHref = $derived(`/projects/${scene.projectId}/editor/${scene.id}`);
+	const _editorHref = $derived(`/projects/${scene.projectId}/editor/${scene.id}`);
 
 	const summary = $derived(
 		scene.summary ? scene.summary.slice(0, 100) + (scene.summary.length > 100 ? '…' : '') : '',
@@ -81,7 +81,11 @@
 		</div>
 	{:else}
 		<div class="scene-header">
-			<button class="scene-title" onclick={() => onSelect(scene)} aria-label="Select scene: {scene.title}">
+			<button
+				class="scene-title"
+				onclick={() => onSelect(scene)}
+				aria-label="Select scene: {scene.title}"
+			>
 				{scene.title}
 			</button>
 			{#if scene.wordCount > 0}
@@ -236,8 +240,6 @@
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}
-
-
 
 	.btn-del:hover {
 		color: var(--color-error);
