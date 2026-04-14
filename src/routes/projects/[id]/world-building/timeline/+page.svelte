@@ -9,6 +9,8 @@
 		submitUpdateTimelineEvent,
 		submitDeleteTimelineEvent,
 	} from '$modules/bible/stores/bible-crud.svelte.js';
+	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 
 	let { data } = $props<{
 		data: { projectId: string; timelineEvents: TimelineEvent[]; characters: Character[] };
@@ -61,15 +63,14 @@
 			>
 			<h1>Timeline</h1>
 		</div>
-		<button
-			class="btn-primary"
+		<PrimaryButton
 			onclick={() => {
 				showForm = !showForm;
 				editingEvent = null;
 			}}
 		>
 			{showForm && !editingEvent ? 'Cancel' : '+ Add Event'}
-		</button>
+		</PrimaryButton>
 	</div>
 
 	{#if showForm || editingEvent}
@@ -90,7 +91,7 @@
 	{#if getTimelineEvents().length === 0 && !showForm}
 		<div class="bible-empty-state">
 			<p>No timeline events yet.</p>
-			<button class="btn-ghost" onclick={() => (showForm = true)}>+ Add your first event</button>
+			<GhostButton onclick={() => (showForm = true)}>+ Add your first event</GhostButton>
 		</div>
 	{:else}
 		<ol class="timeline-list">

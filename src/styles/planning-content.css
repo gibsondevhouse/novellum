@@ -134,7 +134,7 @@
 .planning-beat-add-btn {
 	padding: var(--space-1) var(--space-3);
 	background: var(--ps-accent, var(--color-teal));
-	color: #000;
+	color: var(--color-surface-base);
 	border: none;
 	border-radius: var(--radius-sm);
 	font-size: var(--text-sm);

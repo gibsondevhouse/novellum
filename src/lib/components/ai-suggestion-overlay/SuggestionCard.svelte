@@ -172,7 +172,7 @@
 
 	.btn--primary {
 		background-color: var(--color-nova-blue);
-		color: #fff;
+		color: var(--color-text-on-dark);
 		border-color: var(--color-nova-blue);
 	}
 

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Scene } from '$lib/db';
 	import AiPanel from '$lib/components/AiPanel.svelte';
+	import EmptyState from '$lib/components/EmptyState.svelte';
 	import { pushState } from '$app/navigation';
 	import { page } from '$app/state';
 	import { aiPanel } from '$lib/stores/ai-panel.svelte';
@@ -91,7 +92,7 @@
 			<span class="doc-list-title">Scenes</span>
 		</div>
 		{#if data.scenes.length === 0}
-			<p class="doc-empty">No scenes yet.</p>
+			<EmptyState title="No scenes yet" />
 		{:else}
 			<ul class="scene-list">
 				{#each data.scenes as scene (scene.id)}
@@ -119,9 +120,7 @@
 			</GhostButton>
 		</div>
 		{#if data.scenes.length === 0}
-			<div class="editor-empty">
-				<p>No scenes yet — add one from the Outline.</p>
-			</div>
+			<EmptyState title="No scenes yet" description="Add one from the Outline." />
 		{:else}
 			<textarea
 				class="editor-textarea"
@@ -143,7 +142,7 @@
 		height: calc(100vh - 120px);
 		gap: 0;
 		overflow: hidden;
-		transition: grid-template-columns 0.2s ease;
+		transition: grid-template-columns var(--duration-enter) var(--ease-standard);
 	}
 
 	.editor-page.ai-open {
@@ -169,12 +168,6 @@
 		color: var(--color-text-muted);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
-	}
-
-	.doc-empty {
-		font-size: var(--text-sm);
-		color: var(--color-text-muted);
-		padding: var(--space-2);
 	}
 
 	.scene-list {
@@ -221,15 +214,6 @@
 		justify-content: flex-end;
 		padding: var(--space-2) var(--space-3);
 		border-bottom: 1px solid var(--color-border);
-	}
-
-	.editor-empty {
-		flex: 1;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: var(--color-text-muted);
-		font-size: var(--text-sm);
 	}
 
 	.editor-textarea {

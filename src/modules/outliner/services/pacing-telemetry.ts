@@ -11,6 +11,15 @@ export interface PacingMetrics {
 	sparsity: 'healthy' | 'sparse' | 'very-sparse';
 }
 
+function hasBeatArray(v: unknown): v is { beats: unknown[] } {
+	return (
+		typeof v === 'object' &&
+		v !== null &&
+		'beats' in v &&
+		Array.isArray((v as Record<string, unknown>).beats)
+	);
+}
+
 export function computeMetrics(acts: Act[], chapters: ChapterWithScenes[]): PacingMetrics {
 	const chapterCount = chapters.length;
 	const sceneCount = chapters.reduce((n, ch) => n + ch.scenes.length, 0);
@@ -18,7 +27,7 @@ export function computeMetrics(acts: Act[], chapters: ChapterWithScenes[]): Paci
 		(n, ch) =>
 			n +
 			ch.scenes.reduce(
-				(m, sc) => m + ('beats' in sc ? (sc as unknown as { beats: unknown[] }).beats.length : 0),
+				(m, sc) => m + (hasBeatArray(sc) ? sc.beats.length : 0),
 				0,
 			),
 		0,

@@ -110,7 +110,8 @@
 	.crud-card--selected {
 		border-color: color-mix(in srgb, var(--color-nova-blue) 40%, transparent);
 		background: color-mix(in srgb, var(--color-nova-blue) 6%, var(--color-surface-overlay));
-		box-shadow: inset 0 -3px 0 var(--color-nova-blue);
+		--_shadow: inset 0 -3px 0 var(--color-nova-blue);
+		box-shadow: var(--_shadow);
 	}
 	.crud-card:focus-visible {
 		outline: none;

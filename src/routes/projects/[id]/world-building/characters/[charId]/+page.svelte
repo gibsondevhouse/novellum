@@ -8,6 +8,8 @@
 		submitDeleteCharacter,
 	} from '$modules/bible/stores/bible-crud.svelte.js';
 	import { goto } from '$app/navigation';
+	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 
 	let { data } = $props<{
 		data: {
@@ -43,17 +45,19 @@
 
 <div class="page">
 	<div class="page-header">
-		<a class="back-link" href="/projects/{data.projectId}/world-building/characters">← Characters</a
-		>
+		<Breadcrumb items={[
+			{ label: 'Characters', href: `/projects/${data.projectId}/world-building/characters` },
+			{ label: data.character.name },
+		]} />
 		<div class="header-row">
 			<h1>{data.character.name}</h1>
 			<div class="header-actions">
 				{#if confirmDelete}
 					<span class="confirm-text">Delete this character?</span>
 					<button class="btn-danger" onclick={handleDelete}>Yes, delete</button>
-					<button class="btn-ghost" onclick={() => (confirmDelete = false)}>Cancel</button>
+					<GhostButton onclick={() => (confirmDelete = false)}>Cancel</GhostButton>
 				{:else}
-					<button class="btn-ghost" onclick={() => (confirmDelete = true)}>Delete</button>
+					<GhostButton onclick={() => (confirmDelete = true)}>Delete</GhostButton>
 				{/if}
 			</div>
 		</div>
@@ -85,18 +89,6 @@
 
 	.page-header {
 		margin-bottom: var(--space-4);
-	}
-
-	.back-link {
-		display: block;
-		font-size: var(--text-sm);
-		color: var(--color-text-muted);
-		margin-bottom: var(--space-2);
-	}
-
-	.back-link:hover {
-		color: var(--color-text-secondary);
-		text-decoration: none;
 	}
 
 	.header-row {

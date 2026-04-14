@@ -96,7 +96,7 @@
 		color: var(--color-text-muted);
 		padding: 0 var(--space-1);
 		border-radius: var(--radius-sm);
-		transition: color 0.1s;
+		transition: color var(--duration-fast) var(--ease-standard);
 	}
 
 	.act-expand-btn:hover {
@@ -123,7 +123,7 @@
 		gap: var(--space-2);
 		padding: var(--space-1) var(--space-2);
 		border-radius: var(--radius-sm);
-		transition: background 0.1s;
+		transition: background var(--duration-fast) var(--ease-standard);
 	}
 
 	.act-select-btn:hover {

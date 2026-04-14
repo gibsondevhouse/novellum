@@ -102,11 +102,11 @@
 
 	/* ── Content fade transition ── */
 	:global(::view-transition-old(project-mode-content)) {
-		animation: mode-fade-out 100ms ease forwards;
+		animation: mode-fade-out var(--duration-fast) var(--ease-standard) forwards;
 	}
 
 	:global(::view-transition-new(project-mode-content)) {
-		animation: mode-fade-in 180ms ease forwards;
+		animation: mode-fade-in var(--duration-enter) var(--ease-standard) forwards;
 	}
 
 	@keyframes mode-fade-out {

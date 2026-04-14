@@ -1,13 +1,28 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 
 	let open = $state(false);
+	let modalEl = $state<HTMLElement | null>(null);
+	let previouslyFocused = $state<HTMLElement | null>(null);
 
-	onMount(() => {
+	$effect(() => {
 		const hasSeen = localStorage.getItem('novellum:seen_onboarding');
 		if (!hasSeen) {
 			open = true;
+		}
+	});
+
+	$effect(() => {
+		if (open && modalEl) {
+			previouslyFocused = document.activeElement as HTMLElement | null;
+			// Move focus to first focusable element inside modal
+			const firstFocusable = modalEl.querySelector<HTMLElement>(
+				'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+			);
+			firstFocusable?.focus();
+		} else if (!open && previouslyFocused) {
+			previouslyFocused.focus();
+			previouslyFocused = null;
 		}
 	});
 
@@ -16,9 +31,42 @@
 		open = false;
 	}
 
-	function handleKeydown(event: KeyboardEvent) {
-		if (event.key === 'Escape' && open) {
+	function handleBackdropClick(event: MouseEvent) {
+		if (event.target === event.currentTarget) {
 			dismiss();
+		}
+	}
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (!open || !modalEl) return;
+
+		if (event.key === 'Escape') {
+			dismiss();
+			return;
+		}
+
+		if (event.key === 'Tab') {
+			const focusable = Array.from(
+				modalEl.querySelectorAll<HTMLElement>(
+					'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+				)
+			);
+			if (focusable.length === 0) return;
+
+			const first = focusable[0];
+			const last = focusable[focusable.length - 1];
+
+			if (event.shiftKey) {
+				if (document.activeElement === first) {
+					event.preventDefault();
+					last.focus();
+				}
+			} else {
+				if (document.activeElement === last) {
+					event.preventDefault();
+					first.focus();
+				}
+			}
 		}
 	}
 </script>
@@ -26,15 +74,14 @@
 <svelte:window onkeydown={handleKeydown} />
 
 {#if open}
-	<div class="modal-backdrop" onclick={dismiss} role="presentation">
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<div class="modal-backdrop" onclick={handleBackdropClick} role="presentation">
 		<div
+			bind:this={modalEl}
 			class="modal-content"
 			role="dialog"
 			aria-labelledby="onboarding-title"
 			aria-modal="true"
 			tabindex="-1"
-			onclick={(e) => e.stopPropagation()}
 		>
 			<div class="modal-header">
 				<h2 id="onboarding-title">Welcome to Novellum</h2>
@@ -73,7 +120,7 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		background: rgba(0, 0, 0, 0.6);
+		background: color-mix(in srgb, black 60%, transparent);
 		backdrop-filter: blur(4px);
 		display: flex;
 		align-items: center;
@@ -89,7 +136,7 @@
 		border-radius: var(--radius-lg);
 		max-width: 640px;
 		width: 100%;
-		box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+		box-shadow: var(--shadow-lg);
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
@@ -172,5 +219,14 @@
 	@keyframes slideUp {
 		from { opacity: 0; transform: translateY(16px); }
 		to { opacity: 1; transform: translateY(0); }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.modal-backdrop {
+			animation: none;
+		}
+		.modal-content {
+			animation: none;
+		}
 	}
 </style>

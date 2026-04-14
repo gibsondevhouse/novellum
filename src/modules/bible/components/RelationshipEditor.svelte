@@ -6,6 +6,7 @@
 		submitCreateRelationship,
 		submitDeleteRelationship,
 	} from '../stores/bible-crud.svelte.ts';
+	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 
 	let { characterId, projectId, allCharacters, initialRelationships } = $props<{
 		characterId: string;
@@ -86,7 +87,7 @@
 	<div class="add-form">
 		<h4 class="add-title">Add Relationship</h4>
 		<div class="add-row">
-			<select class="input" bind:value={targetId} aria-label="Target character">
+			<select class="input" bind:value={targetId} aria-label="Target character" aria-required="true">
 				<option value="">— Select character —</option>
 				{#each otherCharacters as c (c.id)}
 					<option value={c.id}>{c.name}</option>
@@ -99,7 +100,7 @@
 				placeholder="Type (e.g. friend, rival)"
 			/>
 			<input class="input" type="text" bind:value={relDesc} placeholder="Description (optional)" />
-			<button class="btn-primary btn-sm" onclick={handleAdd}>Add</button>
+			<PrimaryButton class="btn-sm" onclick={handleAdd}>Add</PrimaryButton>
 		</div>
 		{#if addError}
 			<p class="error-text" role="alert">{addError}</p>
@@ -192,13 +193,7 @@
 	.input:focus {
 		outline: none;
 		border-color: var(--color-border-focus);
-		box-shadow: 0 0 0 2px var(--color-border-focus);
-	}
-
-	.btn-sm {
-		padding: var(--space-2) var(--space-3);
-		font-size: var(--text-sm);
-		border-radius: var(--radius-sm);
+		box-shadow: var(--focus-ring);
 	}
 
 	.btn-xs {

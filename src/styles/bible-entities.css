@@ -103,7 +103,7 @@
 
 .bible-btn-primary {
 	background-color: var(--color-nova-blue);
-	color: #ffffff;
+	color: var(--color-text-on-dark);
 	border: none;
 	padding: var(--space-2) var(--space-4);
 	border-radius: var(--radius-sm);

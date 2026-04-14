@@ -189,7 +189,7 @@
 		max-width: 100%;
 		text-align: center;
 		letter-spacing: var(--tracking-tight);
-		animation: rail-enter 200ms var(--ease-decelerate) both;
+		animation: rail-enter var(--duration-enter) var(--ease-decelerate) both;
 	}
 
 	@keyframes rail-enter {
@@ -301,5 +301,11 @@
 		outline: none;
 		box-shadow: var(--focus-ring);
 		opacity: 1;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.rail-center {
+			animation: none;
+		}
 	}
 </style>

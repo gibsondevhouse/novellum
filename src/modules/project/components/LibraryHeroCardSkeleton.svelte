@@ -82,7 +82,8 @@
 
 	@media (prefers-reduced-motion: no-preference) {
 		.library-card-skeleton {
-			animation: skeleton-pulse 1.35s ease-in-out infinite;
+			--_dur: 1.35s;
+			animation: skeleton-pulse var(--_dur) var(--ease-standard) infinite;
 		}
 
 		@keyframes skeleton-pulse {

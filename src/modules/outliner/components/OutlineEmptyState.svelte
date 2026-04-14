@@ -98,13 +98,13 @@
 	.btn-cta {
 		padding: var(--space-3) var(--space-6);
 		background: var(--color-nova-blue);
-		color: #fff;
+		color: var(--color-text-on-dark);
 		border: none;
 		border-radius: var(--radius-sm);
 		font-size: var(--text-sm);
 		font-weight: var(--font-weight-medium);
 		cursor: pointer;
-		transition: opacity 0.1s;
+		transition: opacity var(--duration-fast) var(--ease-standard);
 	}
 
 	.btn-cta:hover {

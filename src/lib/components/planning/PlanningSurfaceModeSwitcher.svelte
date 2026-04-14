@@ -36,7 +36,7 @@
 		display: flex;
 		gap: 2px;
 		background: var(--color-surface-ground);
-		border: 1px solid rgba(255, 255, 255, 0.07);
+		border: 1px solid var(--color-border-default);
 		border-radius: var(--radius-full);
 		padding: 3px;
 	}
@@ -63,8 +63,8 @@
 		color: var(--color-text-primary);
 		/* Inset outline + drop shadow to separate active pill from ground track */
 		box-shadow:
-			0 1px 3px rgba(0, 0, 0, 0.6),
-			0 0 0 1px rgba(255, 255, 255, 0.07);
+			0 1px 3px color-mix(in srgb, black 60%, transparent),
+			0 0 0 1px var(--color-border-default);
 	}
 
 	.mode-tab:focus-visible {

@@ -1,3 +1,5 @@
+import DOMPurify from 'isomorphic-dompurify';
+
 export function escapeHtml(unsafe: string): string {
 	return unsafe
 		.replace(/&/g, "&amp;")
@@ -35,4 +37,8 @@ export function parseMarkdown(md: string): string {
 	}).join('');
 
 	return html;
+}
+
+export function safeHtml(raw: string): string {
+	return DOMPurify.sanitize(parseMarkdown(raw));
 }

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getDeleting, submitDelete } from '../stores/project-hub.svelte.ts';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 
 	let { projectId, oncancel } = $props<{ projectId: string; oncancel: () => void }>();
 
@@ -15,7 +16,7 @@
 			This action cannot be undone. All project data will be permanently deleted.
 		</p>
 		<div class="actions">
-			<button class="btn-ghost" onclick={oncancel} disabled={getDeleting()}>Cancel</button>
+			<GhostButton onclick={oncancel} disabled={getDeleting()}>Cancel</GhostButton>
 			<button class="btn-danger" onclick={handleConfirm} disabled={getDeleting()}>
 				{getDeleting() ? 'Deleting…' : 'Delete Project'}
 			</button>
@@ -27,7 +28,7 @@
 	.dialog-overlay {
 		position: fixed;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.6);
+		background: color-mix(in srgb, black 60%, transparent);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -58,43 +59,5 @@
 		display: flex;
 		justify-content: flex-end;
 		gap: var(--space-3);
-	}
-
-	.btn-danger {
-		background-color: var(--color-error);
-		color: var(--color-text-primary);
-		border: none;
-		border-radius: var(--radius-sm);
-		padding: var(--space-2) var(--space-4);
-		font-size: var(--text-sm);
-		font-weight: var(--font-weight-medium);
-		cursor: pointer;
-		transition: var(--transition-color);
-	}
-
-	.btn-danger:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
-	.btn-ghost {
-		background: none;
-		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-sm);
-		padding: var(--space-2) var(--space-4);
-		color: var(--color-text-secondary);
-		font-size: var(--text-sm);
-		cursor: pointer;
-		transition: var(--transition-border), var(--transition-color);
-	}
-
-	.btn-ghost:hover {
-		border-color: var(--color-border-strong);
-		color: var(--color-text-primary);
-	}
-
-	.btn-ghost:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
 	}
 </style>

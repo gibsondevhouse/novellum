@@ -200,7 +200,7 @@
 		font-size: 10px;
 		font-weight: var(--font-weight-semibold);
 		text-transform: uppercase;
-		letter-spacing: 0.12em;
+		letter-spacing: var(--tracking-widest);
 		color: var(--color-teal);
 		opacity: 0.7;
 	}
@@ -219,8 +219,8 @@
 		border-radius: var(--radius-sm);
 		line-height: 1;
 		transition:
-			color var(--duration-base),
-			background var(--duration-base);
+			color var(--duration-base) var(--ease-standard),
+			background var(--duration-base) var(--ease-standard);
 	}
 
 	.close-btn:hover {
@@ -246,9 +246,9 @@
 		text-decoration: none;
 		white-space: nowrap;
 		transition:
-			border-color var(--duration-base),
-			color var(--duration-base),
-			background var(--duration-base);
+			border-color var(--duration-base) var(--ease-standard),
+			color var(--duration-base) var(--ease-standard),
+			background var(--duration-base) var(--ease-standard);
 	}
 
 	.btn-editor:hover {
@@ -282,7 +282,7 @@
 		font-size: var(--text-xs);
 		font-weight: var(--font-weight-semibold);
 		text-transform: uppercase;
-		letter-spacing: 0.12em;
+		letter-spacing: var(--tracking-widest);
 		color: var(--color-text-muted);
 		opacity: 0.7;
 	}
@@ -298,8 +298,8 @@
 		line-height: 1;
 		flex-shrink: 0;
 		transition:
-			color 0.1s,
-			background 0.1s;
+			color var(--duration-fast) var(--ease-standard),
+			background var(--duration-fast) var(--ease-standard);
 	}
 
 	.beat-focus-close:hover {
@@ -325,7 +325,7 @@
 		min-height: 120px;
 		padding: var(--space-3);
 		background: color-mix(in srgb, var(--color-surface-ground) 60%, var(--color-surface-overlay));
-		border: 1px solid rgba(255, 255, 255, 0.07);
+		border: 1px solid var(--color-border-default);
 		border-radius: var(--radius-md);
 		color: var(--color-text-primary);
 		font-size: var(--text-sm);
@@ -333,8 +333,8 @@
 		line-height: var(--leading-relaxed);
 		resize: vertical;
 		transition:
-			border-color 0.15s,
-			background 0.15s;
+			border-color var(--duration-base) var(--ease-standard),
+			background var(--duration-base) var(--ease-standard);
 	}
 
 	.beat-content-textarea:focus {
@@ -367,7 +367,7 @@
 		min-height: 72px;
 		padding: var(--space-3);
 		background: color-mix(in srgb, var(--color-surface-ground) 60%, var(--color-surface-overlay));
-		border: 1px solid rgba(255, 255, 255, 0.07);
+		border: 1px solid var(--color-border-default);
 		border-radius: var(--radius-md);
 		color: var(--color-text-primary);
 		font-size: var(--text-sm);
@@ -375,8 +375,8 @@
 		line-height: var(--leading-relaxed);
 		resize: vertical;
 		transition:
-			border-color 0.15s,
-			background 0.15s;
+			border-color var(--duration-base) var(--ease-standard),
+			background var(--duration-base) var(--ease-standard);
 	}
 
 	.beat-notes-textarea:focus {

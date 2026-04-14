@@ -39,8 +39,14 @@
 
 	/* ── States ── */
 	--color-error: #ef4444;
+	--color-error-dark: #dc2626;
 	--color-success: #22c55e;
+	--color-success-subtle: rgba(20, 83, 45, 0.267); /* diff add bg */
+	--color-success-on-dark: #4ade80;              /* diff add text */
+	--color-error-subtle: rgba(127, 29, 29, 0.267); /* diff remove bg */
+	--color-error-on-dark: #f87171;                 /* diff remove text */
 	--color-warning: #f59e0b;
+	--color-text-on-dark: #ffffff;                  /* text on colored backgrounds */
 
 	/* ── Spacing (4 px base grid) ── */
 	--space-1: 4px;

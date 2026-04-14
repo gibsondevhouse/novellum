@@ -75,7 +75,7 @@
 	.modal-backdrop {
 		position: fixed;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.5);
+		background: color-mix(in srgb, black 50%, transparent);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -83,16 +83,16 @@
 	}
 
 	.modal {
-		background: var(--color-surface, #1e1e2e);
-		border: 1px solid var(--color-border, #313244);
-		border-radius: 8px;
-		padding: 1.5rem;
+		background: var(--color-surface-overlay);
+		border: 1px solid var(--color-border-default);
+		border-radius: var(--radius-lg);
+		padding: var(--space-6);
 		width: min(600px, 90vw);
 		max-height: 80vh;
 		overflow-y: auto;
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
+		gap: var(--space-4);
 	}
 
 	.modal-header {
@@ -102,17 +102,17 @@
 	}
 
 	.modal-title {
-		font-size: 1.125rem;
-		font-weight: 600;
+		font-size: var(--text-lg);
+		font-weight: var(--font-weight-semibold);
 		margin: 0;
 	}
 
 	.loading-state {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
-		padding: 1rem 0;
-		color: var(--color-text-muted, #6c7086);
+		gap: var(--space-3);
+		padding: var(--space-4) 0;
+		color: var(--color-text-muted);
 	}
 
 	.spinner {
@@ -121,7 +121,8 @@
 		border: 2px solid currentColor;
 		border-top-color: transparent;
 		border-radius: 50%;
-		animation: spin 0.6s linear infinite;
+		--_dur: 0.6s;
+		animation: spin var(--_dur) linear infinite;
 	}
 
 	@keyframes spin {
@@ -131,80 +132,86 @@
 	}
 
 	.error-state {
-		padding: 1rem 0;
+		padding: var(--space-4) 0;
 	}
 
 	.error-message {
-		color: var(--color-error, #f38ba8);
-		margin: 0 0 0.5rem;
+		color: var(--color-error);
+		margin: 0 0 var(--space-2);
 	}
 
 	.error-hint {
-		color: var(--color-text-muted, #6c7086);
-		font-size: 0.875rem;
+		color: var(--color-text-muted);
+		font-size: var(--text-sm);
 		margin: 0;
 	}
 
 	.options-list {
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
+		gap: var(--space-4);
 	}
 
 	.option-card {
-		background: var(--color-surface-raised, #181825);
-		border: 1px solid var(--color-border, #313244);
-		border-radius: 6px;
-		padding: 1rem;
+		background: var(--color-surface-raised);
+		border: 1px solid var(--color-border-default);
+		border-radius: var(--radius-md);
+		padding: var(--space-4);
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
+		gap: var(--space-2);
 	}
 
 	.option-heading {
-		font-size: 0.875rem;
-		font-weight: 600;
+		font-size: var(--text-sm);
+		font-weight: var(--font-weight-semibold);
 		margin: 0;
-		color: var(--color-text-muted, #6c7086);
+		color: var(--color-text-muted);
 	}
 
 	.option-text {
 		margin: 0;
-		line-height: 1.6;
+		line-height: var(--leading-relaxed);
 	}
 
 	.option-original {
 		margin: 0;
-		font-size: 0.8rem;
-		color: var(--color-text-muted, #6c7086);
+		font-size: var(--text-xs);
+		color: var(--color-text-muted);
 		font-style: italic;
 	}
 
 	.modal-footer {
 		display: flex;
 		justify-content: flex-end;
-		padding-top: 0.5rem;
-		border-top: 1px solid var(--color-border, #313244);
+		padding-top: var(--space-2);
+		border-top: 1px solid var(--color-border-default);
 	}
 
 	.btn {
-		padding: 0.4rem 1rem;
-		border-radius: 4px;
+		padding: var(--space-1) var(--space-4);
+		border-radius: var(--radius-sm);
 		border: none;
 		cursor: pointer;
-		font-size: 0.875rem;
-		font-weight: 500;
+		font-size: var(--text-sm);
+		font-weight: var(--font-weight-medium);
 	}
 
 	.btn--primary {
-		background: var(--color-accent, #cba6f7);
-		color: var(--color-surface, #1e1e2e);
+		background: var(--color-nova-blue);
+		color: var(--color-text-on-dark);
 		align-self: flex-start;
 	}
 
 	.btn--secondary {
 		background: transparent;
-		color: var(--color-text, #cdd6f4);
-		border: 1px solid var(--color-border, #313244);
+		color: var(--color-text-primary);
+		border: 1px solid var(--color-border-default);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.spinner {
+			animation: none;
+		}
 	}
 </style>

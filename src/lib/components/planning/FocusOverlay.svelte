@@ -59,7 +59,7 @@
 	.fo-backdrop {
 		position: absolute;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.45);
+		background: color-mix(in srgb, black 45%, transparent);
 		backdrop-filter: blur(1px);
 		z-index: 9;
 		cursor: pointer;
@@ -73,14 +73,14 @@
 		border: 1px solid var(--color-border-default);
 		border-radius: var(--radius-lg);
 		box-shadow:
-			0 8px 32px rgba(0, 0, 0, 0.7),
-			0 0 0 1px rgba(255, 255, 255, 0.06),
-			inset 0 1px 0 rgba(255, 255, 255, 0.07);
+			0 8px 32px color-mix(in srgb, black 70%, transparent),
+			0 0 0 1px var(--color-border-subtle),
+			inset 0 1px 0 var(--color-border-default);
 		z-index: 10;
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
-		animation: fo-enter 150ms var(--ease-decelerate) forwards;
+		animation: fo-enter var(--duration-base) var(--ease-decelerate) forwards;
 	}
 
 	@keyframes fo-enter {
@@ -105,5 +105,11 @@
 		flex: 1;
 		overflow-y: auto;
 		padding: var(--space-4);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.fo-panel {
+			animation: none;
+		}
 	}
 </style>

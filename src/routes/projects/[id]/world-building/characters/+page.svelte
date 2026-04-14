@@ -9,6 +9,9 @@
 		submitCreateCharacter,
 		submitDeleteCharacter,
 	} from '$modules/bible/stores/bible-crud.svelte.js';
+	import { goto } from '$app/navigation';
+	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 
 	let { data } = $props<{
 		data: { projectId: string; characters: Character[] };
@@ -32,7 +35,7 @@
 	}
 
 	function handleEdit(character: Character) {
-		window.location.href = `/projects/${data.projectId}/world-building/characters/${character.id}`;
+		goto(`/projects/${data.projectId}/world-building/characters/${character.id}`);
 	}
 </script>
 
@@ -48,9 +51,9 @@
 			>
 			<h1>Characters</h1>
 		</div>
-		<button class="btn-primary" onclick={() => (showForm = !showForm)}>
+		<PrimaryButton onclick={() => (showForm = !showForm)}>
 			{showForm ? 'Cancel' : '+ Add Character'}
-		</button>
+		</PrimaryButton>
 	</div>
 
 	{#if showForm}
@@ -66,8 +69,7 @@
 	{#if getCharacters().length === 0 && !showForm}
 		<div class="bible-empty-state">
 			<p>No characters yet.</p>
-			<button class="btn-ghost" onclick={() => (showForm = true)}>+ Add your first character</button
-			>
+			<GhostButton onclick={() => (showForm = true)}>+ Add your first character</GhostButton>
 		</div>
 	{:else}
 		<ul class="bible-entity-list">

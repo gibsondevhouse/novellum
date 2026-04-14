@@ -27,7 +27,7 @@
 		grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
 		gap: var(--space-3);
 		padding: var(--space-1) 0;
-		animation: grid-appear 200ms var(--ease-decelerate) both;
+		animation: grid-appear var(--duration-enter) var(--ease-decelerate) both;
 	}
 	@keyframes grid-appear {
 		from {
@@ -37,6 +37,12 @@
 		to {
 			opacity: 1;
 			transform: translateY(0);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.collection-grid {
+			animation: none;
 		}
 	}
 </style>

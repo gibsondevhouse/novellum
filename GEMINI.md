@@ -21,7 +21,8 @@ This directory houses critical configuration and definitions for the Gemini CLI 
 - **`agents/`**: Defines specialized AI agents for development tasks.
   - `planner.agent.md`: Orchestrates development tasks and generates multi-tier plans.
   - `backend.agent.md`: Manages server-side logic, SQLite, and services.
-  - `frontend.agent.md`: Senior UI architect for SvelteKit and component systems.
+  - `architect.agent.md`: Senior layout architect for route shells, layout composition, and structural systems.
+  - `stylist.agent.md`: Senior UI stylist for design tokens, accessibility, interaction states, and visual polish.
   - `reviewer.agent.md`: Ensures code quality and modular boundary compliance.
   - `ai.agent.md`: Manages AI models, prompts, and context logic.
 - **`skills/`**: Reusable modules or capabilities for dev-agents (e.g., `ai-context/`, `svelte5-runes/`, `modular-boundaries/`).

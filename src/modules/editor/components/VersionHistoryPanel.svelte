@@ -171,13 +171,13 @@
 		margin: 0;
 	}
 	.added {
-		background: #14532d44;
-		color: #4ade80;
+		background: var(--color-success-subtle);
+		color: var(--color-success-on-dark);
 		display: block;
 	}
 	.removed {
-		background: #7f1d1d44;
-		color: #f87171;
+		background: var(--color-error-subtle);
+		color: var(--color-error-on-dark);
 		display: block;
 	}
 	.unchanged {

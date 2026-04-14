@@ -55,7 +55,7 @@
 		border-radius: var(--radius-sm);
 		background: color-mix(in srgb, var(--color-text-primary) 3%, transparent);
 		border: 1px solid var(--color-border-subtle);
-		transition: border-color 0.1s;
+		transition: border-color var(--duration-fast) var(--ease-standard);
 	}
 
 	.beat-number-field:focus-within {

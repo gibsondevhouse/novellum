@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { getCreating, getCreateError, submitCreate } from '../stores/project-hub.svelte.ts';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
+	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 
 	let { oncancel } = $props<{ oncancel: () => void }>();
 
@@ -97,10 +99,10 @@
 		{/if}
 
 		<div class="actions">
-			<button class="btn-ghost" onclick={oncancel} disabled={getCreating()}>Cancel</button>
-			<button class="btn-primary" onclick={handleSubmit} disabled={getCreating()}>
+			<GhostButton onclick={oncancel} disabled={getCreating()}>Cancel</GhostButton>
+			<PrimaryButton onclick={handleSubmit} disabled={getCreating()}>
 				{getCreating() ? 'Creating…' : 'Create Project'}
-			</button>
+			</PrimaryButton>
 		</div>
 	</div>
 </div>
@@ -109,7 +111,7 @@
 	.form-overlay {
 		position: fixed;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.6);
+		background: color-mix(in srgb, black 60%, transparent);
 		display: flex;
 		align-items: center;
 		justify-content: center;

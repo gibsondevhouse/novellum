@@ -43,7 +43,8 @@
 	.variant-inset {
 		background-color: var(--color-surface-base);
 		border: 1px solid transparent;
-		box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+		--_shadow: inset 0 2px 4px color-mix(in srgb, black 20%, transparent);
+		box-shadow: var(--_shadow);
 	}
 
 	.interactive {

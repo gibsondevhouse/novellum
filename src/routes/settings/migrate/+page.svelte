@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { preCheck, migrate } from '$lib/migration/index.js';
 	import type { PreCheckResult, MigrationError } from '$lib/migration/index.js';
+	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 
 	type TableStatus = 'pending' | 'migrating' | 'done' | 'error';
 
@@ -117,9 +118,9 @@
 				</label>
 			{/if}
 
-			<button class="btn-primary" disabled={hasConflict && !confirmed} onclick={startMigration}>
+			<PrimaryButton disabled={hasConflict && !confirmed} onclick={startMigration}>
 				Start Migration
-			</button>
+			</PrimaryButton>
 		{/if}
 	{:else if phase === 'migrating' || phase === 'complete'}
 		<table class="data-table">
@@ -207,8 +208,8 @@
 	}
 
 	.warning-banner {
-		background: var(--color-warning-bg, rgba(255, 200, 50, 0.12));
-		border: 1px solid var(--color-warning, #e6a817);
+		background: color-mix(in srgb, var(--color-warning) 12%, transparent);
+		border: 1px solid var(--color-warning);
 		border-radius: var(--radius-md);
 		padding: var(--space-3) var(--space-4);
 		margin-bottom: var(--space-4);
@@ -298,7 +299,7 @@
 	}
 
 	.status-badge.done {
-		color: var(--color-success, #34d399);
+		color: var(--color-success);
 	}
 
 	.status-badge.error {

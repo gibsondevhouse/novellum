@@ -61,7 +61,8 @@
 		aspect-ratio: 2 / 3;
 		width: 100%;
 		background-color: var(--color-surface-elevated);
-		box-shadow: inset 0 0 0 1px var(--color-border-subtle);
+		--_shadow: inset 0 0 0 1px var(--color-border-subtle);
+		box-shadow: var(--_shadow);
 		border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 		flex-shrink: 0;
 	}

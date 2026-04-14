@@ -9,6 +9,8 @@
 		submitUpdateLoreEntry,
 		submitDeleteLoreEntry,
 	} from '$modules/bible/stores/bible-crud.svelte.js';
+	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 
 	let { data } = $props<{ data: { projectId: string; loreEntries: LoreEntry[] } }>();
 
@@ -63,15 +65,14 @@
 			>
 			<h1>Lore</h1>
 		</div>
-		<button
-			class="btn-primary"
+		<PrimaryButton
 			onclick={() => {
 				showForm = !showForm;
 				editingEntry = null;
 			}}
 		>
 			{showForm && !editingEntry ? 'Cancel' : '+ Add Entry'}
-		</button>
+		</PrimaryButton>
 	</div>
 
 	{#if showForm || editingEntry}
@@ -106,7 +107,7 @@
 	{#if getLoreEntries().length === 0 && !showForm}
 		<div class="bible-empty-state">
 			<p>No lore entries yet.</p>
-			<button class="btn-ghost" onclick={() => (showForm = true)}>+ Add your first entry</button>
+			<GhostButton onclick={() => (showForm = true)}>+ Add your first entry</GhostButton>
 		</div>
 	{:else if filtered.length === 0}
 		<p class="empty-filter">No entries in this category.</p>

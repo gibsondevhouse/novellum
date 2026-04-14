@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseMarkdown } from '../../src/lib/ai/markdown';
+import { parseMarkdown, safeHtml } from '../../src/lib/ai/markdown';
 
 describe('Markdown parser', () => {
     it('escapes malicious HTML', () => {
@@ -36,5 +36,35 @@ describe('Markdown parser', () => {
 
     it('handles empty input gracefully', () => {
         expect(parseMarkdown('')).toBe('<p></p>');
+    });
+});
+
+describe('safeHtml XSS mitigation', () => {
+    it('strips <script> tags from output', () => {
+        const result = safeHtml('<script>alert(1)</script>');
+        expect(result).not.toContain('<script>');
+    });
+
+    it('strips onerror attributes from output', () => {
+        const result = safeHtml('<img src=x onerror=alert(1)>');
+        // parseMarkdown escapes < and > so the tag is rendered as text, not as an executable element
+        expect(result).not.toContain('<img');
+    });
+
+    it('strips javascript: href from output', () => {
+        const result = safeHtml('<a href="javascript:void(0)">click</a>');
+        // parseMarkdown escapes the tag so no executable <a> element is present
+        expect(result).not.toContain('<a ');
+        expect(result).not.toContain('<a>');
+    });
+
+    it('preserves safe markdown output', () => {
+        const result = safeHtml('**bold** text');
+        expect(result).toContain('<strong>bold</strong>');
+    });
+
+    it('does not double-escape ampersands in normal text', () => {
+        const result = safeHtml('fish & chips');
+        expect(result).not.toContain('&amp;amp;');
     });
 });

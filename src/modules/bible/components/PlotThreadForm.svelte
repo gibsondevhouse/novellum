@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { PlotThread, Scene } from '$lib/db/types.js';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
+	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 
 	const STATUS_OPTIONS = ['open', 'in-progress', 'resolved'] as const;
 	type Status = (typeof STATUS_OPTIONS)[number];
@@ -95,10 +97,10 @@
 		</div>
 	{/if}
 	<div class="actions">
-		<button class="btn-ghost" onclick={onCancel} disabled={saving}>Cancel</button>
-		<button class="btn-primary" onclick={handleSubmit} disabled={saving}>
+		<GhostButton onclick={onCancel} disabled={saving}>Cancel</GhostButton>
+		<PrimaryButton onclick={handleSubmit} disabled={saving}>
 			{saving ? 'Saving…' : thread ? 'Save Changes' : 'Create Thread'}
-		</button>
+		</PrimaryButton>
 	</div>
 </div>
 
