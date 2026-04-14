@@ -51,15 +51,15 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-2);
-		padding: 6px 12px;
-		border-radius: 16px;
-		border: 1px solid rgba(255, 255, 255, 0.075);
+		padding: var(--space-2) var(--space-3);
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--color-border-subtle);
 		background-color: var(--color-surface-raised);
 		transition: border-color var(--duration-fast) var(--ease-standard);
 	}
 
 	.prompt-subcard:focus-within {
-		border-color: rgba(255, 255, 255, 0.14);
+		border-color: var(--color-border-strong);
 	}
 
 	.prompt-subcard__textarea {
@@ -96,21 +96,21 @@
 		justify-content: center;
 		width: 34px;
 		height: 32px;
-		border-radius: 8px;
+		border-radius: var(--radius-md);
 		border: none;
-		background-color: rgba(163, 152, 217, 0.1);
-		color: rgba(103, 101, 115, 1);
+		background-color: var(--color-ai-tint);
+		color: var(--color-teal);
 		cursor: pointer;
 		flex-shrink: 0;
-		padding: 0 8px;
+		padding: 0 var(--space-2);
 		transition:
 			background-color var(--duration-fast) var(--ease-standard),
 			color var(--duration-fast) var(--ease-standard);
 	}
 
 	.prompt-subcard__send:hover:not(:disabled) {
-		background-color: rgba(163, 152, 217, 0.2);
-		color: rgba(163, 152, 217, 0.9);
+		background-color: color-mix(in srgb, var(--color-teal) 20%, transparent);
+		color: var(--color-text-on-dark);
 	}
 
 	.prompt-subcard__send:disabled {

@@ -7,7 +7,7 @@
 	import { aiPanel } from '$lib/stores/ai-panel.svelte';
 	import { editorState } from '../../../../modules/editor/stores/editor.svelte.ts';
 	import * as autosaveService from '$modules/editor/services/autosave-service.js';
-	import GhostButton from '$lib/components/ui/GhostButton.svelte';
+	import { GhostButton } from '$lib/components/ui/index.js';
 
 	let { data } = $props<{ data: { scenes: Scene[] } }>();
 
@@ -150,8 +150,8 @@
 	}
 
 	.doc-list {
-		background-color: var(--color-slate);
-		border-right: 1px solid var(--color-border);
+		background-color: var(--color-surface-ground);
+		border-right: 1px solid var(--color-border-default);
 		padding: var(--space-3);
 		overflow-y: auto;
 	}
@@ -194,7 +194,7 @@
 	}
 
 	.scene-item:hover {
-		background-color: var(--color-border);
+		background-color: var(--color-surface-hover);
 		color: var(--color-text-primary);
 	}
 
@@ -213,7 +213,7 @@
 		display: flex;
 		justify-content: flex-end;
 		padding: var(--space-2) var(--space-3);
-		border-bottom: 1px solid var(--color-border);
+		border-bottom: 1px solid var(--color-border-default);
 	}
 
 	.editor-textarea {

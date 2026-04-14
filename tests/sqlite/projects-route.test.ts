@@ -34,7 +34,8 @@ describe('projects route logic', () => {
 			logline: 'A test logline',
 			synopsis: '',
 			targetWordCount: 80000,
-			status: 'draft',
+			status: 'draft', projectType: 'novel' as 'novel',
+
 			createdAt: now,
 			updatedAt: now,
 		};
@@ -63,7 +64,8 @@ describe('projects route logic', () => {
 			logline: '',
 			synopsis: '',
 			targetWordCount: 0,
-			status: 'draft',
+			status: 'draft', projectType: 'novel' as 'novel',
+
 			createdAt: now,
 			updatedAt: now,
 		});
@@ -89,7 +91,8 @@ describe('projects route logic', () => {
 			logline: '',
 			synopsis: '',
 			targetWordCount: 0,
-			status: 'draft',
+			status: 'draft', projectType: 'novel' as 'novel',
+
 			createdAt: now,
 			updatedAt: now,
 		});
@@ -123,7 +126,8 @@ describe('projects route logic', () => {
 			logline: '',
 			synopsis: '',
 			targetWordCount: 0,
-			status: 'draft',
+			status: 'draft', projectType: 'novel' as 'novel',
+
 			createdAt: now,
 			updatedAt: now,
 		});

@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { preCheck, migrate } from '$lib/migration/index.js';
 	import type { PreCheckResult, MigrationError } from '$lib/migration/index.js';
-	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
+	import { PrimaryButton, SecondaryButton } from '$lib/components/ui/index.js';
 
 	type TableStatus = 'pending' | 'migrating' | 'done' | 'error';
 
@@ -159,9 +159,9 @@
 				</p>
 
 				{#if totalErrors > 0}
-					<button class="btn-secondary" onclick={() => (showErrors = !showErrors)}>
+			<SecondaryButton onclick={() => (showErrors = !showErrors)}>
 						{showErrors ? 'Hide' : 'Show'} error details
-					</button>
+			</SecondaryButton>
 
 					{#if showErrors}
 						<ul class="error-list">
@@ -172,7 +172,7 @@
 					{/if}
 				{/if}
 
-				<a href="/projects" class="btn-primary">Go to Projects</a>
+				<PrimaryButton href="/projects">Go to Projects</PrimaryButton>
 			</div>
 		{:else}
 			<p class="status-msg">Migrating…</p>
@@ -252,34 +252,6 @@
 		cursor: pointer;
 	}
 
-	.btn-primary {
-		display: inline-block;
-		background: var(--color-nova-blue);
-		color: var(--color-text-primary);
-		border: none;
-		border-radius: var(--radius-sm);
-		padding: var(--space-2) var(--space-4);
-		font-size: var(--text-sm);
-		font-weight: var(--font-weight-semibold);
-		cursor: pointer;
-		text-decoration: none;
-	}
-
-	.btn-primary:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
-	.btn-secondary {
-		background: transparent;
-		color: var(--color-text-secondary);
-		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-sm);
-		padding: var(--space-1) var(--space-3);
-		font-size: var(--text-xs);
-		cursor: pointer;
-		margin-bottom: var(--space-2);
-	}
 
 	.status-badge {
 		display: inline-block;

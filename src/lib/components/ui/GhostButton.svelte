@@ -5,14 +5,21 @@
 	interface Props extends HTMLButtonAttributes {
 		children?: Snippet;
 		class?: string;
+		href?: string;
 	}
 
-	let { children, class: className = '', ...rest }: Props = $props();
+	let { children, class: className = '', href, ...rest }: Props = $props();
 </script>
 
-<button class="btn-ghost {className}" {...rest}>
-	{@render children?.()}
-</button>
+{#if href}
+	<a {href} class="btn-ghost {className}">
+		{@render children?.()}
+	</a>
+{:else}
+	<button class="btn-ghost {className}" {...rest}>
+		{@render children?.()}
+	</button>
+{/if}
 
 <style>
 	.btn-ghost {

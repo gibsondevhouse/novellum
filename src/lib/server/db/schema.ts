@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS projects (
 	status TEXT NOT NULL DEFAULT '',
 	systemPrompt TEXT NOT NULL DEFAULT '',
 	negativePrompt TEXT NOT NULL DEFAULT '',
+	projectType TEXT NOT NULL DEFAULT 'novel',
 	createdAt TEXT NOT NULL,
 	updatedAt TEXT NOT NULL
 );

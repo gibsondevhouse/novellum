@@ -207,7 +207,7 @@
 	.rail-adj {
 		display: flex;
 		align-items: center;
-		gap: 5px;
+		gap: var(--space-1);
 		background: none;
 		border: none;
 		padding: var(--space-2) 0;
@@ -265,7 +265,7 @@
 	.arc-type-item {
 		background: none;
 		border: none;
-		padding: 3px var(--space-2);
+		padding: var(--space-1) var(--space-2);
 		font-family: var(--font-sans);
 		font-size: var(--text-xs);
 		font-weight: var(--font-weight-medium);
