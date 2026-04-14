@@ -16,15 +16,18 @@
 		isChecking = true;
 
 		try {
-			// Verify key with OpenRouter auth check endpoint or a simple model fetch
-			const res = await fetch('https://openrouter.ai/api/v1/auth/key', {
-				method: 'GET',
-				headers: {
-					'Authorization': `Bearer ${apiKey.trim()}`
-				}
+			const res = await fetch('/api/ai/validate-key', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ apiKey: apiKey.trim() }),
 			});
 
 			if (!res.ok) {
+				throw new Error('Validation request failed');
+			}
+
+			const data = await res.json();
+			if (!data.valid) {
 				throw new Error('Invalid key');
 			}
 

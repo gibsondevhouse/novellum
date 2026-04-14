@@ -11,6 +11,8 @@
 		onsubmit?: (text: string) => void;
 	} = $props();
 
+	let focused = $state(false);
+
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Enter' && !event.shiftKey) {
 			event.preventDefault();
@@ -24,26 +26,32 @@
 	}
 </script>
 
-<div class="prompt-subcard">
-	<textarea
-		class="prompt-subcard__textarea"
-		bind:value
-		{placeholder}
-		rows="1"
-		onkeydown={handleKeydown}
-		{disabled}
-	></textarea>
-	<button
-		class="prompt-subcard__send"
-		onclick={submit}
-		disabled={!value.trim() || disabled}
-		aria-label="Send message"
-	>
-		<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-			<line x1="5" y1="12" x2="19" y2="12"></line>
-			<polyline points="12 5 19 12 12 19"></polyline>
-		</svg>
-	</button>
+<div class="prompt-subcard" class:prompt-subcard--expanded={focused}>
+	<div class="prompt-subcard__body">
+		<textarea
+			class="prompt-subcard__textarea"
+			bind:value
+			{placeholder}
+			rows="1"
+			onkeydown={handleKeydown}
+			onfocus={() => (focused = true)}
+			onblur={() => (focused = false)}
+			{disabled}
+		></textarea>
+	</div>
+	<div class="prompt-subcard__actions">
+		<button
+			class="prompt-subcard__send"
+			onmousedown={submit}
+			disabled={!value.trim() || disabled}
+			aria-label="Send message"
+		>
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+				<line x1="5" y1="12" x2="19" y2="12"></line>
+				<polyline points="12 5 19 12 12 19"></polyline>
+			</svg>
+		</button>
+	</div>
 </div>
 
 <style>
@@ -55,11 +63,27 @@
 		border-radius: 16px;
 		border: 1px solid rgba(255, 255, 255, 0.075);
 		background-color: var(--color-surface-raised);
-		transition: border-color var(--duration-fast) var(--ease-standard);
+		transition:
+			border-color var(--duration-fast) var(--ease-standard),
+			height var(--duration-enter) var(--ease-standard);
 	}
 
-	.prompt-subcard:focus-within {
+	.prompt-subcard--expanded {
+		flex-direction: column;
+		align-items: stretch;
+		padding: 12px;
+		gap: 12px;
 		border-color: rgba(255, 255, 255, 0.14);
+	}
+
+	.prompt-subcard__body {
+		flex: 1;
+		display: flex;
+		min-height: 0;
+	}
+
+	.prompt-subcard--expanded .prompt-subcard__body {
+		min-height: 200px;
 	}
 
 	.prompt-subcard__textarea {
@@ -76,6 +100,10 @@
 		max-height: 200px;
 	}
 
+	.prompt-subcard--expanded .prompt-subcard__textarea {
+		max-height: none;
+	}
+
 	.prompt-subcard__textarea:focus {
 		outline: none;
 	}
@@ -87,6 +115,13 @@
 	.prompt-subcard__textarea:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
+	}
+
+	/* ── Actions row ── */
+	.prompt-subcard__actions {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
 	}
 
 	/* ── Send button ── */
