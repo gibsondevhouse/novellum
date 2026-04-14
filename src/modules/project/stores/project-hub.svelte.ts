@@ -72,6 +72,8 @@ export async function submitCreate(data: {
 			logline: data.logline ?? '',
 			synopsis: data.synopsis ?? '',
 			targetWordCount: data.targetWordCount ?? 80000,
+			systemPrompt: '',
+			negativePrompt: '',
 			status: 'draft',
 		});
 		// active project store update removed as it's now reactively derived from URL

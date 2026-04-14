@@ -5,6 +5,10 @@
 	import DeleteProjectDialog from '$modules/project/components/DeleteProjectDialog.svelte';
 	import ExportModal from '$modules/export/components/ExportModal.svelte';
 	import { initCurrentProject } from '$modules/project/stores/project-hub.svelte.js';
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	import SurfacePanel from '$lib/components/ui/SurfacePanel.svelte';
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	import SectionHeader from '$lib/components/ui/SectionHeader.svelte';
 
 	let { data, children } = $props<{ data: { project: Project }; children: () => void }>();
 

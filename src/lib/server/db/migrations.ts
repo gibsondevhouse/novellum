@@ -10,10 +10,21 @@ function ensureProjectsCoverUrlColumn(db: Database.Database): void {
 	}
 }
 
+function ensureProjectsPromptColumns(db: Database.Database): void {
+	const columns = db.prepare('PRAGMA table_info(projects)').all() as Array<{ name: string }>;
+	const hasSystemPrompt = columns.some((column) => column.name === 'systemPrompt');
+
+	if (!hasSystemPrompt) {
+		db.exec("ALTER TABLE projects ADD COLUMN systemPrompt TEXT NOT NULL DEFAULT ''");
+		db.exec("ALTER TABLE projects ADD COLUMN negativePrompt TEXT NOT NULL DEFAULT ''");
+	}
+}
+
 export function runMigrations(db: Database.Database): void {
 	db.transaction(() => {
 		db.exec(SCHEMA_SQL);
 		ensureProjectsCoverUrlColumn(db);
+		ensureProjectsPromptColumns(db);
 		db.exec(INDEX_SQL);
 	})();
 }

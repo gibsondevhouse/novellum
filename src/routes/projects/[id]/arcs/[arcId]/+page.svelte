@@ -5,8 +5,7 @@
 <div class="coming-soon">
 	<div class="coming-soon__content">
 		<span class="coming-soon__eyebrow">Arc Dashboard</span>
-		<h1 class="coming-soon__heading">Coming Soon</h1>
-		<p class="coming-soon__body">The arc development workspace is being built. Check back soon.</p>
+		<p class="coming-soon__body">The arc development workspace will be available via updates.</p>
 		<a class="coming-soon__back" href="/projects/{$page.params.id}/workspace">
 			← Back to Workspace
 		</a>
@@ -39,15 +38,6 @@
 		letter-spacing: var(--tracking-widest);
 		color: var(--color-nova-blue);
 		opacity: 0.7;
-	}
-
-	.coming-soon__heading {
-		font-family: var(--font-display);
-		font-size: var(--text-3xl);
-		font-weight: var(--font-weight-normal);
-		color: var(--color-text-primary);
-		letter-spacing: var(--tracking-tight);
-		margin: 0;
 	}
 
 	.coming-soon__body {

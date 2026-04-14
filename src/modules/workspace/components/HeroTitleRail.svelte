@@ -84,7 +84,7 @@
 	<div class="rail-zone rail-zone--center">
 		{#if showArcTypes}
 			<div class="arc-type-list" role="group" aria-label="Arc types">
-				{#each ARC_TYPES as t, i}
+				{#each ARC_TYPES as t, i (t.value)}
 					{#if i > 0}<span class="arc-type-sep" aria-hidden="true">|</span>{/if}
 					<button
 						class="arc-type-item"

@@ -15,6 +15,8 @@ export const projectSchema = z.object({
 	synopsis: z.string(),
 	targetWordCount: z.number(),
 	status: z.string(),
+	systemPrompt: z.string(),
+	negativePrompt: z.string(),
 	createdAt: z.string(),
 	updatedAt: z.string(),
 });

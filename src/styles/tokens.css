@@ -10,6 +10,7 @@
 	--color-surface-raised: #191917; /* primary content panels           */
 	--color-surface-overlay: #222222; /* cards, floating panels           */
 	--color-surface-elevated: #2c2c2c; /* hover states, highlighted rows   */
+	--color-surface-hover: #262626; /* new hover standard               */
 	--color-surface-glass: rgba(255, 255, 255, 0.04); /* frosted-glass overlays           */
 
 	/* ── Legacy surface aliases (backwards compat) ── */
@@ -94,7 +95,19 @@
 
 	/* ── Layout ── */
 	--sidebar-width: 220px;
+	--sidebar-collapsed-width: 64px;
+	--panel-width: 280px;
 	--panel-padding: var(--space-4);
+
+	/* ── Icons ── */
+	--icon-size-sm: 16px;
+	--icon-size-md: 20px;
+	--icon-size-lg: 24px;
+
+	/* ── Border Widths ── */
+	--border-width-sm: 1px;
+	--border-width-md: 2px;
+	--border-width-lg: 3px;
 
 	/* ── Radius ── */
 	--radius-none: 0px;

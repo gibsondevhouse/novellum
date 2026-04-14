@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseEditSuggestions } from '../../src/lib/ai/edit-agent.js';
+import { parseEditSuggestions, generateEditSuggestionsFromDiff } from '../../src/lib/ai/edit-agent.js';
 import { buildPrompt } from '../../src/lib/ai/prompt-builder.js';
 import { resolveTask } from '../../src/lib/ai/task-resolver.js';
 
@@ -83,6 +83,50 @@ describe('parseEditSuggestions', () => {
 		const result = parseEditSuggestions(raw, 'developmental');
 		expect(result).toHaveLength(1);
 		expect(result[0].original).toBe('He');
+	});
+});
+
+describe('generateEditSuggestionsFromDiff', () => {
+	it('generates differences properly', () => {
+		const original = 'The quick brown fox jumps.';
+		const revised = 'The very fast brown fox leaping.';
+		const result = generateEditSuggestionsFromDiff(original, revised, 'line_edit');
+		
+		expect(result.length).toBeGreaterThan(0);
+		// Let's assert based on actual trim values, since diffWordsWithSpace might handle spaces differently
+		expect(result[0].original.trim()).toBe('quick');
+		expect(result[0].suggestion.trim()).toBe('very fast');
+		expect(result[0].mode).toBe('line_edit');
+	});
+
+	it('handles insertions missing from original text', () => {
+		const original = 'He walked.';
+		const revised = 'He slowly walked.';
+		const result = generateEditSuggestionsFromDiff(original, revised, 'proofread');
+
+		expect(result.length).toBe(1);
+		expect(result[0].original.trim()).toBe('');
+		expect(result[0].suggestion.trim()).toBe('slowly');
+		expect(result[0].spanStart).toBe(3); // after 'He '
+		expect(result[0].spanEnd).toBe(3);
+	});
+
+	it('handles deletions from original text', () => {
+		const original = 'She quietly smiled.';
+		const revised = 'She smiled.';
+		const result = generateEditSuggestionsFromDiff(original, revised, 'developmental');
+
+		expect(result.length).toBe(1);
+		expect(result[0].original.trim()).toBe('quietly');
+		expect(result[0].suggestion.trim()).toBe('');
+		// 'She ' is unchanged
+		expect(result[0].spanStart).toBe(4);
+	});
+
+	it('returns no suggestions if strings match precisely', () => {
+		const text = 'Nothing to change here.';
+		const result = generateEditSuggestionsFromDiff(text, text, 'line_edit');
+		expect(result.length).toBe(0);
 	});
 });
 

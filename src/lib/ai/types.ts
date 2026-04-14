@@ -65,6 +65,7 @@ export interface UiContext {
 	activeSceneId: string | null;
 	activeBeatId: string | null;
 	activeChapterId: string | null;
+	instruction?: string;
 }
 
 export interface AiTask {
@@ -73,6 +74,7 @@ export interface AiTask {
 	targetEntityId: string | null;
 	contextPolicy: ContextPolicy;
 	outputFormat: string;
+	instruction?: string;
 }
 
 export interface AiContext {

@@ -13,6 +13,7 @@
 		onAddScene,
 		onDeleteScene,
 		onReorderScenes,
+		onMoveScene,
 	} = $props<{
 		act: Act;
 		chapters: ChapterWithScenes[];
@@ -23,6 +24,7 @@
 		onAddScene: (chapter: ChapterWithScenes, title: string) => void;
 		onDeleteScene: (chapter: ChapterWithScenes, sceneId: string) => void;
 		onReorderScenes: (chapter: ChapterWithScenes, ids: string[]) => void;
+		onMoveScene: (sceneId: string, fromChapterId: string, toChapterId: string, index: number) => void;
 	}>();
 
 	let expanded = $state(true);
@@ -68,6 +70,7 @@
 					onAddScene={(title) => onAddScene(chapter, title)}
 					onDeleteScene={(id) => onDeleteScene(chapter, id)}
 					onReorderScenes={(ids) => onReorderScenes(chapter, ids)}
+					{onMoveScene}
 				/>
 			{/each}
 		</div>

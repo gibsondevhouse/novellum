@@ -29,14 +29,6 @@
 	<div class="field">
 		<div class="label-row">
 			<label class="label" for="create-logline">Logline</label>
-			<button
-				type="button"
-				class="ai-hint-btn"
-				aria-label="Generate logline (coming soon)"
-				disabled
-			>
-				✦ Generate Logline
-			</button>
 		</div>
 		<textarea
 			id="create-logline"
@@ -139,19 +131,6 @@
 		color: var(--color-text-muted);
 		margin: 0;
 		line-height: var(--leading-normal);
-	}
-
-	.ai-hint-btn {
-		background: none;
-		border: 1px dashed var(--color-border-default);
-		border-radius: var(--radius-sm);
-		padding: 2px var(--space-2);
-		font-size: var(--text-xs);
-		color: var(--color-text-muted);
-		cursor: not-allowed;
-		opacity: 0.6;
-		transition: opacity var(--duration-fast) var(--ease-standard);
-		font-family: var(--font-sans);
 	}
 
 	.disclosure-toggle {

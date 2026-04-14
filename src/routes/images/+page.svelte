@@ -1,50 +1,72 @@
+<script lang="ts">
+	import ImageGrid from '$modules/assets/components/ImageGrid.svelte';
+</script>
+
 <svelte:head>
 	<title>Images — Novellum</title>
 </svelte:head>
 
-<div class="surface-stub">
-	<div class="surface-stub__icon" aria-hidden="true">🖼</div>
-	<h1 class="surface-stub__title">Images</h1>
-	<p class="surface-stub__description">
-		Asset library for covers, references, character portraits, and scene visuals — manage and tag
-		media across projects.
-	</p>
-	<span class="surface-stub__badge">Coming soon</span>
+<div class="library-hub">
+	<header class="library-header">
+		<div class="library-heading">
+			<h1 class="library-title">Images</h1>
+			<p class="library-subtitle">
+				Asset library for covers, references, character portraits, and scene visuals — manage and tag
+				media across projects.
+			</p>
+		</div>
+	</header>
+	
+	<ImageGrid />
 </div>
 
 <style>
-	.surface-stub {
+	.library-hub {
+		max-width: 1100px;
+		margin: 0 auto;
+		padding: var(--space-8) var(--panel-padding) var(--space-10);
+	}
+
+	.library-header {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: var(--space-4);
+		margin-bottom: var(--space-8);
+	}
+
+	.library-heading {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		min-height: 60vh;
-		text-align: center;
-		gap: var(--space-4);
-		padding: var(--space-12);
-		color: var(--color-text-primary);
+		gap: var(--space-2);
+		max-width: 560px;
 	}
-	.surface-stub__icon {
-		font-size: var(--text-4xl);
-		opacity: 0.3;
-	}
-	.surface-stub__title {
+
+	.library-title {
 		font-family: var(--font-display);
-		font-size: var(--text-3xl);
+		font-size: var(--text-5xl);
+		font-weight: var(--font-weight-normal);
+		letter-spacing: var(--tracking-tight);
+		color: var(--color-text-primary);
+		line-height: 1.1;
 		margin: 0;
 	}
-	.surface-stub__description {
-		font-size: var(--text-sm);
+
+	.library-subtitle {
+		font-family: var(--font-sans);
+		font-size: var(--text-base);
 		color: var(--color-text-muted);
-		max-width: 400px;
 		line-height: var(--leading-relaxed);
 		margin: 0;
 	}
-	.surface-stub__badge {
-		font-size: var(--text-xs);
-		padding: var(--space-1) var(--space-3);
-		background: var(--color-surface-overlay);
-		border-radius: var(--radius-full);
-		color: var(--color-text-muted);
+
+	@media (max-width: 640px) {
+		.library-title {
+			font-size: var(--text-4xl);
+		}
+		.library-subtitle {
+			font-size: var(--text-sm);
+		}
 	}
 </style>

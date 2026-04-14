@@ -6,6 +6,7 @@
 	import { aiPanel } from '$lib/stores/ai-panel.svelte';
 	import { editorState } from '../../../../modules/editor/stores/editor.svelte.ts';
 	import * as autosaveService from '$modules/editor/services/autosave-service.js';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 
 	let { data } = $props<{ data: { scenes: Scene[] } }>();
 
@@ -113,9 +114,9 @@
 	<!-- Editor area (center panel) -->
 	<main class="editor-area">
 		<div class="editor-toolbar">
-			<button class="btn-icon" onclick={handleAskAi} title="Ask AI for a suggestion">
+			<GhostButton onclick={handleAskAi} title="Ask AI for a suggestion">
 				✦ Ask AI
-			</button>
+			</GhostButton>
 		</div>
 		{#if data.scenes.length === 0}
 			<div class="editor-empty">
@@ -220,22 +221,6 @@
 		justify-content: flex-end;
 		padding: var(--space-2) var(--space-3);
 		border-bottom: 1px solid var(--color-border);
-	}
-
-	.btn-icon {
-		background-color: var(--color-border);
-		border: none;
-		border-radius: var(--radius-sm);
-		padding: var(--space-1) var(--space-3);
-		color: var(--color-text-secondary);
-		font-size: var(--text-xs);
-		font-weight: var(--font-weight-semibold);
-		cursor: pointer;
-		letter-spacing: 0.05em;
-	}
-
-	.btn-icon:hover {
-		color: var(--color-teal);
 	}
 
 	.editor-empty {

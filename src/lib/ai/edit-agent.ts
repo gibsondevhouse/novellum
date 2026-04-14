@@ -1,4 +1,5 @@
 import type { EditMode, EditSuggestion } from './types.js';
+import { diffWords } from 'diff';
 
 interface RawEditSuggestion {
 	spanStart: unknown;
@@ -41,4 +42,79 @@ export function parseEditSuggestions(rawText: string, mode: EditMode): EditSugge
 	} catch {
 		return [];
 	}
+}
+
+/**
+ * Compares an original text and a revised text, producing a list of EditSuggestions.
+ * This is useful if the AI returns prose instead of structured spans.
+ */
+export function generateEditSuggestionsFromDiff(
+	originalText: string,
+	revisedText: string,
+	mode: EditMode,
+	defaultReason = 'AI suggested revision'
+): EditSuggestion[] {
+	const changes = diffWords(originalText, revisedText);
+	const suggestions: EditSuggestion[] = [];
+
+	let currentIndex = 0;
+	let pendingOriginalContext = '';
+	let pendingSuggestionContext = '';
+	let inDiffContext = false;
+	let startIdx = 0;
+
+	// Loop through changes from diff package.
+	// Since diff packages often break down changes into adjacent added/removed blocks,
+	// we group adjacent changes together to form a coherent replacement.
+	for (let i = 0; i < changes.length; i++) {
+		const change = changes[i];
+
+		if (change.added || change.removed) {
+			if (!inDiffContext) {
+				inDiffContext = true;
+				startIdx = currentIndex;
+				pendingOriginalContext = '';
+				pendingSuggestionContext = '';
+			}
+
+			if (change.removed) {
+				pendingOriginalContext += change.value;
+			}
+			if (change.added) {
+				pendingSuggestionContext += change.value;
+			}
+		} else {
+			// Unchanged
+			if (inDiffContext) {
+				// Flush pending difference
+				suggestions.push({
+					spanStart: startIdx,
+					spanEnd: currentIndex,
+					original: pendingOriginalContext,
+					suggestion: pendingSuggestionContext,
+					reason: defaultReason,
+					mode
+				});
+				inDiffContext = false;
+			}
+		}
+
+		if (!change.added) {
+			currentIndex += change.value.length;
+		}
+	}
+
+	// Flush remaining diff if file ended on a change
+	if (inDiffContext) {
+		suggestions.push({
+			spanStart: startIdx,
+			spanEnd: currentIndex,
+			original: pendingOriginalContext,
+			suggestion: pendingSuggestionContext,
+			reason: defaultReason,
+			mode
+		});
+	}
+
+	return suggestions;
 }

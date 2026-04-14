@@ -222,7 +222,7 @@
 				{/if}
 				{#if chips.length > 0}
 					<div class="detail-card__chips">
-						{#each chips as chip}
+						{#each chips as chip (chip)}
 							<span class="detail-card__chip">{chip}</span>
 						{/each}
 					</div>
@@ -237,7 +237,7 @@
 			<div class="type-picker" role="dialog" aria-label="Choose arc type">
 				<p class="type-picker__label">Arc Type</p>
 				<div class="type-picker__pills">
-					{#each ARC_TYPES as t}
+					{#each ARC_TYPES as t (t.value)}
 						<button
 							class="type-pill"
 							class:type-pill--active={currentArcType === t.value}

@@ -130,11 +130,18 @@ export function buildPrompt(task: AiTask, ctx: AiContext): string {
 
 	const headerParts = [
 		`## ROLE\n${task.role}`,
-		`## TASK\n${taskDescriptions[task.taskType] ?? 'Complete the requested task.'}`,
+		`## TASK\n${taskDescriptions[task.taskType] ?? 'Complete the requested task.'}`
+	];
+
+	if (task.instruction) {
+		headerParts.push(`## SPECIFIC COMMAND\n${task.instruction}`);
+	}
+
+	headerParts.push(
 		`## CONTEXT\n${contextBody}`,
 		`## CONSTRAINTS\n${constraints.map((c) => `- ${c}`).join('\n')}`,
-		`## OUTPUT FORMAT\n${outputDescriptions[task.outputFormat] ?? task.outputFormat}`,
-	];
+		`## OUTPUT FORMAT\n${outputDescriptions[task.outputFormat] ?? task.outputFormat}`
+	);
 
 	let prompt = headerParts.join('\n\n');
 
@@ -142,7 +149,10 @@ export function buildPrompt(task: AiTask, ctx: AiContext): string {
 	if (prompt.length > MAX_PROMPT_CHARS) {
 		const excess = prompt.length - MAX_PROMPT_CHARS;
 		contextBody = contextBody.slice(0, contextBody.length - excess - 50); // 50 char buffer
-		headerParts[2] = `## CONTEXT\n${contextBody}\n[Context truncated due to size limit]`;
+		const contextIndex = headerParts.findIndex(p => p.startsWith('## CONTEXT'));
+		if (contextIndex !== -1) {
+			headerParts[contextIndex] = `## CONTEXT\n${contextBody}\n[Context truncated due to size limit]`;
+		}
 		prompt = headerParts.join('\n\n');
 	}
 

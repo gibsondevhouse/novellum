@@ -21,6 +21,8 @@ export const PUT: RequestHandler = async ({ params, request }) => {
 		'synopsis',
 		'targetWordCount',
 		'status',
+		'systemPrompt',
+		'negativePrompt'
 	];
 
 	for (const key of allowed) {

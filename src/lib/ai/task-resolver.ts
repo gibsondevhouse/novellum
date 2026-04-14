@@ -111,5 +111,6 @@ export function resolveTask(action: string, uiCtx: UiContext): AiTask {
 		targetEntityId,
 		contextPolicy: def.contextPolicy,
 		outputFormat: def.outputFormat,
+		instruction: uiCtx.instruction,
 	};
 }
