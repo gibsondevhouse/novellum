@@ -2,11 +2,11 @@
 	import type { Project } from '$lib/db/types';
 	import { apiPut } from '$lib/api-client';
 	import SurfaceCard from '$lib/components/ui/SurfaceCard.svelte';
+	import { toast } from '$lib/stores/toast.svelte.js';
 
 	let { project }: { project: Project } = $props();
 
 	let saving = $state(false);
-	let saveMessage = $state('');
 
 	let systemPrompt = $state('');
 	let negativePrompt = $state('');
@@ -26,7 +26,6 @@
 
 	async function handleSave() {
 		saving = true;
-		saveMessage = '';
 
 		try {
 			await apiPut(`/api/db/projects/${project.id}`, {
@@ -35,15 +34,11 @@
 			});
 			project.systemPrompt = systemPrompt;
 			project.negativePrompt = negativePrompt;
-			saveMessage = 'Saved safely.';
+			toast('Prompts saved successfully.', 'success');
 		} catch (error) {
-			console.error(error);
-			saveMessage = 'Failed to save.';
+			toast(error instanceof Error ? error.message : 'Failed to save prompts.', 'error');
 		} finally {
 			saving = false;
-			setTimeout(() => {
-				saveMessage = '';
-			}, 3000);
 		}
 	}
 </script>
@@ -51,9 +46,6 @@
 <div class="prompt-editor" role="region" aria-label="Project Prompts">
 	<div class="header">
 		<h2>Prompts</h2>
-		{#if saveMessage}
-			<span class="save-message" role="status">{saveMessage}</span>
-		{/if}
 	</div>
 
 	<div class="grid">
@@ -110,11 +102,6 @@
 		font-family: var(--font-display);
 		font-size: var(--text-lg);
 		margin: 0;
-	}
-
-	.save-message {
-		font-size: var(--text-sm);
-		color: var(--color-text-muted);
 	}
 
 	.grid {

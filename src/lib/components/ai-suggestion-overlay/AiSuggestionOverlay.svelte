@@ -162,7 +162,8 @@
 		border: 2px solid var(--color-border-strong);
 		border-top-color: var(--color-teal);
 		border-radius: var(--radius-full);
-		animation: spin 0.8s linear infinite;
+		--_dur: 0.8s;
+		animation: spin var(--_dur) linear infinite;
 	}
 
 	@keyframes spin {
@@ -183,7 +184,7 @@
 
 	.btn--primary {
 		background-color: var(--color-nova-blue);
-		color: #fff;
+		color: var(--color-text-on-dark);
 		border-color: var(--color-nova-blue);
 	}
 
@@ -212,5 +213,11 @@
 	.btn--ghost:hover {
 		color: var(--color-text-primary);
 		background-color: var(--color-surface-elevated);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.spinner {
+			animation: none;
+		}
 	}
 </style>

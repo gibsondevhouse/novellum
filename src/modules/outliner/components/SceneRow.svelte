@@ -107,7 +107,7 @@
 	.scene-row {
 		border-radius: var(--radius-sm);
 		overflow: hidden;
-		transition: background 0.1s ease;
+		transition: background var(--duration-fast) var(--ease-standard);
 	}
 
 	.scene-row.is-selected {
@@ -156,7 +156,7 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		transition: color 0.12s ease;
+		transition: color var(--duration-fast) var(--ease-standard);
 		border-radius: var(--radius-sm);
 	}
 
@@ -186,7 +186,7 @@
 
 	.title-edit:focus {
 		outline: none;
-		box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-nova-blue) 25%, transparent);
+		box-shadow: var(--focus-ring);
 	}
 
 	.wc-badge {
@@ -209,7 +209,7 @@
 		margin-left: auto;
 		flex-shrink: 0;
 		opacity: 0;
-		transition: opacity 0.12s ease;
+		transition: opacity var(--duration-fast) var(--ease-standard);
 	}
 
 	.scene-row:hover .scene-actions,

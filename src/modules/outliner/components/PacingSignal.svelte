@@ -22,17 +22,17 @@
 	}
 
 	.pacing-pill--healthy {
-		color: var(--color-success, #4ade80);
+		color: var(--color-success);
 		background: color-mix(in srgb, var(--color-success, #4ade80) 12%, transparent);
 	}
 
 	.pacing-pill--sparse {
-		color: var(--color-warning, #facc15);
+		color: var(--color-warning);
 		background: color-mix(in srgb, var(--color-warning, #facc15) 12%, transparent);
 	}
 
 	.pacing-pill--very-sparse {
-		color: var(--color-error, #f87171);
+		color: var(--color-error);
 		background: color-mix(in srgb, var(--color-error, #f87171) 12%, transparent);
 	}
 </style>

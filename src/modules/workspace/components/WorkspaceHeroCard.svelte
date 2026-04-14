@@ -103,7 +103,7 @@
 		flex-direction: row;
 		align-items: stretch;
 		gap: var(--space-6);
-		animation: mode-appear 180ms var(--ease-decelerate) both;
+		animation: mode-appear var(--duration-enter) var(--ease-decelerate) both;
 	}
 
 	@keyframes mode-appear {
@@ -157,7 +157,7 @@
 		border-radius: var(--radius-md);
 		align-self: center;
 		min-width: 0;
-		animation: explainer-enter 160ms var(--ease-decelerate) both;
+		animation: explainer-enter var(--duration-base) var(--ease-decelerate) both;
 	}
 
 	@keyframes explainer-enter {
@@ -198,5 +198,14 @@
 		padding-top: var(--space-2);
 		border-top: 1px solid var(--color-border-subtle);
 		font-style: italic;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.mode-identity-row {
+			animation: none;
+		}
+		.mode-explainer {
+			animation: none;
+		}
 	}
 </style>

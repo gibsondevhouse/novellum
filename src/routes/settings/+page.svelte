@@ -28,32 +28,32 @@
 		height: 100%;
 		max-width: 1200px;
 		margin: 0 auto;
-		padding: 3rem 2rem;
+		padding: var(--space-12) var(--space-8);
 		width: 100%;
-		gap: 2rem;
+		gap: var(--space-8);
 	}
 
 	.settings-header {
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
-		border-bottom: 1px solid var(--border-color, #333);
-		padding-bottom: 2rem;
+		gap: var(--space-4);
+		border-bottom: 1px solid var(--color-border-default);
+		padding-bottom: var(--space-8);
 	}
 
 	.settings-title {
 		margin: 0;
-		font-size: 2rem;
-		font-weight: 600;
-		line-height: 1.2;
-		letter-spacing: -0.01em;
-		color: var(--text-base, #111111);
+		font-size: var(--text-3xl);
+		font-weight: var(--font-weight-semibold);
+		line-height: var(--leading-tight);
+		letter-spacing: var(--tracking-tight);
+		color: var(--color-text-primary);
 	}
 
 	.settings-subtitle {
-		margin: 0.5rem 0 0 0;
-		font-size: 1.125rem;
-		color: var(--text-subtle, #5c5c5c);
+		margin: var(--space-2) 0 0 0;
+		font-size: var(--text-lg);
+		color: var(--color-text-muted);
 		max-width: 60ch;
 	}
 
@@ -61,12 +61,12 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 2rem;
+		gap: var(--space-8);
 	}
 
 	.settings-grid {
 		display: grid;
-		gap: 2rem;
+		gap: var(--space-8);
 		grid-template-columns: 1fr;
 		align-items: start;
 	}

@@ -70,7 +70,7 @@
 	.btn-submit {
 		padding: var(--space-1) var(--space-3);
 		background: var(--color-nova-blue);
-		color: #fff;
+		color: var(--color-text-on-dark);
 		border: none;
 		border-radius: var(--radius-sm);
 		font-size: var(--text-sm);

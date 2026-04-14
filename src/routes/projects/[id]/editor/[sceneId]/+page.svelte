@@ -3,6 +3,7 @@
 	import VersionHistoryPanel from '$modules/editor/components/VersionHistoryPanel.svelte';
 	import { editorState } from '$modules/editor/stores/editor.svelte.js';
 	import * as autosaveService from '$modules/editor/services/autosave-service.js';
+	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 
 	let { data } = $props();
 
@@ -35,10 +36,11 @@
 
 <div class="editor-page">
 	<header class="editor-header">
-		{#if data.chapter}
-			<span class="breadcrumb">{data.chapter.title}</span>
-			<span class="separator">›</span>
-		{/if}
+		<Breadcrumb items={[
+			{ label: 'Editor', href: `/projects/${data.scene.projectId}/editor` },
+			...(data.chapter ? [{ label: data.chapter.title, href: `/projects/${data.scene.projectId}/editor` }] : []),
+			{ label: data.scene.title },
+		]} />
 		<h1 class="scene-title">{data.scene.title}</h1>
 		<div class="header-actions">
 			{#if saveStatus === 'saving'}
@@ -86,16 +88,6 @@
 		flex-shrink: 0;
 	}
 
-	.breadcrumb {
-		font-size: var(--text-sm);
-		color: var(--color-text-secondary);
-	}
-
-	.separator {
-		font-size: var(--text-sm);
-		color: var(--color-text-muted);
-	}
-
 	.scene-title {
 		font-family: var(--font-sans);
 		font-size: var(--text-lg);
@@ -121,7 +113,7 @@
 	}
 
 	.save-indicator.saved {
-		color: var(--color-success, #4ade80);
+		color: var(--color-success);
 	}
 
 	.btn-history {

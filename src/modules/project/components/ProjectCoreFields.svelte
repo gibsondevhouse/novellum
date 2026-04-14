@@ -20,6 +20,7 @@
 	} = $props();
 
 	let titleError = $derived(!draft.title.trim() ? '' : '');
+	let genreError = $state('');
 	let genreInput = $state('');
 
 	function handleTitleInput(e: Event) {
@@ -99,7 +100,8 @@
 				if (genreInput.trim()) addGenre(genreInput);
 			}}
 			placeholder="e.g. Fantasy, Thriller"
-			aria-describedby="genre-suggestions-hint"
+			aria-describedby="genre-suggestions-hint genre-error"
+			aria-invalid={!!genreError || undefined}
 			autocomplete="off"
 			list="genre-suggestions"
 		/>
@@ -108,6 +110,7 @@
 				<option value={g}></option>
 			{/each}
 		</datalist>
+		<span id="genre-error" role="alert" class="error-text">{genreError}</span>
 		<p id="genre-suggestions-hint" class="helper-text">Press Enter or comma to add a tag</p>
 	</div>
 </div>
@@ -204,4 +207,10 @@
 	.tag-remove:hover {
 		opacity: 1;
 	}
+
+        .error-text {
+                font-size: var(--text-xs);
+                color: var(--color-error, var(--color-warning));
+                min-height: 1em;
+        }
 </style>

@@ -17,7 +17,7 @@
 <style>
 	.btn-primary {
 		background-color: var(--color-nova-blue);
-		color: #fff;
+		color: var(--color-text-on-dark);
 		border: none;
 		border-radius: var(--radius-sm);
 		padding: var(--space-2) var(--space-4);

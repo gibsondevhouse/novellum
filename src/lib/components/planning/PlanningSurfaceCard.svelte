@@ -80,12 +80,12 @@
 		border-bottom: 1px solid color-mix(in srgb, var(--color-border-default) 60%, transparent);
 		background: var(--color-surface-elevated);
 		box-shadow:
-			-14px 0 48px rgba(0, 0, 0, 0.65),
+			-14px 0 48px color-mix(in srgb, black 65%, transparent),
 			-2px 0 10px color-mix(in srgb, var(--ps-accent) 10%, transparent),
-			inset 0 1px 0 rgba(255, 255, 255, 0.05);
+			inset 0 1px 0 var(--color-surface-glass);
 		/* Smooth anchor transition when selected item changes */
-		transition: margin-top 280ms var(--ease-editorial);
-		animation: ps-enter 220ms var(--ease-editorial) forwards;
+		transition: margin-top var(--duration-slow) var(--ease-editorial);
+		animation: ps-enter var(--duration-slow) var(--ease-editorial) forwards;
 	}
 
 	@keyframes ps-enter {
@@ -111,10 +111,16 @@
 		z-index: 2;
 		border-top-left-radius: var(--radius-lg);
 		border-bottom-left-radius: var(--radius-lg);
-		transition: background 0.15s;
+		transition: background var(--duration-base) var(--ease-standard);
 	}
 
 	.ps-resize-handle:hover {
 		background: color-mix(in srgb, var(--ps-accent) 35%, transparent);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.planning-surface-card {
+			animation: none;
+		}
 	}
 </style>

@@ -40,6 +40,10 @@ src-tauri/gen/
 # Misc
 *.local
 
+# Playwright
+tests/visual/test-results/
+tests/visual/playwright-report/
+
 # Docs
 dev-docs/*
 .github/*

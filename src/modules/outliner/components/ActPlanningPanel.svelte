@@ -93,7 +93,7 @@
 		cursor: pointer;
 		padding: var(--space-1) var(--space-2);
 		border-radius: var(--radius-sm);
-		transition: background 0.1s;
+		transition: background var(--duration-fast) var(--ease-standard);
 	}
 
 	.title-btn:hover {
@@ -160,7 +160,7 @@
 		line-height: 1.5;
 		padding: var(--space-2) var(--space-3);
 		resize: vertical;
-		transition: border-color 0.1s;
+		transition: border-color var(--duration-fast) var(--ease-standard);
 	}
 
 	.field-textarea:focus {

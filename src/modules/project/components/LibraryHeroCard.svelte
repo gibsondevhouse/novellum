@@ -155,8 +155,8 @@
 		position: absolute;
 		inset: 0;
 		background:
-			radial-gradient(circle at 22% 18%, rgba(255, 255, 255, 0.26) 0%, transparent 45%),
-			linear-gradient(125deg, rgba(255, 255, 255, 0.12), transparent 55%);
+			radial-gradient(circle at 22% 18%, color-mix(in srgb, white 26%, transparent) 0%, transparent 45%),
+			linear-gradient(125deg, color-mix(in srgb, white 12%, transparent), transparent 55%);
 		mix-blend-mode: screen;
 		pointer-events: none;
 	}
@@ -172,7 +172,7 @@
 	.library-card__cover-shade {
 		position: absolute;
 		inset: 0;
-		background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 35%, rgba(0, 0, 0, 0.55) 100%);
+		background: linear-gradient(180deg, color-mix(in srgb, black 10%, transparent) 35%, color-mix(in srgb, black 55%, transparent) 100%);
 		pointer-events: none;
 	}
 
@@ -182,7 +182,7 @@
 		font-size: clamp(2.2rem, 4vw, 3rem);
 		line-height: 1;
 		color: color-mix(in srgb, white 88%, var(--color-text-primary));
-		text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+		text-shadow: 0 2px 18px color-mix(in srgb, black 45%, transparent);
 	}
 
 	.library-card__spine {
@@ -218,7 +218,7 @@
 	.genre-pill {
 		display: inline-flex;
 		align-items: center;
-		padding: 5px 10px;
+		padding: var(--space-1) var(--space-2);
 		border-radius: var(--radius-full);
 		font-size: var(--text-xs);
 		font-weight: var(--font-weight-semibold);
@@ -291,6 +291,12 @@
 		.library-card__cover {
 			min-height: 220px;
 			max-width: 180px;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.library-card {
+			animation: none;
 		}
 	}
 </style>

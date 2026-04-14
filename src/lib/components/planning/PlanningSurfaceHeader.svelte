@@ -38,7 +38,7 @@
 		/* Stronger visual separator — card header must feel pinned, not floating */
 		border-bottom: 1px solid color-mix(in srgb, var(--color-border-default) 70%, transparent);
 		/* Layered shadow below header creates scroll-depth cue */
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+		box-shadow: var(--shadow-sm);
 		background: color-mix(in srgb, var(--color-surface-elevated) 95%, var(--color-surface-ground));
 		/* Port above scrolling body */
 		position: sticky;

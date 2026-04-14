@@ -140,7 +140,7 @@
 		display: flex;
 		align-items: flex-start;
 		gap: var(--space-8);
-		animation: detail-appear 180ms var(--ease-decelerate) both;
+		animation: detail-appear var(--duration-enter) var(--ease-decelerate) both;
 		max-width: 900px;
 		width: 100%;
 		margin: 0 auto;
@@ -161,7 +161,7 @@
 
 	.empty-detail__primary,
 	.empty-detail__body {
-		animation: content-swap 160ms var(--ease-decelerate) both;
+		animation: content-swap var(--duration-base) var(--ease-decelerate) both;
 	}
 
 	@keyframes content-swap {
@@ -246,6 +246,16 @@
 		.empty-detail__primary {
 			min-width: unset;
 			max-width: unset;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.empty-detail {
+			animation: none;
+		}
+		.empty-detail__primary,
+		.empty-detail__body {
+			animation: none;
 		}
 	}
 </style>

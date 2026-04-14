@@ -284,7 +284,7 @@
 		background: color-mix(in srgb, var(--color-teal) 10%, var(--color-surface-overlay));
 		/* Soft right-side glow — visual hint toward the card */
 		box-shadow:
-			0 2px 12px rgba(0, 0, 0, 0.35),
+			0 2px 12px color-mix(in srgb, black 35%, transparent),
 			2px 0 0 color-mix(in srgb, var(--color-teal) 18%, transparent);
 	}
 
@@ -345,7 +345,7 @@
 		padding: var(--space-1) var(--space-2);
 		color: inherit;
 		border-radius: var(--radius-sm);
-		transition: background 0.1s ease;
+		transition: background var(--duration-fast) var(--ease-standard);
 	}
 
 	.chapter-select:hover {
@@ -368,7 +368,7 @@
 		pointer-events: none;
 		user-select: none;
 		flex-shrink: 0;
-		transition: color 0.12s;
+		transition: color var(--duration-fast) var(--ease-standard);
 	}
 
 	.chapter-group.is-expanded .expand-icon {
@@ -416,7 +416,7 @@
 
 	.title-input:focus {
 		outline: none;
-		box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-nova-blue) 25%, transparent);
+		box-shadow: var(--focus-ring);
 	}
 
 	/* ── Utility actions ── */
@@ -425,7 +425,7 @@
 		gap: 2px;
 		flex-shrink: 0;
 		opacity: 0;
-		transition: opacity 0.12s;
+		transition: opacity var(--duration-fast) var(--ease-standard);
 	}
 
 	.chapter-group:hover .chapter-utils,

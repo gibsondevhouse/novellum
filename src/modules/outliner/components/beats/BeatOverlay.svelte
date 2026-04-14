@@ -108,7 +108,7 @@
 		font-size: var(--text-sm);
 		font-family: inherit;
 		cursor: pointer;
-		transition: opacity 0.1s;
+		transition: opacity var(--duration-fast) var(--ease-standard);
 	}
 
 	.btn-save:hover {

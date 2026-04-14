@@ -152,7 +152,7 @@
 		cursor: pointer;
 		font-weight: 500;
 		font-size: var(--text-sm);
-		transition: background 0.2s ease;
+		transition: background var(--duration-enter) var(--ease-standard);
 	}
 	.upload-btn:hover {
 		background-color: var(--color-surface-overlay);
@@ -173,7 +173,7 @@
 		border-radius: var(--radius-md);
 		overflow: hidden;
 		cursor: pointer;
-		transition: transform 0.2s ease, border-color 0.2s ease;
+		transition: transform var(--duration-enter) var(--ease-standard), border-color var(--duration-enter) var(--ease-standard);
 		display: flex;
 		flex-direction: column;
 	}
@@ -217,7 +217,7 @@
 		left: 0;
 		width: 100%;
 		height: 100%;
-		background: rgba(0, 0, 0, 0.6);
+		background: color-mix(in srgb, black 60%, transparent);
 		backdrop-filter: blur(2px);
 		display: flex;
 		align-items: center;
@@ -298,7 +298,7 @@
 		border-radius: var(--radius-md);
 		cursor: pointer;
 		font-size: var(--text-sm);
-		transition: background 0.2s ease;
+		transition: background var(--duration-enter) var(--ease-standard);
 	}
 	.btn-danger:hover {
 		background: var(--color-status-error);

@@ -4,6 +4,8 @@
 	import ProjectCoreFields from './ProjectCoreFields.svelte';
 	import ProjectStoryFields from './ProjectStoryFields.svelte';
 	import ProjectAdvancedFields from './ProjectAdvancedFields.svelte';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
+	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 
 	let { oncancel }: { oncancel: () => void } = $props();
 
@@ -141,12 +143,12 @@
 
 			<!-- ── Actions ───────────────────────────────────────────── -->
 			<div class="actions">
-				<button type="button" class="btn-ghost" onclick={handleCancel} disabled={getCreating()}>
+				<GhostButton type="button" onclick={handleCancel} disabled={getCreating()}>
 					Cancel
-				</button>
-				<button type="submit" class="btn-primary" disabled={!canSubmit}>
+				</GhostButton>
+				<PrimaryButton type="submit" disabled={!canSubmit}>
 					{getCreating() ? 'Creating…' : 'Start Writing'}
-				</button>
+				</PrimaryButton>
 			</div>
 		</form>
 	</div>
@@ -167,7 +169,7 @@
 	.backdrop {
 		position: absolute;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.72);
+		background: color-mix(in srgb, black 72%, transparent);
 		border: none;
 		cursor: pointer;
 	}

@@ -123,7 +123,7 @@
 	}
 
 	.workspace-hero__body-inner {
-		animation: hero-mode-enter 200ms var(--ease-decelerate) both;
+		animation: hero-mode-enter var(--duration-enter) var(--ease-decelerate) both;
 		width: 100%;
 	}
 
@@ -135,6 +135,12 @@
 		to {
 			opacity: 1;
 			transform: translateY(0);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.workspace-hero__body-inner {
+			animation: none;
 		}
 	}
 </style>

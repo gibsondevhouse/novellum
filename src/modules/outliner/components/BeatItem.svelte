@@ -80,7 +80,7 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		transition: color 0.1s;
+		transition: color var(--duration-fast) var(--ease-standard);
 	}
 
 	.beat-text:hover {

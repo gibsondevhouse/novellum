@@ -82,7 +82,6 @@
 		onclick={prev}
 		disabled={!canPrev}
 		aria-label="Previous"
-		tabindex="-1"
 	>
 		<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
 			<path
@@ -118,7 +117,7 @@
 		</div>
 	{/key}
 
-	<button class="carousel-arrow" onclick={next} disabled={!canNext} aria-label="Next" tabindex="-1">
+	<button class="carousel-arrow" onclick={next} disabled={!canNext} aria-label="Next">
 		<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
 			<path
 				d="M6 3L10.5 8L6 13"
@@ -136,7 +135,7 @@
 		display: flex;
 		align-items: stretch;
 		gap: var(--space-2);
-		animation: carousel-appear 200ms var(--ease-decelerate) both;
+		animation: carousel-appear var(--duration-enter) var(--ease-decelerate) both;
 	}
 
 	@keyframes carousel-appear {
@@ -213,5 +212,11 @@
 	/* CreateStructureCard fills poster height via its container */
 	.carousel-slot--create {
 		display: flex;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.carousel {
+			animation: none;
+		}
 	}
 </style>

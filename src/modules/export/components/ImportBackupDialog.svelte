@@ -7,6 +7,8 @@
 	import { PortabilityParseError } from '../services/portability/zip-import-parse.js';
 	import type { ParsedArchive, PreviewSummary } from '../services/portability/zip-import-parse.js';
 	import type { RestoreResult } from '../services/portability/restore-service.js';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
+	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 
 	type DialogState = 'idle' | 'validating' | 'preview' | 'restoring' | 'success' | 'error';
 
@@ -146,7 +148,10 @@
 						</p>
 					</div>
 				{:else if dialogState === 'restoring'}
-					<p class="status-text">Restoring project data…</p>
+					<div class="restoring-indicator" aria-busy="true" aria-label="Restoring in progress">
+						<span class="spinner" aria-hidden="true"></span>
+						<p class="status-text">Restoring project data…</p>
+					</div>
 				{:else if dialogState === 'success' && restoreResult}
 					<div class="success-section">
 						<p class="success-title">Restore Complete</p>
@@ -167,19 +172,22 @@
 
 			<div class="modal-footer">
 				{#if dialogState === 'idle' || dialogState === 'validating'}
-					<button class="btn-ghost" onclick={onClose}>Cancel</button>
+					<GhostButton onclick={onClose}>Cancel</GhostButton>
 				{:else if dialogState === 'preview'}
-					<button class="btn-ghost" onclick={onClose}>Cancel</button>
-					<button class="btn-primary btn-danger" onclick={handleConfirmRestore}>
-						Replace & Restore
-					</button>
+					<GhostButton onclick={onClose}>Cancel</GhostButton>
+					<PrimaryButton class="btn-danger" onclick={handleConfirmRestore}>
+						Replace &amp; Restore
+					</PrimaryButton>
 				{:else if dialogState === 'success'}
-					<button class="btn-primary" onclick={handleDone}>Done</button>
+					<PrimaryButton onclick={handleDone}>Done</PrimaryButton>
 				{:else if dialogState === 'error'}
-					<button class="btn-ghost" onclick={onClose}>Close</button>
-					<button class="btn-primary" onclick={handleRetry}>Try Another File</button>
+					<GhostButton onclick={onClose}>Close</GhostButton>
+					<PrimaryButton onclick={handleRetry}>Try Another File</PrimaryButton>
 				{:else if dialogState === 'restoring'}
-					<button class="btn-ghost" disabled>Restoring…</button>
+					<GhostButton disabled>
+						<span class="spinner btn-spinner" aria-hidden="true"></span>
+						Restoring…
+					</GhostButton>
 				{/if}
 			</div>
 		</div>
@@ -190,7 +198,7 @@
 	.modal-backdrop {
 		position: fixed;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.6);
+		background: color-mix(in srgb, black 60%, transparent);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -318,8 +326,8 @@
 	}
 
 	.warning-box {
-		background-color: rgba(239, 68, 68, 0.08);
-		border: 1px solid rgba(239, 68, 68, 0.25);
+		background-color: color-mix(in srgb, var(--color-error) 8%, transparent);
+		border: 1px solid color-mix(in srgb, var(--color-error) 25%, transparent);
 		border-radius: var(--radius-sm);
 		padding: var(--space-3) var(--space-4);
 	}
@@ -336,16 +344,6 @@
 		color: var(--color-text-secondary);
 		line-height: 1.5;
 		margin: 0;
-	}
-
-	.btn-danger {
-		background-color: #ef4444;
-		border-color: #ef4444;
-	}
-
-	.btn-danger:hover {
-		background-color: #dc2626;
-		border-color: #dc2626;
 	}
 
 	.success-section {
@@ -374,7 +372,7 @@
 	.error-title {
 		font-size: var(--text-base);
 		font-weight: var(--font-weight-medium);
-		color: #ef4444;
+		color: var(--color-error);
 		margin: 0 0 var(--space-2) 0;
 	}
 

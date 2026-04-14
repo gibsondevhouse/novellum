@@ -212,7 +212,7 @@
 	.reader-genre-pill {
 		display: inline-flex;
 		align-items: center;
-		padding: 5px 10px;
+		padding: var(--space-1) var(--space-2);
 		border-radius: var(--radius-full);
 		font-size: var(--text-xs);
 		font-weight: var(--font-weight-semibold);

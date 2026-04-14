@@ -259,7 +259,7 @@
 		display: flex;
 		align-items: flex-start;
 		gap: var(--space-8);
-		animation: detail-appear 180ms var(--ease-decelerate) both;
+		animation: detail-appear var(--duration-enter) var(--ease-decelerate) both;
 		max-width: 900px;
 		width: 100%;
 		margin: 0 auto;
@@ -528,7 +528,7 @@
 		justify-content: center;
 		gap: var(--space-6);
 		padding: var(--space-8);
-		animation: picker-appear 150ms var(--ease-decelerate) both;
+		animation: picker-appear var(--duration-base) var(--ease-decelerate) both;
 	}
 
 	@keyframes picker-appear {
@@ -586,7 +586,8 @@
 		color: var(--color-nova-blue);
 		background: color-mix(in srgb, var(--color-nova-blue) 8%, var(--color-surface-raised));
 		border-color: color-mix(in srgb, var(--color-nova-blue) 35%, transparent);
-		box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-nova-blue) 25%, transparent);
+		--_shadow: 0 0 0 1px color-mix(in srgb, var(--color-nova-blue) 25%, transparent);
+		box-shadow: var(--_shadow);
 	}
 
 	.type-pill:focus-visible {
@@ -604,6 +605,15 @@
 		.detail-card__primary {
 			min-width: unset;
 			max-width: unset;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.detail-card {
+			animation: none;
+		}
+		.type-picker {
+			animation: none;
 		}
 	}
 </style>

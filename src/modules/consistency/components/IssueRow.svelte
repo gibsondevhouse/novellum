@@ -80,12 +80,12 @@
 
 	.badge--warning {
 		background-color: var(--color-warning);
-		color: #000;
+		color: var(--color-surface-base);
 	}
 
 	.badge--error {
 		background-color: var(--color-error);
-		color: #fff;
+		color: var(--color-text-on-dark);
 	}
 
 	.issue-type {
@@ -132,7 +132,7 @@
 		cursor: pointer;
 		font-size: var(--text-xs);
 		font-weight: var(--font-weight-medium);
-		transition: background-color var(--duration-fast);
+		transition: background-color var(--duration-fast) var(--ease-standard);
 	}
 
 	.btn-resolve {

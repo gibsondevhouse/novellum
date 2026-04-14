@@ -76,7 +76,7 @@
 	:global(.planning-field-textarea) {
 		padding: var(--space-2) var(--space-3);
 		background: color-mix(in srgb, var(--color-surface-ground) 60%, var(--color-surface-overlay));
-		border: 1px solid rgba(255, 255, 255, 0.07);
+		border: 1px solid var(--color-border-default);
 		border-radius: var(--radius-md);
 		color: var(--color-text-primary);
 		font-size: var(--text-sm);
@@ -125,7 +125,7 @@
 		color: var(--color-text-primary);
 		font-size: var(--text-xs);
 		font-family: inherit;
-		transition: border-color 0.1s;
+		transition: border-color var(--duration-fast) var(--ease-standard);
 	}
 
 	:global(.planning-beat-add-input:focus) {
@@ -140,13 +140,13 @@
 	:global(.planning-beat-add-btn) {
 		padding: var(--space-1) var(--space-3);
 		background: var(--ps-accent, var(--color-teal));
-		color: #000;
+		color: var(--color-surface-base);
 		border: none;
 		border-radius: var(--radius-sm);
 		font-size: var(--text-sm);
 		font-weight: var(--font-weight-medium);
 		cursor: pointer;
-		transition: opacity 0.1s;
+		transition: opacity var(--duration-fast) var(--ease-standard);
 	}
 
 	:global(.planning-beat-add-btn:hover) {

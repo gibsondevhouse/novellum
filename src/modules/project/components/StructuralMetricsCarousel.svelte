@@ -66,7 +66,8 @@
 		background: var(--color-surface-overlay);
 		border: 1px solid var(--color-border-subtle);
 		border-radius: var(--radius-lg);
-		animation: pulse 1.5s ease-in-out infinite;
+		--_dur: 1.5s;
+		animation: pulse var(--_dur) var(--ease-standard) infinite;
 	}
 	@keyframes pulse {
 		0%,
@@ -94,6 +95,12 @@
 			flex: 0 0 calc(100% - var(--space-8));
 			max-width: 280px;
 			scroll-snap-align: start;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.metric-skeleton {
+			animation: none;
 		}
 	}
 </style>

@@ -165,7 +165,7 @@
 		text-overflow: ellipsis;
 		white-space: nowrap;
 		font-family: inherit;
-		transition: color 0.1s;
+		transition: color var(--duration-fast) var(--ease-standard);
 	}
 
 	.beat-text:hover {

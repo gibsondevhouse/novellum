@@ -7,14 +7,9 @@
 </svelte:head>
 
 <div class="nova-layout">
-	<header class="nova-header">
-		<div class="nova-header__icon" aria-hidden="true">★</div>
-		<h1 class="nova-header__title">Nova Assistant</h1>
-	</header>
-	
-	<main class="nova-content">
+	<div class="nova-container">
 		<ChatInterface />
-	</main>
+	</div>
 </div>
 
 <style>
@@ -22,37 +17,14 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-		max-height: 100vh;
 		background-color: var(--color-surface-base);
 	}
 
-	.nova-header {
-		display: flex;
-		align-items: center;
-		padding: var(--space-4) var(--space-6);
-		gap: var(--space-3);
-		border-bottom: 1px solid var(--color-border-subtle);
-		background-color: var(--color-surface-overlay);
-	}
-
-	.nova-header__icon {
-		color: var(--color-text-brand);
-		font-size: var(--text-xl);
-	}
-
-	.nova-header__title {
-		margin: 0;
-		font-family: var(--font-display);
-		font-size: var(--text-lg);
-		font-weight: var(--font-weight-medium);
-		color: var(--color-text-primary);
-	}
-
-	.nova-content {
-		flex: 1;
-		padding: var(--space-6);
-		overflow: hidden;
+	.nova-container {
 		display: flex;
 		flex-direction: column;
+		width: 100%;
+		flex: 1;
+		overflow: hidden;
 	}
 </style>

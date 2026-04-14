@@ -9,6 +9,8 @@
 		submitUpdatePlotThread,
 		submitDeletePlotThread,
 	} from '$modules/bible/stores/bible-crud.svelte.js';
+	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 
 	let { data } = $props<{
 		data: { projectId: string; plotThreads: PlotThread[]; scenes: Scene[] };
@@ -67,15 +69,14 @@
 			>
 			<h1>Plot Threads</h1>
 		</div>
-		<button
-			class="btn-primary"
+		<PrimaryButton
 			onclick={() => {
 				showForm = !showForm;
 				editingThread = null;
 			}}
 		>
 			{showForm && !editingThread ? 'Cancel' : '+ Add Thread'}
-		</button>
+		</PrimaryButton>
 	</div>
 
 	{#if showForm || editingThread}
@@ -96,7 +97,7 @@
 	{#if getPlotThreads().length === 0 && !showForm}
 		<div class="bible-empty-state">
 			<p>No plot threads yet.</p>
-			<button class="btn-ghost" onclick={() => (showForm = true)}>+ Add your first thread</button>
+			<GhostButton onclick={() => (showForm = true)}>+ Add your first thread</GhostButton>
 		</div>
 	{:else}
 		<ul class="bible-entity-list">

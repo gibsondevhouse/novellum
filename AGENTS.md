@@ -16,11 +16,12 @@ Located in `.github/agents/`, these agents are designed to be invoked via the Ge
 | :--- | :--- | :--- |
 | **Planner** | `planner.agent.md` | Orchestrates multi-tier development plans (Plan -> Stage -> Phase -> Part), interprets user requests, and manages the `dev-docs/plans/` directory. |
 | **Reviewer** | `reviewer.agent.md` | Ensures code quality, enforces the strict vertical domain modular boundaries (`eslint-plugin-boundaries`), and validates PRs/commits. |
-| **Frontend** | `frontend.agent.md` | Senior UI architect. Enforces Svelte 5 Rune patterns (`$state`, `$derived`), accessible HTML, and component isolation. |
+| **Architect** | `architect.agent.md` | Senior layout architect and structural systems lead. Owns route shells, layout composition, shell contracts, structural primitives, SvelteKit routing, and state management. |
+| **Stylist** | `stylist.agent.md` | Senior UI stylist, design system steward, and component quality lead. Owns design tokens, accessibility, interaction states, dark theme, motion, and visual polish. |
 | **Backend** | `backend.agent.md` | Server-side logic owner. Manages the SQLite database via `/api/db/*`, API routes, and data persistence layers. |
 | **AI** | `ai.agent.md` | Manages the internal Prompt System, Context Engine logic, and OpenRouter integration. |
 
-**Developer Workflow:** Use the `planner` to break down a feature request, then delegate specific implementation tasks to the `frontend`, `backend`, or `ai` agents, finally using the `reviewer` to ensure the work meets project standards.
+**Developer Workflow:** Use the `planner` to break down a feature request, then delegate specific implementation tasks to the `architect` (layout/structure), `stylist` (styling/components), `backend`, or `ai` agents, finally using the `reviewer` to ensure the work meets project standards.
 
 ---
 

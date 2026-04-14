@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { Character } from '$lib/db/types.js';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
+	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 
 	let {
 		character = null,
@@ -103,9 +105,9 @@
 		<input id="char-tags" class="input" type="text" bind:value={tagsRaw} />
 	</div>
 	<div class="actions">
-		<button class="btn-ghost" onclick={onCancel} disabled={saving}>Cancel</button>
-		<button class="btn-primary" onclick={handleSubmit} disabled={saving}>
+		<GhostButton onclick={onCancel} disabled={saving}>Cancel</GhostButton>
+		<PrimaryButton onclick={handleSubmit} disabled={saving}>
 			{saving ? 'Saving…' : character ? 'Save Changes' : 'Create Character'}
-		</button>
+		</PrimaryButton>
 	</div>
 </div>

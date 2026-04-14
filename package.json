@@ -14,16 +14,20 @@
 		"format": "prettier --write .",
 		"test": "vitest run",
 		"test:watch": "vitest",
-		"test:coverage": "vitest run --coverage"
+		"test:coverage": "vitest run --coverage",
+		"check:tokens": "node scripts/check-visual-tokens.mjs",
+		"test:visual": "playwright test tests/visual/"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
+		"@playwright/test": "^1.59.1",
 		"@sveltejs/adapter-auto": "^7.0.1",
 		"@sveltejs/adapter-node": "^5.5.4",
 		"@sveltejs/kit": "^2.57.0",
 		"@sveltejs/vite-plugin-svelte": "^7.0.0",
 		"@types/better-sqlite3": "^7.6.13",
 		"@types/diff": "^8.0.0",
+		"@types/dompurify": "^3.2.0",
 		"@types/node": "^25.6.0",
 		"@typescript-eslint/eslint-plugin": "^8.58.1",
 		"@typescript-eslint/parser": "^8.58.1",
@@ -56,6 +60,7 @@
 		"diff": "^8.0.4",
 		"docx": "^9.6.1",
 		"epub-gen-memory": "^1.1.2",
+		"isomorphic-dompurify": "^3.8.0",
 		"jszip": "^3.10.1",
 		"zod": "^4.3.6"
 	},

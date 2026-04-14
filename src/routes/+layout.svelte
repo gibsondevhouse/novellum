@@ -6,24 +6,27 @@
 	import { db } from '$lib/db';
 
 	import AppSidebar from '$lib/components/AppSidebar.svelte';
+	import AppHeader from '$lib/components/AppHeader.svelte';
 	import OnboardingModal from '$lib/components/OnboardingModal.svelte';
+	import ToastContainer from '$lib/components/ToastContainer.svelte';
 
 	let { children } = $props();
 
-	onMount(async () => {
-		await db.open().catch(() => {}); // already opened; no-op if open
-		console.log('DB version:', db.verno);
+	onMount(() => {
+		db.open().catch(() => {}); // already opened; no-op if open
 
 		// Register service worker for stale-chunk protection
-		if ('serviceWorker' in navigator) {
-			navigator.serviceWorker.register('/service-worker.js', { type: 'module' }).catch(() => {});
-			// Handle stale-chunk signal: reload the page to pick up fresh assets
-			navigator.serviceWorker.addEventListener('message', (event) => {
-				if (event.data?.type === 'STALE_CHUNK') {
-					window.location.reload();
-				}
-			});
-		}
+		if (!('serviceWorker' in navigator)) return;
+
+		navigator.serviceWorker.register('/service-worker.js', { type: 'module' }).catch(() => {});
+		// Handle stale-chunk signal: reload the page to pick up fresh assets
+		const handleSwMessage = (event: MessageEvent) => {
+			if ((event.data as { type?: string } | null)?.type === 'STALE_CHUNK') {
+				window.location.reload();
+			}
+		};
+		navigator.serviceWorker.addEventListener('message', handleSwMessage);
+		return () => navigator.serviceWorker.removeEventListener('message', handleSwMessage);
 	});
 
 	// Enable View Transitions API for route changes (with reduced-motion safety via CSS)
@@ -47,12 +50,16 @@
 
 <div class="app-shell">
 	<AppSidebar />
-	<main id="main-content" class="main-content" aria-label="Main content">
-		{@render children()}
-	</main>
+	<div class="content-column">
+		<AppHeader />
+		<main id="main-content" class="main-content" aria-label="Main content">
+			{@render children()}
+		</main>
+	</div>
 </div>
 
 <OnboardingModal />
+<ToastContainer />
 
 <style>
 	.skip-link {
@@ -79,11 +86,18 @@
 		background-color: var(--color-surface-base);
 	}
 
+	.content-column {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		height: 100vh;
+	}
+
 	.main-content {
 		flex: 1;
 		min-width: 0;
 		overflow-y: auto;
-		height: 100vh;
 		padding: var(--panel-padding);
 		color: var(--color-text-primary);
 	}

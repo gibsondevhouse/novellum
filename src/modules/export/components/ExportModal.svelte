@@ -6,6 +6,8 @@
 	import { exportProject } from '../services/export-service.js';
 	import type { ExportSettings } from '$lib/db/types.js';
 	import type { ExportFormat } from '../types.js';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
+	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 
 	let {
 		projectId,
@@ -241,10 +243,10 @@
 			{/if}
 
 			<div class="modal-footer">
-				<button class="btn-ghost" onclick={onClose} disabled={exporting}> Cancel </button>
-				<button class="btn-primary" onclick={handleExport} disabled={exporting || !settings}>
+				<GhostButton onclick={onClose} disabled={exporting}>Cancel</GhostButton>
+				<PrimaryButton onclick={handleExport} disabled={exporting || !settings}>
 					{exporting ? 'Exporting…' : isBackup ? 'Export Backup ZIP' : 'Export'}
-				</button>
+				</PrimaryButton>
 			</div>
 		</div>
 	</div>
@@ -254,7 +256,7 @@
 	.modal-backdrop {
 		position: fixed;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.6);
+		background: color-mix(in srgb, black 60%, transparent);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -351,7 +353,7 @@
 	.format-tab.active {
 		border-color: var(--color-nova-blue);
 		color: var(--color-nova-blue);
-		background-color: rgba(59, 130, 246, 0.08);
+		background-color: color-mix(in srgb, var(--color-nova-blue) 8%, transparent);
 	}
 
 	.field-select,

@@ -9,6 +9,8 @@
 		submitUpdateLocation,
 		submitDeleteLocation,
 	} from '$modules/bible/stores/bible-crud.svelte.js';
+	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 
 	let { data } = $props<{
 		data: { projectId: string; locations: Location[] };
@@ -55,15 +57,14 @@
 			>
 			<h1>Locations</h1>
 		</div>
-		<button
-			class="btn-primary"
+		<PrimaryButton
 			onclick={() => {
 				showForm = !showForm;
 				editingLocation = null;
 			}}
 		>
 			{showForm ? 'Cancel' : '+ Add Location'}
-		</button>
+		</PrimaryButton>
 	</div>
 
 	{#if showForm}
@@ -88,7 +89,7 @@
 	{#if getLocations().length === 0 && !showForm}
 		<div class="bible-empty-state">
 			<p>No locations yet.</p>
-			<button class="btn-ghost" onclick={() => (showForm = true)}>+ Add your first location</button>
+			<GhostButton onclick={() => (showForm = true)}>+ Add your first location</GhostButton>
 		</div>
 	{:else}
 		<ul class="bible-entity-list">

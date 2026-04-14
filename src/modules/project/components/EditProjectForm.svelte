@@ -2,6 +2,8 @@
 	import { untrack } from 'svelte';
 	import type { Project } from '$lib/db/types.js';
 	import { getSaving, getSaveSuccess, submitUpdate } from '../stores/project-hub.svelte.ts';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
+	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 
 	let { project, oncancel } = $props<{ project: Project; oncancel: () => void }>();
 
@@ -79,9 +81,9 @@
 	{/if}
 
 	<div class="actions">
-		<button class="btn-ghost" onclick={oncancel} disabled={getSaving()}>Cancel</button>
-		<button class="btn-primary" onclick={handleSubmit} disabled={getSaving()}>
+		<GhostButton onclick={oncancel} disabled={getSaving()}>Cancel</GhostButton>
+		<PrimaryButton onclick={handleSubmit} disabled={getSaving()}>
 			{getSaving() ? 'Saving…' : 'Save Changes'}
-		</button>
+		</PrimaryButton>
 	</div>
 </div>

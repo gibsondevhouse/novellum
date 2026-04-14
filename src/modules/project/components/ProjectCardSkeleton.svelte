@@ -62,7 +62,8 @@
 	/* Pulse animation */
 	@media (prefers-reduced-motion: no-preference) {
 		.project-card-skeleton {
-			animation: skeleton-pulse 1.4s ease-in-out infinite;
+			--_dur: 1.4s;
+			animation: skeleton-pulse var(--_dur) var(--ease-standard) infinite;
 		}
 
 		@keyframes skeleton-pulse {

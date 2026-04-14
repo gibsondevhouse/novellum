@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { toast } from '$lib/stores/toast.svelte.js';
 
 	let apiKey = $state('');
-	let isSaved = $state(false);
-	let isInvalid = $state(false);
 	let isChecking = $state(false);
 
 	onMount(() => {
@@ -15,8 +14,7 @@
 
 	async function saveKey() {
 		isChecking = true;
-		isInvalid = false;
-		
+
 		try {
 			// Verify key with OpenRouter auth check endpoint or a simple model fetch
 			const res = await fetch('https://openrouter.ai/api/v1/auth/key', {
@@ -25,18 +23,15 @@
 					'Authorization': `Bearer ${apiKey.trim()}`
 				}
 			});
-			
+
 			if (!res.ok) {
 				throw new Error('Invalid key');
 			}
-			
+
 			localStorage.setItem('novellum_openrouter_key', apiKey.trim());
-			isSaved = true;
-			setTimeout(() => {
-				isSaved = false;
-			}, 2000);
+			toast('API key saved successfully.', 'success');
 		} catch {
-			isInvalid = true;
+			toast('Invalid API key. Please check again.', 'error');
 		} finally {
 			isChecking = false;
 		}
@@ -45,10 +40,7 @@
 	function removeKey() {
 		localStorage.removeItem('novellum_openrouter_key');
 		apiKey = '';
-		isSaved = true;
-		setTimeout(() => {
-			isSaved = false;
-		}, 2000);
+		toast('API key removed.', 'info');
 	}
 </script>
 
@@ -91,93 +83,87 @@
 		>
 			{isChecking ? 'Verifying...' : 'Save Key'}
 		</button>
-		{#if isSaved}
-			<span class="status-msg success">Settings saved!</span>
-		{/if}
-		{#if isInvalid}
-			<span class="status-msg error">Invalid API key. Please check again.</span>
-		{/if}
 	</footer>
 </div>
 
 <style>
 	.api-settings-panel {
-		background: var(--surface-2, #1e1e1e);
-		border: 1px solid var(--border-color, #333);
-		border-radius: 8px;
-		padding: 1.5rem;
+		background: var(--color-surface-overlay);
+		border: 1px solid var(--color-border-default);
+		border-radius: var(--radius-lg);
+		padding: var(--space-6);
 		max-width: 600px;
 	}
 
 	.panel-header h2 {
-		margin: 0 0 0.5rem 0;
-		font-size: 1.25rem;
-		font-weight: 500;
+		margin: 0 0 var(--space-2) 0;
+		font-size: var(--text-xl);
+		font-weight: var(--font-weight-medium);
 	}
 
 	.panel-desc {
-		margin: 0 0 1.5rem 0;
-		color: var(--text-muted, #888);
-		font-size: 0.875rem;
+		margin: 0 0 var(--space-6) 0;
+		color: var(--color-text-muted);
+		font-size: var(--text-sm);
 	}
 
 	.setting-group {
-		margin-bottom: 1.5rem;
+		margin-bottom: var(--space-6);
 	}
 
 	.setting-label {
 		display: block;
-		margin-bottom: 0.5rem;
-		font-weight: 500;
-		font-size: 0.875rem;
+		margin-bottom: var(--space-2);
+		font-weight: var(--font-weight-medium);
+		font-size: var(--text-sm);
 	}
 
 	.input-wrapper {
 		display: flex;
-		gap: 0.5rem;
+		gap: var(--space-2);
 	}
 
 	.text-input {
 		flex: 1;
-		padding: 0.5rem 0.75rem;
-		background: var(--surface-1, #111);
-		border: 1px solid var(--border-color, #333);
-		border-radius: 4px;
-		color: var(--text-primary, #fff);
+		padding: var(--space-2) var(--space-3);
+		background: var(--color-surface-ground);
+		border: 1px solid var(--color-border-default);
+		border-radius: var(--radius-sm);
+		color: var(--color-text-primary);
 		font-family: inherit;
-		font-size: 1rem;
+		font-size: var(--text-base);
 	}
 
 	.text-input:focus {
 		outline: none;
-		border-color: var(--focus-ring, #4a90e2);
+		border-color: var(--color-border-focus);
 	}
 
 	.help-text {
-		margin: 0.5rem 0 0 0;
-		font-size: 0.75rem;
-		color: var(--text-muted, #888);
+		margin: var(--space-2) 0 0 0;
+		font-size: var(--text-xs);
+		color: var(--color-text-muted);
 	}
 
 	.panel-actions {
 		display: flex;
 		align-items: center;
 		flex-direction: row-reverse;
-		gap: 1rem;
-		border-top: 1px solid var(--border-color, #333);
-		padding-top: 1rem;
-		margin-top: 1.5rem;
+		gap: var(--space-4);
+		border-top: 1px solid var(--color-border-default);
+		padding-top: var(--space-4);
+		margin-top: var(--space-6);
 	}
 
 	.btn {
-		padding: 0.5rem 1rem;
-		border-radius: 4px;
+		padding: var(--space-2) var(--space-4);
+		border-radius: var(--radius-sm);
 		font-family: inherit;
-		font-size: 0.875rem;
-		font-weight: 500;
+		font-size: var(--text-sm);
+		font-weight: var(--font-weight-medium);
 		cursor: pointer;
 		border: none;
-		transition: opacity 0.2s;
+		transition: opacity var(--duration-base) var(--ease-standard);
 	}
 
 	.btn:disabled {
@@ -186,8 +172,8 @@
 	}
 
 	.btn-primary {
-		background: var(--primary-color, #4a90e2);
-		color: white;
+		background: var(--color-nova-blue);
+		color: var(--color-text-on-dark);
 	}
 
 	.btn-primary:active:not(:disabled) {
@@ -196,24 +182,11 @@
 
 	.btn-secondary {
 		background: transparent;
-		color: var(--text-primary, #fff);
-		border: 1px solid var(--border-color, #333);
+		color: var(--color-text-primary);
+		border: 1px solid var(--color-border-default);
 	}
 
 	.btn-secondary:hover:not(:disabled) {
-		background: var(--surface-3, #2a2a2a);
-	}
-
-	.status-msg {
-		font-size: 0.875rem;
-		margin-right: auto;
-	}
-
-	.success {
-		color: var(--success-color, #43a047);
-	}
-
-	.error {
-		color: var(--error-color, #e53935);
+		background: var(--color-surface-elevated);
 	}
 </style>

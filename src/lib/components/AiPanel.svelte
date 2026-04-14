@@ -168,7 +168,8 @@
 		border: 2px solid var(--color-border);
 		border-top-color: var(--color-teal);
 		border-radius: 50%;
-		animation: spin 0.6s linear infinite;
+		--_dur: 0.6s;
+		animation: spin var(--_dur) linear infinite;
 		flex-shrink: 0;
 	}
 
