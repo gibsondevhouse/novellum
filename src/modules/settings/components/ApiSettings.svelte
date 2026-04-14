@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { toast } from '$lib/stores/toast.svelte.js';
+	import { PrimaryButton, SecondaryButton, Input } from '$lib/components/ui/index.js';
 
 	let apiKey = $state('');
 	let isChecking = $state(false);
@@ -54,38 +55,31 @@
 	</header>
 
 	<div class="setting-group">
-		<label for="openrouter-key" class="setting-label">OpenRouter API Key</label>
-		<div class="input-wrapper">
-			<input
-				id="openrouter-key"
-				type="password"
-				bind:value={apiKey}
-				placeholder="sk-or-v1-..."
-				class="text-input"
-			/>
-		</div>
+		<Input
+			id="openrouter-key"
+			type="password"
+			label="OpenRouter API Key"
+			bind:value={apiKey}
+			placeholder="sk-or-v1-..."
+		/>
 		<p class="help-text">
 			Your key is stored locally in your browser and never sent to our servers.
 		</p>
 	</div>
 
 	<footer class="panel-actions">
-		<button
-			type="button"
-			class="btn btn-secondary"
-			onclick={removeKey}
-			disabled={!apiKey || isChecking}
-		>
-			Clear Key
-		</button>
-		<button
-			type="button"
-			class="btn btn-primary"
+		<PrimaryButton
 			onclick={saveKey}
 			disabled={!apiKey || isChecking}
 		>
 			{isChecking ? 'Verifying...' : 'Save Key'}
-		</button>
+		</PrimaryButton>
+		<SecondaryButton
+			onclick={removeKey}
+			disabled={!apiKey || isChecking}
+		>
+			Clear Key
+		</SecondaryButton>
 	</footer>
 </div>
 
@@ -114,34 +108,6 @@
 		margin-bottom: var(--space-6);
 	}
 
-	.setting-label {
-		display: block;
-		margin-bottom: var(--space-2);
-		font-weight: var(--font-weight-medium);
-		font-size: var(--text-sm);
-	}
-
-	.input-wrapper {
-		display: flex;
-		gap: var(--space-2);
-	}
-
-	.text-input {
-		flex: 1;
-		padding: var(--space-2) var(--space-3);
-		background: var(--color-surface-ground);
-		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-sm);
-		color: var(--color-text-primary);
-		font-family: inherit;
-		font-size: var(--text-base);
-	}
-
-	.text-input:focus {
-		outline: none;
-		border-color: var(--color-border-focus);
-	}
-
 	.help-text {
 		margin: var(--space-2) 0 0 0;
 		font-size: var(--text-xs);
@@ -151,45 +117,9 @@
 	.panel-actions {
 		display: flex;
 		align-items: center;
-		flex-direction: row-reverse;
-		gap: var(--space-4);
+		gap: var(--space-3);
 		border-top: 1px solid var(--color-border-default);
 		padding-top: var(--space-4);
 		margin-top: var(--space-6);
-	}
-
-	.btn {
-		padding: var(--space-2) var(--space-4);
-		border-radius: var(--radius-sm);
-		font-family: inherit;
-		font-size: var(--text-sm);
-		font-weight: var(--font-weight-medium);
-		cursor: pointer;
-		border: none;
-		transition: opacity var(--duration-base) var(--ease-standard);
-	}
-
-	.btn:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
-	.btn-primary {
-		background: var(--color-nova-blue);
-		color: var(--color-text-on-dark);
-	}
-
-	.btn-primary:active:not(:disabled) {
-		opacity: 0.8;
-	}
-
-	.btn-secondary {
-		background: transparent;
-		color: var(--color-text-primary);
-		border: 1px solid var(--color-border-default);
-	}
-
-	.btn-secondary:hover:not(:disabled) {
-		background: var(--color-surface-elevated);
 	}
 </style>

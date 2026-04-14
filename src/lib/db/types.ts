@@ -11,6 +11,7 @@ export interface Project {
 	status: string;
 	systemPrompt: string;
 	negativePrompt: string;
+	projectType: 'novel' | 'story' | 'collection';
 	createdAt: string; // ISO 8601
 	updatedAt: string;
 }
