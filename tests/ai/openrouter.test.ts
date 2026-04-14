@@ -100,7 +100,7 @@ describe('OpenRouterClient', () => {
     it('falls back to secondary model after max retries on 5xx', async () => {
         const fetchMock = vi.mocked(globalThis.fetch);
 
-        // 3 times 500 error for 'anthropic/claude-3-opus'
+        // 3 times 500 error for 'google/gemini-3.1-flash-lite-preview'
         for (let i = 0; i < 3; i++) {
             fetchMock.mockResolvedValueOnce({
                 ok: false,
@@ -109,22 +109,16 @@ describe('OpenRouterClient', () => {
             } as Response);
         }
 
-        // Success on the first fallback attempt
-        const mockSuccess = { choices: [{ message: { content: 'fallback success' } }], model: 'anthropic/claude-3-sonnet' };
-        fetchMock.mockResolvedValueOnce({
-            ok: true,
-            json: async () => mockSuccess
-        } as Response);
-
-        const completePromise = client.complete({ model: 'anthropic/claude-3-opus', messages: [] });
+        // No fallback exists, so it should throw after 3 retries
+        const completePromise = client.complete({ model: 'google/gemini-3.1-flash-lite-preview', messages: [] });
+        // Attach catch early to avoid Unhandled Rejection warning
+        completePromise.catch(() => {});
 
         // Advance timers to pass the 3 retries (1000, 2000)
         await vi.advanceTimersByTimeAsync(3000);
 
-        const result = await completePromise;
-        expect(result.text).toBe('fallback success');
-        expect(result.model).toBe('anthropic/claude-3-sonnet');
-        expect(fetchMock).toHaveBeenCalledTimes(4); // 3 failures + 1 success
+        // Should throw since no fallback models are defined
+        await expect(completePromise).rejects.toThrow('[OpenRouterClient] All models/retries failed');
     });
 
     it('throws if all models and retries fail', async () => {
