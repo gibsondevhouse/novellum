@@ -38,7 +38,7 @@
 		gap: var(--space-4);
 		justify-content: space-between;
 		padding: var(--space-4) var(--space-1);
-		border-top: 1px solid rgba(255, 255, 255, 0.075);
+		border-top: 1px solid var(--color-border-subtle);
 		margin-top: var(--space-3);
 	}
 
@@ -59,22 +59,24 @@
 	}
 
 	.suggestion-chip {
-		padding: 6px 12px 6px 8px;
-		border-radius: 6px;
-		border: none;
-		background-color: rgba(163, 152, 217, 0.05);
-		color: var(--color-text-primary);
-		font-size: 11px;
+		padding: var(--space-1) var(--space-3);
+		border-radius: var(--radius-full);
+		border: 1px solid var(--color-border-subtle);
+		background-color: var(--color-ai-tint);
+		color: var(--color-text-secondary);
+		font-size: var(--text-xs);
 		cursor: pointer;
 		white-space: nowrap;
 		transition:
 			background-color var(--duration-fast) var(--ease-standard),
-			color var(--duration-fast) var(--ease-standard);
+			color var(--duration-fast) var(--ease-standard),
+			border-color var(--duration-fast) var(--ease-standard);
 	}
 
 	.suggestion-chip:hover {
-		background-color: rgba(163, 152, 217, 0.12);
-		color: var(--color-text-on-dark);
+		background-color: color-mix(in srgb, var(--color-teal) 10%, transparent);
+		border-color: var(--color-teal);
+		color: var(--color-text-primary);
 	}
 
 	.suggestion-chip:focus-visible {

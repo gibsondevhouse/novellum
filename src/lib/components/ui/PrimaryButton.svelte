@@ -5,14 +5,21 @@
 	interface Props extends HTMLButtonAttributes {
 		children?: Snippet;
 		class?: string;
+		href?: string;
 	}
 
-	let { children, class: className = '', ...rest }: Props = $props();
+	let { children, class: className = '', href, ...rest }: Props = $props();
 </script>
 
-<button class="btn-primary {className}" {...rest}>
-	{@render children?.()}
-</button>
+{#if href}
+	<a {href} class="btn-primary {className}">
+		{@render children?.()}
+	</a>
+{:else}
+	<button class="btn-primary {className}" {...rest}>
+		{@render children?.()}
+	</button>
+{/if}
 
 <style>
 	.btn-primary {
@@ -30,6 +37,7 @@
 		justify-content: center;
 		gap: var(--space-2);
 		transition: opacity var(--duration-fast) var(--ease-standard);
+		text-decoration: none;
 	}
 
 	.btn-primary:not(:disabled):hover {

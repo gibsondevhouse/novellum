@@ -56,7 +56,8 @@ describe('snapshot-service', () => {
 				targetWordCount: 50000,
 			systemPrompt: '',
 			negativePrompt: '',
-				status: 'draft',
+				status: 'draft', projectType: 'novel' as 'novel',
+
 				createdAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString(),
 			});
@@ -88,7 +89,8 @@ describe('snapshot-service', () => {
 				targetWordCount: 0,
 			systemPrompt: '',
 			negativePrompt: '',
-				status: 'draft',
+				status: 'draft', projectType: 'novel' as 'novel',
+
 				createdAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString(),
 			});
@@ -101,7 +103,8 @@ describe('snapshot-service', () => {
 				targetWordCount: 0,
 			systemPrompt: '',
 			negativePrompt: '',
-				status: 'draft',
+				status: 'draft', projectType: 'novel' as 'novel',
+
 				createdAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString(),
 			});
@@ -134,7 +137,8 @@ describe('snapshot-service', () => {
 				targetWordCount: 0,
 			systemPrompt: '',
 			negativePrompt: '',
-				status: 'draft',
+				status: 'draft', projectType: 'novel' as 'novel',
+
 				createdAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString(),
 			});

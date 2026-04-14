@@ -55,7 +55,8 @@ describe('portability failure modes', () => {
 			targetWordCount: 0,
 			systemPrompt: '',
 			negativePrompt: '',
-			status: 'draft',
+			status: 'draft', projectType: 'novel' as 'novel',
+
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString(),
 		});
@@ -88,7 +89,8 @@ describe('portability failure modes', () => {
 			targetWordCount: 0,
 			systemPrompt: '',
 			negativePrompt: '',
-			status: 'draft',
+			status: 'draft', projectType: 'novel' as 'novel',
+
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString(),
 		});
@@ -118,7 +120,8 @@ describe('portability failure modes', () => {
 			targetWordCount: 0,
 			systemPrompt: '',
 			negativePrompt: '',
-			status: 'draft',
+			status: 'draft', projectType: 'novel' as 'novel',
+
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString(),
 		});
