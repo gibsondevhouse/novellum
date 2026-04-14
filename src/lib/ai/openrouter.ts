@@ -8,27 +8,29 @@ export class MissingCredentialsError extends Error {
 }
 
 export const FALLBACK_MODELS: Record<string, string[]> = {
-	'anthropic/claude-3-opus': ['anthropic/claude-3-sonnet', 'anthropic/claude-3-haiku'],
-	'anthropic/claude-3.5-sonnet': ['anthropic/claude-3-haiku', 'google/gemini-1.5-flash'],
+	// No fallbacks for now - we're testing with a single model
 };
 
 /**
  * OpenRouterClient — HTTP implementation.
- * Reads VITE_OPENROUTER_API_KEY from the environment.
+ * Reads VITE_OPENROUTER_API_KEY from the environment or localStorage.
  */
 export class OpenRouterClient {
-	private readonly apiKey: string;
 	private readonly apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
 	private readonly maxRetries = 3;
 	private readonly baseDelayMs = 1000;
 
 	constructor() {
-		// Prefer runtime UI key, then fallback to build-time env var
+		// Constructor no longer caches the key; streamComplete() reads it dynamically
+	}
+
+	private getApiKey(): string {
+		// Read the key dynamically each time it's needed
 		let uiKey = '';
 		if (typeof window !== 'undefined' && window.localStorage && typeof window.localStorage.getItem === 'function') {
 			uiKey = window.localStorage.getItem('novellum_openrouter_key') || '';
 		}
-		this.apiKey = uiKey || import.meta.env.VITE_OPENROUTER_API_KEY || '';
+		return uiKey || import.meta.env.VITE_OPENROUTER_API_KEY || '';
 	}
 
 	private async sleep(ms: number) {
@@ -36,7 +38,8 @@ export class OpenRouterClient {
 	}
 
 	async *streamComplete(payload: AIRequestPayload): AsyncGenerator<string, void, unknown> {
-		if (!this.apiKey) {
+		const apiKey = this.getApiKey();
+		if (!apiKey) {
 			throw new MissingCredentialsError(
 				'[OpenRouterClient] API key is not set. Add it in the Settings UI or set VITE_OPENROUTER_API_KEY in .env.local.'
 			);
@@ -55,24 +58,34 @@ export class OpenRouterClient {
 			while (attempt < this.maxRetries) {
 				attempt++;
 				try {
+					const requestBody = {
+						model: currentModel,
+						messages: payload.messages,
+						stream: true,
+					};
+
+					const keyPreview = apiKey.substring(0, 15) + '...' + apiKey.substring(apiKey.length - 5);
+					console.log('[OpenRouterClient] Attempt', attempt, 'with API key:', keyPreview);
+					console.log('[OpenRouterClient] Using model:', currentModel, 'messages count:', payload.messages.length);
+
 					const res = await fetch(this.apiUrl, {
 						method: 'POST',
 						headers: {
-							'Authorization': `Bearer ${this.apiKey}`,
-							'HTTP-Referer': 'http://localhost:5173', // Adjust this with dynamic url if available
+							'Authorization': `Bearer ${apiKey}`,
+							'HTTP-Referer': 'http://localhost:5174',
 							'X-Title': 'Novellum',
 							'Content-Type': 'application/json',
 						},
-						body: JSON.stringify({
-							model: currentModel,
-							messages: payload.messages,
-							stream: true,
-						}),
+						body: JSON.stringify(requestBody),
 					});
+
+					console.log('[OpenRouterClient] Response status:', res.status);
 
 					if (!res.ok) {
 						const errorText = await res.text();
 						const isRetryable = res.status === 429 || res.status >= 500;
+
+						console.error('[OpenRouterClient] API error response:', res.status, errorText, 'Full response:', res.statusText);
 
 						if (isRetryable) {
 							throw new Error(`OpenRouter API error ${res.status}: ${errorText}`);
@@ -131,6 +144,12 @@ export class OpenRouterClient {
 				} catch (err: unknown) {
 					lastError = err instanceof Error ? err : new Error(String(err));
 
+					console.error('[OpenRouterClient] Fetch error on attempt', attempt, 'for model', currentModel, ':', {
+						message: lastError.message,
+						type: lastError.constructor.name,
+						fullError: lastError,
+					});
+
 					// If it's a 4xx error that is not 429, don't retry this model
 					const status = (err as Record<string, unknown>).status;
 					if (typeof status === 'number' && status >= 400 && status < 500 && status !== 429) {
@@ -140,6 +159,7 @@ export class OpenRouterClient {
 					if (attempt < this.maxRetries) {
 						// Exponential backoff
 						const delay = this.baseDelayMs * Math.pow(2, attempt - 1);
+						console.log('[OpenRouterClient] Retrying stream in', delay, 'ms...');
 						await this.sleep(delay);
 					}
 				}
@@ -150,7 +170,8 @@ export class OpenRouterClient {
 	}
 
 	async complete(payload: AIRequestPayload): Promise<AIResponse> {
-		if (!this.apiKey) {
+		const apiKey = this.getApiKey();
+		if (!apiKey) {
 			throw new MissingCredentialsError(
 				'[OpenRouterClient] API key is not set. Add it in the Settings UI or set VITE_OPENROUTER_API_KEY in .env.local.'
 			);
@@ -172,7 +193,7 @@ export class OpenRouterClient {
 					const res = await fetch(this.apiUrl, {
 						method: 'POST',
 						headers: {
-							'Authorization': `Bearer ${this.apiKey}`,
+							'Authorization': `Bearer ${apiKey}`,
 							'HTTP-Referer': 'http://localhost:5173', // Adjust this with dynamic url if available
 							'X-Title': 'Novellum',
 							'Content-Type': 'application/json',
@@ -208,6 +229,11 @@ export class OpenRouterClient {
 				} catch (err: unknown) {
 					lastError = err instanceof Error ? err : new Error(String(err));
 
+					console.error('[OpenRouterClient] Complete error on attempt', attempt, 'for model', currentModel, ':', {
+						message: lastError.message,
+						type: lastError.constructor.name,
+					});
+
 					// If it's a 4xx error that is not 429, don't retry this model
 					const status = (err as Record<string, unknown>).status;
 					if (typeof status === 'number' && status >= 400 && status < 500 && status !== 429) {
@@ -217,6 +243,7 @@ export class OpenRouterClient {
 					if (attempt < this.maxRetries) {
 						// Exponential backoff
 						const delay = this.baseDelayMs * Math.pow(2, attempt - 1);
+						console.log('[OpenRouterClient] Retrying complete in', delay, 'ms...');
 						await this.sleep(delay);
 					}
 				}

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { OpenRouterClient } from '$lib/ai/openrouter.js';
 	import type { AIRequestPayload } from '$lib/ai/types.js';
+	import { getSelectedModel } from '$lib/stores/model-selection.svelte.js';
 	import SurfaceCard from '$lib/components/ui/SurfaceCard.svelte';
 	import { safeHtml } from '$lib/ai/markdown.js';
 	import PromptInput from './PromptInput.svelte';
@@ -30,7 +31,6 @@
 	let hasMessages = $derived(messages.length > 0);
 
 	const client = new OpenRouterClient();
-	const defaultModel = 'anthropic/claude-3-haiku';
 
 	async function handleSubmit(text: string) {
 		if (!text.trim() || isStreaming) return;
@@ -42,18 +42,21 @@
 		messages = [...messages, { role: 'assistant', content: '' }];
 
 		const payload: AIRequestPayload = {
-			model: defaultModel,
+			model: getSelectedModel(),
 			messages: messages.map((m) => ({ role: m.role, content: m.content })).filter((m) => m.content),
 		};
 
 		try {
 			for await (const chunk of client.streamComplete(payload)) {
+				// Mutate the last message and trigger reactivity with array reassignment
 				messages[messages.length - 1].content += chunk;
+				messages = messages; // Reassign to trigger Svelte 5 reactivity
 			}
 		} catch (error) {
 			console.error('Nova chat error:', error);
 			messages[messages.length - 1].content +=
 				`\n\n*Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}*`;
+			messages = messages; // Reassign to trigger reactivity
 		} finally {
 			isStreaming = false;
 		}

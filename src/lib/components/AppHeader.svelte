@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import ModelSelector from './ModelSelector.svelte';
 
 	let isSettingsRoute = $derived(page.url.pathname.startsWith('/settings'));
 	let isNovaRoute = $derived(page.url.pathname === '/nova');
@@ -44,6 +45,9 @@
 	</div>
 
 	<div class="header-right">
+		{#if isNovaRoute}
+			<ModelSelector />
+		{/if}
 		<button
 			class="header-action header-action--new"
 			onclick={handleNewProject}
