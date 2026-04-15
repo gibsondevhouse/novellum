@@ -19,21 +19,22 @@ export const POST: RequestHandler = async ({ request }) => {
 		id: crypto.randomUUID(),
 		title: body.title,
 		coverUrl: typeof body.coverUrl === 'string' ? body.coverUrl : '',
-		genre: '',
-		logline: '',
-		synopsis: '',
-		targetWordCount: 0,
-		status: '',
-		systemPrompt: '',
-		negativePrompt: '',
-		projectType: body.projectType || 'novel',
+		genre: typeof body.genre === 'string' ? body.genre : '',
+		logline: typeof body.logline === 'string' ? body.logline : '',
+		synopsis: typeof body.synopsis === 'string' ? body.synopsis : '',
+		targetWordCount: typeof body.targetWordCount === 'number' ? body.targetWordCount : 0,
+		status: typeof body.status === 'string' ? body.status : 'planning',
+		systemPrompt: typeof body.systemPrompt === 'string' ? body.systemPrompt : '',
+		negativePrompt: typeof body.negativePrompt === 'string' ? body.negativePrompt : '',
+		projectType: typeof body.projectType === 'string' ? body.projectType : 'novel',
+		lastOpenedAt: typeof body.lastOpenedAt === 'string' ? body.lastOpenedAt : now,
 		createdAt: now,
 		updatedAt: now,
 	};
 
 	db.prepare(
-		`INSERT INTO projects (id, title, coverUrl, genre, logline, synopsis, targetWordCount, status, systemPrompt, negativePrompt, projectType, createdAt, updatedAt)
-		 VALUES (@id, @title, @coverUrl, @genre, @logline, @synopsis, @targetWordCount, @status, @systemPrompt, @negativePrompt, @projectType, @createdAt, @updatedAt)`,
+		`INSERT INTO projects (id, title, coverUrl, genre, logline, synopsis, targetWordCount, status, systemPrompt, negativePrompt, projectType, lastOpenedAt, createdAt, updatedAt)
+		 VALUES (@id, @title, @coverUrl, @genre, @logline, @synopsis, @targetWordCount, @status, @systemPrompt, @negativePrompt, @projectType, @lastOpenedAt, @createdAt, @updatedAt)`,
 	).run(project);
 
 	return json(project, { status: 201 });

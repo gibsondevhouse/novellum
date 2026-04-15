@@ -22,7 +22,7 @@ describe('zip-import-parse', () => {
 			targetWordCount: 60000,
 			systemPrompt: '',
 			negativePrompt: '',
-			status: 'draft', projectType: 'novel' as 'novel',
+			status: 'draft', projectType: 'novel' as const,
 
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString(),

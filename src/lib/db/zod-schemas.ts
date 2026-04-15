@@ -17,6 +17,8 @@ export const projectSchema = z.object({
 	status: z.string(),
 	systemPrompt: z.string(),
 	negativePrompt: z.string(),
+	projectType: z.enum(['novel', 'story', 'collection']).optional(),
+	lastOpenedAt: z.string().optional(),
 	createdAt: z.string(),
 	updatedAt: z.string(),
 });

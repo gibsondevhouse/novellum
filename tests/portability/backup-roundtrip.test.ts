@@ -21,7 +21,7 @@ describe('portability roundtrip', () => {
 			targetWordCount: 90000,
 			systemPrompt: '',
 			negativePrompt: '',
-			status: 'draft', projectType: 'novel' as 'novel',
+			status: 'draft', projectType: 'novel' as const,
 
 			createdAt: '2026-04-10T00:00:00.000Z',
 			updatedAt: '2026-04-10T00:00:00.000Z',
@@ -173,7 +173,7 @@ describe('portability roundtrip', () => {
 			targetWordCount: 0,
 			systemPrompt: '',
 			negativePrompt: '',
-			status: 'draft', projectType: 'novel' as 'novel',
+			status: 'draft', projectType: 'novel' as const,
 
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString(),
