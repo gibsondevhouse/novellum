@@ -86,6 +86,28 @@ function serializeContext(ctx: AiContext): string {
 		ctx.plotThreads.forEach((t) => lines.push(`- [${t.status}] ${t.title}: ${t.description}`));
 	}
 
+	if (ctx.writingStyles && ctx.writingStyles.length > 0) {
+		lines.push('\nCUSTOM WRITING STYLES:');
+		ctx.writingStyles.forEach((ws) => {
+			lines.push(`- ${ws.title}: ${ws.description}`);
+			if (ws.exampleText) lines.push(`  Example: ${ws.exampleText}`);
+		});
+	}
+
+	if (ctx.systemPrompts && ctx.systemPrompts.length > 0) {
+		const activePrompt = ctx.systemPrompts.find(p => p.isDefault) || ctx.systemPrompts[0];
+		if (activePrompt) {
+			lines.push(`\nSYSTEM PROMPT:\n${activePrompt.content}`);
+		}
+	}
+
+	if (ctx.chatInstructions && ctx.chatInstructions.length > 0) {
+		const activeInstruction = ctx.chatInstructions.find(i => i.isDefault) || ctx.chatInstructions[0];
+		if (activeInstruction) {
+			lines.push(`\nCUSTOM INSTRUCTIONS:\n${activeInstruction.content}`);
+		}
+	}
+
 	return lines.join('\n');
 }
 

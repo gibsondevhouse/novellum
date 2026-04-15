@@ -8,6 +8,9 @@ import type {
 	LoreEntry,
 	PlotThread,
 	Scene,
+	SystemPrompt,
+	ChatInstruction,
+	WritingStyle
 } from '$lib/db/types.js';
 
 export type ContextPolicy =
@@ -87,6 +90,9 @@ export interface AiContext {
 	locations: Location[];
 	loreEntries: LoreEntry[];
 	plotThreads: PlotThread[];
+	systemPrompts?: SystemPrompt[];
+	chatInstructions?: ChatInstruction[];
+	writingStyles?: WritingStyle[];
 }
 
 // Legacy types — kept for backward compatibility with existing consumers

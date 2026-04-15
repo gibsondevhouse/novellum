@@ -60,9 +60,42 @@ const richCtx: AiContext = {
 			updatedAt: '2026-01-01T00:00:00Z',
 		},
 	],
-	locations: [],
-	loreEntries: [],
-	plotThreads: [],
+	locations: [
+		{
+			id: 'loc-1',
+			projectId: 'proj-1',
+			name: 'Train Station',
+			description: 'Foggy and damp.',
+			tags: [],
+			createdAt: '2026-01-01T00:00:00Z',
+			updatedAt: '2026-01-01T00:00:00Z',
+		}
+	],
+	loreEntries: [
+		{
+			id: 'lore-1',
+			projectId: 'proj-1',
+			title: 'The Fog',
+			category: 'Environment',
+			content: 'A magical fog.',
+			tags: [],
+			createdAt: '2026-01-01T00:00:00Z',
+			updatedAt: '2026-01-01T00:00:00Z',
+		}
+	],
+	plotThreads: [
+		{
+			id: 'pt-1',
+			projectId: 'proj-1',
+			title: 'Find the truth',
+			description: 'She must find it.',
+			status: 'active',
+			relatedSceneIds: [],
+			relatedCharacterIds: [],
+			createdAt: '2026-01-01T00:00:00Z',
+			updatedAt: '2026-01-01T00:00:00Z',
+		}
+	],
 };
 
 describe('prompt-builder', () => {
@@ -99,10 +132,57 @@ describe('prompt-builder', () => {
 		expect(prompt.length).toBeLessThanOrEqual(8000);
 	});
 
-        it('includes SPECIFIC COMMAND when instruction is provided', () => {
-                const instructionTask: AiTask = { ...task, instruction: 'Make the dialogue snappier.' };
-                const prompt = buildPrompt(instructionTask, richCtx);
-                expect(prompt).toContain('## SPECIFIC COMMAND');
-                expect(prompt).toContain('Make the dialogue snappier.');
-        });
+	it('includes SPECIFIC COMMAND when instruction is provided', () => {
+		const instructionTask: AiTask = { ...task, instruction: 'Make the dialogue snappier.' };
+		const prompt = buildPrompt(instructionTask, richCtx);
+		expect(prompt).toContain('## SPECIFIC COMMAND');
+		expect(prompt).toContain('Make the dialogue snappier.');
+	});
+
+	it('includes custom writing styles when provided', () => {
+		const styleCtx: AiContext = {
+			...emptyCtx,
+			writingStyles: [
+				{
+					id: 'ws-1',
+					projectId: 'proj-1',
+					title: 'Hemingway',
+					description: 'Short and punchy',
+					exampleText: 'The man was old.',
+					createdAt: '',
+					updatedAt: '',
+				}
+			]
+		};
+		const prompt = buildPrompt(task, styleCtx);
+		expect(prompt).toContain('CUSTOM WRITING STYLES:');
+		expect(prompt).toContain('Hemingway: Short and punchy');
+		expect(prompt).toContain('Example: The man was old.');
+	});
+
+	it('includes default system prompt when provided', () => {
+		const sysPromptCtx: AiContext = {
+			...emptyCtx,
+			systemPrompts: [
+				{ id: 'sp-1', projectId: 'p-1', name: 'SP1', content: 'Not default', isDefault: 0, createdAt: '', updatedAt: '' },
+				{ id: 'sp-2', projectId: 'p-1', name: 'SP2', content: 'You are custom bot', isDefault: 1, createdAt: '', updatedAt: '' },
+			]
+		};
+		const prompt = buildPrompt(task, sysPromptCtx);
+		expect(prompt).toContain('SYSTEM PROMPT:');
+		expect(prompt).toContain('You are custom bot');
+		expect(prompt).not.toContain('Not default');
+	});
+
+	it('includes custom chat instructions when provided', () => {
+		const chatCtx: AiContext = {
+			...emptyCtx,
+			chatInstructions: [
+				{ id: 'ci-1', projectId: 'p-1', name: 'CI1', content: 'Be terse', isDefault: 1, createdAt: '', updatedAt: '' },
+			]
+		};
+		const prompt = buildPrompt(task, chatCtx);
+		expect(prompt).toContain('CUSTOM INSTRUCTIONS:');
+		expect(prompt).toContain('Be terse');
+	});
 });
