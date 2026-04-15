@@ -3,6 +3,8 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { resolveTask, buildContext, buildPrompt, selectModel } from '$lib/ai/index.js';
 import type { UiContext } from '$lib/ai/types.js';
+import { db } from '$lib/server/db/index.js';
+import type { ChatInstruction, SystemPrompt, WritingStyle } from '$lib/db/types.js';
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
@@ -36,6 +38,16 @@ export const POST: RequestHandler = async ({ request, url }) => {
 
 	const task = resolveTask(body.action as string, uiCtx);
 	const ctx = await buildContext(task, body.projectId as string);
+
+	// Fetch custom models from SQLite
+	const writingStyles = db.prepare(`SELECT * FROM writing_styles WHERE projectId = ?`).all(body.projectId) as WritingStyle[];
+	const systemPrompts = db.prepare(`SELECT * FROM system_prompts WHERE projectId = ?`).all(body.projectId) as SystemPrompt[];
+	const chatInstructions = db.prepare(`SELECT * FROM chat_instructions WHERE projectId = ?`).all(body.projectId) as ChatInstruction[];
+
+	if (writingStyles.length > 0) ctx.writingStyles = writingStyles;
+	if (systemPrompts.length > 0) ctx.systemPrompts = systemPrompts;
+	if (chatInstructions.length > 0) ctx.chatInstructions = chatInstructions;
+
 	const prompt = buildPrompt(task, ctx);
 	const model = selectModel(task.taskType);
 
