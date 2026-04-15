@@ -34,7 +34,7 @@ describe('project-repository', () => {
 		const data = {
 			title: 'Test Novel',
 			genre: 'Fantasy',
-			status: 'draft', projectType: 'novel' as 'novel',
+			status: 'draft', projectType: 'novel' as const,
 
 			logline: '',
 			synopsis: '',
@@ -56,7 +56,7 @@ describe('project-repository', () => {
 			id: 'p1',
 			title: 'Found',
 			genre: 'Sci-Fi',
-			status: 'draft', projectType: 'novel' as 'novel',
+			status: 'draft', projectType: 'novel' as const,
 
 			logline: '',
 			synopsis: '',

@@ -75,8 +75,9 @@ export async function submitCreate(data: {
 			targetWordCount: data.targetWordCount ?? 80000,
 			systemPrompt: '',
 			negativePrompt: '',
-			status: 'draft',
+			status: 'drafting',
 			projectType: data.projectType ?? 'novel',
+			lastOpenedAt: new Date().toISOString(),
 		});
 		// active project store update removed as it's now reactively derived from URL
 		goto(`/projects/${project.id}`);
@@ -88,15 +89,17 @@ export async function submitCreate(data: {
 }
 
 export function selectProject(project: Project): void {
+	// Update lastOpenedAt implicitly in background
+	updateProject(project.id, { lastOpenedAt: new Date().toISOString() }).catch(console.error);
 	// active project store update removed as it's now reactively derived from URL
 	goto(`/projects/${project.id}`);
 }
 
-export function initCurrentProject(project: Project): void {
-	currentProject = project;
-	saveSuccess = false;
+export function openReader(project: Project): void {
+        // Update lastOpenedAt implicitly in background
+        updateProject(project.id, { lastOpenedAt: new Date().toISOString() }).catch(console.error);
+        goto(`/books/${project.id}`);
 }
-
 export async function submitUpdate(
 	id: string,
 	data: Partial<Omit<Project, 'id' | 'createdAt'>>,

@@ -8,10 +8,11 @@ export interface Project {
 	logline: string;
 	synopsis: string;
 	targetWordCount: number;
-	status: string;
+	status: 'planning' | 'drafting' | 'revising' | 'completed' | 'archived' | string;
 	systemPrompt: string;
 	negativePrompt: string;
 	projectType: 'novel' | 'story' | 'collection';
+	lastOpenedAt: string;
 	createdAt: string; // ISO 8601
 	updatedAt: string;
 }
@@ -212,4 +213,45 @@ export interface Asset {
     sizeBytes: number;
     createdAt: string;
     updatedAt: string;
+}
+
+export interface WritingStyle {
+	id: string;
+	projectId: string;
+	title: string;
+	description: string;
+	exampleText: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface Template {
+	id: string;
+	projectId: string;
+	name: string;
+	description: string;
+	content: string;
+	type: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface SystemPrompt {
+	id: string;
+	projectId: string;
+	name: string;
+	content: string;
+	isDefault: number;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface ChatInstruction {
+	id: string;
+	projectId: string;
+	name: string;
+	content: string;
+	isDefault: number;
+	createdAt: string;
+	updatedAt: string;
 }

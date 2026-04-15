@@ -66,8 +66,7 @@
 	aria-selected={selected}
 	tabindex="0"
 >
-	<div class="crud-card__cover"></div>
-	<div class="crud-card__footer">
+	
 		{#if editing}
 			<!-- svelte-ignore a11y_autofocus -->
 			<input
@@ -83,89 +82,76 @@
 				<span class="crud-card__subtitle">{subtitle}</span>
 			{/if}
 		{/if}
-	</div>
+	
 </div>
 
 <style>
-	.crud-card {
-		display: flex;
-		flex-direction: column;
-		aspect-ratio: 2 / 3;
-		background: var(--color-surface-overlay);
-		border: 1px solid var(--color-border-subtle);
-		border-radius: var(--radius-lg);
-		cursor: pointer;
-		text-align: left;
-		font-family: var(--font-sans);
-		position: relative;
-		overflow: hidden;
-		transition:
-			border-color var(--duration-fast) var(--ease-standard),
-			background var(--duration-fast) var(--ease-standard),
-			box-shadow var(--duration-fast) var(--ease-standard);
-	}
-	.crud-card:hover {
-		border-color: var(--color-border-default);
-	}
-	.crud-card--selected {
-		border-color: color-mix(in srgb, var(--color-nova-blue) 40%, transparent);
-		background: color-mix(in srgb, var(--color-nova-blue) 6%, var(--color-surface-overlay));
-		--_shadow: inset 0 -3px 0 var(--color-nova-blue);
-		box-shadow: var(--_shadow);
-	}
-	.crud-card:focus-visible {
-		outline: none;
-		box-shadow: var(--focus-ring);
-	}
-	.crud-card--selected:focus-visible {
-		box-shadow:
-			inset 0 -3px 0 var(--color-nova-blue),
-			var(--focus-ring);
-	}
-	.crud-card__cover {
-		flex: 1;
-		position: relative;
-		display: flex;
-		align-items: flex-start;
-		justify-content: flex-end;
-		padding: var(--space-2);
-	}
-	.crud-card__footer {
-		padding: var(--space-3) var(--space-3) var(--space-3);
-		border-top: 1px solid var(--color-border-subtle);
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-		min-height: 0;
-	}
-	.crud-card__title {
-		font-size: var(--text-sm);
-		font-weight: var(--font-weight-medium);
-		color: var(--color-text-primary);
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		line-height: var(--leading-tight);
-	}
-	.crud-card__rename-input {
-		font-family: var(--font-sans);
-		font-size: var(--text-sm);
-		font-weight: var(--font-weight-medium);
-		color: var(--color-text-primary);
-		background: transparent;
-		border: none;
-		border-bottom: 1px solid var(--color-nova-blue);
-		outline: none;
-		width: 100%;
-		padding: 0;
-		line-height: var(--leading-tight);
-	}
-	.crud-card__subtitle {
-		font-size: var(--text-xs);
-		color: var(--color-text-muted);
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		opacity: 0.55;
-	}
+        .crud-card {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                height: 72px; /* Short rectangle */
+                padding: var(--space-3) var(--space-4);
+                background: var(--color-surface-overlay);
+                border: 1px solid var(--color-border-subtle);
+                border-radius: var(--radius-md);
+                cursor: pointer;
+                text-align: left;
+                font-family: var(--font-sans);
+                position: relative;
+                overflow: hidden;
+                transition:
+                        border-color var(--duration-fast) var(--ease-standard),
+                        background var(--duration-fast) var(--ease-standard),
+                        box-shadow var(--duration-fast) var(--ease-standard);
+        }
+        .crud-card:hover {
+                border-color: var(--color-border-default);
+        }
+        .crud-card--selected {
+                border-color: color-mix(in srgb, var(--color-nova-blue) 40%, transparent);
+                background: color-mix(in srgb, var(--color-nova-blue) 6%, var(--color-surface-overlay));
+                --_shadow: inset 0 -3px 0 var(--color-nova-blue);
+                box-shadow: var(--_shadow);
+        }
+        .crud-card:focus-visible {
+                outline: none;
+                box-shadow: var(--focus-ring);
+        }
+        .crud-card--selected:focus-visible {
+                box-shadow:
+                        inset 0 -3px 0 var(--color-nova-blue),
+                        var(--focus-ring);
+        }
+        .crud-card__title {
+                font-size: var(--text-sm);
+                font-weight: var(--font-weight-medium);
+                color: var(--color-text-primary);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                line-height: var(--leading-tight);
+        }
+        .crud-card__rename-input {
+                font-family: var(--font-sans);
+                font-size: var(--text-sm);
+                font-weight: var(--font-weight-medium);
+                color: var(--color-text-primary);
+                background: transparent;
+                border: none;
+                border-bottom: 1px solid var(--color-nova-blue);
+                outline: none;
+                width: 100%;
+                padding: 0;
+                line-height: var(--leading-tight);
+        }
+        .crud-card__subtitle {
+                font-size: var(--text-xs);
+                color: var(--color-text-muted);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                opacity: 0.55;
+                margin-top: 2px;
+        }
 </style>

@@ -22,7 +22,9 @@ export const PUT: RequestHandler = async ({ params, request }) => {
 		'targetWordCount',
 		'status',
 		'systemPrompt',
-		'negativePrompt'
+		'negativePrompt',
+		'projectType',
+		'lastOpenedAt'
 	];
 
 	for (const key of allowed) {

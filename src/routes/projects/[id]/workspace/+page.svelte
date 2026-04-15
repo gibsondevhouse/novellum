@@ -26,10 +26,8 @@
 		updateScene,
 		removeScene,
 	} from '$modules/editor/services/scene-repository.js';
-	import WorkspaceHeroShell from '$modules/workspace/components/WorkspaceHeroShell.svelte';
-	import WorkspaceHeroCard from '$modules/workspace/components/WorkspaceHeroCard.svelte';
 	import WorkspaceDetailCard from '$modules/workspace/components/WorkspaceDetailCard.svelte';
-	import EmptyDetailCard from '$modules/workspace/components/EmptyDetailCard.svelte';
+	import WorkspaceHelpModal from '$modules/workspace/components/WorkspaceHelpModal.svelte';
 	import StructureCarousel from '$modules/workspace/components/StructureCarousel.svelte';
 	import { WORKSPACE_MODE_LABELS } from '$modules/workspace/types.js';
 
@@ -51,6 +49,7 @@
 	let characters = $state<Character[]>(untrack(() => data.characters));
 
 	let focusedArcType = $state<ArcType | null>(null);
+	let showHelp = $state(false);
 
 	$effect(() => {
 		setMode('arcs');
@@ -230,17 +229,6 @@
 </svelte:head>
 
 <div class="workspace-surface">
-	<WorkspaceHeroShell
-		activeMode={mode}
-		items={railItems}
-		{activeIndex}
-		onNavigate={handleNavigate}
-		onCreate={handleCreate}
-		{focusedArcType}
-		onArcTypeFocus={(t) => (focusedArcType = t)}
-	>
-		<WorkspaceHeroCard {mode} {focusedArcType} />
-	</WorkspaceHeroShell>
 
 	{#if heroItem !== null}
 		<WorkspaceDetailCard
@@ -251,18 +239,31 @@
 			povCharacterName={heroPovName}
 			onUpdate={mode === 'arcs' ? handleUpdateArc : undefined}
 		/>
-	{:else}
-		<EmptyDetailCard {mode} {focusedArcType} />
-	{/if}
+        {/if}
 
-	<div class="collection-header">
-		<span class="collection-label">
-			{collectionItems.length}
-			{WORKSPACE_MODE_LABELS[mode].toLowerCase()}
-		</span>
-	</div>
+        <div class="collection-header">
+                <span class="collection-label">
+                        {collectionItems.length}
+                        {WORKSPACE_MODE_LABELS[mode].toLowerCase()}
+                </span>
+                <button class="help-toggle" onclick={() => (showHelp = true)} aria-label="Show conceptual help">
+                        ?
+                </button>
+        </div>
 
-	<StructureCarousel
+        <WorkspaceHelpModal
+                open={showHelp}
+                onClose={() => (showHelp = false)}
+                activeMode={mode}
+                items={railItems}
+                {activeIndex}
+                onNavigate={handleNavigate}
+                onCreate={handleCreate}
+                {focusedArcType}
+                onArcTypeFocus={(t) => (focusedArcType = t)}
+        />
+
+        <StructureCarousel
 		items={collectionItems}
 		{selectedId}
 		{mode}
@@ -286,8 +287,30 @@
 	.collection-header {
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
 		padding: 0 var(--space-1);
 	}
+        .help-toggle {
+                background: var(--color-surface-glass);
+                border: 1px solid var(--color-border-subtle);
+                color: var(--color-text-secondary);
+                width: 24px;
+                height: 24px;
+                border-radius: var(--radius-full);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: var(--font-mono);
+                font-size: var(--text-xs);
+                font-weight: var(--font-weight-bold);
+                cursor: pointer;
+                transition: var(--transition-color);
+        }
+        .help-toggle:hover {
+                background: var(--color-surface-raised);
+                color: var(--color-text-primary);
+                border-color: var(--color-border-strong);
+        }
 	.collection-label {
 		font-size: var(--text-xs);
 		font-weight: var(--font-weight-semibold);

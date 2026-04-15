@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS projects (
 	systemPrompt TEXT NOT NULL DEFAULT '',
 	negativePrompt TEXT NOT NULL DEFAULT '',
 	projectType TEXT NOT NULL DEFAULT 'novel',
+	lastOpenedAt TEXT NOT NULL DEFAULT '',
 	createdAt TEXT NOT NULL,
 	updatedAt TEXT NOT NULL
 );
@@ -193,6 +194,47 @@ CREATE TABLE IF NOT EXISTS arcs (
 	createdAt TEXT NOT NULL,
 	updatedAt TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS writing_styles (
+	id TEXT PRIMARY KEY,
+	projectId TEXT NOT NULL,
+	title TEXT NOT NULL,
+	description TEXT NOT NULL DEFAULT '',
+	exampleText TEXT NOT NULL DEFAULT '',
+	createdAt TEXT NOT NULL,
+	updatedAt TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS templates (
+	id TEXT PRIMARY KEY,
+	projectId TEXT NOT NULL,
+	name TEXT NOT NULL,
+	description TEXT NOT NULL DEFAULT '',
+	content TEXT NOT NULL DEFAULT '',
+	type TEXT NOT NULL DEFAULT '',
+	createdAt TEXT NOT NULL,
+	updatedAt TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS system_prompts (
+	id TEXT PRIMARY KEY,
+	projectId TEXT NOT NULL,
+	name TEXT NOT NULL,
+	content TEXT NOT NULL DEFAULT '',
+	isDefault INTEGER NOT NULL DEFAULT 0,
+	createdAt TEXT NOT NULL,
+	updatedAt TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS chat_instructions (
+	id TEXT PRIMARY KEY,
+	projectId TEXT NOT NULL,
+	name TEXT NOT NULL,
+	content TEXT NOT NULL DEFAULT '',
+	isDefault INTEGER NOT NULL DEFAULT 0,
+	createdAt TEXT NOT NULL,
+	updatedAt TEXT NOT NULL
+);
 `;
 
 export const INDEX_SQL = `
@@ -218,4 +260,8 @@ CREATE INDEX IF NOT EXISTS idx_scene_snapshots_projectId ON scene_snapshots(proj
 CREATE INDEX IF NOT EXISTS idx_story_frames_projectId ON story_frames(projectId);
 CREATE INDEX IF NOT EXISTS idx_acts_projectId ON acts(projectId);
 CREATE INDEX IF NOT EXISTS idx_arcs_projectId ON arcs(projectId);
+CREATE INDEX IF NOT EXISTS idx_writing_styles_projectId ON writing_styles(projectId);
+CREATE INDEX IF NOT EXISTS idx_templates_projectId ON templates(projectId);
+CREATE INDEX IF NOT EXISTS idx_system_prompts_projectId ON system_prompts(projectId);
+CREATE INDEX IF NOT EXISTS idx_chat_instructions_projectId ON chat_instructions(projectId);
 `;

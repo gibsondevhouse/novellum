@@ -1,17 +1,32 @@
 <script lang="ts">
-	import { page } from '$app/state';
-	import SidebarSection from './SidebarSection.svelte';
-	import SidebarItem from './SidebarItem.svelte';
+        import { page } from '$app/state';
+        import SidebarSection from './SidebarSection.svelte';
+        import SidebarItem from './SidebarItem.svelte';
 
-	let id = $derived(page.params.id);
-	let isProjectRoute = $derived(page.url.pathname.startsWith('/projects/'));
-	let base = $derived(isProjectRoute && id && id !== 'undefined' ? `/projects/${id}` : null);
+        let base = $state<string | null>(null);
+
+        $effect(() => {
+                const currentId = page.params.id;
+                const isProjectRoute = page.url.pathname.startsWith('/projects/');
+                
+                if (isProjectRoute && currentId && currentId !== 'undefined') {
+                        localStorage.setItem('novellum_last_project_id', currentId);
+                        base = `/projects/${currentId}`;
+                } else {
+                        const storedId = localStorage.getItem('novellum_last_project_id');
+                        if (storedId) {
+                                base = `/projects/${storedId}`;
+                        } else {
+                                base = null;
+                        }
+                }
+        });
 </script>
 
 {#if base}
 	<hr class="sidebar-divider" />
 
-	<SidebarSection label="ACTIVE PROJECT">
+	<SidebarSection label="LAST PROJECT" collapsible>
 		<SidebarItem href="{base}/hub" label="Hub">
 			{#snippet icon()}
 				<svg
