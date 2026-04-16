@@ -1,5 +1,5 @@
 import { db, type Asset } from '$lib/db';
-import type { Project } from '$modules/project/types';
+import type { Project } from '$lib/db/types';
 import { getAllProjects } from '$modules/project/services/project-repository';
 
 export interface Album {

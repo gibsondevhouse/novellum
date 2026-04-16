@@ -77,6 +77,7 @@ export async function submitCreate(data: {
 			negativePrompt: '',
 			status: 'drafting',
 			projectType: data.projectType ?? 'novel',
+			stylePresetId: '',
 			lastOpenedAt: new Date().toISOString(),
 		});
 		// active project store update removed as it's now reactively derived from URL

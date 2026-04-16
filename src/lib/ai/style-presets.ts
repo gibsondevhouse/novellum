@@ -1,5 +1,6 @@
-export const stylePresets = [
+export const STYLE_PRESETS = [
   {
+    id: "literary-fiction",
     name: "Literary Fiction",
     description:
       "Lyrical, restrained prose focused on interiority, subtext, and quiet observation.",
@@ -23,6 +24,7 @@ Do not over-explain. Trust the reader to infer meaning.
   },
 
   {
+    id: "thriller",
     name: "Thriller",
     description:
       "Tight, fast-moving prose built around urgency, clarity, and escalating stakes.",
@@ -46,6 +48,7 @@ End scenes with tension, new information, or unresolved outcomes.
   },
 
   {
+    id: "young-adult",
     name: "Young Adult",
     description:
       "Clear, emotionally immediate prose with strong character voice and accessibility.",
@@ -69,6 +72,7 @@ Keep pacing steady with frequent emotional or situational shifts.
   },
 
   {
+    id: "romance",
     name: "Romance",
     description:
       "Emotion-driven prose centered on connection, tension, and vulnerability between characters.",
@@ -91,3 +95,5 @@ Physical description should serve emotional context, not exist on its own.
     `.trim(),
   },
 ];
+
+export const getPreset = (id: string) => STYLE_PRESETS.find(p => p.id === id);

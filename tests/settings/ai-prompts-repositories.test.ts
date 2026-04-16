@@ -68,7 +68,7 @@ describe('AI Data Repositories', () => {
 		it('should get a writing style by id', async () => {
 			const mockStyle = { id: 'w1' };
 			vi.mocked(apiGet).mockResolvedValue(mockStyle);
-			const result = await getWritingStyleById('w1');
+			const result = await getWritingStyleById('proj1', 'w1');
 			expect(apiGet).toHaveBeenCalledWith('/api/db/writing_styles/w1');
 			expect(result).toEqual(mockStyle);
 		});
@@ -121,7 +121,7 @@ describe('AI Data Repositories', () => {
 		
 		it('should handle get by id and 404', async () => {
 			vi.mocked(apiGet).mockRejectedValue(new ApiError(404));
-			const result = await getTemplateById('t1');
+			const result = await getTemplateById('proj1', 't1');
 			expect(result).toBeUndefined();
 		});
 		
@@ -153,7 +153,7 @@ describe('AI Data Repositories', () => {
 		
 		it('should handle get by id and 404', async () => {
 			vi.mocked(apiGet).mockRejectedValue(new ApiError(404));
-			const result = await getSystemPromptById('t1');
+			const result = await getSystemPromptById('proj1', 't1');
 			expect(result).toBeUndefined();
 		});
 		
@@ -185,7 +185,7 @@ describe('AI Data Repositories', () => {
 		
 		it('should handle get by id and 404', async () => {
 			vi.mocked(apiGet).mockRejectedValue(new ApiError(404));
-			const result = await getChatInstructionById('t1');
+			const result = await getChatInstructionById('proj1', 't1');
 			expect(result).toBeUndefined();
 		});
 		
