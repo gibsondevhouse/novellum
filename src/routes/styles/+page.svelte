@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { invalidateAll } from '$app/navigation';
 	import SurfacePanel from '$lib/components/ui/SurfacePanel.svelte';
 	import SectionHeader from '$lib/components/ui/SectionHeader.svelte';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
@@ -15,7 +16,13 @@
 	}>();
 
 	let isEditing = $state(false);
+	let isSaving = $state(false);
+	let errorMessage = $state('');
 	let editingItem = $state<any>(null);
+
+	let itemName = $state('');
+	let itemDesc = $state('');
+	let itemContent = $state('');
 
 	let styles = $derived(data.styles || []);
 	let systemPrompts = $derived(data.systemPrompts || []);
@@ -31,6 +38,76 @@
 		{ id: 'instructions', label: 'Chat Instructions' },
 		{ id: 'templates', label: 'Templates' },
 	];
+
+	function openEditor(item: any) {
+		editingItem = item;
+		itemName = item?.title || item?.name || '';
+		itemDesc = item?.description || '';
+		itemContent = item?.exampleText || item?.content || '';
+		errorMessage = '';
+		isEditing = true;
+	}
+
+	async function saveConfiguration() {
+		if (!itemName.trim() || !itemContent.trim()) {
+			errorMessage = 'Name and content are required.';
+			return;
+		}
+
+		isSaving = true;
+		errorMessage = '';
+
+		const endpoint =
+			activeTab === 'styles' ? 'writing_styles' :
+			activeTab === 'prompts' ? 'system_prompts' :
+			activeTab === 'instructions' ? 'chat_instructions' :
+			'templates';
+
+		const isNew = !editingItem?.id;
+		let payload: any = { ...editingItem };
+
+		if (isNew) {
+			payload.projectId = 'default-project';
+		}
+
+		if (activeTab === 'styles') {
+			payload.title = itemName;
+			payload.description = itemDesc;
+			payload.exampleText = itemContent;
+		} else if (activeTab === 'templates') {
+			payload.name = itemName;
+			payload.description = itemDesc;
+			payload.content = itemContent;
+			if (isNew) payload.type = 'general';
+		} else {
+			payload.name = itemName;
+			payload.content = itemContent;
+			if (isNew) payload.isDefault = 0;
+		}
+
+		try {
+			const url = isNew ? `/api/db/${endpoint}` : `/api/db/${endpoint}/${editingItem.id}`;
+			const method = isNew ? 'POST' : 'PUT';
+
+			const res = await fetch(url, {
+				method,
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload)
+			});
+
+			if (!res.ok) {
+				const errorData = await res.json().catch(() => ({}));
+				throw new Error(errorData.error || 'Failed to save configuration');
+			}
+
+			await invalidateAll();
+			isEditing = false;
+		} catch (err: any) {
+			errorMessage = err.message || 'An error occurred while saving.';
+		} finally {
+			isSaving = false;
+		}
+	}
 </script>
 
 <svelte:head>
@@ -64,7 +141,7 @@
 					title="Writing Styles"
 					description="Define tone, pacing, and formatting rules for Nova's generated prose."
 				/>
-				<PrimaryButton onclick={() => { isEditing = true; editingItem = {}; }}>New Style</PrimaryButton>
+				<PrimaryButton onclick={() => openEditor({})} disabled={isSaving}>New Style</PrimaryButton>
 			</div>
 			
 			<div class="settings-grid">
@@ -77,7 +154,7 @@
 							{/if}
 						</div>
 						<div class="card__actions">
-							<GhostButton onclick={() => { isEditing = true; editingItem = style; }}>Edit</GhostButton>
+							<GhostButton onclick={() => openEditor(style)} disabled={isSaving}>Edit</GhostButton>
 						</div>
 					</div>
 				{:else}
@@ -94,7 +171,7 @@
 					title="System Prompts"
 					description="Core instructions that guide Nova's overarching behavior per project or globally."
 				/>
-				<PrimaryButton onclick={() => { isEditing = true; editingItem = {}; }}>New Prompt</PrimaryButton>
+				<PrimaryButton onclick={() => openEditor({})} disabled={isSaving}>New Prompt</PrimaryButton>
 			</div>
 			
 			<div class="settings-grid">
@@ -105,7 +182,7 @@
 							<span class="card__desc">{prompt.content.slice(0, 50)}...</span>
 						</div>
 						<div class="card__actions">
-							<GhostButton onclick={() => { isEditing = true; editingItem = prompt; }}>Edit</GhostButton>
+							<GhostButton onclick={() => openEditor(prompt)} disabled={isSaving}>Edit</GhostButton>
 						</div>
 					</div>
 				{:else}
@@ -122,7 +199,7 @@
 					title="Chat Instructions"
 					description="Specific rules and constraints for interactive chat sessions with Nova."
 				/>
-				<PrimaryButton onclick={() => { isEditing = true; editingItem = {}; }}>New Instruction</PrimaryButton>
+				<PrimaryButton onclick={() => openEditor({})} disabled={isSaving}>New Instruction</PrimaryButton>
 			</div>
 			
 			<div class="settings-grid">
@@ -133,7 +210,7 @@
 							<span class="card__desc">{instruction.content.slice(0, 50)}...</span>
 						</div>
 						<div class="card__actions">
-							<GhostButton onclick={() => { isEditing = true; editingItem = instruction; }}>Edit</GhostButton>
+							<GhostButton onclick={() => openEditor(instruction)} disabled={isSaving}>Edit</GhostButton>
 						</div>
 					</div>
 				{:else}
@@ -150,7 +227,7 @@
 					title="Templates"
 					description="Reusable blueprints for scenes, characters, or structural units."
 				/>
-				<PrimaryButton onclick={() => { isEditing = true; editingItem = {}; }}>New Template</PrimaryButton>
+				<PrimaryButton onclick={() => openEditor({})} disabled={isSaving}>New Template</PrimaryButton>
 			</div>
 			
 			<div class="settings-grid">
@@ -163,7 +240,7 @@
 							{/if}
 						</div>
 						<div class="card__actions">
-							<GhostButton onclick={() => { isEditing = true; editingItem = template; }}>Edit</GhostButton>
+							<GhostButton onclick={() => openEditor(template)} disabled={isSaving}>Edit</GhostButton>
 						</div>
 					</div>
 				{:else}
@@ -178,31 +255,38 @@
 {#if isEditing}
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div class="panel-backdrop" onclick={() => isEditing = false}>
+	<div class="panel-backdrop" onclick={() => { if (!isSaving) isEditing = false; }}>
 		<div class="slide-panel" onclick={(e) => e.stopPropagation()}>
 			<div class="slide-panel__header">
 				<h2 class="slide-panel__title">{editingItem?.id ? 'Edit' : 'Create'} {activeTab === 'styles' ? 'Writing Style' : activeTab === 'prompts' ? 'System Prompt' : activeTab === 'instructions' ? 'Chat Instruction' : 'Template'}</h2>
-				<GhostButton onclick={() => isEditing = false}>Close</GhostButton>
+				<GhostButton onclick={() => isEditing = false} disabled={isSaving}>Close</GhostButton>
 			</div>
 			<div class="slide-panel__content">
+				{#if errorMessage}
+					<div class="error-banner">{errorMessage}</div>
+				{/if}
 				<div class="form-group">
 					<label for="item-name" class="form-label">Name</label>
-					<input id="item-name" type="text" class="form-input" placeholder="e.g. Hemingway, Descriptive, Short" value={editingItem?.name || editingItem?.title || ''} />
+					<input id="item-name" type="text" class="form-input" placeholder="e.g. Hemingway, Descriptive, Short" bind:value={itemName} disabled={isSaving} />
 				</div>
 				
+				{#if activeTab === 'styles' || activeTab === 'templates'}
 				<div class="form-group">
 					<label for="item-desc" class="form-label">Description</label>
-					<textarea id="item-desc" class="form-textarea form-textarea--small" placeholder="Briefly describe when to use this." value={editingItem?.description || ''}></textarea>
+					<textarea id="item-desc" class="form-textarea form-textarea--small" placeholder="Briefly describe when to use this." bind:value={itemDesc} disabled={isSaving}></textarea>
 				</div>
+				{/if}
 				
 				<div class="form-group form-group--grow">
 					<label for="item-content" class="form-label">Content / Rules</label>
-					<textarea id="item-content" class="form-textarea form-textarea--mono" placeholder="Write out the exact instructions or rules Nova should follow..."></textarea>
+					<textarea id="item-content" class="form-textarea form-textarea--mono" placeholder="Write out the exact instructions or rules Nova should follow..." bind:value={itemContent} disabled={isSaving}></textarea>
 				</div>
 			</div>
 			<div class="slide-panel__footer">
-				<GhostButton onclick={() => isEditing = false}>Cancel</GhostButton>
-				<PrimaryButton onclick={() => isEditing = false}>Save Configuration</PrimaryButton>
+				<GhostButton onclick={() => isEditing = false} disabled={isSaving}>Cancel</GhostButton>
+				<PrimaryButton onclick={saveConfiguration} disabled={isSaving}>
+					{isSaving ? 'Saving...' : 'Save Configuration'}
+				</PrimaryButton>
 			</div>
 		</div>
 	</div>
@@ -509,6 +593,16 @@ line-clamp: 3;
 	.form-textarea {
 		resize: vertical;
 		min-height: 15rem;
+	}
+
+	.error-banner {
+		padding: var(--space-4);
+		background-color: rgba(255, 60, 60, 0.1);
+		color: #ff4d4d;
+		border-radius: var(--radius-lg);
+		border: 1px solid rgba(255, 60, 60, 0.2);
+		font-family: var(--font-sans);
+		font-size: var(--text-sm);
 	}
 
 	.form-textarea--small {
