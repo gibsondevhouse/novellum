@@ -31,12 +31,20 @@ function ensureProjectTypeAndLastOpened(db: Database.Database): void {
 	}
 }
 
+function ensureStylePresetIdColumn(db: Database.Database): void {
+	const columns = db.prepare('PRAGMA table_info(projects)').all() as Array<{ name: string }>;
+	if (!columns.some((c) => c.name === 'stylePresetId')) {
+		db.exec("ALTER TABLE projects ADD COLUMN stylePresetId TEXT NOT NULL DEFAULT ''");
+	}
+}
+
 export function runMigrations(db: Database.Database): void {
 	db.transaction(() => {
 		db.exec(SCHEMA_SQL);
 		ensureProjectsCoverUrlColumn(db);
 		ensureProjectsPromptColumns(db);
 		ensureProjectTypeAndLastOpened(db);
+		ensureStylePresetIdColumn(db);
 		db.exec(INDEX_SQL);
 	})();
 }

@@ -4,19 +4,20 @@
 	import SectionHeader from '$lib/components/ui/SectionHeader.svelte';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
-	import type { WritingStyle, SystemPrompt, ChatInstruction, Template } from '$lib/db/types';
+	import type { WritingStyle, SystemPrompt, ChatInstruction } from '$lib/db/types';
+	import { STYLE_PRESETS } from '$lib/ai/style-presets.js';
 
 	let { data } = $props<{
 		data: {
 			styles: WritingStyle[];
 			systemPrompts: SystemPrompt[];
 			instructions: ChatInstruction[];
-			templates: Template[];
 		};
 	}>();
 
 	let isEditing = $state(false);
 	let isSaving = $state(false);
+	let isEditingPreset = $state(false);
 	let errorMessage = $state('');
 	let editingItem = $state<any>(null);
 
@@ -27,23 +28,28 @@
 	let styles = $derived(data.styles || []);
 	let systemPrompts = $derived(data.systemPrompts || []);
 	let instructions = $derived(data.instructions || []);
-	let templates = $derived(data.templates || []);
 
-	type Tab = 'styles' | 'prompts' | 'instructions' | 'templates';
+	type Tab = 'styles' | 'prompts' | 'instructions';
 	let activeTab = $state<Tab>('styles');
 
 	const tabs: { id: Tab; label: string }[] = [
 		{ id: 'styles', label: 'Writing Styles' },
 		{ id: 'prompts', label: 'System Prompts' },
 		{ id: 'instructions', label: 'Chat Instructions' },
-		{ id: 'templates', label: 'Templates' },
 	];
 
-	function openEditor(item: any) {
+	function openEditor(item: any, isPreset = false) {
 		editingItem = item;
-		itemName = item?.title || item?.name || '';
-		itemDesc = item?.description || '';
-		itemContent = item?.exampleText || item?.content || '';
+		isEditingPreset = isPreset;
+		if (isPreset) {
+			itemName = item?.name || '';
+			itemDesc = item?.description || '';
+			itemContent = item?.rules ? item.rules.join('\n') : '';
+		} else {
+			itemName = item?.title || item?.name || '';
+			itemDesc = item?.description || '';
+			itemContent = item?.exampleText || item?.content || '';
+		}
 		errorMessage = '';
 		isEditing = true;
 	}
@@ -60,8 +66,7 @@
 		const endpoint =
 			activeTab === 'styles' ? 'writing_styles' :
 			activeTab === 'prompts' ? 'system_prompts' :
-			activeTab === 'instructions' ? 'chat_instructions' :
-			'templates';
+			'chat_instructions';
 
 		const isNew = !editingItem?.id;
 		let payload: any = { ...editingItem };
@@ -74,11 +79,6 @@
 			payload.title = itemName;
 			payload.description = itemDesc;
 			payload.exampleText = itemContent;
-		} else if (activeTab === 'templates') {
-			payload.name = itemName;
-			payload.description = itemDesc;
-			payload.content = itemContent;
-			if (isNew) payload.type = 'general';
 		} else {
 			payload.name = itemName;
 			payload.content = itemContent;
@@ -138,7 +138,7 @@
 		<SurfacePanel>
 			<div class="panel-header-actions">
 				<SectionHeader
-					title="Writing Styles"
+					title="Custom Styles"
 					description="Define tone, pacing, and formatting rules for Nova's generated prose."
 				/>
 				<PrimaryButton onclick={() => openEditor({})} disabled={isSaving}>New Style</PrimaryButton>
@@ -158,7 +158,30 @@
 						</div>
 					</div>
 				{:else}
-					<div class="card card--empty"><p>No items defined.</p></div>
+					<div class="card card--empty"><p>No custom styles defined.</p></div>
+				{/each}
+			</div>
+
+			<div class="panel-header-actions" style="margin-top: 2rem;">
+				<SectionHeader
+					title="Built-in Presets"
+					description="Standard writing styles available out of the box."
+				/>
+			</div>
+
+			<div class="settings-grid">
+				{#each STYLE_PRESETS as preset (preset.id)}
+					<div class="card card--preset">
+						<div class="card__info">
+							<span class="card__name">{preset.name}</span>
+							{#if preset.description}
+								<span class="card__desc">{preset.description}</span>
+							{/if}
+						</div>
+						<div class="card__actions">
+							<GhostButton onclick={() => openEditor(preset, true)} disabled={isSaving}>View</GhostButton>
+						</div>
+					</div>
 				{/each}
 			</div>
 		</SurfacePanel>
@@ -219,36 +242,6 @@
 			</div>
 		</SurfacePanel>
 		{/if}
-		
-		{#if activeTab === 'templates'}
-		<SurfacePanel>
-			<div class="panel-header-actions">
-				<SectionHeader
-					title="Templates"
-					description="Reusable blueprints for scenes, characters, or structural units."
-				/>
-				<PrimaryButton onclick={() => openEditor({})} disabled={isSaving}>New Template</PrimaryButton>
-			</div>
-			
-			<div class="settings-grid">
-				{#each templates as template (template.id)}
-					<div class="card">
-						<div class="card__info">
-							<span class="card__name">{template.name}</span>
-							{#if template.description}
-								<span class="card__desc">{template.description}</span>
-							{/if}
-						</div>
-						<div class="card__actions">
-							<GhostButton onclick={() => openEditor(template)} disabled={isSaving}>Edit</GhostButton>
-						</div>
-					</div>
-				{:else}
-					<div class="card card--empty"><p>No items defined.</p></div>
-				{/each}
-			</div>
-		</SurfacePanel>
-		{/if}
 	</div>
 </div>
 
@@ -258,7 +251,7 @@
 	<div class="panel-backdrop" onclick={() => { if (!isSaving) isEditing = false; }}>
 		<div class="slide-panel" onclick={(e) => e.stopPropagation()}>
 			<div class="slide-panel__header">
-				<h2 class="slide-panel__title">{editingItem?.id ? 'Edit' : 'Create'} {activeTab === 'styles' ? 'Writing Style' : activeTab === 'prompts' ? 'System Prompt' : activeTab === 'instructions' ? 'Chat Instruction' : 'Template'}</h2>
+				<h2 class="slide-panel__title">{editingItem?.id && !isEditingPreset ? 'Edit' : isEditingPreset ? 'View' : 'Create'} {activeTab === 'styles' ? (isEditingPreset ? 'Built-in Preset' : 'Writing Style') : activeTab === 'prompts' ? 'System Prompt' : 'Chat Instruction'}</h2>
 				<GhostButton onclick={() => isEditing = false} disabled={isSaving}>Close</GhostButton>
 			</div>
 			<div class="slide-panel__content">
@@ -267,26 +260,32 @@
 				{/if}
 				<div class="form-group">
 					<label for="item-name" class="form-label">Name</label>
-					<input id="item-name" type="text" class="form-input" placeholder="e.g. Hemingway, Descriptive, Short" bind:value={itemName} disabled={isSaving} />
+					<input id="item-name" type="text" class="form-input" placeholder="e.g. Hemingway, Descriptive, Short" bind:value={itemName} disabled={isSaving || isEditingPreset} />
 				</div>
 				
-				{#if activeTab === 'styles' || activeTab === 'templates'}
+				{#if activeTab === 'styles'}
 				<div class="form-group">
 					<label for="item-desc" class="form-label">Description</label>
-					<textarea id="item-desc" class="form-textarea form-textarea--small" placeholder="Briefly describe when to use this." bind:value={itemDesc} disabled={isSaving}></textarea>
+					<textarea id="item-desc" class="form-textarea form-textarea--small" placeholder="Briefly describe when to use this." bind:value={itemDesc} disabled={isSaving || isEditingPreset}></textarea>
 				</div>
 				{/if}
 				
 				<div class="form-group form-group--grow">
 					<label for="item-content" class="form-label">Content / Rules</label>
-					<textarea id="item-content" class="form-textarea form-textarea--mono" placeholder="Write out the exact instructions or rules Nova should follow..." bind:value={itemContent} disabled={isSaving}></textarea>
+					<textarea id="item-content" class="form-textarea form-textarea--mono" placeholder="Write out the exact instructions or rules Nova should follow..." bind:value={itemContent} disabled={isSaving || isEditingPreset}></textarea>
 				</div>
 			</div>
 			<div class="slide-panel__footer">
-				<GhostButton onclick={() => isEditing = false} disabled={isSaving}>Cancel</GhostButton>
-				<PrimaryButton onclick={saveConfiguration} disabled={isSaving}>
-					{isSaving ? 'Saving...' : 'Save Configuration'}
-				</PrimaryButton>
+				{#if isEditingPreset}
+					<!-- spacer to push the primary action if needed, or just the close button -->
+					<div style="flex: 1;"></div>
+					<PrimaryButton onclick={() => isEditing = false}>Close</PrimaryButton>
+				{:else}
+					<GhostButton onclick={() => isEditing = false} disabled={isSaving}>Cancel</GhostButton>
+					<PrimaryButton onclick={saveConfiguration} disabled={isSaving}>
+						{isSaving ? 'Saving...' : 'Save Configuration'}
+					</PrimaryButton>
+				{/if}
 			</div>
 		</div>
 	</div>

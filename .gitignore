@@ -44,6 +44,14 @@ src-tauri/gen/
 tests/visual/test-results/
 tests/visual/playwright-report/
 
+# Databases
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
 # Docs
 dev-docs/*
 .github/*

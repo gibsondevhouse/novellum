@@ -85,7 +85,7 @@
 	{:else}
 		<ul class="stories-list" role="list" aria-label="Stories collection">
 			{#each stories as project, i (project.id)}
-				<LibraryHeroCard {project} cardIndex={i} />
+				<LibraryHeroCard {project} cardIndex={i} destination="hub" />
 			{/each}
 		</ul>
 	{/if}

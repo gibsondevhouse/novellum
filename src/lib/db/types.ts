@@ -13,6 +13,7 @@ export interface Project {
 	negativePrompt: string;
 	projectType: 'novel' | 'story' | 'collection';
 	lastOpenedAt: string;
+	stylePresetId: string;
 	createdAt: string; // ISO 8601
 	updatedAt: string;
 }
