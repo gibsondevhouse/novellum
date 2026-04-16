@@ -9,17 +9,10 @@
 	import type { Arc, Act, Scene, ArcType } from '$lib/db/types.js';
 	import type { ChapterWithScenes } from '$modules/outliner/types.js';
 	import type { WorkspaceMode } from '../types.js';
+	import { ARC_TYPES } from '../constants.js';
 
 	type ArcChanges = Partial<Pick<Arc, 'title' | 'description' | 'arcType'>>;
 	type EditableField = 'title' | 'description';
-
-	const ARC_TYPES: { value: ArcType; label: string }[] = [
-		{ value: 'character', label: 'Character' },
-		{ value: 'plot', label: 'Plot' },
-		{ value: 'relationship', label: 'Relationship' },
-		{ value: 'thematic', label: 'Thematic' },
-		{ value: 'world', label: 'World' },
-	];
 
 	let {
 		mode,
