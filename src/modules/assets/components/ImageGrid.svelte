@@ -71,7 +71,7 @@
 
 	{#if store.loading}
 		<div class="loading">Loading assets...</div>
-	{:else if store.assets.length === 0}
+	{:else if store.albums.length === 0}
 		<EmptyStatePanel
 			title="No images yet"
 			description="Upload reference visuals, character portraits, and map designs to use across your projects."
@@ -84,22 +84,39 @@
 			{/snippet}
 		</EmptyStatePanel>
 	{:else}
-		<div class="grid">
-			{#each store.assets as asset (asset.id)}
-				<!-- svelte-ignore a11y_click_events_have_key_events -->
-				<!-- svelte-ignore a11y_no_static_element_interactions -->
-				<div
-					class="asset-card"
-					onclick={() => (selectedAsset = asset)}
-					class:selected={selectedAsset?.id === asset.id}
-				>
-					<div class="img-wrapper">
-						<img src={asset.data} alt={asset.name} />
+		<div class="albums-container">
+			{#each store.albums as album (album.id)}
+				<section class="album-section">
+					<h3 class="album-title">{album.title}</h3>
+					<div class="grid">
+						{#if album.coverUrl}
+							<div class="asset-card cover-card">
+								<div class="img-wrapper">
+									<img src={album.coverUrl} alt="{album.title} Cover" />
+								</div>
+								<div class="asset-meta">
+									<span class="asset-name">Cover Artwork</span>
+								</div>
+							</div>
+						{/if}
+						{#each album.assets as asset (asset.id)}
+							<!-- svelte-ignore a11y_click_events_have_key_events -->
+							<!-- svelte-ignore a11y_no_static_element_interactions -->
+							<div
+								class="asset-card"
+								onclick={() => (selectedAsset = asset)}
+								class:selected={selectedAsset?.id === asset.id}
+							>
+								<div class="img-wrapper">
+									<img src={asset.data} alt={asset.name} />
+								</div>
+								<div class="asset-meta">
+									<span class="asset-name">{asset.name}</span>
+								</div>
+							</div>
+						{/each}
 					</div>
-					<div class="asset-meta">
-						<span class="asset-name">{asset.name}</span>
-					</div>
-				</div>
+				</section>
 			{/each}
 		</div>
 	{/if}
@@ -161,6 +178,24 @@
 		text-align: center;
 		color: var(--color-text-muted);
 		padding: var(--space-8);
+	}
+	.albums-container {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-8);
+	}
+	.album-section {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-4);
+	}
+	.album-title {
+		font-size: var(--text-lg);
+		font-weight: 600;
+		color: var(--color-text-primary);
+		margin: 0;
+		padding-bottom: var(--space-2);
+		border-bottom: 1px solid var(--color-border);
 	}
 	.grid {
 		display: grid;
