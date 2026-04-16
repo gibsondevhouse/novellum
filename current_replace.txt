@@ -1,0 +1,45 @@
+<div class="workspace-surface">
+
+	{#if heroItem !== null}
+		<WorkspaceDetailCard
+			{mode}
+			item={heroItem}
+			projectId={data.projectId}
+			sceneCount={heroSceneCount}
+			povCharacterName={heroPovName}
+			onUpdate={mode === 'arcs' ? handleUpdateArc : undefined}
+		/>
+        {/if}
+
+        <div class="collection-header">
+                <span class="collection-label">
+                        {collectionItems.length}
+                        {WORKSPACE_MODE_LABELS[mode].toLowerCase()}
+                </span>
+                <button class="help-toggle" onclick={() => (showHelp = true)} aria-label="Show conceptual help">
+                        ?
+                </button>
+        </div>
+
+        <WorkspaceHelpModal
+                open={showHelp}
+                onClose={() => (showHelp = false)}
+                activeMode={mode}
+                items={railItems}
+                {activeIndex}
+                onNavigate={handleNavigate}
+                onCreate={handleCreate}
+                {focusedArcType}
+                onArcTypeFocus={(t) => (focusedArcType = t)}
+        />
+
+        <StructureCarousel
+		items={collectionItems}
+		{selectedId}
+		{mode}
+		onCreate={handleCreate}
+		onSelect={handleSelectItem}
+		onRename={handleRename}
+		onDelete={handleDelete}
+	/>
+</div>
