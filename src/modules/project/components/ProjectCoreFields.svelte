@@ -46,6 +46,23 @@
 			onchange({ genre: draft.genre.slice(0, -1) });
 		}
 	}
+
+	function handleGenreInput() {
+		// When a user picks from the datalist, the value is set in one shot.
+		// If it matches a suggestion exactly, auto-add it as a tag.
+		const trimmed = genreInput.trim();
+		if (GENRE_SUGGESTIONS.some((g) => g === trimmed)) {
+			addGenre(trimmed);
+		}
+		// Also handle comma-separated paste/input (e.g. "Fantasy, Thriller")
+		if (trimmed.includes(',')) {
+			const parts = trimmed.split(',');
+			for (const part of parts) {
+				addGenre(part);
+			}
+			genreInput = '';
+		}
+	}
 </script>
 
 <div class="section">
@@ -95,6 +112,7 @@
 			class="input"
 			type="text"
 			bind:value={genreInput}
+			oninput={handleGenreInput}
 			onkeydown={handleGenreKeydown}
 			onblur={() => {
 				if (genreInput.trim()) addGenre(genreInput);

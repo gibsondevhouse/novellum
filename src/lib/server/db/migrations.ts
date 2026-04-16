@@ -20,11 +20,23 @@ function ensureProjectsPromptColumns(db: Database.Database): void {
 	}
 }
 
+function ensureProjectTypeAndLastOpened(db: Database.Database): void {
+	const columns = db.prepare('PRAGMA table_info(projects)').all() as Array<{ name: string }>;
+
+	if (!columns.some((c) => c.name === 'projectType')) {
+		db.exec("ALTER TABLE projects ADD COLUMN projectType TEXT NOT NULL DEFAULT 'novel'");
+	}
+	if (!columns.some((c) => c.name === 'lastOpenedAt')) {
+		db.exec("ALTER TABLE projects ADD COLUMN lastOpenedAt TEXT NOT NULL DEFAULT ''");
+	}
+}
+
 export function runMigrations(db: Database.Database): void {
 	db.transaction(() => {
 		db.exec(SCHEMA_SQL);
 		ensureProjectsCoverUrlColumn(db);
 		ensureProjectsPromptColumns(db);
+		ensureProjectTypeAndLastOpened(db);
 		db.exec(INDEX_SQL);
 	})();
 }
