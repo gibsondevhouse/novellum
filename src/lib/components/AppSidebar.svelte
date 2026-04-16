@@ -11,14 +11,12 @@
 		collapsed = !collapsed;
 	}
 
-	let isBooksShelfRoute = $derived(page.url.pathname === '/books');
 	let isReaderRoute = $derived(
 		page.url.pathname.startsWith('/books/') && page.url.pathname !== '/books',
 	);
 	let isHomeActive = $derived(page.url.pathname === '/' || isReaderRoute);
 	let isNovaActive = $derived(page.url.pathname === '/nova');
 	let isImagesActive = $derived(page.url.pathname.startsWith('/images'));
-	let isStoriesActive = $derived(page.url.pathname === '/stories');
 	let isProjectsActive = $derived(page.url.pathname === '/projects');
 	let isStylesActive = $derived(page.url.pathname === '/styles');
 	let isSettingsActive = $derived(page.url.pathname.startsWith('/settings'));
@@ -161,50 +159,6 @@
 					<rect x="14" y="3" width="7" height="7"></rect>
 					<rect x="14" y="14" width="7" height="7"></rect>
 					<rect x="3" y="14" width="7" height="7"></rect>
-				</svg>
-			{/snippet}
-		</SidebarItem>
-	</SidebarSection>
-
-	<hr class="sidebar-divider" />
-
-	<SidebarSection label="PROJECTS" collapsible>
-		<SidebarItem href="/books" label="Books" active={isBooksShelfRoute}>
-			{#snippet icon()}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="1em"
-					height="1em"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-					<path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-				</svg>
-			{/snippet}
-		</SidebarItem>
-		<SidebarItem href="/stories" label="Stories" active={isStoriesActive}>
-			{#snippet icon()}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="1em"
-					height="1em"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-					<polyline points="14 2 14 8 20 8"></polyline>
-					<line x1="16" y1="13" x2="8" y2="13"></line>
-					<line x1="16" y1="17" x2="8" y2="17"></line>
-					<polyline points="10 9 9 9 8 9"></polyline>
 				</svg>
 			{/snippet}
 		</SidebarItem>
