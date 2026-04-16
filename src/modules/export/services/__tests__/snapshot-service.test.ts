@@ -57,7 +57,7 @@ describe('snapshot-service', () => {
 			systemPrompt: '',
 			negativePrompt: '',
 				status: 'draft', projectType: 'novel' as const,
-
+				lastOpenedAt: new Date().toISOString(),
 				createdAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString(),
 			});
