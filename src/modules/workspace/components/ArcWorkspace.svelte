@@ -5,11 +5,13 @@
 		stages: Stage[];
 	}
 
-	let { arc, allBeats = [], allStages = [], projectId, onCreateBeat, onUpdateBeat, onDeleteBeat, onCreateStage, onUpdateStage, onDeleteStage } = $props<{
+	let { arc, allBeats = [], allStages = [], projectId, onUpdateArc, onDeleteArc, onCreateBeat, onUpdateBeat, onDeleteBeat, onCreateStage, onUpdateStage, onDeleteStage } = $props<{
 		arc: Arc | null;
 		allBeats?: Beat[];
 		allStages?: Stage[];
 		projectId: string;
+		onUpdateArc?: (id: string, changes: Partial<Arc>) => void;
+		onDeleteArc?: (id: string) => void;
 		onCreateBeat?: (beat: Beat) => void;
 		onUpdateBeat?: (id: string, changes: Partial<Beat>) => void;
 		onDeleteBeat?: (id: string) => void;
@@ -105,6 +107,38 @@
 		onUpdateStage?.(stageId, { [field]: value });
 	}
 
+	let openStatusDropdownId = $state<string | null>(null);
+
+	let dropdownPos = $state({ top: 0, left: 0 });
+
+	function toggleStatusDropdown(stageId: string, event: MouseEvent) {
+		if (openStatusDropdownId === stageId) {
+			openStatusDropdownId = null;
+			return;
+		}
+		const dot = event.currentTarget as HTMLElement;
+		const rect = dot.getBoundingClientRect();
+		dropdownPos = { top: rect.top - 4, left: rect.right + 8 };
+		openStatusDropdownId = stageId;
+	}
+
+	function selectStageStatus(stageId: string, value: string) {
+		handleStageUpdate(stageId, 'status', value);
+		openStatusDropdownId = null;
+	}
+
+	$effect(() => {
+		if (!openStatusDropdownId) return;
+		function handleClickOutside(e: MouseEvent) {
+			const target = e.target as HTMLElement;
+			if (!target.closest('.status-dot-wrapper')) {
+				openStatusDropdownId = null;
+			}
+		}
+		document.addEventListener('click', handleClickOutside, true);
+		return () => document.removeEventListener('click', handleClickOutside, true);
+	});
+
 	let editArc = $state({
 		title: '',
 		arcType: '',
@@ -125,6 +159,12 @@
 		}
 	});
 
+	function handleArcFieldUpdate(field: keyof typeof editArc, value: string) {
+		if (!arc) return;
+		(editArc as Record<string, unknown>)[field] = value;
+		onUpdateArc?.(arc.id, { [field]: value });
+	}
+
 </script>
 
 <div class="arc-workspace">
@@ -137,14 +177,15 @@
 	<header class="arc-header split-panel">
 			<div class="panel-left">
 				<div class="title-row">
-					<input type="text" class="arc-title-input" bind:value={editArc.title} placeholder="Untitled Arc" />
-					<input type="text" class="arc-type-input" bind:value={editArc.arcType} placeholder="Type" />
+					<input type="text" class="arc-title-input" bind:value={editArc.title} onchange={() => handleArcFieldUpdate('title', editArc.title)} placeholder="Untitled Arc" />
+					<input type="text" class="arc-type-input" bind:value={editArc.arcType} onchange={() => handleArcFieldUpdate('arcType', editArc.arcType)} placeholder="Type" />
+					<button class="delete-arc-btn" onclick={() => { if (arc && onDeleteArc) onDeleteArc(arc.id); }} title="Delete arc">&times;</button>
 				</div>
-				<textarea class="arc-purpose-input" bind:value={editArc.purpose} placeholder="Arc Purpose..."></textarea>
+				<textarea class="arc-purpose-input" bind:value={editArc.purpose} onchange={() => handleArcFieldUpdate('purpose', editArc.purpose)} placeholder="Arc Purpose..."></textarea>
 				<div class="meta-row">
 					<div class="meta-field">
 						<span class="field-label">Status</span>
-						<select class="arc-status-select" bind:value={editArc.status}>
+						<select class="arc-status-select" bind:value={editArc.status} onchange={() => handleArcFieldUpdate('status', editArc.status)}>
 							{#each arcStatuses as opt (opt.value)}
 								<option value={opt.value}>{opt.label}</option>
 							{/each}
@@ -163,14 +204,22 @@
 			</div>
 			<div class="panel-right">
 				<span class="field-label">Description</span>
-				<textarea class="arc-desc-input" bind:value={editArc.description} placeholder="Arc Description..."></textarea>
+				<textarea class="arc-desc-input" bind:value={editArc.description} onchange={() => handleArcFieldUpdate('description', editArc.description)} placeholder="Arc Description..."></textarea>
 			</div>
 		</header>
 
-                <div class="arc-layout">
+                <!-- svelte-ignore a11y_click_events_have_key_events -->
+                <div class="arc-layout" role="presentation" onclick={(e: MouseEvent) => {
+			const t = e.target as HTMLElement;
+			if (!t.closest('.beat-card') && !t.closest('.sidebar-column')) selectedBeatId = null;
+		}}>
+			<div class="arc-layout-header">
+				<h3>Beats</h3>
+				<h3>Stages</h3>
+			</div>
+			<div class="arc-layout-body">
 			<div class="main-column">
 				<div class="beat-sequence">
-					<h3>Beat Sequence</h3>
 					<div class="beats">
 						{#each beatsWithStages as beat (beat.id)}
 							<div class="beat-card" class:selected={selectedBeatId === beat.id}>
@@ -211,37 +260,54 @@
 				<div class="arc-context-panel">
 					{#if selectedBeat}
 						<div class="beat-editor">
-							<h3>{selectedBeat.title}</h3>
-							
 							<div class="stage-list">
-								<h4>Stages</h4>
 								{#each selectedBeat.stages as stage (stage.id)}
 									<div class="stage-row" data-status={stage.status}>
-										<select
-											class="stage-status-select"
-											value={stage.status}
-											onchange={(e) => handleStageUpdate(stage.id, 'status', e.currentTarget.value)}
-										>
-											{#each stageStatuses as opt (opt.value)}
-												<option value={opt.value}>{opt.label}</option>
-											{/each}
-										</select>
-										<div class="stage-content">
+										<div class="stage-row-header">
+											<div class="status-dot-wrapper">
+												<button
+													class="status-dot"
+													data-status={stage.status}
+													onclick={(e: MouseEvent) => toggleStatusDropdown(stage.id, e)}
+													title={stageStatuses.find(s => s.value === stage.status)?.label ?? stage.status}
+													aria-label="Change stage status"
+													aria-haspopup="listbox"
+													aria-expanded={openStatusDropdownId === stage.id}
+												></button>
+												{#if openStatusDropdownId === stage.id}
+													<ul class="status-dropdown" role="listbox" aria-label="Stage status" style="top:{dropdownPos.top}px;left:{dropdownPos.left}px">
+														{#each stageStatuses as opt (opt.value)}
+															<li>
+																<button
+																	class="status-option"
+																	class:active={stage.status === opt.value}
+																	role="option"
+																	aria-selected={stage.status === opt.value}
+																	onclick={() => selectStageStatus(stage.id, opt.value)}
+																>
+																	<span class="status-dot-preview" data-status={opt.value}></span>
+																	{opt.label}
+																</button>
+															</li>
+														{/each}
+													</ul>
+												{/if}
+											</div>
 											<input
 												type="text"
 												class="stage-title-input"
 												value={stage.title}
 												oninput={(e) => handleStageUpdate(stage.id, 'title', e.currentTarget.value)}
 											/>
-											<textarea
-												class="stage-desc-input"
-												value={stage.description}
-												oninput={(e) => handleStageUpdate(stage.id, 'description', e.currentTarget.value)}
-												placeholder="Stage details..."
-												rows="2"
-											></textarea>
+											<button class="delete-btn small" onclick={() => deleteStage(selectedBeat.id, stage.id)} title="Delete stage">&times;</button>
 										</div>
-										<button class="delete-btn small" onclick={() => deleteStage(selectedBeat.id, stage.id)} title="Delete stage">&times;</button>
+										<textarea
+											class="stage-desc-input"
+											value={stage.description}
+											oninput={(e) => handleStageUpdate(stage.id, 'description', e.currentTarget.value)}
+											placeholder="Stage details..."
+											rows="2"
+										></textarea>
 									</div>
 								{/each}
 								<button class="add-stage-btn" onclick={() => addStage(selectedBeat.id)}>+ Add Stage</button>
@@ -269,7 +335,8 @@
 					{/if}
 				</div>
 			</div>
-		</div>
+			</div><!-- arc-layout-body -->
+		</div><!-- arc-layout -->
 	{/if}
 </div>
 
@@ -313,6 +380,23 @@
 		display: flex;
 		align-items: baseline;
 		gap: var(--space-3);
+	}
+
+	.delete-arc-btn {
+		background: transparent;
+		border: 1px solid transparent;
+		color: var(--color-text-tertiary);
+		font-size: var(--text-lg);
+		cursor: pointer;
+		padding: var(--space-1) var(--space-2);
+		border-radius: var(--radius-sm);
+		line-height: 1;
+		transition: color 0.15s ease, background 0.15s ease;
+	}
+
+	.delete-arc-btn:hover {
+		color: var(--color-danger, #ef4444);
+		background: var(--color-surface-hover);
 	}
 
 	.panel-right {
@@ -494,8 +578,30 @@
 	}
 
 	.arc-layout {
+		--card-row-height: 148px;
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+		gap: var(--space-3);
+	}
+
+	.arc-layout-header {
 		display: grid;
-		grid-template-columns: 7fr 3fr;
+		grid-template-columns: 3fr 2fr;
+		gap: var(--space-6);
+	}
+
+	.arc-layout-header h3 {
+		font-size: var(--text-lg);
+		font-weight: var(--font-weight-medium);
+		color: var(--color-text-primary);
+		margin: 0;
+	}
+
+	.arc-layout-body {
+		display: grid;
+		grid-template-columns: 3fr 2fr;
 		gap: var(--space-6);
 		flex: 1;
 		min-height: 0;
@@ -511,9 +617,6 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 0;
-		background: var(--color-surface-sunken);
-		border-radius: var(--radius-lg);
-		border: 1px solid var(--color-border-subtle);
 		overflow: hidden;
 	}
 
@@ -521,13 +624,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-4);
-	}
-
-	.beat-sequence h3 {
-		font-size: var(--text-lg);
-		font-weight: var(--font-weight-medium);
-		color: var(--color-text-primary);
-		margin: 0;
 	}
 
 	.beats {
@@ -548,6 +644,8 @@
 		cursor: pointer;
 		transition: all 0.2s ease;
 		width: 100%;
+		height: var(--card-row-height);
+		overflow: hidden;
 	}
 
 	.beat-card:hover {
@@ -667,7 +765,6 @@
 	}
 
 	.arc-context-panel {
-		padding: var(--space-4);
 		display: flex;
 		flex-direction: column;
 		height: 100%;
@@ -677,10 +774,17 @@
 	.arc-guidance, .beat-editor {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-4);
 	}
 
-	.arc-guidance h3, .beat-editor h3 {
+	.arc-guidance {
+		padding: var(--space-4);
+		background: var(--color-surface-raised);
+		border: 1px solid var(--color-border-subtle);
+		border-radius: var(--radius-md);
+		gap: var(--space-2);
+	}
+
+	.arc-guidance h3 {
 		font-size: var(--text-lg);
 		font-weight: var(--font-weight-medium);
 		color: var(--color-text-primary);
@@ -699,61 +803,136 @@
 		gap: var(--space-3);
 	}
 
-	.stage-list h4 {
-		font-size: var(--text-sm);
-		font-weight: var(--font-weight-medium);
-		color: var(--color-text-primary);
-		margin: 0 0 var(--space-2);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
-
 	.stage-row {
 		display: flex;
-		gap: var(--space-3);
-		padding: var(--space-3);
+		flex-direction: column;
+		gap: var(--space-2);
+		padding: var(--space-4);
 		background: var(--color-surface-raised);
 		border: 1px solid var(--color-border-subtle);
-		border-radius: var(--radius-sm);
-		align-items: flex-start;
+		border-radius: var(--radius-md);
+		cursor: default;
+		transition: border-color 0.2s ease;
+		height: var(--card-row-height);
+		overflow: hidden;
 	}
 
-	.stage-status-select {
+	.stage-row:hover {
+		border-color: var(--color-border-hover);
+	}
+
+	/* Status dot */
+	.status-dot-wrapper {
+		position: relative;
+		flex-shrink: 0;
+		margin-top: var(--space-2);
+	}
+
+	.status-dot {
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+		background: var(--color-text-muted);
+		transition: transform var(--duration-fast) var(--ease-standard),
+			box-shadow var(--duration-fast) var(--ease-standard);
+	}
+
+	.status-dot:hover {
+		transform: scale(1.3);
+	}
+
+	.status-dot:focus-visible {
+		outline: 2px solid var(--color-border-focus);
+		outline-offset: 2px;
+	}
+
+	.status-dot[data-status="planned"] {
+		background: var(--color-text-muted);
+	}
+
+	.status-dot[data-status="in_progress"] {
+		background: var(--color-nova-blue);
+	}
+
+	.status-dot[data-status="completed"] {
+		background: var(--color-success);
+	}
+
+	/* Status dropdown */
+	.status-dropdown {
+		position: fixed;
+		list-style: none;
+		margin: 0;
+		padding: var(--space-1);
+		background: var(--color-surface-overlay);
+		border: 1px solid var(--color-border-default);
+		border-radius: var(--radius-sm);
+		box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.3));
+		z-index: 100;
+		min-width: 120px;
+		white-space: nowrap;
+	}
+
+	.status-option {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		padding: var(--space-1) var(--space-2);
+		background: transparent;
+		border: none;
+		border-radius: var(--radius-xs, 2px);
+		color: var(--color-text-secondary);
 		font-family: inherit;
 		font-size: var(--text-xs);
-		font-weight: var(--font-weight-medium);
-		color: var(--color-text-secondary);
-		background: var(--color-surface-sunken);
-		border: 1px solid var(--color-border-subtle);
-		padding: 2px var(--space-1);
-		border-radius: var(--radius-sm);
 		cursor: pointer;
+		transition: background var(--duration-fast) var(--ease-standard),
+			color var(--duration-fast) var(--ease-standard);
+	}
+
+	.status-option:hover {
+		background: var(--color-surface-hover);
+		color: var(--color-text-primary);
+	}
+
+	.status-option:focus-visible {
+		outline: 2px solid var(--color-border-focus);
+		outline-offset: -2px;
+	}
+
+	.status-option.active {
+		color: var(--color-text-primary);
+		font-weight: var(--font-weight-medium);
+	}
+
+	.status-dot-preview {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
 		flex-shrink: 0;
-		margin-top: var(--space-1);
-		transition: border-color var(--duration-base) var(--ease-standard);
+		background: var(--color-text-muted);
 	}
 
-	.stage-status-select:focus {
-		border-color: var(--color-border-focus);
-		outline: none;
+	.status-dot-preview[data-status="planned"] {
+		background: var(--color-text-muted);
 	}
 
-	.stage-row[data-status="done"] .stage-status-select {
-		color: var(--color-success);
-		border-color: var(--color-success);
+	.status-dot-preview[data-status="in_progress"] {
+		background: var(--color-nova-blue);
 	}
 
-	.stage-row[data-status="in_progress"] .stage-status-select {
-		color: var(--color-primary);
-		border-color: var(--color-primary);
+	.status-dot-preview[data-status="completed"] {
+		background: var(--color-success);
 	}
 
-	.stage-content {
+	.stage-row-header {
 		display: flex;
-		flex-direction: column;
-		gap: var(--space-1);
-		flex: 1;
-		min-width: 0;
+		align-items: center;
+		gap: var(--space-2);
+		flex-shrink: 0;
 	}
 
 	.stage-title-input {
@@ -763,9 +942,9 @@
 		background: transparent;
 		border: 1px solid transparent;
 		padding: var(--space-1) var(--space-2);
-		margin-left: calc(var(--space-2) * -1);
 		border-radius: var(--radius-sm);
-		width: calc(100% + var(--space-2));
+		flex: 1;
+		min-width: 0;
 		transition: background var(--duration-base) var(--ease-standard),
 			border-color var(--duration-base) var(--ease-standard);
 	}
@@ -787,11 +966,11 @@
 		background: transparent;
 		border: 1px solid transparent;
 		padding: var(--space-1) var(--space-2);
-		margin-left: calc(var(--space-2) * -1);
 		border-radius: var(--radius-sm);
 		resize: none;
 		line-height: 1.5;
-		width: calc(100% + var(--space-2));
+		width: 100%;
+		flex: 1;
 		transition: background var(--duration-base) var(--ease-standard),
 			border-color var(--duration-base) var(--ease-standard);
 	}
