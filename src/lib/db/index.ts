@@ -18,6 +18,7 @@ import type {
 	Arc,
 	ArcRef,
 	Asset,
+	Milestone,
 } from './types.js';
 import {
 	schemaV1,
@@ -29,6 +30,7 @@ import {
 	schemaV7,
 	schemaV8,
 	schemaV9,
+	schemaV10,
 } from './schema.js';
 
 export class AppDB extends Dexie {
@@ -49,6 +51,7 @@ export class AppDB extends Dexie {
 	acts!: Table<Act, string>;
 	arcs!: Table<Arc, string>;
 	assets!: Table<Asset, string>;
+	milestones!: Table<Milestone, string>;
 
 	constructor() {
 		super('novellum');
@@ -90,6 +93,8 @@ export class AppDB extends Dexie {
 		this.version(8).stores(schemaV8);
 		// v9 → adds assets table
 		this.version(9).stores(schemaV9);
+		// v10 → adds milestones table
+		this.version(10).stores(schemaV10);
 	}
 }
 
@@ -124,4 +129,5 @@ export type {
 	Arc,
 	ArcRef,
 	Asset,
+	Milestone,
 };

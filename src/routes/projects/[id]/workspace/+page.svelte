@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { Arc, Act, Scene, Character, Beat, Stage } from '$lib/db/types.js';
+	import type { Arc, Act, Scene, Character, Beat, Stage, Milestone } from '$lib/db/types.js';
 	import type { ArcType } from '$lib/db/types.js';
 	import type { ChapterWithScenes } from '$modules/outliner/types.js';
 	import {
@@ -15,6 +15,9 @@
 		createAct,
 		updateAct,
 		removeAct,
+		createMilestone as createMilestoneApi,
+		updateMilestone as updateMilestoneApi,
+		removeMilestone as removeMilestoneApi,
 	} from '$modules/outliner/services/story-structure-service.js';
 	import {
 		createChapter,
@@ -39,6 +42,7 @@
 	import WorkspaceHelpModal from '$modules/workspace/components/WorkspaceHelpModal.svelte';
 	import StructureCarousel from '$modules/workspace/components/StructureCarousel.svelte';
 	import ArcWorkspace from '$modules/workspace/components/ArcWorkspace.svelte';
+	import ActsWorkspace from '$modules/workspace/components/ActsWorkspace.svelte';
 	import { WORKSPACE_MODE_LABELS } from '$modules/workspace/types.js';
 
 	let { data } = $props<{
@@ -47,6 +51,7 @@
 			projectId: string;
 			arcs: Arc[];
 			acts: Act[];
+			milestones: Milestone[];
 			chapters: ChapterWithScenes[];
 			scenes: Scene[];
 			characters: Character[];
@@ -57,6 +62,7 @@
 
 	let arcs = $state<Arc[]>(untrack(() => data.arcs));
 	let acts = $state<Act[]>(untrack(() => data.acts));
+	let milestones = $state<Milestone[]>(untrack(() => data.milestones));
 	let chapters = $state<ChapterWithScenes[]>(untrack(() => data.chapters));
 	let scenes = $state<Scene[]>(untrack(() => data.scenes));
 	let characters = $state<Character[]>(untrack(() => data.characters));
@@ -299,6 +305,45 @@
 		stages = stages.filter((s) => s.id !== id);
 		void removeStage(id);
 	}
+
+	/* ── Act-specific handlers ── */
+	function handleUpdateAct(id: string, changes: Partial<Act>) {
+		void updateAct(id, changes);
+		acts = acts.map((a) => (a.id === id ? { ...a, ...changes } : a));
+	}
+
+	/* ── Milestone CRUD ── */
+	async function handleCreateMilestone(actId: string) {
+		const actMilestones = milestones.filter((m) => m.actId === actId);
+		const milestone = await createMilestoneApi(actId, data.projectId, `Milestone ${actMilestones.length + 1}`, actMilestones.length);
+		milestones = [...milestones, milestone];
+	}
+
+	function handleUpdateMilestone(id: string, changes: Partial<Milestone>) {
+		void updateMilestoneApi(id, changes);
+		milestones = milestones.map((m) => (m.id === id ? { ...m, ...changes } : m));
+	}
+
+	function handleDeleteMilestone(id: string) {
+		void removeMilestoneApi(id);
+		milestones = milestones.filter((m) => m.id !== id);
+	}
+
+	function handleLinkChapterToMilestone(milestoneId: string, chapterId: string) {
+		const ms = milestones.find((m) => m.id === milestoneId);
+		if (!ms || ms.chapterIds.includes(chapterId)) return;
+		const updated = [...ms.chapterIds, chapterId];
+		void updateMilestoneApi(milestoneId, { chapterIds: updated });
+		milestones = milestones.map((m) => (m.id === milestoneId ? { ...m, chapterIds: updated } : m));
+	}
+
+	function handleUnlinkChapterFromMilestone(milestoneId: string, chapterId: string) {
+		const ms = milestones.find((m) => m.id === milestoneId);
+		if (!ms) return;
+		const updated = ms.chapterIds.filter((id) => id !== chapterId);
+		void updateMilestoneApi(milestoneId, { chapterIds: updated });
+		milestones = milestones.map((m) => (m.id === milestoneId ? { ...m, chapterIds: updated } : m));
+	}
 </script>
 
 <svelte:head>
@@ -355,6 +400,45 @@
                         onCreateStage={handleCreateStage}
                         onUpdateStage={handleUpdateStage}
                         onDeleteStage={handleDeleteStage}
+                />
+        </div>
+{:else if mode === 'acts'}
+        <div class="workspace-board-view">
+                <div class="board-header-row">
+                        <div class="collection-header">
+                                <span class="collection-label item-selection-row">
+                                        {#each collectionItems as item, i (item.id)}
+                                                <button
+                                                        class="item-selector"
+                                                        class:item-selector--active={selectedId === item.id}
+                                                        onclick={() => handleSelectItem(item.id)}
+                                                >
+                                                        {item.title ? item.title.toUpperCase() : `ACT ${i + 1}`}
+                                                </button>
+                                                {#if i < collectionItems.length - 1}
+                                                        <span class="divider"> | </span>
+                                                {/if}
+                                        {/each}
+                                        <button class="item-selector item-new-btn" onclick={handleCreate}>+ New</button>
+                                </span>
+                                <button class="help-toggle" onclick={() => (showHelp = true)} aria-label="Show conceptual help">
+                                        ?
+                                </button>
+                        </div>
+                </div>
+
+                <ActsWorkspace
+                        act={heroItem as Act | null}
+                        {milestones}
+                        allChapters={chapters}
+                        projectId={data.projectId}
+                        onUpdateAct={handleUpdateAct}
+                        onDeleteAct={handleDelete}
+                        onCreateMilestone={handleCreateMilestone}
+                        onUpdateMilestone={handleUpdateMilestone}
+                        onDeleteMilestone={handleDeleteMilestone}
+                        onLinkChapter={handleLinkChapterToMilestone}
+                        onUnlinkChapter={handleUnlinkChapterFromMilestone}
                 />
         </div>
 {:else}
@@ -478,6 +562,42 @@
         }
 
         .arc-new-btn {
+                color: var(--color-text-tertiary);
+                margin-left: var(--space-2);
+        }
+
+        /* ── Board View (Acts) ── */
+
+        .item-selection-row {
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-2);
+        }
+
+        .item-selector {
+                background: none;
+                border: none;
+                color: var(--color-text-secondary);
+                font-family: var(--font-sans);
+                font-size: var(--text-sm);
+                font-weight: var(--font-weight-medium);
+                letter-spacing: var(--tracking-wider);
+                cursor: pointer;
+                padding: var(--space-1) var(--space-2);
+                border-radius: var(--radius-sm);
+                transition: color 150ms ease, background 150ms ease;
+        }
+
+        .item-selector:hover {
+                color: var(--color-text-primary);
+                background: rgba(255, 255, 255, 0.05);
+        }
+
+        .item-selector--active {
+                color: var(--color-nova-blue);
+        }
+
+        .item-new-btn {
                 color: var(--color-text-tertiary);
                 margin-left: var(--space-2);
         }

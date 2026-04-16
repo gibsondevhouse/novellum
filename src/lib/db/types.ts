@@ -222,6 +222,18 @@ export interface Arc {
 	updatedAt: string;
 }
 
+export interface Milestone {
+	id: string;
+	actId: string;
+	projectId: string;
+	title: string;
+	description: string;
+	order: number;
+	chapterIds: string[];
+	createdAt: string;
+	updatedAt: string;
+}
+
 export interface Asset {
     id: string;
     projectId: string;

@@ -10,6 +10,11 @@ export {
 	updateAct,
 	removeAct,
 	reorderActs,
+	getMilestonesByActId,
+	getMilestonesByProjectId,
+	createMilestone,
+	updateMilestone,
+	removeMilestone,
 } from './services/story-structure-service.js';
 export {
 	createArc,

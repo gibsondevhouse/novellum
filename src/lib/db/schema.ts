@@ -71,3 +71,9 @@ export const schemaV9 = {
     ...schemaV8,
     assets: 'id, projectId, createdAt'
 };
+
+// Version 10 — adds milestones table.
+export const schemaV10 = {
+    ...schemaV9,
+    milestones: 'id, actId, projectId, order'
+};

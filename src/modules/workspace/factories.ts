@@ -1,4 +1,4 @@
-import type { Beat, Stage } from '$lib/db/types.js';
+import type { Beat, Stage, Milestone } from '$lib/db/types.js';
 
 /** Create a new Beat entity with sensible defaults. Pure — no side effects. */
 export function createBeat(arcId: string, projectId: string, order: number): Beat {
@@ -29,5 +29,21 @@ export function createStage(beatId: string, projectId: string, order: number): S
 		status: 'planned',
 		createdAt: now,
 		updatedAt: now
+	};
+}
+
+/** Create a new Milestone entity with sensible defaults. Pure — no side effects. */
+export function createMilestoneEntity(actId: string, projectId: string, order: number): Milestone {
+	const now = new Date().toISOString();
+	return {
+		id: crypto.randomUUID(),
+		actId,
+		projectId,
+		title: `Milestone ${order + 1}`,
+		description: '',
+		order,
+		chapterIds: [],
+		createdAt: now,
+		updatedAt: now,
 	};
 }

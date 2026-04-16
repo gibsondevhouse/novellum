@@ -4,6 +4,7 @@
 	import { STAGE_STATUSES } from '../constants.js';
 	import { createBeat, createStage } from '../factories.js';
 	import { computeCompletionPercent } from '../utils.js';
+	import WorkspaceBoardShell from './WorkspaceBoardShell.svelte';
 	import ArcHeader from './ArcHeader.svelte';
 	import BeatCard from './BeatCard.svelte';
 	import StageCard from './StageCard.svelte';
@@ -57,156 +58,105 @@
 		if (!beat) return;
 		onCreateStage?.(createStage(beatId, projectId, beat.stages.length));
 	}
+
+	function handleBackdropClick() {
+		selectedBeatId = null;
+	}
 </script>
 
-<div class="arc-workspace">
-	{#if !arc}
-		<div class="empty-state">
-			<h2>No Arc Selected</h2>
-			<p>Select an arc from the header or create a new one to begin mapping out the story.</p>
-		</div>
-	{:else}
-		<ArcHeader {arc} {onUpdateArc} {onDeleteArc} />
+<WorkspaceBoardShell
+	showEmpty={!arc}
+	onBackdropClick={handleBackdropClick}
+>
+	{#snippet empty()}
+		<h2>No Arc Selected</h2>
+		<p>Select an arc from the header or create a new one to begin mapping out the story.</p>
+	{/snippet}
 
-		<div class="arc-layout" role="presentation" onclick={(e: MouseEvent) => {
-			const t = e.target as HTMLElement;
-			if (!t.closest('.beat-card') && !t.closest('.sidebar-column')) selectedBeatId = null;
-		}}>
-			<div class="arc-layout-header">
-				<h3>Beats</h3>
-				<h3>Stages</h3>
+	{#snippet header()}
+		<ArcHeader arc={arc!} {onUpdateArc} {onDeleteArc} />
+	{/snippet}
+
+	{#snippet columnHeaders()}
+		<h3 class="column-label">Beats</h3>
+		<h3 class="column-label">Stages</h3>
+	{/snippet}
+
+	{#snippet main()}
+		<div class="beat-sequence">
+			<div class="beats">
+				{#each beatsWithStages as beat (beat.id)}
+					<BeatCard
+						{beat}
+						selected={selectedBeatId === beat.id}
+						onSelect={() => selectBeat(beat.id)}
+						onUpdateTitle={(value) => onUpdateBeat?.(beat.id, { title: value })}
+						onUpdateNotes={(value) => onUpdateBeat?.(beat.id, { notes: value })}
+						onDelete={() => deleteBeat(beat.id)}
+					/>
+				{/each}
+				{#if beatsWithStages.length === 0}
+					<p class="empty-beats">No beats yet. Add your first beat to start building the arc.</p>
+				{/if}
+				<button class="add-beat-card" onclick={addBeat}>
+					+ Add Beat
+				</button>
 			</div>
-			<div class="arc-layout-body">
-			<div class="main-column">
-				<div class="beat-sequence">
-					<div class="beats">
-						{#each beatsWithStages as beat (beat.id)}
-							<BeatCard
-								{beat}
-								selected={selectedBeatId === beat.id}
-								onSelect={() => selectBeat(beat.id)}
-								onUpdateTitle={(value) => onUpdateBeat?.(beat.id, { title: value })}
-								onUpdateNotes={(value) => onUpdateBeat?.(beat.id, { notes: value })}
-								onDelete={() => deleteBeat(beat.id)}
+		</div>
+	{/snippet}
+
+	{#snippet sidebar()}
+		<div class="arc-context-panel">
+			{#if selectedBeat}
+				<div class="beat-editor">
+					<div class="stage-list">
+						{#each selectedBeat.stages as stage (stage.id)}
+							<StageCard
+								{stage}
+								stageStatuses={STAGE_STATUSES}
+								onUpdateField={(field, value) => onUpdateStage?.(stage.id, { [field]: value })}
+								onDelete={() => onDeleteStage?.(stage.id)}
 							/>
 						{/each}
-						{#if beatsWithStages.length === 0}
-							<p class="empty-beats">No beats yet. Add your first beat to start building the arc.</p>
-						{/if}
-						<button class="add-beat-card" onclick={addBeat}>
-							+ Add Beat
-						</button>
+						<button class="add-stage-btn" onclick={() => addStage(selectedBeat.id)}>+ Add Stage</button>
 					</div>
 				</div>
-			</div>
-			
-			<div class="sidebar-column">
-				<div class="arc-context-panel">
-					{#if selectedBeat}
-						<div class="beat-editor">
-							<div class="stage-list">
-								{#each selectedBeat.stages as stage (stage.id)}
-									<StageCard
-										{stage}
-									stageStatuses={STAGE_STATUSES}
-										onUpdateField={(field, value) => onUpdateStage?.(stage.id, { [field]: value })}
-										onDelete={() => onDeleteStage?.(stage.id)}
-									/>
-								{/each}
-								<button class="add-stage-btn" onclick={() => addStage(selectedBeat.id)}>+ Add Stage</button>
+			{:else}
+				<div class="arc-guidance">
+					<h3>Arc Overview</h3>
+					<div class="guidance-content">
+						<p>{beatsWithStages.length === 0 ? 'Create a beat to get started.' : 'Select a beat to edit its stages.'}</p>
+						<div class="health-metrics">
+							<div class="metric">
+								<span class="label">Total Beats</span>
+								<span class="value">{beatsWithStages.length}</span>
+							</div>
+							<div class="metric">
+								<span class="label">Completion</span>
+								<span class="value">
+									{computeCompletionPercent(beatsWithStages.flatMap(b => b.stages))}%
+								</span>
 							</div>
 						</div>
-					{:else}
-						<div class="arc-guidance">
-							<h3>Arc Overview</h3>
-							<div class="guidance-content">
-								<p>{beatsWithStages.length === 0 ? 'Create a beat to get started.' : 'Select a beat to edit its stages.'}</p>
-								<div class="health-metrics">
-									<div class="metric">
-										<span class="label">Total Beats</span>
-										<span class="value">{beatsWithStages.length}</span>
-									</div>
-									<div class="metric">
-										<span class="label">Completion</span>
-										<span class="value">
-											{computeCompletionPercent(beatsWithStages.flatMap(b => b.stages))}%
-										</span>
-									</div>
-								</div>
-							</div>
-						</div>
-					{/if}
+					</div>
 				</div>
-			</div>
-			</div><!-- arc-layout-body -->
-		</div><!-- arc-layout -->
-	{/if}
-</div>
+			{/if}
+		</div>
+	{/snippet}
+</WorkspaceBoardShell>
 
 <style>
-	.arc-workspace {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-6);
-		height: 100%;
-		padding: var(--space-4);
-	}
+	/* Arc-specific styles — layout structure is owned by WorkspaceBoardShell */
 
-	.empty-state {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		height: 100%;
-		color: var(--color-text-secondary);
-		gap: var(--space-2);
-		text-align: center;
-	}
-
-	.arc-layout {
-		--card-row-height: 148px;
-		display: flex;
-		flex-direction: column;
-		flex: 1;
-		min-height: 0;
-		gap: var(--space-3);
-	}
-
-	.arc-layout-header {
-		display: grid;
-		grid-template-columns: 3fr 2fr;
-		gap: var(--space-6);
-	}
-
-	.arc-layout-header h3 {
+	.column-label {
 		font-size: var(--text-lg);
 		font-weight: var(--font-weight-medium);
 		color: var(--color-text-primary);
 		margin: 0;
 	}
 
-	.arc-layout-body {
-		display: grid;
-		grid-template-columns: 3fr 2fr;
-		gap: var(--space-6);
-		flex: 1;
-		min-height: 0;
-	}
-
-	.main-column {
-		display: flex;
-		flex-direction: column;
-		min-height: 0;
-	}
-
-	.sidebar-column {
-		display: flex;
-		flex-direction: column;
-		min-height: 0;
-		overflow: hidden;
-	}
-
 	.beat-sequence {
+		--card-row-height: 148px;
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-4);
