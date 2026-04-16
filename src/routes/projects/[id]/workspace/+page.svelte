@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { Arc, Act, Scene, Character } from '$lib/db/types.js';
+	import type { Arc, Act, Scene, Character, Beat, Stage } from '$lib/db/types.js';
 	import type { ArcType } from '$lib/db/types.js';
 	import type { ChapterWithScenes } from '$modules/outliner/types.js';
 	import {
@@ -26,8 +26,19 @@
 		updateScene,
 		removeScene,
 	} from '$modules/editor/services/scene-repository.js';
+	import {
+		createBeat,
+		updateBeat,
+		removeBeat,
+	} from '$modules/editor/services/beat-repository.js';
+	import {
+		createStage,
+		updateStage as updateStageApi,
+		removeStage,
+	} from '$modules/editor/services/stage-repository.js';
 	import WorkspaceHelpModal from '$modules/workspace/components/WorkspaceHelpModal.svelte';
 	import StructureCarousel from '$modules/workspace/components/StructureCarousel.svelte';
+	import ArcWorkspace from '$modules/workspace/components/ArcWorkspace.svelte';
 	import { WORKSPACE_MODE_LABELS } from '$modules/workspace/types.js';
 
 	let { data } = $props<{
@@ -39,6 +50,8 @@
 			chapters: ChapterWithScenes[];
 			scenes: Scene[];
 			characters: Character[];
+			beats: Beat[];
+			stages: Stage[];
 		};
 	}>();
 
@@ -47,31 +60,46 @@
 	let chapters = $state<ChapterWithScenes[]>(untrack(() => data.chapters));
 	let scenes = $state<Scene[]>(untrack(() => data.scenes));
 	let characters = $state<Character[]>(untrack(() => data.characters));
+	let beats = $state<Beat[]>(untrack(() => data.beats));
+	let stages = $state<Stage[]>(untrack(() => data.stages));
 
 	let focusedArcType = $state<ArcType | null>(null);
 	let showHelp = $state(false);
 
+	// One-time initialization — runs at component creation, NOT inside $effect
+	// (Writing to $state inside $effect during mount poisons the Svelte 5 reactive graph)
+	setMode('arcs');
+	resetSelections();
+
 	$effect(() => {
-		setMode('arcs');
-		resetSelections();
-		focusedArcType = null;
+		if (arcs.length > 0) {
+			selectItem('arcs', arcs[0].id);
+		}
 	});
 
 	const mode = $derived(getActiveMode());
 	const selectedId = $derived(getActiveSelectedId());
+
+	// Auto-select first item when mode changes or collection changes and nothing is selected
+	$effect(() => {
+		const items = mode === 'arcs' ? arcs : mode === 'acts' ? acts : mode === 'chapters' ? chapters : scenes;
+		if (!selectedId && items.length > 0) {
+			selectItem(mode, items[0].id);
+		}
+	});
 
 	$effect(() => {
 		void mode;
 		focusedArcType = null;
 	});
 
-	const heroSceneCount = $derived.by(() => {
+	const _heroSceneCount = $derived.by(() => {
 		if (mode !== 'chapters' || !selectedId) return 0;
 		const ch = chapters.find((c) => c.id === selectedId);
 		return ch ? ch.scenes.length : 0;
 	});
 
-	const heroPovName = $derived.by(() => {
+	const _heroPovName = $derived.by(() => {
 		if (mode !== 'scenes' || !selectedId) return null;
 		const sc = scenes.find((s) => s.id === selectedId);
 		if (!sc?.povCharacterId) return null;
@@ -85,12 +113,6 @@
 		if (mode === 'chapters') return chapters.find((c) => c.id === selectedId) ?? null;
 		return scenes.find((s) => s.id === selectedId) ?? null;
 	});
-
-	const dummyBeats = [
-		{ id: '1', title: 'Inciting Incident', completed: true },
-		{ id: '2', title: 'First Plot Point', completed: false },
-		{ id: '3', title: 'Midpoint', completed: false },
-	];
 
 	/* ── Collection items for active mode ── */
 	type CollectionItem = { id: string; title: string; subtitle: string };
@@ -221,12 +243,64 @@
 		selectItem(mode, selectedId === id ? null : id);
 	}
 
-	async function handleUpdateArc(
+	function _handleUpdateArc(
 		id: string,
 		changes: Partial<{ title: string; description: string; arcType: ArcType }>,
 	) {
-		await updateArc(id, changes);
+		void updateArc(id, changes);
 		arcs = arcs.map((a) => (a.id === id ? { ...a, ...changes } : a));
+	}
+
+	/* ── Beat CRUD ── */
+	function handleCreateBeat(beat: Beat) {
+		beats = [...beats, beat];
+		void createBeat({
+			arcId: beat.arcId,
+			projectId: beat.projectId,
+			title: beat.title,
+			type: beat.type,
+			order: beat.order,
+			notes: beat.notes,
+		});
+	}
+
+	function handleUpdateBeat(id: string, changes: Partial<Beat>) {
+		beats = beats.map((b) => (b.id === id ? { ...b, ...changes } : b));
+		void updateBeat(id, changes);
+	}
+
+	function handleDeleteBeat(id: string) {
+		// Also remove stages belonging to this beat
+		const beatStages = stages.filter((s) => s.beatId === id);
+		for (const s of beatStages) {
+			void removeStage(s.id);
+		}
+		stages = stages.filter((s) => s.beatId !== id);
+		beats = beats.filter((b) => b.id !== id);
+		void removeBeat(id);
+	}
+
+	/* ── Stage CRUD ── */
+	function handleCreateStage(stage: Stage) {
+		stages = [...stages, stage];
+		void createStage({
+			beatId: stage.beatId,
+			projectId: stage.projectId,
+			title: stage.title,
+			description: stage.description,
+			order: stage.order,
+			status: stage.status,
+		});
+	}
+
+	function handleUpdateStage(id: string, changes: Partial<Stage>) {
+		stages = stages.map((s) => (s.id === id ? { ...s, ...changes } : s));
+		void updateStageApi(id, changes);
+	}
+
+	function handleDeleteStage(id: string) {
+		stages = stages.filter((s) => s.id !== id);
+		void removeStage(id);
 	}
 </script>
 
@@ -251,7 +325,7 @@
                 <div class="board-header-row">
                         <div class="collection-header">
                                 <span class="collection-label arc-selection-row">
-                                        {#each collectionItems as item, i}
+                                        {#each collectionItems as item, i (item.id)}
                                                 <button 
                                                         class="arc-selector" 
                                                         class:arc-selector--active={selectedId === item.id}
@@ -270,68 +344,18 @@
                         </div>
                 </div>
 
-                <div class="arc-main-layout">
-                        <!-- Primary Column: 70% -->
-                        <div class="arc-primary-col">
-                                {#if heroItem}
-                                        <div class="arc-hero-panel">
-                                                <h1>{heroItem.title || 'Untitled Arc'}</h1>
-                                                <p>{'description' in heroItem && heroItem.description ? heroItem.description : 'No description provided for this arc.'}</p>
-                                        </div>
-                                        <div class="arc-progression-section">
-                                                <h2>Story Beats</h2>
-                                                <div class="beats-grid">
-                                                        {#each dummyBeats as beat (beat.id)}
-                                                                <button class="beat-card" class:completed={beat.completed}>
-                                                                        <span class="beat-status"></span>
-                                                                        <span class="beat-title">{beat.title}</span>
-                                                                </button>
-                                                        {/each}
-                                                        <button class="add-beat-btn">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                                                                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                                                                </svg>
-                                                                <span>Add Beat</span>
-                                                        </button>
-                                                </div>
-                                        </div>
-                                {:else}
-                                        <div class="arc-dashboard-empty">
-                                                <div class="empty-state-content">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5; margin-bottom: 1rem;">
-                                                                <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"></path>
-                                                                <polyline points="14 2 14 8 20 8"></polyline>
-                                                                <path d="M2 15h10"></path>
-                                                                <path d="m9 18 3-3-3-3"></path>
-                                                        </svg>
-                                                        <h2>No Arc Selected</h2>
-                                                        <p>Select an arc from the header or create a new one to begin mapping out the story.</p>
-                                                        <button class="add-column-btn" onclick={handleCreate} style="margin-top: 1rem;">
-                                                                <span>New Arc</span>
-                                                        </button>
-                                                </div>
-                                        </div>
-                                {/if}
-                        </div>
-
-                        <!-- Sidebar Column: 30% -->
-                        <div class="arc-sidebar-col">
-                                {#if heroItem}
-                                        <div class="sidebar-meta">
-                                                <h3>Arc Metadata</h3>
-                                                <div class="meta-field">
-                                                        <span class="label">Type</span>
-                                                        <span>{'arcType' in heroItem && heroItem.arcType ? heroItem.arcType : 'Unknown'}</span>
-                                                </div>
-                                                <div class="meta-field">
-                                                        <span class="label">Purpose</span>
-                                                        <span>{'purpose' in heroItem && heroItem.purpose ? heroItem.purpose : 'Not specified'}</span>
-                                                </div>
-                                        </div>
-                                {/if}
-                        </div>
-                </div>
+                <ArcWorkspace
+                        arc={heroItem as Arc | null}
+                        allBeats={beats}
+                        allStages={stages}
+                        projectId={data.projectId}
+                        onCreateBeat={handleCreateBeat}
+                        onUpdateBeat={handleUpdateBeat}
+                        onDeleteBeat={handleDeleteBeat}
+                        onCreateStage={handleCreateStage}
+                        onUpdateStage={handleUpdateStage}
+                        onDeleteStage={handleDeleteStage}
+                />
         </div>
 {:else}
         <div class="workspace-surface">
@@ -451,227 +475,5 @@
 
         .arc-selector--active {
                 color: var(--color-nova-blue);
-        }
-
-        .arc-main-layout {
-                display: flex;
-                flex-direction: row;
-                gap: var(--space-6);
-                flex: 1;
-                padding: var(--space-6);
-                overflow-y: auto;
-        }
-
-        .arc-primary-col {
-                flex: 7;
-                display: flex;
-                flex-direction: column;
-                gap: var(--space-8);
-        }
-
-        .arc-sidebar-col {
-                flex: 3;
-                display: flex;
-                flex-direction: column;
-                gap: var(--space-6);
-                border-left: 1px solid rgba(255, 255, 255, 0.08);
-                padding-left: var(--space-6);
-        }
-
-        .arc-hero-panel {
-                display: flex;
-                flex-direction: column;
-                gap: var(--space-2);
-                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-                padding-bottom: var(--space-6);
-        }
-
-        .arc-hero-panel h1 {
-                font-family: var(--font-serif);
-                font-size: var(--text-3xl);
-                margin: 0;
-                color: #fff;
-        }
-
-        .arc-hero-panel p {
-                color: var(--color-text-secondary);
-                font-size: var(--text-base);
-                max-width: 65ch;
-                line-height: var(--leading-relaxed);
-                margin: 0;
-        }
-
-        .arc-progression-section {
-                display: flex;
-                flex-direction: column;
-                gap: var(--space-4);
-        }
-
-        .arc-progression-section h2 {
-                font-size: var(--text-sm);
-                text-transform: uppercase;
-                letter-spacing: var(--tracking-wider);
-                font-weight: var(--font-weight-bold);
-                color: var(--color-text-secondary);
-                margin: 0;
-        }
-
-        .beats-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                gap: var(--space-4);
-        }
-
-        .beat-card {
-                background: color-mix(in srgb, var(--color-surface-raised) 50%, transparent);
-                border: 1px solid rgba(255, 255, 255, 0.08);
-                border-radius: var(--radius-md);
-                padding: var(--space-4);
-                display: flex;
-                align-items: center;
-                gap: var(--space-3);
-                cursor: pointer;
-                text-align: left;
-                transition: all 150ms ease;
-                min-height: 80px;
-        }
-
-        .beat-card:hover, .beat-card:focus-visible {
-                background: var(--color-surface-raised);
-                border-color: rgba(255, 255, 255, 0.15);
-                outline: none;
-        }
-
-        .beat-status {
-                width: 12px;
-                height: 12px;
-                border-radius: 50%;
-                border: 2px solid rgba(255, 255, 255, 0.2);
-                flex-shrink: 0;
-                transition: background 150ms ease;
-        }
-
-        .beat-card.completed .beat-status {
-                background: var(--color-nova-blue);
-                border-color: var(--color-nova-blue);
-        }
-
-        .beat-title {
-                color: var(--color-text-primary);
-                font-size: var(--text-sm);
-                font-weight: var(--font-weight-medium);
-                line-height: var(--leading-tight);
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-                line-clamp: 2;
-                -webkit-box-orient: vertical;
-                overflow: hidden;
-        }
-
-        .add-beat-btn {
-                background: transparent;
-                border: 2px dashed rgba(255, 255, 255, 0.15);
-                border-radius: var(--radius-md);
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                gap: var(--space-2);
-                padding: var(--space-4);
-                min-height: 80px;
-                cursor: pointer;
-                color: var(--color-text-secondary);
-                transition: all 150ms ease;
-        }
-
-        .add-beat-btn:hover, .add-beat-btn:focus-visible {
-                border-color: var(--color-nova-blue);
-                color: var(--color-nova-blue);
-                background: color-mix(in srgb, var(--color-nova-blue) 10%, transparent);
-                outline: none;
-        }
-
-        .add-beat-btn span {
-                font-size: var(--text-sm);
-                font-weight: var(--font-weight-medium);
-        }
-        
-        .sidebar-meta {
-                display: flex;
-                flex-direction: column;
-                gap: var(--space-6);
-        }
-
-        .sidebar-meta h3 {
-                font-size: var(--text-sm);
-                text-transform: uppercase;
-                letter-spacing: var(--tracking-wider);
-                font-weight: var(--font-weight-bold);
-                color: var(--color-text-secondary);
-                margin: 0;
-        }
-
-        .meta-field {
-                display: flex;
-                flex-direction: column;
-                gap: var(--space-1);
-                font-size: var(--text-sm);
-        }
-
-        .meta-field .label {
-                color: var(--color-text-muted);
-                font-weight: var(--font-weight-medium);
-        }
-
-        .meta-field span:not(.label) {
-                color: var(--color-text-primary);
-        }
-
-        .arc-dashboard-empty {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                flex: 1;
-                height: 100%;
-        }
-
-        .empty-state-content {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                max-width: 400px;
-                color: var(--color-text-secondary);
-        }
-
-        .empty-state-content h2 {
-                color: #fff;
-                margin-bottom: var(--space-2);
-                font-size: var(--text-xl);
-                font-weight: var(--font-weight-medium);
-        }
-
-        .add-column-btn {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: var(--space-2);
-                width: 100%;
-                height: 100%;
-                min-height: 200px;
-                background: transparent;
-                border: none;
-                border-radius: var(--radius-lg);
-                color: #a0a0a0;
-                font-family: var(--font-sans);
-                font-size: var(--text-base);
-                font-weight: var(--font-weight-medium);
-                cursor: pointer;
-                transition: all 150ms ease;
-        }
-
-        .add-column-btn:hover {
-                color: var(--color-nova-blue);
-                background: color-mix(in srgb, var(--color-nova-blue) 8%, transparent);
         }
 </style>

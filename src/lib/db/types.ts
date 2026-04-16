@@ -52,12 +52,25 @@ export interface Scene {
 
 export interface Beat {
 	id: string;
-	sceneId: string;
+	sceneId?: string | null;
+	arcId?: string | null;
 	projectId: string;
 	title: string;
 	type: string;
 	order: number;
 	notes: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface Stage {
+	id: string;
+	beatId: string;
+	projectId: string;
+	title: string;
+	description: string;
+	order: number;
+	status: 'planned' | 'in_progress' | 'completed' | string;
 	createdAt: string;
 	updatedAt: string;
 }
@@ -193,6 +206,8 @@ export interface Act {
 
 export type ArcType = 'character' | 'plot' | 'relationship' | 'thematic' | 'world';
 
+export type ArcStatus = 'planned' | 'in_progress' | 'complete' | 'on_hold' | 'cut';
+
 export interface Arc {
 	id: string;
 	projectId: string;
@@ -200,6 +215,8 @@ export interface Arc {
 	description: string;
 	purpose: string;
 	arcType?: ArcType;
+	status?: ArcStatus;
+	characterIds?: string[];
 	order: number;
 	createdAt: string;
 	updatedAt: string;

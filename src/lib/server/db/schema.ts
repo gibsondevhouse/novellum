@@ -51,7 +51,8 @@ CREATE TABLE IF NOT EXISTS scenes (
 
 CREATE TABLE IF NOT EXISTS beats (
 	id TEXT PRIMARY KEY,
-	sceneId TEXT NOT NULL,
+	sceneId TEXT,
+	arcId TEXT,
 	projectId TEXT NOT NULL,
 	title TEXT NOT NULL,
 	type TEXT NOT NULL DEFAULT '',
@@ -140,6 +141,7 @@ CREATE TABLE IF NOT EXISTS consistency_issues (
 	description TEXT NOT NULL DEFAULT '',
 	entityIds TEXT NOT NULL DEFAULT '[]',
 	sceneId TEXT,
+	arcId TEXT,
 	status TEXT NOT NULL DEFAULT 'open',
 	createdAt TEXT NOT NULL,
 	updatedAt TEXT NOT NULL
@@ -159,7 +161,8 @@ CREATE TABLE IF NOT EXISTS export_settings (
 
 CREATE TABLE IF NOT EXISTS scene_snapshots (
 	id TEXT PRIMARY KEY,
-	sceneId TEXT NOT NULL,
+	sceneId TEXT,
+	arcId TEXT,
 	projectId TEXT NOT NULL,
 	text TEXT NOT NULL DEFAULT '',
 	createdAt TEXT NOT NULL
@@ -236,6 +239,18 @@ CREATE TABLE IF NOT EXISTS chat_instructions (
 	createdAt TEXT NOT NULL,
 	updatedAt TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS stages (
+	id TEXT PRIMARY KEY,
+	beatId TEXT NOT NULL,
+	projectId TEXT NOT NULL,
+	title TEXT NOT NULL,
+	description TEXT NOT NULL DEFAULT '',
+	"order" INTEGER NOT NULL,
+	status TEXT NOT NULL DEFAULT 'planned',
+	createdAt TEXT NOT NULL,
+	updatedAt TEXT NOT NULL
+);
 `;
 
 export const INDEX_SQL = `
@@ -265,4 +280,7 @@ CREATE INDEX IF NOT EXISTS idx_writing_styles_projectId ON writing_styles(projec
 CREATE INDEX IF NOT EXISTS idx_templates_projectId ON templates(projectId);
 CREATE INDEX IF NOT EXISTS idx_system_prompts_projectId ON system_prompts(projectId);
 CREATE INDEX IF NOT EXISTS idx_chat_instructions_projectId ON chat_instructions(projectId);
+CREATE INDEX IF NOT EXISTS idx_stages_beatId ON stages(beatId);
+CREATE INDEX IF NOT EXISTS idx_stages_projectId ON stages(projectId);
 `;
+
