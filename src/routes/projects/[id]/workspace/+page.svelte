@@ -26,12 +26,12 @@
 		updateScene,
 		removeScene,
 	} from '$modules/editor/services/scene-repository.js';
-	import WorkspaceDetailCard from '$modules/workspace/components/WorkspaceDetailCard.svelte';
 	import WorkspaceHelpModal from '$modules/workspace/components/WorkspaceHelpModal.svelte';
 	import StructureCarousel from '$modules/workspace/components/StructureCarousel.svelte';
 	import { WORKSPACE_MODE_LABELS } from '$modules/workspace/types.js';
 
 	let { data } = $props<{
+
 		data: {
 			projectId: string;
 			arcs: Arc[];
@@ -85,6 +85,12 @@
 		if (mode === 'chapters') return chapters.find((c) => c.id === selectedId) ?? null;
 		return scenes.find((s) => s.id === selectedId) ?? null;
 	});
+
+	const dummyBeats = [
+		{ id: '1', title: 'Inciting Incident', completed: true },
+		{ id: '2', title: 'First Plot Point', completed: false },
+		{ id: '3', title: 'Midpoint', completed: false },
+	];
 
 	/* ── Collection items for active mode ── */
 	type CollectionItem = { id: string; title: string; subtitle: string };
@@ -264,69 +270,71 @@
                         </div>
                 </div>
 
-                <div class="arc-dashboard">
-                        {#if heroItem}
-                                <div class="arc-dashboard-header">
-                                        <div class="arc-meta">
+                <div class="arc-main-layout">
+                        <!-- Primary Column: 70% -->
+                        <div class="arc-primary-col">
+                                {#if heroItem}
+                                        <div class="arc-hero-panel">
                                                 <h1>{heroItem.title || 'Untitled Arc'}</h1>
+                                                <p>{'description' in heroItem && heroItem.description ? heroItem.description : 'No description provided for this arc.'}</p>
                                         </div>
-                                        <WorkspaceDetailCard
-                                                {mode}
-                                                item={heroItem}
-                                                projectId={data.projectId}
-                                                sceneCount={heroSceneCount}
-                                                povCharacterName={heroPovName}
-                                                onUpdate={handleUpdateArc}
-                                        />
-                                </div>
-                                <div class="arc-dashboard-content">
-                                        <div class="arc-dashboard-section">
-                                                <h2>Arc Progression</h2>
-                                                <div class="arc-timeline">
-                                                        <div class="timeline-dropzone">
-                                                                <button class="add-event-btn">
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                                                <line x1="12" y1="5" x2="12" y2="19"></line>
-                                                                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                                                                        </svg>
-                                                                        <span>Add Story Beat</span>
+                                        <div class="arc-progression-section">
+                                                <h2>Story Beats</h2>
+                                                <div class="beats-grid">
+                                                        {#each dummyBeats as beat (beat.id)}
+                                                                <button class="beat-card" class:completed={beat.completed}>
+                                                                        <span class="beat-status"></span>
+                                                                        <span class="beat-title">{beat.title}</span>
                                                                 </button>
-                                                        </div>
+                                                        {/each}
+                                                        <button class="add-beat-btn">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                                                </svg>
+                                                                <span>Add Beat</span>
+                                                        </button>
                                                 </div>
                                         </div>
-                                </div>
-                        {:else}
-                                <div class="arc-dashboard-empty">
-                                        <div class="empty-state-content">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5; margin-bottom: 1rem;">
-                                                        <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"></path>
-                                                        <polyline points="14 2 14 8 20 8"></polyline>
-                                                        <path d="M2 15h10"></path>
-                                                        <path d="m9 18 3-3-3-3"></path>
-                                                </svg>
-                                                <h2>No Arc Selected</h2>
-                                                <p>Select an arc from the header or create a new one to begin mapping out the story.</p>
-                                                <button class="add-column-btn" onclick={handleCreate} style="margin-top: 1rem;">
-                                                        <span>New Arc</span>
-                                                </button>
+                                {:else}
+                                        <div class="arc-dashboard-empty">
+                                                <div class="empty-state-content">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5; margin-bottom: 1rem;">
+                                                                <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"></path>
+                                                                <polyline points="14 2 14 8 20 8"></polyline>
+                                                                <path d="M2 15h10"></path>
+                                                                <path d="m9 18 3-3-3-3"></path>
+                                                        </svg>
+                                                        <h2>No Arc Selected</h2>
+                                                        <p>Select an arc from the header or create a new one to begin mapping out the story.</p>
+                                                        <button class="add-column-btn" onclick={handleCreate} style="margin-top: 1rem;">
+                                                                <span>New Arc</span>
+                                                        </button>
+                                                </div>
                                         </div>
-                                </div>
-                        {/if}
+                                {/if}
+                        </div>
+
+                        <!-- Sidebar Column: 30% -->
+                        <div class="arc-sidebar-col">
+                                {#if heroItem}
+                                        <div class="sidebar-meta">
+                                                <h3>Arc Metadata</h3>
+                                                <div class="meta-field">
+                                                        <span class="label">Type</span>
+                                                        <span>{'arcType' in heroItem && heroItem.arcType ? heroItem.arcType : 'Unknown'}</span>
+                                                </div>
+                                                <div class="meta-field">
+                                                        <span class="label">Purpose</span>
+                                                        <span>{'purpose' in heroItem && heroItem.purpose ? heroItem.purpose : 'Not specified'}</span>
+                                                </div>
+                                        </div>
+                                {/if}
+                        </div>
                 </div>
         </div>
 {:else}
         <div class="workspace-surface">
-
-                {#if heroItem !== null}
-                        <WorkspaceDetailCard
-                                {mode}
-                                item={heroItem}
-                                projectId={data.projectId}
-                                sceneCount={heroSceneCount}
-                                povCharacterName={heroPovName}
-                                onUpdate={undefined}
-                        />
-                {/if}
 
                 <div class="collection-header">
                         <span class="collection-label">
@@ -445,92 +453,178 @@
                 color: var(--color-nova-blue);
         }
 
-        .arc-dashboard {
-                display: flex;
-                flex-direction: column;
-                flex: 1;
-                overflow-y: auto;
-                padding: var(--space-6);
-                gap: var(--space-6);
-        }
-
-        .arc-dashboard-header {
+        .arc-main-layout {
                 display: flex;
                 flex-direction: row;
                 gap: var(--space-6);
-                align-items: flex-start;
-                padding-bottom: var(--space-6);
-                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                flex: 1;
+                padding: var(--space-6);
+                overflow-y: auto;
         }
 
-        .arc-meta {
-                flex: 1;
+        .arc-primary-col {
+                flex: 7;
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-8);
+        }
+
+        .arc-sidebar-col {
+                flex: 3;
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-6);
+                border-left: 1px solid rgba(255, 255, 255, 0.08);
+                padding-left: var(--space-6);
+        }
+
+        .arc-hero-panel {
                 display: flex;
                 flex-direction: column;
                 gap: var(--space-2);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                padding-bottom: var(--space-6);
         }
 
-        .arc-meta h1 {
+        .arc-hero-panel h1 {
                 font-family: var(--font-serif);
                 font-size: var(--text-3xl);
                 margin: 0;
                 color: #fff;
         }
 
-        .arc-dashboard-content {
-                display: flex;
-                flex-direction: column;
-                gap: var(--space-8);
-                flex: 1;
+        .arc-hero-panel p {
+                color: var(--color-text-secondary);
+                font-size: var(--text-base);
+                max-width: 65ch;
+                line-height: var(--leading-relaxed);
+                margin: 0;
         }
 
-        .arc-dashboard-section h2 {
+        .arc-progression-section {
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-4);
+        }
+
+        .arc-progression-section h2 {
                 font-size: var(--text-sm);
                 text-transform: uppercase;
                 letter-spacing: var(--tracking-wider);
                 font-weight: var(--font-weight-bold);
                 color: var(--color-text-secondary);
-                margin-bottom: var(--space-4);
+                margin: 0;
         }
 
-        .arc-timeline {
-                display: flex;
-                flex-direction: row;
+        .beats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
                 gap: var(--space-4);
-                overflow-x: auto;
-                padding-bottom: var(--space-4);
         }
 
-        .timeline-dropzone {
+        .beat-card {
+                background: color-mix(in srgb, var(--color-surface-raised) 50%, transparent);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: var(--radius-md);
+                padding: var(--space-4);
                 display: flex;
-                flex: 0 0 200px;
-                min-height: 120px;
+                align-items: center;
+                gap: var(--space-3);
+                cursor: pointer;
+                text-align: left;
+                transition: all 150ms ease;
+                min-height: 80px;
+        }
+
+        .beat-card:hover, .beat-card:focus-visible {
+                background: var(--color-surface-raised);
+                border-color: rgba(255, 255, 255, 0.15);
+                outline: none;
+        }
+
+        .beat-status {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                flex-shrink: 0;
+                transition: background 150ms ease;
+        }
+
+        .beat-card.completed .beat-status {
+                background: var(--color-nova-blue);
+                border-color: var(--color-nova-blue);
+        }
+
+        .beat-title {
+                color: var(--color-text-primary);
+                font-size: var(--text-sm);
+                font-weight: var(--font-weight-medium);
+                line-height: var(--leading-tight);
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+        }
+
+        .add-beat-btn {
+                background: transparent;
                 border: 2px dashed rgba(255, 255, 255, 0.15);
                 border-radius: var(--radius-md);
-                align-items: center;
-                justify-content: center;
-                transition: all 150ms ease;
-        }
-
-        .timeline-dropzone:hover {
-                border-color: var(--color-nova-blue);
-                background: color-mix(in srgb, var(--color-nova-blue) 10%, transparent);
-        }
-
-        .add-event-btn {
-                background: none;
-                border: none;
-                color: var(--color-text-secondary);
                 display: flex;
                 flex-direction: column;
                 align-items: center;
+                justify-content: center;
                 gap: var(--space-2);
+                padding: var(--space-4);
+                min-height: 80px;
                 cursor: pointer;
+                color: var(--color-text-secondary);
+                transition: all 150ms ease;
+        }
+
+        .add-beat-btn:hover, .add-beat-btn:focus-visible {
+                border-color: var(--color-nova-blue);
+                color: var(--color-nova-blue);
+                background: color-mix(in srgb, var(--color-nova-blue) 10%, transparent);
+                outline: none;
+        }
+
+        .add-beat-btn span {
+                font-size: var(--text-sm);
+                font-weight: var(--font-weight-medium);
+        }
+        
+        .sidebar-meta {
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-6);
+        }
+
+        .sidebar-meta h3 {
+                font-size: var(--text-sm);
+                text-transform: uppercase;
+                letter-spacing: var(--tracking-wider);
+                font-weight: var(--font-weight-bold);
+                color: var(--color-text-secondary);
+                margin: 0;
+        }
+
+        .meta-field {
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-1);
                 font-size: var(--text-sm);
         }
 
-        .timeline-dropzone:hover .add-event-btn {
-                color: var(--color-nova-blue);
+        .meta-field .label {
+                color: var(--color-text-muted);
+                font-weight: var(--font-weight-medium);
+        }
+
+        .meta-field span:not(.label) {
+                color: var(--color-text-primary);
         }
 
         .arc-dashboard-empty {
