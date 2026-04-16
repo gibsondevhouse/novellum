@@ -1,4 +1,6 @@
-import { db, type Asset, type Project } from '$lib/db';
+import { db, type Asset } from '$lib/db';
+import type { Project } from '$modules/project/types';
+import { getAllProjects } from '$modules/project/services/project-repository';
 
 export interface Album {
 	id: string;
@@ -55,7 +57,7 @@ export function createAssetsStore(getProjectId: () => string | undefined) {
         loading = true;
         try {
 			const pid = getProjectId();
-			projects = await db.projects.toArray();
+			projects = await getAllProjects();
             if (pid) {
                 assets = await db.assets.where('projectId').equals(pid).sortBy('createdAt');
             } else {
