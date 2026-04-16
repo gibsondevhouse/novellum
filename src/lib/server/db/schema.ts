@@ -194,6 +194,7 @@ CREATE TABLE IF NOT EXISTS arcs (
 	description TEXT NOT NULL DEFAULT '',
 	purpose TEXT NOT NULL DEFAULT '',
 	arcType TEXT,
+	status TEXT NOT NULL DEFAULT 'planned',
 	"order" INTEGER NOT NULL,
 	createdAt TEXT NOT NULL,
 	updatedAt TEXT NOT NULL

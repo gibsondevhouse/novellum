@@ -243,10 +243,7 @@
 		selectItem(mode, selectedId === id ? null : id);
 	}
 
-	function _handleUpdateArc(
-		id: string,
-		changes: Partial<{ title: string; description: string; arcType: ArcType }>,
-	) {
+	function handleUpdateArc(id: string, changes: Partial<Arc>) {
 		void updateArc(id, changes);
 		arcs = arcs.map((a) => (a.id === id ? { ...a, ...changes } : a));
 	}
@@ -337,6 +334,7 @@
                                                         <span class="divider"> | </span>
                                                 {/if}
                                         {/each}
+                                        <button class="arc-selector arc-new-btn" onclick={handleCreate}>+ New</button>
                                 </span>
                                 <button class="help-toggle" onclick={() => (showHelp = true)} aria-label="Show conceptual help">
                                         ?
@@ -349,6 +347,8 @@
                         allBeats={beats}
                         allStages={stages}
                         projectId={data.projectId}
+                        onUpdateArc={handleUpdateArc}
+                        onDeleteArc={handleDelete}
                         onCreateBeat={handleCreateBeat}
                         onUpdateBeat={handleUpdateBeat}
                         onDeleteBeat={handleDeleteBeat}
@@ -475,5 +475,10 @@
 
         .arc-selector--active {
                 color: var(--color-nova-blue);
+        }
+
+        .arc-new-btn {
+                color: var(--color-text-tertiary);
+                margin-left: var(--space-2);
         }
 </style>
