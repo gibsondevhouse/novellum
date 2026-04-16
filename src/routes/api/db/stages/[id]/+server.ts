@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/index.js';
 
 export const GET: RequestHandler = async ({ params }) => {
-	const row = db.prepare('SELECT * FROM beats WHERE id = ?').get(params.id);
+	const row = db.prepare('SELECT * FROM stages WHERE id = ?').get(params.id);
 	if (!row) {
 		return json({ error: 'Not found' }, { status: 404 });
 	}
@@ -13,7 +13,7 @@ export const GET: RequestHandler = async ({ params }) => {
 export const PUT: RequestHandler = async ({ params, request }) => {
 	const body = await request.json();
 	const updates: Record<string, unknown> = {};
-	const allowed = ['title', 'type', 'order', 'notes', 'sceneId', 'arcId'];
+	const allowed = ['title', 'description', 'order', 'status', 'beatId'];
 
 	for (const key of allowed) {
 		if (key in body) updates[key] = body[key];
@@ -24,18 +24,18 @@ export const PUT: RequestHandler = async ({ params, request }) => {
 		const col = k === 'order' ? `"order"` : k;
 		return `${col} = @${k}`;
 	});
-	const stmt = db.prepare(`UPDATE beats SET ${setClauses.join(', ')} WHERE id = @id`);
+	const stmt = db.prepare(`UPDATE stages SET ${setClauses.join(', ')} WHERE id = @id`);
 	const result = stmt.run({ ...updates, id: params.id });
 
 	if (result.changes === 0) {
 		return json({ error: 'Not found' }, { status: 404 });
 	}
 
-	const updated = db.prepare('SELECT * FROM beats WHERE id = ?').get(params.id);
+	const updated = db.prepare('SELECT * FROM stages WHERE id = ?').get(params.id);
 	return json(updated);
 };
 
 export const DELETE: RequestHandler = async ({ params }) => {
-	db.prepare('DELETE FROM beats WHERE id = ?').run(params.id);
+	db.prepare('DELETE FROM stages WHERE id = ?').run(params.id);
 	return new Response(null, { status: 204 });
 };

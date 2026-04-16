@@ -20,6 +20,10 @@ export async function getBeatsBySceneId(sceneId: string): Promise<Beat[]> {
 	return apiGet<Beat[]>('/api/db/beats', { sceneId });
 }
 
+export async function getBeatsByArcId(arcId: string): Promise<Beat[]> {
+	return apiGet<Beat[]>('/api/db/beats', { arcId });
+}
+
 export async function getBeatsByProjectId(projectId: string): Promise<Beat[]> {
 	return apiGet<Beat[]>('/api/db/beats', { projectId });
 }

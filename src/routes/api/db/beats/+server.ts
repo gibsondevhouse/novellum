@@ -4,6 +4,7 @@ import { db } from '$lib/server/db/index.js';
 
 export const GET: RequestHandler = async ({ url }) => {
 	const sceneId = url.searchParams.get('sceneId');
+	const arcId = url.searchParams.get('arcId');
 	const projectId = url.searchParams.get('projectId');
 
 	const conditions: string[] = [];
@@ -12,6 +13,10 @@ export const GET: RequestHandler = async ({ url }) => {
 	if (sceneId) {
 		conditions.push('sceneId = ?');
 		params.push(sceneId);
+	}
+	if (arcId) {
+		conditions.push('arcId = ?');
+		params.push(arcId);
 	}
 	if (projectId) {
 		conditions.push('projectId = ?');
@@ -27,14 +32,15 @@ export const GET: RequestHandler = async ({ url }) => {
 export const POST: RequestHandler = async ({ request }) => {
 	const body = await request.json();
 
-	if (!body.sceneId || !body.projectId || !body.title) {
-		return json({ error: 'sceneId, projectId, and title are required' }, { status: 400 });
+	if ((!body.sceneId && !body.arcId) || !body.projectId || !body.title) {
+		return json({ error: 'sceneId or arcId, projectId, and title are required' }, { status: 400 });
 	}
 
 	const now = new Date().toISOString();
 	const beat = {
 		id: crypto.randomUUID(),
-		sceneId: body.sceneId,
+		sceneId: body.sceneId ?? null,
+		arcId: body.arcId ?? null,
 		projectId: body.projectId,
 		title: body.title,
 		type: body.type ?? '',
@@ -45,8 +51,8 @@ export const POST: RequestHandler = async ({ request }) => {
 	};
 
 	db.prepare(
-		`INSERT INTO beats (id, sceneId, projectId, title, type, "order", notes, createdAt, updatedAt)
-		 VALUES (@id, @sceneId, @projectId, @title, @type, @order, @notes, @createdAt, @updatedAt)`,
+		`INSERT INTO beats (id, sceneId, arcId, projectId, title, type, "order", notes, createdAt, updatedAt)
+		 VALUES (@id, @sceneId, @arcId, @projectId, @title, @type, @order, @notes, @createdAt, @updatedAt)`,
 	).run(beat);
 
 	return json(beat, { status: 201 });
