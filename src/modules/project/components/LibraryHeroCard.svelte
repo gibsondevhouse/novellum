@@ -13,14 +13,7 @@
 		destination?: LibraryCardDestination;
 	}>();
 
-	const coverPalettes = [
-		{ a: '#1f2937', b: '#4f46e5' },
-		{ a: '#3f2a1d', b: '#b45309' },
-		{ a: '#102a43', b: '#0ea5e9' },
-		{ a: '#2b1a3a', b: '#9333ea' },
-		{ a: '#1f3a2e', b: '#10b981' },
-		{ a: '#3a1f2a', b: '#fb7185' },
-	] as const;
+	import { COVER_PALETTES as coverPalettes } from '../constants.js';
 
 	function hashSeed(value: string): number {
 		let hash = 0;

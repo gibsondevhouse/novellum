@@ -1,15 +1,16 @@
 import { db } from '$lib/db/index.js';
 import type { Character, Location, Scene } from '$lib/db/types.js';
 import type { AiContext, AiTask, ContextPolicy } from './types.js';
-
-const MAX_CHARACTERS = 5;
-const MAX_LOCATIONS = 3;
-const MAX_ADJACENT_SCENE_CHARS = 500;
-const MAX_CHAPTER_SCENE_CHARS = 300;
-const MAX_CONTINUITY_SCENE_CHARS = 200;
-const MAX_CONTINUITY_TOTAL_CHARS = 24000;
-const MAX_CHAPTER_CHARACTERS = 10;
-const MAX_CHAPTER_LOCATIONS = 5;
+import {
+	MAX_CHARACTERS,
+	MAX_LOCATIONS,
+	MAX_ADJACENT_SCENE_CHARS,
+	MAX_CHAPTER_SCENE_CHARS,
+	MAX_CONTINUITY_SCENE_CHARS,
+	MAX_CONTINUITY_TOTAL_CHARS,
+	MAX_CHAPTER_CHARACTERS,
+	MAX_CHAPTER_LOCATIONS,
+} from './constants.js';
 
 function emptyContext(policy: ContextPolicy): AiContext {
 	return {

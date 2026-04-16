@@ -1,15 +1,7 @@
 <script lang="ts">
 	import type { Scene } from '$lib/db/types.js';
+	import type { BeatFocus } from '../types.js';
 	import BeatList from './BeatList.svelte';
-
-	type BeatFocus = {
-		id: string;
-		index: number;
-		content: string;
-		notes: string;
-		onUpdateContent: (content: string) => void;
-		onUpdateNotes: (notes: string) => void;
-	};
 
 	let {
 		scene,

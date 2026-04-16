@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { LoreEntry } from '$lib/db/types.js';
+	import type { EntityFormCallbacks } from '../types.js';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 
@@ -12,9 +13,7 @@
 	} = $props<{
 		entry?: LoreEntry | null;
 		saving?: boolean;
-		onSave: (data: Omit<LoreEntry, 'id' | 'projectId' | 'createdAt' | 'updatedAt'>) => void;
-		onCancel: () => void;
-	}>();
+	} & EntityFormCallbacks<LoreEntry>>();
 
 	let title = $state(untrack(() => entry?.title ?? ''));
 	let category = $state(untrack(() => entry?.category ?? ''));

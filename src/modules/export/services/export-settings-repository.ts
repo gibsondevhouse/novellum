@@ -1,13 +1,6 @@
 import { apiGet, apiPost, apiPut } from '$lib/api-client.js';
 import type { ExportSettings } from '$lib/db/types.js';
-
-const DEFAULTS: Omit<ExportSettings, 'id' | 'projectId' | 'createdAt' | 'updatedAt'> = {
-	titlePage: true,
-	chapterStyle: 'heading',
-	fontFamily: 'Georgia',
-	fontSize: 12,
-	lineSpacing: 1.5,
-};
+import { DEFAULT_EXPORT_SETTINGS } from '../constants.js';
 
 export async function getExportSettings(projectId: string): Promise<ExportSettings> {
 	const result = await apiGet<{ data: ExportSettings | null }>(
@@ -17,7 +10,7 @@ export async function getExportSettings(projectId: string): Promise<ExportSettin
 	return apiPost<ExportSettings>('/api/db/export_settings', {
 		id: projectId,
 		projectId,
-		...DEFAULTS,
+		...DEFAULT_EXPORT_SETTINGS,
 	});
 }
 

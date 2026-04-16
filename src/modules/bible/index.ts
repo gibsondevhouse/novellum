@@ -1,4 +1,5 @@
 export * from './types.js';
+export * from './constants.js';
 
 // Store — UI state
 export * from './stores/story-bible.svelte.ts';

@@ -1,11 +1,6 @@
 <script lang="ts">
 	import type { ProjectDraft } from '../types/project-draft.js';
-
-	const PRESETS: { label: string; value: number }[] = [
-		{ label: 'Short Story', value: 5000 },
-		{ label: 'Novella', value: 20000 },
-		{ label: 'Novel', value: 80000 },
-	];
+	import { WORD_COUNT_PRESETS as PRESETS } from '../constants.js';
 
 	let {
 		draft,

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Chapter, Scene } from '$lib/db/types.js';
+	import type { BeatFocus, OutlineSelection } from '../types.js';
 	import PlanningSurfaceCard from '$lib/components/planning/PlanningSurfaceCard.svelte';
 	import PlanningSurfaceHeader from '$lib/components/planning/PlanningSurfaceHeader.svelte';
 	import PlanningSurfaceModeSwitcher from '$lib/components/planning/PlanningSurfaceModeSwitcher.svelte';
@@ -10,19 +11,6 @@
 	import SceneOutlineForm from './SceneOutlineForm.svelte';
 	import ChapterOutlinePanel from './ChapterOutlinePanel.svelte';
 	import SceneOutlinePanel from './SceneOutlinePanel.svelte';
-
-	export type OutlineSelection =
-		| { type: 'chapter'; chapter: Chapter }
-		| { type: 'scene'; scene: Scene };
-
-	type BeatFocus = {
-		id: string;
-		index: number;
-		content: string;
-		notes: string;
-		onUpdateContent: (content: string) => void;
-		onUpdateNotes: (notes: string) => void;
-	};
 
 	const MODES = [
 		{ key: 'overview', label: 'Overview' },

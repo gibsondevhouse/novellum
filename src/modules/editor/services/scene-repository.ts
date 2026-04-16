@@ -1,40 +1,21 @@
-import { apiGet, apiPost, apiPut, apiDel, ApiError } from '$lib/api-client.js';
+import { createRepository } from '$lib/factories/repository-factory.js';
 import type { Scene } from '$lib/db/types.js';
 
-export async function createScene(
-	data: Omit<Scene, 'id' | 'createdAt' | 'updatedAt'>,
-): Promise<Scene> {
-	return apiPost<Scene>('/api/db/scenes', data);
-}
+const repo = createRepository<Scene>({
+	endpoint: '/api/db/scenes',
+	entityName: 'Scene',
+	hasReorder: true,
+	queries: { byChapterId: 'chapterId', byProjectId: 'projectId' },
+});
 
-export async function getSceneById(id: string): Promise<Scene | undefined> {
-	try {
-		return await apiGet<Scene>(`/api/db/scenes/${id}`);
-	} catch (err) {
-		if (err instanceof ApiError && err.status === 404) return undefined;
-		throw err;
-	}
-}
+export const createScene = repo.create;
+export const getSceneById = repo.getById;
+export const updateScene = repo.update;
+export const removeScene = repo.remove;
 
-export async function getScenesByChapterId(chapterId: string): Promise<Scene[]> {
-	return apiGet<Scene[]>('/api/db/scenes', { chapterId });
-}
-
-export async function getScenesByProjectId(projectId: string): Promise<Scene[]> {
-	return apiGet<Scene[]>('/api/db/scenes', { projectId });
-}
-
-export async function updateScene(
-	id: string,
-	data: Partial<Omit<Scene, 'id' | 'createdAt'>>,
-): Promise<void> {
-	await apiPut(`/api/db/scenes/${id}`, data);
-}
-
-export async function removeScene(id: string): Promise<void> {
-	await apiDel(`/api/db/scenes/${id}`);
-}
+export const getScenesByChapterId = repo.queries.byChapterId;
+export const getScenesByProjectId = repo.queries.byProjectId;
 
 export async function reorderScenes(_chapterId: string, orderedIds: string[]): Promise<void> {
-	await apiPut('/api/db/scenes/reorder', { orderedIds });
+	await repo.reorder!(orderedIds);
 }

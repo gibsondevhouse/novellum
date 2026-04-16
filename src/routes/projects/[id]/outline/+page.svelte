@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { Chapter, Scene, StoryFrame, Act } from '$lib/db/types.js';
-	import type { ChapterWithScenes } from '$modules/outliner/types.js';
+	import type { ChapterWithScenes, OutlineSelection } from '$modules/outliner/types.js';
 	import HierarchyNavigator from '$modules/outliner/components/HierarchyNavigator.svelte';
 	import OutlineDetailCard from '$modules/outliner/components/OutlineDetailCard.svelte';
-	import type { OutlineSelection } from '$modules/outliner/components/OutlineDetailCard.svelte';
 	import {
 		getSelectedChapterId,
 		getSelectedSceneId,

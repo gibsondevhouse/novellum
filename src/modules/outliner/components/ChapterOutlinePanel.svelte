@@ -1,14 +1,6 @@
 <script lang="ts">
 	import type { Chapter } from '$lib/db/types.js';
-
-	type BeatFocus = {
-		id: string;
-		index: number;
-		content: string;
-		notes: string;
-		onUpdateContent: (content: string) => void;
-		onUpdateNotes: (notes: string) => void;
-	};
+	import type { BeatFocus } from '../types.js';
 
 	let {
 		chapter,

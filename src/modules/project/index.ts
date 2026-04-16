@@ -1,6 +1,15 @@
 export * from './types.js';
 export * from './types/project-draft.js';
+export * from './constants.js';
 export * from './services/project-repository.js';
+export {
+	createChapter,
+	getChapterById,
+	getChaptersByProjectId,
+	updateChapter,
+	removeChapter,
+	reorderChapters,
+} from './services/chapter-repository.js';
 export * from './services/hub-metrics-service.js';
 export * from './stores/project-hub.svelte.ts';
 export { default as ProjectCard } from './components/ProjectCard.svelte';

@@ -1,15 +1,6 @@
 <script lang="ts">
 	import type { ProjectDraft } from '../types/project-draft.js';
-
-	const GENRE_SUGGESTIONS = [
-		'Fantasy',
-		'Sci-Fi',
-		'Romance',
-		'Thriller',
-		'Literary',
-		'Horror',
-		'Mystery',
-	] as const;
+	import { GENRE_SUGGESTIONS } from '../constants.js';
 
 	let {
 		draft,
