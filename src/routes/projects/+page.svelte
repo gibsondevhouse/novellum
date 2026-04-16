@@ -114,7 +114,7 @@
                                 <SurfacePanel>
                                         <ul class="project-list" role="list" aria-label="Stories collection">
                                                 {#each stories as project, i (project.id)}
-                                                        <LibraryHeroCard {project} cardIndex={i} />
+                                                        <LibraryHeroCard {project} cardIndex={i} destination="hub" />
                                                 {/each}
                                         </ul>
                                 </SurfacePanel>
@@ -158,7 +158,7 @@
                                 <SurfacePanel>
                                         <ul class="project-list" role="list" aria-label="Book projects">
                                                 {#each books as project, i (project.id)}
-                                                        <LibraryHeroCard {project} cardIndex={i} />
+                                                        <LibraryHeroCard {project} cardIndex={i} destination="hub" />
                                                 {/each}
                                         </ul>
                                 </SurfacePanel>

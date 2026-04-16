@@ -24,7 +24,8 @@ export const PUT: RequestHandler = async ({ params, request }) => {
 		'systemPrompt',
 		'negativePrompt',
 		'projectType',
-		'lastOpenedAt'
+		'lastOpenedAt',
+		'stylePresetId'
 	];
 
 	for (const key of allowed) {

@@ -28,13 +28,14 @@ export const POST: RequestHandler = async ({ request }) => {
 		negativePrompt: typeof body.negativePrompt === 'string' ? body.negativePrompt : '',
 		projectType: typeof body.projectType === 'string' ? body.projectType : 'novel',
 		lastOpenedAt: typeof body.lastOpenedAt === 'string' ? body.lastOpenedAt : now,
+		stylePresetId: typeof body.stylePresetId === 'string' ? body.stylePresetId : '',
 		createdAt: now,
 		updatedAt: now,
 	};
 
 	db.prepare(
-		`INSERT INTO projects (id, title, coverUrl, genre, logline, synopsis, targetWordCount, status, systemPrompt, negativePrompt, projectType, lastOpenedAt, createdAt, updatedAt)
-		 VALUES (@id, @title, @coverUrl, @genre, @logline, @synopsis, @targetWordCount, @status, @systemPrompt, @negativePrompt, @projectType, @lastOpenedAt, @createdAt, @updatedAt)`,
+		`INSERT INTO projects (id, title, coverUrl, genre, logline, synopsis, targetWordCount, status, systemPrompt, negativePrompt, projectType, lastOpenedAt, stylePresetId, createdAt, updatedAt)
+		 VALUES (@id, @title, @coverUrl, @genre, @logline, @synopsis, @targetWordCount, @status, @systemPrompt, @negativePrompt, @projectType, @lastOpenedAt, @stylePresetId, @createdAt, @updatedAt)`,
 	).run(project);
 
 	return json(project, { status: 201 });

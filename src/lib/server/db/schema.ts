@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS projects (
 	negativePrompt TEXT NOT NULL DEFAULT '',
 	projectType TEXT NOT NULL DEFAULT 'novel',
 	lastOpenedAt TEXT NOT NULL DEFAULT '',
+	stylePresetId TEXT NOT NULL DEFAULT '',
 	createdAt TEXT NOT NULL,
 	updatedAt TEXT NOT NULL
 );

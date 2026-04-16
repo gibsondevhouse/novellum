@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Project } from '$lib/db/types.js';
 
-	type LibraryCardDestination = 'reader' | 'workspace';
+	type LibraryCardDestination = 'reader' | 'workspace' | 'hub';
 
 	let {
 		project,
@@ -51,10 +51,18 @@
 			.filter(Boolean),
 	);
 	const cardHref = $derived(
-		destination === 'workspace' ? `/projects/${project.id}/workspace` : `/books/${project.id}`,
+		destination === 'hub'
+			? `/projects/${project.id}/hub`
+			: destination === 'workspace'
+				? `/projects/${project.id}/workspace`
+				: `/books/${project.id}`,
 	);
 	const cardActionLabel = $derived(
-		destination === 'workspace' ? 'Open workspace for' : 'Open reader for',
+		destination === 'hub'
+			? 'Open project hub for'
+			: destination === 'workspace'
+				? 'Open workspace for'
+				: 'Open reader for',
 	);
 </script>
 

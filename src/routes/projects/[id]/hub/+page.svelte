@@ -5,8 +5,9 @@
 	import StructuralMetricsCarousel from '$modules/project/components/StructuralMetricsCarousel.svelte';
 	import { SurfacePanel, SectionHeader, PrimaryButton, GhostButton, Input } from '$lib/components/ui/index.js';
 	import { submitUpdate } from '$modules/project/stores/project-hub.svelte.js';
+	import { STYLE_PRESETS } from '$lib/ai/style-presets.js';
 
-	let { data } = $props<{ data: { project: Project; currentWordCount: number } }>();
+	let { data } = $props<{ data: { project: Project; currentWordCount: number; writingStyles: import('$lib/db/types.js').WritingStyle[] } }>();
 
 	const { openExport, openDelete } = getContext<{ openExport: () => void; openDelete: () => void }>(
 		'projectActions',
@@ -117,6 +118,30 @@
 		<SurfacePanel class="hub-card hub-card--wide">
 			<SectionHeader title="Details" />
 			<dl class="details-list">
+				<div class="details-row">
+					<dt class="details-key">Writing Style</dt>
+					<dd class="details-val">
+						<select
+							value={project.stylePresetId ?? ''}
+							onchange={(e) => submitUpdate(project.id, { stylePresetId: e.currentTarget.value })}
+							class="details-select"
+						>
+							<option value="">— None —</option>
+							{#if data.writingStyles.length > 0}
+								<optgroup label="Your Styles">
+									{#each data.writingStyles as style}
+										<option value={style.id}>{style.title}</option>
+									{/each}
+								</optgroup>
+							{/if}
+							<optgroup label="Built-in Presets">
+								{#each STYLE_PRESETS as preset}
+									<option value={preset.id}>{preset.name}</option>
+								{/each}
+							</optgroup>
+						</select>
+					</dd>
+				</div>
 				<div class="details-row">
 					<dt class="details-key">Status</dt>
 					<dd class="details-val">
