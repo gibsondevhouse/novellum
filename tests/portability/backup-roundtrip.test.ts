@@ -22,6 +22,8 @@ describe('portability roundtrip', () => {
 			systemPrompt: '',
 			negativePrompt: '',
 			status: 'draft', projectType: 'novel' as const,
+			stylePresetId: '',
+			lastOpenedAt: new Date().toISOString(),
 
 			createdAt: '2026-04-10T00:00:00.000Z',
 			updatedAt: '2026-04-10T00:00:00.000Z',
@@ -174,6 +176,8 @@ describe('portability roundtrip', () => {
 			systemPrompt: '',
 			negativePrompt: '',
 			status: 'draft', projectType: 'novel' as const,
+			stylePresetId: '',
+			lastOpenedAt: new Date().toISOString(),
 
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString(),

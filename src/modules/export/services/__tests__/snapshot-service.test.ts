@@ -57,7 +57,9 @@ describe('snapshot-service', () => {
 			systemPrompt: '',
 			negativePrompt: '',
 				status: 'draft', projectType: 'novel' as const,
-				lastOpenedAt: new Date().toISOString(),
+			stylePresetId: '',
+			
+				
 				createdAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString(),
 			});
@@ -90,6 +92,8 @@ describe('snapshot-service', () => {
 			systemPrompt: '',
 			negativePrompt: '',
 				status: 'draft', projectType: 'novel' as const,
+			stylePresetId: '',
+			
 
 				createdAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString(),
@@ -104,6 +108,8 @@ describe('snapshot-service', () => {
 			systemPrompt: '',
 			negativePrompt: '',
 				status: 'draft', projectType: 'novel' as const,
+			stylePresetId: '',
+			
 
 				createdAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString(),
@@ -138,6 +144,8 @@ describe('snapshot-service', () => {
 			systemPrompt: '',
 			negativePrompt: '',
 				status: 'draft', projectType: 'novel' as const,
+			stylePresetId: '',
+			
 
 				createdAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString(),

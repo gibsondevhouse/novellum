@@ -35,6 +35,8 @@ describe('project-repository', () => {
 			title: 'Test Novel',
 			genre: 'Fantasy',
 			status: 'draft', projectType: 'novel' as const,
+			stylePresetId: '',
+			lastOpenedAt: new Date().toISOString(),
 
 			logline: '',
 			synopsis: '',
@@ -57,6 +59,8 @@ describe('project-repository', () => {
 			title: 'Found',
 			genre: 'Sci-Fi',
 			status: 'draft', projectType: 'novel' as const,
+			stylePresetId: '',
+			lastOpenedAt: new Date().toISOString(),
 
 			logline: '',
 			synopsis: '',
