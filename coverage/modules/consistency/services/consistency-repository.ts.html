@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>0/6</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>0/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>0/6</span>
             </div>
         
             
@@ -86,13 +86,7 @@
 <a name='L21'></a><a href='#L21'>21</a>
 <a name='L22'></a><a href='#L22'>22</a>
 <a name='L23'></a><a href='#L23'>23</a>
-<a name='L24'></a><a href='#L24'>24</a>
-<a name='L25'></a><a href='#L25'>25</a>
-<a name='L26'></a><a href='#L26'>26</a>
-<a name='L27'></a><a href='#L27'>27</a>
-<a name='L28'></a><a href='#L28'>28</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L24'></a><a href='#L24'>24</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -100,8 +94,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -113,22 +109,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { apiGet, apiPost, apiPut, apiDel } from '$lib/api-client.js';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { createRepository } from '$lib/factories/repository-factory.js';
+import { apiGet, apiPut } from '$lib/api-client.js';
 import type { ConsistencyIssue } from '$lib/db/types.js';
 &nbsp;
-export async function <span class="fstat-no" title="function not covered" >createIssue(</span>
-	data: Omit&lt;ConsistencyIssue, 'id' | 'createdAt' | 'updatedAt'&gt;,
-): Promise&lt;ConsistencyIssue&gt; {
-<span class="cstat-no" title="statement not covered" >	return apiPost&lt;ConsistencyIssue&gt;('/api/db/consistency_issues', data);</span>
-}
+const <span class="cstat-no" title="statement not covered" >repo = createRepository&lt;ConsistencyIssue&gt;({</span>
+	endpoint: '/api/db/consistency_issues',
+	entityName: 'ConsistencyIssue',
+});
 &nbsp;
-export async function <span class="fstat-no" title="function not covered" >getIssuesByProjectId(p</span>rojectId: string): Promise&lt;ConsistencyIssue[]&gt; {
-<span class="cstat-no" title="statement not covered" >	return apiGet&lt;ConsistencyIssue[]&gt;('/api/db/consistency_issues', { projectId });</span>
-}
+export const createIssue = <span class="cstat-no" title="statement not covered" >repo.create;</span>
+export const getIssuesByProjectId = <span class="cstat-no" title="statement not covered" >repo.getByProjectId;</span>
+export const removeIssue = <span class="cstat-no" title="statement not covered" >repo.remove;</span>
 &nbsp;
 export async function <span class="fstat-no" title="function not covered" >getOpenIssuesByProjectId(p</span>rojectId: string): Promise&lt;ConsistencyIssue[]&gt; {
 <span class="cstat-no" title="statement not covered" >	return apiGet&lt;ConsistencyIssue[]&gt;('/api/db/consistency_issues', { projectId, status: 'open' });</span>
@@ -140,10 +132,6 @@ export async function <span class="fstat-no" title="function not covered" >updat
 ): Promise&lt;void&gt; {
 <span class="cstat-no" title="statement not covered" >	await apiPut(`/api/db/consistency_issues/${id}`, { status });</span>
 }
-&nbsp;
-export async function <span class="fstat-no" title="function not covered" >removeIssue(i</span>d: string): Promise&lt;void&gt; {
-<span class="cstat-no" title="statement not covered" >	await apiDel(`/api/db/consistency_issues/${id}`);</span>
-}
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -151,7 +139,7 @@ export async function <span class="fstat-no" title="function not covered" >remov
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-15T21:48:57.419Z
+                at 2026-04-16T21:31:05.615Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

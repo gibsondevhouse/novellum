@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>0/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>0/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>0/7</span>
             </div>
         
             
@@ -81,41 +81,7 @@
 <a name='L16'></a><a href='#L16'>16</a>
 <a name='L17'></a><a href='#L17'>17</a>
 <a name='L18'></a><a href='#L18'>18</a>
-<a name='L19'></a><a href='#L19'>19</a>
-<a name='L20'></a><a href='#L20'>20</a>
-<a name='L21'></a><a href='#L21'>21</a>
-<a name='L22'></a><a href='#L22'>22</a>
-<a name='L23'></a><a href='#L23'>23</a>
-<a name='L24'></a><a href='#L24'>24</a>
-<a name='L25'></a><a href='#L25'>25</a>
-<a name='L26'></a><a href='#L26'>26</a>
-<a name='L27'></a><a href='#L27'>27</a>
-<a name='L28'></a><a href='#L28'>28</a>
-<a name='L29'></a><a href='#L29'>29</a>
-<a name='L30'></a><a href='#L30'>30</a>
-<a name='L31'></a><a href='#L31'>31</a>
-<a name='L32'></a><a href='#L32'>32</a>
-<a name='L33'></a><a href='#L33'>33</a>
-<a name='L34'></a><a href='#L34'>34</a>
-<a name='L35'></a><a href='#L35'>35</a>
-<a name='L36'></a><a href='#L36'>36</a>
-<a name='L37'></a><a href='#L37'>37</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L19'></a><a href='#L19'>19</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -124,52 +90,32 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { apiGet, apiPost, apiPut, apiDel, ApiError } from '$lib/api-client.js';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { createRepository } from '$lib/factories/repository-factory.js';
 import type { Chapter } from '$lib/db/types.js';
 &nbsp;
-export async function <span class="fstat-no" title="function not covered" >createChapter(</span>
-	data: Omit&lt;Chapter, 'id' | 'createdAt' | 'updatedAt'&gt;,
-): Promise&lt;Chapter&gt; {
-<span class="cstat-no" title="statement not covered" >	return apiPost&lt;Chapter&gt;('/api/db/chapters', data);</span>
-}
+const <span class="cstat-no" title="statement not covered" >repo = createRepository&lt;Chapter&gt;({</span>
+	endpoint: '/api/db/chapters',
+	entityName: 'Chapter',
+	hasReorder: true,
+});
 &nbsp;
-export async function <span class="fstat-no" title="function not covered" >getChapterById(i</span>d: string): Promise&lt;Chapter | undefined&gt; {
-<span class="cstat-no" title="statement not covered" >	try {</span>
-<span class="cstat-no" title="statement not covered" >		return await apiGet&lt;Chapter&gt;(`/api/db/chapters/${id}`);</span>
-	} catch (err) {
-<span class="cstat-no" title="statement not covered" >		if (err instanceof ApiError &amp;&amp; err.status === 404) <span class="cstat-no" title="statement not covered" >return undefined;</span></span>
-<span class="cstat-no" title="statement not covered" >		throw err;</span>
-	}
-}
-&nbsp;
-export async function <span class="fstat-no" title="function not covered" >getChaptersByProjectId(p</span>rojectId: string): Promise&lt;Chapter[]&gt; {
-<span class="cstat-no" title="statement not covered" >	return apiGet&lt;Chapter[]&gt;('/api/db/chapters', { projectId });</span>
-}
-&nbsp;
-export async function <span class="fstat-no" title="function not covered" >updateChapter(</span>
-	id: string,
-	data: Partial&lt;Omit&lt;Chapter, 'id' | 'createdAt'&gt;&gt;,
-): Promise&lt;void&gt; {
-<span class="cstat-no" title="statement not covered" >	await apiPut(`/api/db/chapters/${id}`, data);</span>
-}
-&nbsp;
-export async function <span class="fstat-no" title="function not covered" >removeChapter(i</span>d: string): Promise&lt;void&gt; {
-<span class="cstat-no" title="statement not covered" >	await apiDel(`/api/db/chapters/${id}`);</span>
-}
+export const createChapter = <span class="cstat-no" title="statement not covered" >repo.create;</span>
+export const getChapterById = <span class="cstat-no" title="statement not covered" >repo.getById;</span>
+export const getChaptersByProjectId = <span class="cstat-no" title="statement not covered" >repo.getByProjectId;</span>
+export const updateChapter = <span class="cstat-no" title="statement not covered" >repo.update;</span>
+export const removeChapter = <span class="cstat-no" title="statement not covered" >repo.remove;</span>
 &nbsp;
 export async function <span class="fstat-no" title="function not covered" >reorderChapters(_</span>projectId: string, orderedIds: string[]): Promise&lt;void&gt; {
-<span class="cstat-no" title="statement not covered" >	await apiPut('/api/db/chapters/reorder', { orderedIds });</span>
+<span class="cstat-no" title="statement not covered" >	await repo.reorder!(orderedIds);</span>
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -178,7 +124,7 @@ export async function <span class="fstat-no" title="function not covered" >reord
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-15T21:48:57.419Z
+                at 2026-04-16T21:31:05.615Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

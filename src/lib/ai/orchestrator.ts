@@ -1,7 +1,6 @@
 import type { ContextBundle, AIResponse } from './types.js';
 import { OpenRouterClient } from './openrouter.js';
-
-const DEFAULT_MODEL = 'openai/gpt-4o-mini';
+import { DEFAULT_MODEL } from './constants.js';
 
 export class Orchestrator {
 	private readonly client: OpenRouterClient;

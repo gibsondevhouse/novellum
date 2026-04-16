@@ -1,6 +1,5 @@
-import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
-import { db, encodeJson, decodeJson } from '$lib/server/db/index.js';
+import { createGetHandler, createPostHandler } from '$lib/server/api-helpers.js';
+import { decodeJson } from '$lib/server/db/index.js';
 
 function decodeRow(row: Record<string, unknown>) {
 	return {
@@ -9,44 +8,21 @@ function decodeRow(row: Record<string, unknown>) {
 	};
 }
 
-export const GET: RequestHandler = async ({ url }) => {
-	const projectId = url.searchParams.get('projectId');
-	if (!projectId) {
-		return json({ error: 'projectId is required' }, { status: 400 });
-	}
-
-	const rows = db
-		.prepare('SELECT * FROM chapters WHERE projectId = ? ORDER BY "order" ASC')
-		.all(projectId) as Record<string, unknown>[];
-
-	return json(rows.map(decodeRow));
+const config = {
+	table: 'chapters',
+	fields: {
+		projectId: { required: true },
+		title: { required: true },
+		order: { default: 0 },
+		summary: { default: '' },
+		wordCount: { default: 0 },
+		actId: { default: null },
+		arcRefs: { default: [], json: true },
+	},
+	orderBy: '"order" ASC',
+	queryParams: ['projectId'],
+	decodeRow,
 };
 
-export const POST: RequestHandler = async ({ request }) => {
-	const body = await request.json();
-
-	if (!body.projectId || !body.title) {
-		return json({ error: 'projectId and title are required' }, { status: 400 });
-	}
-
-	const now = new Date().toISOString();
-	const chapter = {
-		id: crypto.randomUUID(),
-		projectId: body.projectId,
-		title: body.title,
-		order: body.order ?? 0,
-		summary: body.summary ?? '',
-		wordCount: body.wordCount ?? 0,
-		actId: body.actId ?? null,
-		arcRefs: encodeJson(body.arcRefs ?? []),
-		createdAt: now,
-		updatedAt: now,
-	};
-
-	db.prepare(
-		`INSERT INTO chapters (id, projectId, title, "order", summary, wordCount, actId, arcRefs, createdAt, updatedAt)
-		 VALUES (@id, @projectId, @title, @order, @summary, @wordCount, @actId, @arcRefs, @createdAt, @updatedAt)`,
-	).run(chapter);
-
-	return json(decodeRow({ ...chapter }), { status: 201 });
-};
+export const GET = createGetHandler(config);
+export const POST = createPostHandler(config);

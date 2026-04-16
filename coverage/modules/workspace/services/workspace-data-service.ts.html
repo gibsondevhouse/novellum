@@ -95,7 +95,17 @@
 <a name='L30'></a><a href='#L30'>30</a>
 <a name='L31'></a><a href='#L31'>31</a>
 <a name='L32'></a><a href='#L32'>32</a>
-<a name='L33'></a><a href='#L33'>33</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -120,20 +130,24 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { db } from '$lib/db/index.js';
-import type { Arc, Act, Scene, Character } from '$lib/db/types.js';
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { getCharactersByProjectId } from "$modules/bible/services/character-repository.js";
+import type { Arc, Act, Scene, Character, Beat, Stage } from '$lib/db/types.js';
 import type { ChapterWithScenes } from '$modules/outliner/types.js';
 import { getArcsByProjectId } from '$modules/outliner/services/arc-repository.js';
 import { getActsByProjectId } from '$modules/outliner/services/story-structure-service.js';
 import { getChaptersByProjectId } from '$modules/project/services/chapter-repository.js';
 import { getScenesByProjectId } from '$modules/editor/services/scene-repository.js';
+import { getBeatsByProjectId } from '$modules/editor/services/beat-repository.js';
+import { getStagesByProjectId } from '$modules/editor/services/stage-repository.js';
 &nbsp;
 export interface WorkspaceData {
 	arcs: Arc[];
@@ -141,15 +155,19 @@ export interface WorkspaceData {
 	chapters: ChapterWithScenes[];
 	scenes: Scene[];
 	characters: Character[];
+	beats: Beat[];
+	stages: Stage[];
 }
 &nbsp;
 export async function <span class="fstat-no" title="function not covered" >getWorkspaceData(p</span>rojectId: string): Promise&lt;WorkspaceData&gt; {
-	const [arcs, acts, rawChapters, scenes, characters] = <span class="cstat-no" title="statement not covered" >await Promise.all([</span>
+	const [arcs, acts, rawChapters, scenes, characters, beats, stages] = <span class="cstat-no" title="statement not covered" >await Promise.all([</span>
 		getArcsByProjectId(projectId),
 		getActsByProjectId(projectId),
 		getChaptersByProjectId(projectId),
 		getScenesByProjectId(projectId),
-		db.characters.where('projectId').equals(projectId).toArray(),
+		getCharactersByProjectId(projectId),
+		getBeatsByProjectId(projectId),
+		getStagesByProjectId(projectId)
 	]);
 &nbsp;
 	const chapters: ChapterWithScenes[] = <span class="cstat-no" title="statement not covered" >rawChapters.<span class="fstat-no" title="function not covered" >map((c</span>h) =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
@@ -157,7 +175,7 @@ export async function <span class="fstat-no" title="function not covered" >getWo
 		scenes: scenes.<span class="fstat-no" title="function not covered" >filter((s</span>) =&gt; <span class="cstat-no" title="statement not covered" >s.chapterId === ch.id).<span class="fstat-no" title="function not covered" ></span>sort((a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >a.order - b.order),</span>
 	}));
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	return { arcs, acts, chapters, scenes, characters };</span>
+<span class="cstat-no" title="statement not covered" >	return { arcs, acts, chapters, scenes, characters, beats, stages };</span>
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -166,7 +184,7 @@ export async function <span class="fstat-no" title="function not covered" >getWo
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-15T21:48:57.419Z
+                at 2026-04-16T21:31:05.615Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

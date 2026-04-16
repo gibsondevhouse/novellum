@@ -10,14 +10,13 @@
 		reopenIssue,
 	} from '../stores/consistency-store.svelte.js';
 	import IssueGroup from './IssueGroup.svelte';
+	import { ISSUE_TYPES } from '../constants.js';
 
 	let { projectId }: { projectId: string } = $props();
 
 	let showAll = $state(false);
 
 	const visibleIssues = $derived(showAll ? getIssues() : getOpenIssues());
-
-	const ISSUE_TYPES = ['timeline', 'character', 'lore', 'plot_thread'] as const;
 
 	type GroupEntry = { type: ConsistencyIssue['type']; issues: ConsistencyIssue[] };
 

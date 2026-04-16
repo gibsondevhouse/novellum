@@ -1,6 +1,5 @@
-import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
-import { db, encodeJson, decodeJson } from '$lib/server/db/index.js';
+import { createGetHandler, createPostHandler } from '$lib/server/api-helpers.js';
+import { decodeJson } from '$lib/server/db/index.js';
 
 function decodeRow(row: Record<string, unknown>) {
 	return {
@@ -11,61 +10,27 @@ function decodeRow(row: Record<string, unknown>) {
 	};
 }
 
-export const GET: RequestHandler = async ({ url }) => {
-	const projectId = url.searchParams.get('projectId');
-	const chapterId = url.searchParams.get('chapterId');
-
-	const conditions: string[] = [];
-	const params: unknown[] = [];
-
-	if (projectId) {
-		conditions.push('projectId = ?');
-		params.push(projectId);
-	}
-	if (chapterId) {
-		conditions.push('chapterId = ?');
-		params.push(chapterId);
-	}
-
-	const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-	const rows = db
-		.prepare(`SELECT * FROM scenes ${where} ORDER BY "order" ASC`)
-		.all(...params) as Record<string, unknown>[];
-
-	return json(rows.map(decodeRow));
+const config = {
+	table: 'scenes',
+	fields: {
+		chapterId: { required: true },
+		projectId: { required: true },
+		title: { required: true },
+		summary: { default: '' },
+		povCharacterId: { default: null },
+		locationId: { default: null },
+		timelineEventId: { default: null },
+		order: { default: 0 },
+		content: { default: '' },
+		wordCount: { default: 0 },
+		characterIds: { default: [], json: true },
+		locationIds: { default: [], json: true },
+		arcRefs: { default: [], json: true },
+	},
+	orderBy: '"order" ASC',
+	queryParams: ['projectId', 'chapterId'],
+	decodeRow,
 };
 
-export const POST: RequestHandler = async ({ request }) => {
-	const body = await request.json();
-
-	if (!body.chapterId || !body.projectId || !body.title) {
-		return json({ error: 'chapterId, projectId, and title are required' }, { status: 400 });
-	}
-
-	const now = new Date().toISOString();
-	const scene = {
-		id: crypto.randomUUID(),
-		chapterId: body.chapterId,
-		projectId: body.projectId,
-		title: body.title,
-		summary: body.summary ?? '',
-		povCharacterId: body.povCharacterId ?? null,
-		locationId: body.locationId ?? null,
-		timelineEventId: body.timelineEventId ?? null,
-		order: body.order ?? 0,
-		content: body.content ?? '',
-		wordCount: body.wordCount ?? 0,
-		characterIds: encodeJson(body.characterIds ?? []),
-		locationIds: encodeJson(body.locationIds ?? []),
-		arcRefs: encodeJson(body.arcRefs ?? []),
-		createdAt: now,
-		updatedAt: now,
-	};
-
-	db.prepare(
-		`INSERT INTO scenes (id, chapterId, projectId, title, summary, povCharacterId, locationId, timelineEventId, "order", content, wordCount, characterIds, locationIds, arcRefs, createdAt, updatedAt)
-		 VALUES (@id, @chapterId, @projectId, @title, @summary, @povCharacterId, @locationId, @timelineEventId, @order, @content, @wordCount, @characterIds, @locationIds, @arcRefs, @createdAt, @updatedAt)`,
-	).run(scene);
-
-	return json(decodeRow({ ...scene }), { status: 201 });
-};
+export const GET = createGetHandler(config);
+export const POST = createPostHandler(config);

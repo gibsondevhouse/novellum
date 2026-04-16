@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { Character } from '$lib/db/types.js';
+	import type { EntityFormCallbacks } from '../types.js';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 
@@ -12,9 +13,7 @@
 	} = $props<{
 		character?: Character | null;
 		saving?: boolean;
-		onSave: (data: Omit<Character, 'id' | 'projectId' | 'createdAt' | 'updatedAt'>) => void;
-		onCancel: () => void;
-	}>();
+	} & EntityFormCallbacks<Character>>();
 
 	let name = $state(untrack(() => character?.name ?? ''));
 	let role = $state(untrack(() => character?.role ?? ''));

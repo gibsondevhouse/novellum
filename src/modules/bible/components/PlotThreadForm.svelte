@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { PlotThread, Scene } from '$lib/db/types.js';
+	import type { EntityFormCallbacks } from '../types.js';
+	import { PLOT_THREAD_STATUS_OPTIONS } from '../constants.js';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 
-	const STATUS_OPTIONS = ['open', 'in-progress', 'resolved'] as const;
-	type Status = (typeof STATUS_OPTIONS)[number];
+	type Status = (typeof PLOT_THREAD_STATUS_OPTIONS)[number];
 
 	let {
 		thread = null,
@@ -17,9 +18,7 @@
 		thread?: PlotThread | null;
 		scenes?: Scene[];
 		saving?: boolean;
-		onSave: (data: Omit<PlotThread, 'id' | 'projectId' | 'createdAt' | 'updatedAt'>) => void;
-		onCancel: () => void;
-	}>();
+	} & EntityFormCallbacks<PlotThread>>();
 
 	let title = $state(untrack(() => thread?.title ?? ''));
 	let description = $state(untrack(() => thread?.description ?? ''));
@@ -74,7 +73,7 @@
 	<div class="field">
 		<label class="label" for="pt-status">Status</label>
 		<select id="pt-status" class="input" bind:value={status}>
-			{#each STATUS_OPTIONS as s (s)}
+			{#each PLOT_THREAD_STATUS_OPTIONS as s (s)}
 				<option value={s}>{s}</option>
 			{/each}
 		</select>

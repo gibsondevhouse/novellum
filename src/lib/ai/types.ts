@@ -107,6 +107,11 @@ export interface AIResponse {
 	tokensUsed: number;
 }
 
+export interface RetryConfig {
+	maxRetries: number;
+	baseDelayMs: number;
+}
+
 export interface ContextBundle {
 	userPrompt: string;
 	chapterText?: string;

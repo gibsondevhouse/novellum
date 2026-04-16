@@ -2,6 +2,15 @@ export { exportProject } from './services/export-service.js';
 export { default as ExportModal } from './components/ExportModal.svelte';
 export { getExportSettings, updateExportSettings } from './services/export-settings-repository.js';
 export type { ExportFormat, ExportOptions, AssembledProject, AssembledChapter } from './types.js';
+export {
+	EXPORT_FORMAT_OPTIONS,
+	FORMAT_EXTENSIONS,
+	FORMAT_MIME_TYPES,
+	FONT_FAMILY_OPTIONS,
+	LINE_SPACING_OPTIONS,
+	CHAPTER_STYLE_OPTIONS,
+	DEFAULT_EXPORT_SETTINGS,
+} from './constants.js';
 
 // Portability
 export {

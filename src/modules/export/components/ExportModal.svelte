@@ -6,6 +6,12 @@
 	import { exportProject } from '../services/export-service.js';
 	import type { ExportSettings } from '$lib/db/types.js';
 	import type { ExportFormat } from '../types.js';
+	import {
+		EXPORT_FORMAT_OPTIONS,
+		FONT_FAMILY_OPTIONS,
+		LINE_SPACING_OPTIONS,
+		CHAPTER_STYLE_OPTIONS,
+	} from '../constants.js';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 
@@ -130,23 +136,17 @@
 					<div class="field-group">
 						<span class="field-label">Format</span>
 						<div class="format-tabs" role="radiogroup" aria-label="Export format">
-							{#each ['markdown', 'docx', 'epub', 'backup_zip'] as fmt (fmt)}
+							{#each EXPORT_FORMAT_OPTIONS as opt (opt.value)}
 								<button
 									role="radio"
-									aria-checked={format === fmt}
+									aria-checked={format === opt.value}
 									class="format-tab"
-									class:active={format === fmt}
+									class:active={format === opt.value}
 									onclick={() => {
-										format = fmt as ExportFormat;
+										format = opt.value;
 									}}
 								>
-									{fmt === 'markdown'
-										? 'Markdown'
-										: fmt === 'docx'
-											? 'DOCX'
-											: fmt === 'epub'
-												? 'EPUB'
-												: 'Backup ZIP'}
+									{opt.label}
 								</button>
 							{/each}
 						</div>
@@ -183,9 +183,9 @@
 								value={settings.chapterStyle}
 								onchange={handleChapterStyleChange}
 							>
-								<option value="heading">Heading text</option>
-								<option value="chapter_number">Chapter number</option>
-								<option value="both">Both</option>
+								{#each CHAPTER_STYLE_OPTIONS as opt (opt.value)}
+									<option value={opt.value}>{opt.label}</option>
+								{/each}
 							</select>
 						</div>
 
@@ -198,10 +198,9 @@
 								disabled={isMarkdown}
 								onchange={handleFontFamilyChange}
 							>
-								<option value="Georgia">Georgia</option>
-								<option value="Times New Roman">Times New Roman</option>
-								<option value="Arial">Arial</option>
-								<option value="Courier New">Courier New</option>
+								{#each FONT_FAMILY_OPTIONS as opt (opt.value)}
+									<option value={opt.value}>{opt.label}</option>
+								{/each}
 							</select>
 						</div>
 
@@ -228,10 +227,9 @@
 								disabled={isMarkdown}
 								onchange={handleLineSpacingChange}
 							>
-								<option value="1">1.0</option>
-								<option value="1.15">1.15</option>
-								<option value="1.5">1.5</option>
-								<option value="2">2.0</option>
+								{#each LINE_SPACING_OPTIONS as opt (opt.value)}
+									<option value={String(opt.value)}>{opt.label}</option>
+								{/each}
 							</select>
 						</div>
 					{/if}

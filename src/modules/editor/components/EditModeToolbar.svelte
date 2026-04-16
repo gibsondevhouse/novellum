@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { EditMode } from '$lib/ai/types.js';
+	import { EDIT_MODES } from '../constants.js';
 
 	let {
 		activeMode,
@@ -10,16 +11,10 @@
 		isRunning: boolean;
 		onSelectMode: (mode: EditMode) => void;
 	} = $props();
-
-	const modes: { value: EditMode; label: string }[] = [
-		{ value: 'developmental', label: 'Developmental' },
-		{ value: 'line_edit', label: 'Line Edit' },
-		{ value: 'proofread', label: 'Proofread' },
-	];
 </script>
 
 <div class="toolbar" role="toolbar" aria-label="Edit mode">
-	{#each modes as mode (mode.value)}
+	{#each EDIT_MODES as mode (mode.value)}
 		<button
 			class="toolbar-btn"
 			class:active={activeMode === mode.value}

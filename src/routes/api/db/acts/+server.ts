@@ -1,46 +1,16 @@
-import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
-import { db } from '$lib/server/db/index.js';
+import { createGetHandler, createPostHandler } from '$lib/server/api-helpers.js';
 
-export const GET: RequestHandler = async ({ url }) => {
-	const projectId = url.searchParams.get('projectId');
-
-	const conditions: string[] = [];
-	const params: unknown[] = [];
-
-	if (projectId) {
-		conditions.push('projectId = ?');
-		params.push(projectId);
-	}
-
-	const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-	const rows = db.prepare(`SELECT * FROM acts ${where} ORDER BY "order" ASC`).all(...params);
-
-	return json(rows);
+const config = {
+	table: 'acts',
+	fields: {
+		projectId: { required: true },
+		title: { required: true },
+		order: { default: 0 },
+		planningNotes: { default: '' },
+	},
+	orderBy: '"order" ASC',
+	queryParams: ['projectId'],
 };
 
-export const POST: RequestHandler = async ({ request }) => {
-	const body = await request.json();
-
-	if (!body.projectId || !body.title) {
-		return json({ error: 'projectId and title are required' }, { status: 400 });
-	}
-
-	const now = new Date().toISOString();
-	const act = {
-		id: crypto.randomUUID(),
-		projectId: body.projectId,
-		title: body.title,
-		order: body.order ?? 0,
-		planningNotes: body.planningNotes ?? '',
-		createdAt: now,
-		updatedAt: now,
-	};
-
-	db.prepare(
-		`INSERT INTO acts (id, projectId, title, "order", planningNotes, createdAt, updatedAt)
-		 VALUES (@id, @projectId, @title, @order, @planningNotes, @createdAt, @updatedAt)`,
-	).run(act);
-
-	return json(act, { status: 201 });
-};
+export const GET = createGetHandler(config);
+export const POST = createPostHandler(config);

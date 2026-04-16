@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Beat } from '$lib/db/types.js';
+	import type { BeatFocus } from '../types.js';
 	import {
 		getBeatsBySceneId,
 		createBeat,
@@ -8,15 +9,6 @@
 		reorderBeats,
 	} from '$modules/editor/services/beat-repository.js';
 	import BeatItem from './BeatItem.svelte';
-
-	type BeatFocus = {
-		id: string;
-		index: number;
-		content: string;
-		notes: string;
-		onUpdateContent: (content: string) => void;
-		onUpdateNotes: (notes: string) => void;
-	};
 
 	let { sceneId, projectId, onSelectBeat } = $props<{
 		sceneId: string;

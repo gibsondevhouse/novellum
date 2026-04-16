@@ -1,35 +1,17 @@
-import { apiGet, apiPost, apiPut, apiDel, ApiError } from '$lib/api-client.js';
+import { createRepository } from '$lib/factories/repository-factory.js';
+import { apiGet, apiPost, apiDel } from '$lib/api-client.js';
 import type { Character, CharacterRelationship } from '$lib/db/types.js';
 
-export async function createCharacter(
-	data: Omit<Character, 'id' | 'createdAt' | 'updatedAt'>,
-): Promise<Character> {
-	return apiPost<Character>('/api/db/characters', data);
-}
+const repo = createRepository<Character>({
+	endpoint: '/api/db/characters',
+	entityName: 'Character',
+});
 
-export async function getCharacterById(id: string): Promise<Character | undefined> {
-	try {
-		return await apiGet<Character>(`/api/db/characters/${id}`);
-	} catch (err) {
-		if (err instanceof ApiError && err.status === 404) return undefined;
-		throw err;
-	}
-}
-
-export async function getCharactersByProjectId(projectId: string): Promise<Character[]> {
-	return apiGet<Character[]>('/api/db/characters', { projectId });
-}
-
-export async function updateCharacter(
-	id: string,
-	data: Partial<Omit<Character, 'id' | 'createdAt'>>,
-): Promise<void> {
-	await apiPut(`/api/db/characters/${id}`, data);
-}
-
-export async function removeCharacter(id: string): Promise<void> {
-	await apiDel(`/api/db/characters/${id}`);
-}
+export const createCharacter = repo.create;
+export const getCharacterById = repo.getById;
+export const getCharactersByProjectId = repo.getByProjectId;
+export const updateCharacter = repo.update;
+export const removeCharacter = repo.remove;
 
 export async function createRelationship(
 	data: Omit<CharacterRelationship, 'id' | 'createdAt' | 'updatedAt'>,
