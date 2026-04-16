@@ -1,5 +1,5 @@
 import { db } from '$lib/db/index.js';
-import type { StoryFrame, Act } from '$lib/db/types.js';
+import type { StoryFrame, Act, Milestone } from '$lib/db/types.js';
 
 export async function getOrCreateStoryFrame(projectId: string): Promise<StoryFrame> {
 	const existing = await db.story_frames.where('projectId').equals(projectId).first();
@@ -59,4 +59,47 @@ export async function reorderActs(projectId: string, orderedIds: string[]): Prom
 			db.acts.update(id, { order: idx, updatedAt: new Date().toISOString() }),
 		),
 	);
+}
+
+/* ── Milestones ── */
+
+export async function getMilestonesByActId(actId: string): Promise<Milestone[]> {
+	return db.milestones.where('actId').equals(actId).sortBy('order');
+}
+
+export async function getMilestonesByProjectId(projectId: string): Promise<Milestone[]> {
+	return db.milestones.where('projectId').equals(projectId).sortBy('order');
+}
+
+export async function createMilestone(
+	actId: string,
+	projectId: string,
+	title: string,
+	order: number,
+): Promise<Milestone> {
+	const now = new Date().toISOString();
+	const milestone: Milestone = {
+		id: crypto.randomUUID(),
+		actId,
+		projectId,
+		title,
+		description: '',
+		order,
+		chapterIds: [],
+		createdAt: now,
+		updatedAt: now,
+	};
+	await db.milestones.add(milestone);
+	return milestone;
+}
+
+export async function updateMilestone(
+	id: string,
+	patch: Partial<Omit<Milestone, 'id' | 'actId' | 'projectId' | 'createdAt'>>,
+): Promise<void> {
+	await db.milestones.update(id, { ...patch, updatedAt: new Date().toISOString() });
+}
+
+export async function removeMilestone(id: string): Promise<void> {
+	await db.milestones.delete(id);
 }

@@ -1,4 +1,5 @@
-import type { Beat, Stage } from '$lib/db/types.js';
+import type { Arc, Beat, Stage, Milestone } from '$lib/db/types.js';
+import type { ChapterWithScenes } from '$modules/outliner/types.js';
 
 export type WorkspaceMode = 'arcs' | 'acts' | 'chapters' | 'scenes';
 
@@ -20,4 +21,9 @@ export interface StatusOption<T extends string = string> {
 /** Beat with its child stages pre-joined. */
 export interface BeatWithStages extends Beat {
 	stages: Stage[];
+}
+
+/** Milestone with resolved linked chapter data for the Acts Workspace sidebar. */
+export interface MilestoneWithChapters extends Milestone {
+	linkedChapters: ChapterWithScenes[];
 }

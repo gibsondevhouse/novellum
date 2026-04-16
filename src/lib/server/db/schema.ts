@@ -252,6 +252,18 @@ CREATE TABLE IF NOT EXISTS stages (
 	createdAt TEXT NOT NULL,
 	updatedAt TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS milestones (
+	id TEXT PRIMARY KEY,
+	actId TEXT NOT NULL,
+	projectId TEXT NOT NULL,
+	title TEXT NOT NULL,
+	description TEXT NOT NULL DEFAULT '',
+	"order" INTEGER NOT NULL,
+	chapterIds TEXT NOT NULL DEFAULT '[]',
+	createdAt TEXT NOT NULL,
+	updatedAt TEXT NOT NULL
+);
 `;
 
 export const INDEX_SQL = `
@@ -283,5 +295,7 @@ CREATE INDEX IF NOT EXISTS idx_system_prompts_projectId ON system_prompts(projec
 CREATE INDEX IF NOT EXISTS idx_chat_instructions_projectId ON chat_instructions(projectId);
 CREATE INDEX IF NOT EXISTS idx_stages_beatId ON stages(beatId);
 CREATE INDEX IF NOT EXISTS idx_stages_projectId ON stages(projectId);
+CREATE INDEX IF NOT EXISTS idx_milestones_actId ON milestones(actId);
+CREATE INDEX IF NOT EXISTS idx_milestones_projectId ON milestones(projectId);
 `;
 
