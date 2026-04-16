@@ -2,6 +2,10 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import ModelSelector from './ModelSelector.svelte';
+	import { getActiveMode, setMode } from '../../modules/workspace/stores/workspace-mode.svelte.js';
+	import { WORKSPACE_MODES } from '../../modules/workspace/types.js';
+
+	let isWorkspaceRoute = $derived(page.url.pathname.includes('/workspace'));
 
 	let isSettingsRoute = $derived(page.url.pathname.startsWith('/settings'));
 	let isNovaRoute = $derived(page.url.pathname === '/nova');
@@ -40,6 +44,22 @@
 					</span>
 				{/if}
 				<span class="header-context__title">{displayTitle}</span>
+			</div>
+		{/if}
+	</div>
+
+		<div class="header-center">
+		{#if isWorkspaceRoute}
+			<div class="workspace-switcher">
+				{#each WORKSPACE_MODES as m}
+					<button
+						class="workspace-switcher-btn"
+						class:active={getActiveMode() === m}
+						onclick={() => setMode(m)}
+					>
+						{m.toUpperCase()}
+					</button>
+				{/each}
 			</div>
 		{/if}
 	</div>
@@ -191,4 +211,44 @@
 		color: var(--color-text-primary);
 		background-color: var(--color-surface-glass);
 	}
+
+	.header-center {
+		display: flex;
+		flex: 1;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.workspace-switcher {
+		display: flex;
+		background: var(--color-surface-elevated);
+		border: 1px solid var(--color-border-default);
+		border-radius: var(--radius-full);
+		padding: 2px;
+		gap: 2px;
+	}
+
+	.workspace-switcher-btn {
+		background: transparent;
+		border: none;
+		padding: var(--space-1) var(--space-4);
+		border-radius: var(--radius-full);
+		font-size: var(--text-xs);
+		font-weight: var(--font-weight-semibold);
+		color: var(--color-text-muted);
+		cursor: pointer;
+		transition: all var(--duration-fast) var(--ease-standard);
+		letter-spacing: var(--tracking-wide);
+	}
+
+	.workspace-switcher-btn:hover {
+		color: var(--color-text-primary);
+	}
+
+	.workspace-switcher-btn.active {
+		background: var(--color-surface-hover);
+		color: var(--color-text-primary);
+		box-shadow: var(--shadow-sm);
+	}
+
 </style>

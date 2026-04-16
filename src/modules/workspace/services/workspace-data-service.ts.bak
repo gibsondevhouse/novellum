@@ -1,4 +1,3 @@
-import { getCharactersByProjectId } from "$modules/bible/services/character-repository.js";
 import { db } from '$lib/db/index.js';
 import type { Arc, Act, Scene, Character } from '$lib/db/types.js';
 import type { ChapterWithScenes } from '$modules/outliner/types.js';

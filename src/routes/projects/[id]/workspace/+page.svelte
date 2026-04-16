@@ -228,52 +228,127 @@
 	<title>Workspace — Novellum</title>
 </svelte:head>
 
-<div class="workspace-surface">
+<WorkspaceHelpModal
+        open={showHelp}
+        onClose={() => (showHelp = false)}
+        activeMode={mode}
+        items={railItems}
+        {activeIndex}
+        onNavigate={handleNavigate}
+        onCreate={handleCreate}
+        {focusedArcType}
+        onArcTypeFocus={(t) => (focusedArcType = t)}
+/>
 
-	{#if heroItem !== null}
-		<WorkspaceDetailCard
-			{mode}
-			item={heroItem}
-			projectId={data.projectId}
-			sceneCount={heroSceneCount}
-			povCharacterName={heroPovName}
-			onUpdate={mode === 'arcs' ? handleUpdateArc : undefined}
-		/>
-        {/if}
+{#if mode === 'arcs'}
+        <div class="workspace-board-view">
+                <div class="board-header-row">
+                        <div class="collection-header">
+                                <span class="collection-label arc-selection-row">
+                                        {#each collectionItems as item, i}
+                                                <button 
+                                                        class="arc-selector" 
+                                                        class:arc-selector--active={selectedId === item.id}
+                                                        onclick={() => handleSelectItem(item.id)}
+                                                >
+                                                        {item.title ? item.title.toUpperCase() : `ARC ${i + 1}`}
+                                                </button>
+                                                {#if i < collectionItems.length - 1}
+                                                        <span class="divider"> | </span>
+                                                {/if}
+                                        {/each}
+                                </span>
+                                <button class="help-toggle" onclick={() => (showHelp = true)} aria-label="Show conceptual help">
+                                        ?
+                                </button>
+                        </div>
+                </div>
 
-        <div class="collection-header">
-                <span class="collection-label">
-                        {collectionItems.length}
-                        {WORKSPACE_MODE_LABELS[mode].toLowerCase()}
-                </span>
-                <button class="help-toggle" onclick={() => (showHelp = true)} aria-label="Show conceptual help">
-                        ?
-                </button>
+                <div class="arc-dashboard">
+                        {#if heroItem}
+                                <div class="arc-dashboard-header">
+                                        <div class="arc-meta">
+                                                <h1>{heroItem.title || 'Untitled Arc'}</h1>
+                                        </div>
+                                        <WorkspaceDetailCard
+                                                {mode}
+                                                item={heroItem}
+                                                projectId={data.projectId}
+                                                sceneCount={heroSceneCount}
+                                                povCharacterName={heroPovName}
+                                                onUpdate={handleUpdateArc}
+                                        />
+                                </div>
+                                <div class="arc-dashboard-content">
+                                        <div class="arc-dashboard-section">
+                                                <h2>Arc Progression</h2>
+                                                <div class="arc-timeline">
+                                                        <div class="timeline-dropzone">
+                                                                <button class="add-event-btn">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                                                        </svg>
+                                                                        <span>Add Story Beat</span>
+                                                                </button>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+                        {:else}
+                                <div class="arc-dashboard-empty">
+                                        <div class="empty-state-content">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5; margin-bottom: 1rem;">
+                                                        <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"></path>
+                                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                                        <path d="M2 15h10"></path>
+                                                        <path d="m9 18 3-3-3-3"></path>
+                                                </svg>
+                                                <h2>No Arc Selected</h2>
+                                                <p>Select an arc from the header or create a new one to begin mapping out the story.</p>
+                                                <button class="add-column-btn" onclick={handleCreate} style="margin-top: 1rem;">
+                                                        <span>New Arc</span>
+                                                </button>
+                                        </div>
+                                </div>
+                        {/if}
+                </div>
         </div>
+{:else}
+        <div class="workspace-surface">
 
-        <WorkspaceHelpModal
-                open={showHelp}
-                onClose={() => (showHelp = false)}
-                activeMode={mode}
-                items={railItems}
-                {activeIndex}
-                onNavigate={handleNavigate}
-                onCreate={handleCreate}
-                {focusedArcType}
-                onArcTypeFocus={(t) => (focusedArcType = t)}
-        />
+                {#if heroItem !== null}
+                        <WorkspaceDetailCard
+                                {mode}
+                                item={heroItem}
+                                projectId={data.projectId}
+                                sceneCount={heroSceneCount}
+                                povCharacterName={heroPovName}
+                                onUpdate={undefined}
+                        />
+                {/if}
 
-        <StructureCarousel
-		items={collectionItems}
-		{selectedId}
-		{mode}
-		onCreate={handleCreate}
-		onSelect={handleSelectItem}
-		onRename={handleRename}
-		onDelete={handleDelete}
-	/>
-</div>
+                <div class="collection-header">
+                        <span class="collection-label">
+                                {collectionItems.length}
+                                {WORKSPACE_MODE_LABELS[mode].toLowerCase()}
+                        </span>
+                        <button class="help-toggle" onclick={() => (showHelp = true)} aria-label="Show conceptual help">
+                                ?
+                        </button>
+                </div>
 
+                <StructureCarousel
+                        items={collectionItems}
+                        {selectedId}
+                        {mode}
+                        onCreate={handleCreate}
+                        onSelect={handleSelectItem}
+                        onRename={handleRename}
+                        onDelete={handleDelete}
+                />
+        </div>
+{/if}
 <style>
 	.workspace-surface {
 		display: flex;
@@ -325,4 +400,184 @@
 			padding: var(--space-4) var(--space-4) var(--space-8);
 		}
 	}
+
+        /* ── Board View (Arcs) ── */
+
+        .workspace-board-view {
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+                min-height: 0;
+        }
+
+        .board-header-row {
+                flex-shrink: 0;
+                padding: var(--space-3) var(--space-6);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .arc-selection-row {
+                display: inline-flex;
+                align-items: center;
+                gap: var(--space-2);
+        }
+
+        .arc-selector {
+                background: none;
+                border: none;
+                color: var(--color-text-secondary);
+                font-family: var(--font-sans);
+                font-size: var(--text-sm);
+                font-weight: var(--font-weight-medium);
+                letter-spacing: var(--tracking-wider);
+                cursor: pointer;
+                padding: var(--space-1) var(--space-2);
+                border-radius: var(--radius-sm);
+                transition: color 150ms ease, background 150ms ease;
+        }
+
+        .arc-selector:hover {
+                color: var(--color-text-primary);
+                background: rgba(255, 255, 255, 0.05);
+        }
+
+        .arc-selector--active {
+                color: var(--color-nova-blue);
+        }
+
+        .arc-dashboard {
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+                overflow-y: auto;
+                padding: var(--space-6);
+                gap: var(--space-6);
+        }
+
+        .arc-dashboard-header {
+                display: flex;
+                flex-direction: row;
+                gap: var(--space-6);
+                align-items: flex-start;
+                padding-bottom: var(--space-6);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .arc-meta {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-2);
+        }
+
+        .arc-meta h1 {
+                font-family: var(--font-serif);
+                font-size: var(--text-3xl);
+                margin: 0;
+                color: #fff;
+        }
+
+        .arc-dashboard-content {
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-8);
+                flex: 1;
+        }
+
+        .arc-dashboard-section h2 {
+                font-size: var(--text-sm);
+                text-transform: uppercase;
+                letter-spacing: var(--tracking-wider);
+                font-weight: var(--font-weight-bold);
+                color: var(--color-text-secondary);
+                margin-bottom: var(--space-4);
+        }
+
+        .arc-timeline {
+                display: flex;
+                flex-direction: row;
+                gap: var(--space-4);
+                overflow-x: auto;
+                padding-bottom: var(--space-4);
+        }
+
+        .timeline-dropzone {
+                display: flex;
+                flex: 0 0 200px;
+                min-height: 120px;
+                border: 2px dashed rgba(255, 255, 255, 0.15);
+                border-radius: var(--radius-md);
+                align-items: center;
+                justify-content: center;
+                transition: all 150ms ease;
+        }
+
+        .timeline-dropzone:hover {
+                border-color: var(--color-nova-blue);
+                background: color-mix(in srgb, var(--color-nova-blue) 10%, transparent);
+        }
+
+        .add-event-btn {
+                background: none;
+                border: none;
+                color: var(--color-text-secondary);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: var(--space-2);
+                cursor: pointer;
+                font-size: var(--text-sm);
+        }
+
+        .timeline-dropzone:hover .add-event-btn {
+                color: var(--color-nova-blue);
+        }
+
+        .arc-dashboard-empty {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex: 1;
+                height: 100%;
+        }
+
+        .empty-state-content {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                max-width: 400px;
+                color: var(--color-text-secondary);
+        }
+
+        .empty-state-content h2 {
+                color: #fff;
+                margin-bottom: var(--space-2);
+                font-size: var(--text-xl);
+                font-weight: var(--font-weight-medium);
+        }
+
+        .add-column-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: var(--space-2);
+                width: 100%;
+                height: 100%;
+                min-height: 200px;
+                background: transparent;
+                border: none;
+                border-radius: var(--radius-lg);
+                color: #a0a0a0;
+                font-family: var(--font-sans);
+                font-size: var(--text-base);
+                font-weight: var(--font-weight-medium);
+                cursor: pointer;
+                transition: all 150ms ease;
+        }
+
+        .add-column-btn:hover {
+                color: var(--color-nova-blue);
+                background: color-mix(in srgb, var(--color-nova-blue) 8%, transparent);
+        }
 </style>
