@@ -3,11 +3,15 @@
 	import { onMount } from 'svelte';
 	import { createAssetsStore } from '$modules/assets/stores/assets.svelte';
 	import EmptyStatePanel from '$lib/components/ui/EmptyStatePanel.svelte';
+	import { updateProject } from '$modules/project/services/project-repository';
 
 	let { projectId = null } = $props<{ projectId?: string | null }>();
 
 	const store = createAssetsStore(() => projectId || undefined);
 	let selectedAsset = $state<Asset | null>(null);
+	let isAssigning = $state(false);
+	let assignProjectId = $state('');
+	let assignUseFor = $state('cover');
 
 	onMount(() => {
 		store.load();
@@ -47,10 +51,25 @@
 	}
 
 	async function deleteAsset(id: string) {
-		await store.removeAsset(id);
+		if (id.startsWith('cover-')) {
+			const targetProjectId = id.replace('cover-', '');
+			await updateProject(targetProjectId, { coverUrl: '' });
+			store.load();
+		} else {
+			await store.removeAsset(id);
+		}
 		if (selectedAsset?.id === id) {
 			selectedAsset = null;
+			isAssigning = false;
 		}
+	}
+
+	async function assignAsset() {
+		if (!selectedAsset || !assignProjectId || assignUseFor !== 'cover') return;
+		await updateProject(assignProjectId, { coverUrl: selectedAsset.data });
+		isAssigning = false;
+		assignProjectId = '';
+		store.load();
 	}
 
 	function bytesToSize(bytes: number) {
@@ -90,7 +109,23 @@
 					<h3 class="album-title">{album.title}</h3>
 					<div class="grid">
 						{#if album.coverUrl}
-							<div class="asset-card cover-card">
+							<!-- svelte-ignore a11y_click_events_have_key_events -->
+							<!-- svelte-ignore a11y_no_static_element_interactions -->
+							<div
+								class="asset-card cover-card"
+								onclick={() => {
+									selectedAsset = {
+										id: `cover-${album.id}`,
+										projectId: album.id,
+										name: `${album.title} Cover`,
+										data: album.coverUrl!,
+										mimeType: 'image/*',
+										sizeBytes: 0,
+										createdAt: new Date().toISOString(),
+										updatedAt: new Date().toISOString()
+									};
+								}}
+							>
 								<div class="img-wrapper">
 									<img src={album.coverUrl} alt="{album.title} Cover" />
 								</div>
@@ -128,7 +163,7 @@
 			<div class="dialog" onclick={(e) => e.stopPropagation()}>
 				<div class="dialog-header">
 					<h2>{selectedAsset.name}</h2>
-					<button class="close-btn" onclick={() => (selectedAsset = null)}>✕</button>
+					<button class="close-btn" onclick={() => { selectedAsset = null; isAssigning = false; }}>✕</button>
 				</div>
 				<div class="dialog-content">
 					<img src={selectedAsset.data} alt={selectedAsset.name} />
@@ -136,8 +171,32 @@
 						<span>Size: {bytesToSize(selectedAsset.sizeBytes)}</span>
 						<span>Date: {new Date(selectedAsset.createdAt).toLocaleDateString()}</span>
 					</div>
+					
+					{#if isAssigning}
+						<div class="assign-form">
+							<select bind:value={assignUseFor} class="assign-select">
+								<option value="cover">Project Cover</option>
+								<option value="character">Character Portrait</option>
+								<option value="scene">Scene Reference</option>
+							</select>
+							<select bind:value={assignProjectId} class="assign-select">
+								<option value="">-- Select Project --</option>
+								{#each store.albums as album}
+									{#if album.id !== 'global'}
+										<option value={album.id}>{album.title}</option>
+									{/if}
+								{/each}
+							</select>
+							<button class="btn-primary" onclick={assignAsset} disabled={!assignProjectId || assignUseFor !== 'cover'}>
+								Confirm Assignment
+							</button>
+						</div>
+					{/if}
 				</div>
 				<div class="dialog-footer">
+					<button class="btn-ghost" onclick={() => isAssigning = !isAssigning}>
+						{isAssigning ? 'Cancel' : 'Assign to Project...'}
+					</button>
 					<button class="btn-danger" onclick={() => deleteAsset(selectedAsset!.id)}>
 						Delete Image
 					</button>
@@ -324,20 +383,25 @@
 		border-top: 1px solid var(--color-border);
 		display: flex;
 		justify-content: flex-end;
+		gap: var(--space-4);
 	}
-	.btn-danger {
-		background: transparent;
+	.assign-form {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-4);
+		width: 100%;
+		max-width: 400px;
+		margin-top: var(--space-4);
+		padding: var(--space-4);
+		background: var(--color-surface);
 		border: 1px solid var(--color-border);
-		color: var(--color-status-error);
-		padding: var(--space-2) var(--space-4);
 		border-radius: var(--radius-md);
-		cursor: pointer;
-		font-size: var(--text-sm);
-		transition: background var(--duration-enter) var(--ease-standard);
 	}
-	.btn-danger:hover {
-		background: var(--color-status-error);
-		color: white;
-		border-color: var(--color-status-error);
+	.assign-select {
+		padding: var(--space-2);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-md);
+		background: var(--color-surface);
+		color: var(--color-text-primary);
 	}
 </style>
