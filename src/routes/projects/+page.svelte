@@ -58,50 +58,6 @@
         </header>
 
         <div class="projects-grid">
-                <!-- Books Column -->
-                <div class="projects-column">
-                        <SectionHeader
-                                title="Books"
-                                description="Long-form narratives and novels."
-                        >
-                                {#snippet actions()}
-                                        <PrimaryButton onclick={openCreateBook}>New Book</PrimaryButton>
-                                {/snippet}
-                        </SectionHeader>
-
-                        {#if showCreateBook}
-                                <div class="create-card-wrapper">
-                                        <ProjectCreateCard oncancel={closeCreateBook} />
-                                </div>
-                        {/if}
-
-                        {#if getLoading()}
-                                <SurfacePanel>
-                                        <ul class="project-list" role="list" aria-label="Loading books">
-                                                <LibraryHeroCardSkeleton />
-                                                <LibraryHeroCardSkeleton />
-                                        </ul>
-                                </SurfacePanel>
-                        {:else if books.length === 0}
-                                <EmptyStatePanel
-                                        title="No active book projects yet."
-                                        description="Novels you are working on will appear here."
-                                >
-                                        {#snippet actions()}
-                                                <PrimaryButton onclick={openCreateBook}>Start New Book</PrimaryButton>
-                                        {/snippet}
-                                </EmptyStatePanel>
-                        {:else}
-                                <SurfacePanel>
-                                        <ul class="project-list" role="list" aria-label="Book projects">
-                                                {#each books as project, i (project.id)}
-                                                        <LibraryHeroCard {project} cardIndex={i} />
-                                                {/each}
-                                        </ul>
-                                </SurfacePanel>
-                        {/if}
-                </div>
-
                 <!-- Stories Column -->
                 <div class="projects-column">
                         <SectionHeader
@@ -158,6 +114,50 @@
                                 <SurfacePanel>
                                         <ul class="project-list" role="list" aria-label="Stories collection">
                                                 {#each stories as project, i (project.id)}
+                                                        <LibraryHeroCard {project} cardIndex={i} />
+                                                {/each}
+                                        </ul>
+                                </SurfacePanel>
+                        {/if}
+                </div>
+
+                <!-- Books Column -->
+                <div class="projects-column">
+                        <SectionHeader
+                                title="Books"
+                                description="Long-form narratives and novels."
+                        >
+                                {#snippet actions()}
+                                        <PrimaryButton onclick={openCreateBook}>New Book</PrimaryButton>
+                                {/snippet}
+                        </SectionHeader>
+
+                        {#if showCreateBook}
+                                <div class="create-card-wrapper">
+                                        <ProjectCreateCard oncancel={closeCreateBook} />
+                                </div>
+                        {/if}
+
+                        {#if getLoading()}
+                                <SurfacePanel>
+                                        <ul class="project-list" role="list" aria-label="Loading books">
+                                                <LibraryHeroCardSkeleton />
+                                                <LibraryHeroCardSkeleton />
+                                        </ul>
+                                </SurfacePanel>
+                        {:else if books.length === 0}
+                                <EmptyStatePanel
+                                        title="No active book projects yet."
+                                        description="Novels you are working on will appear here."
+                                >
+                                        {#snippet actions()}
+                                                <PrimaryButton onclick={openCreateBook}>Start New Book</PrimaryButton>
+                                        {/snippet}
+                                </EmptyStatePanel>
+                        {:else}
+                                <SurfacePanel>
+                                        <ul class="project-list" role="list" aria-label="Book projects">
+                                                {#each books as project, i (project.id)}
                                                         <LibraryHeroCard {project} cardIndex={i} />
                                                 {/each}
                                         </ul>
