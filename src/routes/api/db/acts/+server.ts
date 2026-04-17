@@ -4,6 +4,7 @@ const config = {
 	table: 'acts',
 	fields: {
 		projectId: { required: true },
+		arcId: { default: null },
 		title: { required: true },
 		order: { default: 0 },
 		planningNotes: { default: '' },

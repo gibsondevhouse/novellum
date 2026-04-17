@@ -31,6 +31,7 @@ import {
 	schemaV8,
 	schemaV9,
 	schemaV10,
+	schemaV11,
 } from './schema.js';
 
 export class AppDB extends Dexie {
@@ -95,6 +96,8 @@ export class AppDB extends Dexie {
 		this.version(9).stores(schemaV9);
 		// v10 → adds milestones table
 		this.version(10).stores(schemaV10);
+		// v11 → adds arcId index to acts for hierarchy support
+		this.version(11).stores(schemaV11);
 	}
 }
 

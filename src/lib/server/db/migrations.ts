@@ -45,6 +45,13 @@ function ensureScenesNotesColumn(db: Database.Database): void {
 	}
 }
 
+function ensureActsArcIdColumn(db: Database.Database): void {
+	const columns = db.prepare('PRAGMA table_info(acts)').all() as Array<{ name: string }>;
+	if (!columns.some((c) => c.name === 'arcId')) {
+		db.exec('ALTER TABLE acts ADD COLUMN arcId TEXT');
+	}
+}
+
 export function runMigrations(db: Database.Database): void {
 	db.transaction(() => {
 		db.exec(SCHEMA_SQL);
@@ -53,6 +60,7 @@ export function runMigrations(db: Database.Database): void {
 		ensureProjectTypeAndLastOpened(db);
 		ensureStylePresetIdColumn(db);
 		ensureScenesNotesColumn(db);
+		ensureActsArcIdColumn(db);
 		db.exec(INDEX_SQL);
 	})();
 }

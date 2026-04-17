@@ -198,6 +198,7 @@ export interface StoryFrame {
 export interface Act {
 	id: string;
 	projectId: string;
+	arcId?: string;
 	title: string;
 	order: number;
 	planningNotes: string;

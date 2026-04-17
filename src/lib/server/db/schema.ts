@@ -181,6 +181,7 @@ CREATE TABLE IF NOT EXISTS story_frames (
 CREATE TABLE IF NOT EXISTS acts (
 	id TEXT PRIMARY KEY,
 	projectId TEXT NOT NULL,
+	arcId TEXT,
 	title TEXT NOT NULL,
 	"order" INTEGER NOT NULL,
 	planningNotes TEXT NOT NULL DEFAULT '',

@@ -9,6 +9,8 @@
 		selectItem,
 		setMode,
 		resetSelections,
+		getParentContext,
+		propagateParentFromSelection,
 	} from '$modules/workspace/stores/workspace-mode.svelte.js';
 	import { createArc, updateArc, removeArc } from '$modules/outliner/services/arc-repository.js';
 	import {
@@ -45,6 +47,7 @@
 	import ActsWorkspace from '$modules/workspace/components/ActsWorkspace.svelte';
 	import ChaptersWorkspace from '$modules/workspace/components/ChaptersWorkspace.svelte';
 	import ScenesWorkspace from '$modules/workspace/components/ScenesWorkspace.svelte';
+	import WorkspaceSubheader from '$modules/workspace/components/WorkspaceSubheader.svelte';
 	import { WORKSPACE_MODE_LABELS } from '$modules/workspace/types.js';
 
 	let { data } = $props<{
@@ -80,17 +83,81 @@
 	resetSelections();
 
 	$effect(() => {
-		if (arcs.length > 0) {
+		if (arcs.length > 0 && !getActiveSelectedId()) {
 			selectItem('arcs', arcs[0].id);
+			propagateParentFromSelection('arcs');
 		}
 	});
 
 	const mode = $derived(getActiveMode());
 	const selectedId = $derived(getActiveSelectedId());
 
+	/* ── Parent context for current mode ── */
+	const actsParentArcId = $derived(getParentContext('acts'));
+	const chaptersParentActId = $derived(getParentContext('chapters'));
+	const scenesParentChapterId = $derived(getParentContext('scenes'));
+
+	/* ── Scoped collections ── */
+	const scopedActs = $derived.by(() => {
+		if (!actsParentArcId) return { scoped: [] as Act[], unassigned: acts };
+		return {
+			scoped: acts.filter((a) => a.arcId === actsParentArcId),
+			unassigned: acts.filter((a) => !a.arcId),
+		};
+	});
+
+	const scopedChapters = $derived.by(() => {
+		if (!chaptersParentActId) return { scoped: [] as ChapterWithScenes[], unassigned: chapters };
+		return {
+			scoped: chapters.filter((c) => c.actId === chaptersParentActId),
+			unassigned: chapters.filter((c) => !c.actId),
+		};
+	});
+
+	const scopedScenes = $derived.by(() => {
+		if (!scenesParentChapterId) return { scoped: [] as Scene[], unassigned: scenes };
+		return {
+			scoped: scenes.filter((s) => s.chapterId === scenesParentChapterId),
+			unassigned: scenes.filter((s) => s.chapterId !== scenesParentChapterId),
+		};
+	});
+
+	/** The visible collection for the current mode: scoped + unassigned combined. */
+	function visibleActs(): Act[] {
+		if (!actsParentArcId) return acts;
+		return [...scopedActs.scoped, ...scopedActs.unassigned];
+	}
+
+	function visibleChapters(): ChapterWithScenes[] {
+		if (!chaptersParentActId) return chapters;
+		return [...scopedChapters.scoped, ...scopedChapters.unassigned];
+	}
+
+	function visibleScenes(): Scene[] {
+		if (!scenesParentChapterId) return scenes;
+		return [...scopedScenes.scoped, ...scopedScenes.unassigned];
+	}
+
+	/* ── Context labels for breadcrumbs ── */
+	const parentContextLabel = $derived.by((): string | null => {
+		if (mode === 'acts' && actsParentArcId) {
+			const arc = arcs.find((a) => a.id === actsParentArcId);
+			return arc ? `Arc: ${arc.title}` : null;
+		}
+		if (mode === 'chapters' && chaptersParentActId) {
+			const act = acts.find((a) => a.id === chaptersParentActId);
+			return act ? `Act: ${act.title}` : null;
+		}
+		if (mode === 'scenes' && scenesParentChapterId) {
+			const ch = chapters.find((c) => c.id === scenesParentChapterId);
+			return ch ? `Chapter: ${ch.title}` : null;
+		}
+		return null;
+	});
+
 	// Auto-select first item when mode changes or collection changes and nothing is selected
 	$effect(() => {
-		const items = mode === 'arcs' ? arcs : mode === 'acts' ? acts : mode === 'chapters' ? chapters : scenes;
+		const items = mode === 'arcs' ? arcs : mode === 'acts' ? visibleActs() : mode === 'chapters' ? visibleChapters() : visibleScenes();
 		if (!selectedId && items.length > 0) {
 			selectItem(mode, items[0].id);
 		}
@@ -122,24 +189,46 @@
 		return scenes.find((s) => s.id === selectedId) ?? null;
 	});
 
-	/* ── Collection items for active mode ── */
-	type CollectionItem = { id: string; title: string; subtitle: string };
+	/* ── Collection items for active mode (scoped) ── */
+	type CollectionItem = { id: string; title: string; subtitle: string; isUnassigned?: boolean };
 
 	const collectionItems = $derived.by((): CollectionItem[] => {
 		if (mode === 'arcs')
 			return arcs.map((a) => ({ id: a.id, title: a.title, subtitle: a.description || '' }));
-		if (mode === 'acts')
-			return acts.map((a) => ({
-				id: a.id,
-				title: a.title,
-				subtitle: `Act ${a.order + 1}`,
+		if (mode === 'acts') {
+			const items: CollectionItem[] = [];
+			if (actsParentArcId) {
+				for (const a of scopedActs.scoped)
+					items.push({ id: a.id, title: a.title, subtitle: `Act ${a.order + 1}` });
+				for (const a of scopedActs.unassigned)
+					items.push({ id: a.id, title: a.title, subtitle: 'Unassigned', isUnassigned: true });
+			} else {
+				for (const a of acts)
+					items.push({ id: a.id, title: a.title, subtitle: `Act ${a.order + 1}` });
+			}
+			return items;
+		}
+		if (mode === 'chapters') {
+			const items: CollectionItem[] = [];
+			if (chaptersParentActId) {
+				for (const c of scopedChapters.scoped)
+					items.push({ id: c.id, title: c.title, subtitle: `${c.scenes.length} scene${c.scenes.length === 1 ? '' : 's'}` });
+				for (const c of scopedChapters.unassigned)
+					items.push({ id: c.id, title: c.title, subtitle: 'Unassigned', isUnassigned: true });
+			} else {
+				for (const c of chapters)
+					items.push({ id: c.id, title: c.title, subtitle: `${c.scenes.length} scene${c.scenes.length === 1 ? '' : 's'}` });
+			}
+			return items;
+		}
+		// scenes
+		if (scenesParentChapterId) {
+			return scopedScenes.scoped.map((s) => ({
+				id: s.id,
+				title: s.title,
+				subtitle: s.summary || '',
 			}));
-		if (mode === 'chapters')
-			return chapters.map((c) => ({
-				id: c.id,
-				title: c.title,
-				subtitle: `${c.scenes.length} scene${c.scenes.length === 1 ? '' : 's'}`,
-			}));
+		}
 		return scenes.map((s) => ({
 			id: s.id,
 			title: s.title,
@@ -167,8 +256,10 @@
 			});
 			arcs = [...arcs, arc];
 			selectItem('arcs', arc.id);
+			propagateParentFromSelection('arcs');
 		} else if (mode === 'acts') {
-			const act = await createAct(data.projectId, `Act ${acts.length + 1}`, acts.length);
+			const parentArcId = actsParentArcId ?? undefined;
+			const act = await createAct(data.projectId, `Act ${acts.length + 1}`, acts.length, parentArcId);
 			acts = [...acts, act];
 
 			/* Pre-seed default milestones for the new act */
@@ -183,28 +274,35 @@
 			milestones = [...milestones, ...created];
 
 			selectItem('acts', act.id);
+			propagateParentFromSelection('acts');
 		} else if (mode === 'chapters') {
+			const parentActId = chaptersParentActId ?? undefined;
 			const chapter = await createChapter({
 				projectId: data.projectId,
 				title: `Chapter ${chapters.length + 1}`,
 				order: chapters.length,
 				summary: '',
 				wordCount: 0,
+				...(parentActId ? { actId: parentActId } : {}),
 			});
 			chapters = [...chapters, { ...chapter, scenes: [] }];
 			selectItem('chapters', chapter.id);
+			propagateParentFromSelection('chapters');
 		} else if (mode === 'scenes') {
-			const firstChapter = chapters[0];
-			if (!firstChapter) return;
+			const parentChapterId = scenesParentChapterId;
+			if (!parentChapterId) return;
+			const parentChapter = chapters.find((c) => c.id === parentChapterId);
+			if (!parentChapter) return;
+			const siblingCount = scenes.filter((s) => s.chapterId === parentChapterId).length;
 			const scene = await createScene({
 				projectId: data.projectId,
-				chapterId: firstChapter.id,
-				title: `Scene ${scenes.length + 1}`,
+				chapterId: parentChapterId,
+				title: `Scene ${siblingCount + 1}`,
 				summary: '',
 				povCharacterId: null,
 				locationId: null,
 				timelineEventId: null,
-				order: scenes.length,
+				order: siblingCount,
 				content: '',
 				wordCount: 0,
 				notes: '',
@@ -213,7 +311,7 @@
 			});
 			scenes = [...scenes, scene];
 			chapters = chapters.map((c) =>
-				c.id === firstChapter.id ? { ...c, scenes: [...c.scenes, scene] } : c,
+				c.id === parentChapterId ? { ...c, scenes: [...c.scenes, scene] } : c,
 			);
 			selectItem('scenes', scene.id);
 		}
@@ -262,6 +360,8 @@
 
 	function handleSelectItem(id: string) {
 		selectItem(mode, selectedId === id ? null : id);
+		// Propagate selection as parent context for the child mode
+		propagateParentFromSelection(mode);
 	}
 
 	function handleUpdateArc(id: string, changes: Partial<Arc>) {
@@ -481,28 +581,14 @@
 
 {#if mode === 'arcs'}
         <div class="workspace-board-view">
-                <div class="board-header-row">
-                        <div class="collection-header">
-                                <span class="collection-label arc-selection-row">
-                                        {#each collectionItems as item, i (item.id)}
-                                                <button 
-                                                        class="arc-selector" 
-                                                        class:arc-selector--active={selectedId === item.id}
-                                                        onclick={() => handleSelectItem(item.id)}
-                                                >
-                                                        {item.title ? item.title.toUpperCase() : `ARC ${i + 1}`}
-                                                </button>
-                                                {#if i < collectionItems.length - 1}
-                                                        <span class="divider"> | </span>
-                                                {/if}
-                                        {/each}
-                                        <button class="arc-selector arc-new-btn" onclick={handleCreate}>+ New</button>
-                                </span>
-                                <button class="help-toggle" onclick={() => (showHelp = true)} aria-label="Show conceptual help">
-                                        ?
-                                </button>
-                        </div>
-                </div>
+                <WorkspaceSubheader
+                        items={collectionItems}
+                        {selectedId}
+                        fallbackLabel="ARC"
+                        onSelect={handleSelectItem}
+                        onCreate={handleCreate}
+                        onHelp={() => (showHelp = true)}
+                />
 
                 <ArcWorkspace
                         arc={heroItem as Arc | null}
@@ -521,28 +607,15 @@
         </div>
 {:else if mode === 'acts'}
         <div class="workspace-board-view">
-                <div class="board-header-row">
-                        <div class="collection-header">
-                                <span class="collection-label item-selection-row">
-                                        {#each collectionItems as item, i (item.id)}
-                                                <button
-                                                        class="item-selector"
-                                                        class:item-selector--active={selectedId === item.id}
-                                                        onclick={() => handleSelectItem(item.id)}
-                                                >
-                                                        {item.title ? item.title.toUpperCase() : `ACT ${i + 1}`}
-                                                </button>
-                                                {#if i < collectionItems.length - 1}
-                                                        <span class="divider"> | </span>
-                                                {/if}
-                                        {/each}
-                                        <button class="item-selector item-new-btn" onclick={handleCreate}>+ New</button>
-                                </span>
-                                <button class="help-toggle" onclick={() => (showHelp = true)} aria-label="Show conceptual help">
-                                        ?
-                                </button>
-                        </div>
-                </div>
+                <WorkspaceSubheader
+                        items={collectionItems}
+                        {selectedId}
+                        fallbackLabel="ACT"
+                        {parentContextLabel}
+                        onSelect={handleSelectItem}
+                        onCreate={handleCreate}
+                        onHelp={() => (showHelp = true)}
+                />
 
                 <ActsWorkspace
                         act={heroItem as Act | null}
@@ -560,28 +633,15 @@
         </div>
 {:else if mode === 'chapters'}
         <div class="workspace-board-view">
-                <div class="board-header-row">
-                        <div class="collection-header">
-                                <span class="collection-label item-selection-row">
-                                        {#each collectionItems as item, i (item.id)}
-                                                <button
-                                                        class="item-selector"
-                                                        class:item-selector--active={selectedId === item.id}
-                                                        onclick={() => handleSelectItem(item.id)}
-                                                >
-                                                        {item.title ? item.title.toUpperCase() : `CH ${i + 1}`}
-                                                </button>
-                                                {#if i < collectionItems.length - 1}
-                                                        <span class="divider"> | </span>
-                                                {/if}
-                                        {/each}
-                                        <button class="item-selector item-new-btn" onclick={handleCreate}>+ New</button>
-                                </span>
-                                <button class="help-toggle" onclick={() => (showHelp = true)} aria-label="Show conceptual help">
-                                        ?
-                                </button>
-                        </div>
-                </div>
+                <WorkspaceSubheader
+                        items={collectionItems}
+                        {selectedId}
+                        fallbackLabel="CH"
+                        {parentContextLabel}
+                        onSelect={handleSelectItem}
+                        onCreate={handleCreate}
+                        onHelp={() => (showHelp = true)}
+                />
 
                 <ChaptersWorkspace
                         chapter={heroItem as ChapterWithScenes | null}
@@ -596,32 +656,19 @@
         </div>
 {:else if mode === 'scenes'}
         <div class="workspace-board-view">
-                <div class="board-header-row">
-                        <div class="collection-header">
-                                <span class="collection-label item-selection-row">
-                                        {#each collectionItems as item, i (item.id)}
-                                                <button
-                                                        class="item-selector"
-                                                        class:item-selector--active={selectedId === item.id}
-                                                        onclick={() => handleSelectItem(item.id)}
-                                                >
-                                                        {item.title ? item.title.toUpperCase() : `SCENE ${i + 1}`}
-                                                </button>
-                                                {#if i < collectionItems.length - 1}
-                                                        <span class="divider"> | </span>
-                                                {/if}
-                                        {/each}
-                                        <button class="item-selector item-new-btn" onclick={handleCreate}>+ New</button>
-                                </span>
-                                <button class="help-toggle" onclick={() => (showHelp = true)} aria-label="Show conceptual help">
-                                        ?
-                                </button>
-                        </div>
-                </div>
+                <WorkspaceSubheader
+                        items={collectionItems}
+                        {selectedId}
+                        fallbackLabel="SCENE"
+                        {parentContextLabel}
+                        onSelect={handleSelectItem}
+                        onCreate={handleCreate}
+                        onHelp={() => (showHelp = true)}
+                />
 
                 <ScenesWorkspace
                         scene={heroItem as Scene | null}
-                        allScenes={scenes}
+                        allScenes={scenesParentChapterId ? scopedScenes.scoped : scenes}
                         projectId={data.projectId}
                         onSelectScene={(id) => handleSelectItem(id)}
                         onUpdateScene={handleUpdateWorkspaceScene}
@@ -633,125 +680,10 @@
         </div>
 {/if}
 <style>
-	.collection-header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 0 var(--space-1);
-	}
-        .help-toggle {
-                background: var(--color-surface-glass);
-                border: 1px solid var(--color-border-subtle);
-                color: var(--color-text-secondary);
-                width: 24px;
-                height: 24px;
-                border-radius: var(--radius-full);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-family: var(--font-mono);
-                font-size: var(--text-xs);
-                font-weight: var(--font-weight-bold);
-                cursor: pointer;
-                transition: var(--transition-color);
-        }
-        .help-toggle:hover {
-                background: var(--color-surface-raised);
-                color: var(--color-text-primary);
-                border-color: var(--color-border-strong);
-        }
-	.collection-label {
-		font-size: var(--text-xs);
-		font-weight: var(--font-weight-semibold);
-		text-transform: uppercase;
-		letter-spacing: var(--tracking-widest);
-		color: var(--color-text-muted);
-		opacity: 0.4;
-		user-select: none;
-	}
-
-        /* ── Board View (Arcs) ── */
-
         .workspace-board-view {
                 display: flex;
                 flex-direction: column;
                 flex: 1;
                 min-height: 0;
-        }
-
-        .board-header-row {
-                flex-shrink: 0;
-                padding: var(--space-3) var(--space-6);
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .arc-selection-row {
-                display: inline-flex;
-                align-items: center;
-                gap: var(--space-2);
-        }
-
-        .arc-selector {
-                background: none;
-                border: none;
-                color: var(--color-text-secondary);
-                font-family: var(--font-sans);
-                font-size: var(--text-sm);
-                font-weight: var(--font-weight-medium);
-                letter-spacing: var(--tracking-wider);
-                cursor: pointer;
-                padding: var(--space-1) var(--space-2);
-                border-radius: var(--radius-sm);
-                transition: color 150ms ease, background 150ms ease;
-        }
-
-        .arc-selector:hover {
-                color: var(--color-text-primary);
-                background: rgba(255, 255, 255, 0.05);
-        }
-
-        .arc-selector--active {
-                color: var(--color-nova-blue);
-        }
-
-        .arc-new-btn {
-                color: var(--color-text-tertiary);
-                margin-left: var(--space-2);
-        }
-
-        /* ── Board View (Acts) ── */
-
-        .item-selection-row {
-                display: inline-flex;
-                align-items: center;
-                gap: var(--space-2);
-        }
-
-        .item-selector {
-                background: none;
-                border: none;
-                color: var(--color-text-secondary);
-                font-family: var(--font-sans);
-                font-size: var(--text-sm);
-                font-weight: var(--font-weight-medium);
-                letter-spacing: var(--tracking-wider);
-                cursor: pointer;
-                padding: var(--space-1) var(--space-2);
-                border-radius: var(--radius-sm);
-                transition: color 150ms ease, background 150ms ease;
-        }
-
-        .item-selector:hover {
-                color: var(--color-text-primary);
-                background: rgba(255, 255, 255, 0.05);
-        }
-
-        .item-selector--active {
-                color: var(--color-nova-blue);
-        }
-
-        .item-new-btn {
-                color: var(--color-text-tertiary);
-                margin-left: var(--space-2);
         }
 </style>

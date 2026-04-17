@@ -13,7 +13,7 @@ export const GET: RequestHandler = async ({ params }) => {
 export const PUT: RequestHandler = async ({ params, request }) => {
 	const body = await request.json();
 	const updates: Record<string, unknown> = {};
-	const simpleAllowed = ['title', 'planningNotes'];
+	const simpleAllowed = ['title', 'planningNotes', 'arcId'];
 
 	for (const key of simpleAllowed) {
 		if (key in body) updates[key] = body[key];
