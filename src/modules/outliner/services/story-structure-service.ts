@@ -76,6 +76,7 @@ export async function createMilestone(
 	projectId: string,
 	title: string,
 	order: number,
+	description = '',
 ): Promise<Milestone> {
 	const now = new Date().toISOString();
 	const milestone: Milestone = {
@@ -83,7 +84,7 @@ export async function createMilestone(
 		actId,
 		projectId,
 		title,
-		description: '',
+		description,
 		order,
 		chapterIds: [],
 		createdAt: now,

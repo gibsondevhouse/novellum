@@ -204,7 +204,9 @@ export interface Act {
 	updatedAt: string;
 }
 
-export type ArcType = 'character' | 'plot' | 'relationship' | 'thematic' | 'world';
+export type CoreArcType = 'character' | 'plot' | 'relationship' | 'theme' | 'world';
+
+export type ArcType = CoreArcType | `custom:${string}`;
 
 export type ArcStatus = 'planned' | 'in_progress' | 'complete' | 'on_hold' | 'cut';
 

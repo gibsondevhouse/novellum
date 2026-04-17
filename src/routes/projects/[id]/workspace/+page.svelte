@@ -43,6 +43,7 @@
 	import StructureCarousel from '$modules/workspace/components/StructureCarousel.svelte';
 	import ArcWorkspace from '$modules/workspace/components/ArcWorkspace.svelte';
 	import ActsWorkspace from '$modules/workspace/components/ActsWorkspace.svelte';
+	import ChaptersWorkspace from '$modules/workspace/components/ChaptersWorkspace.svelte';
 	import { WORKSPACE_MODE_LABELS } from '$modules/workspace/types.js';
 
 	let { data } = $props<{
@@ -168,6 +169,18 @@
 		} else if (mode === 'acts') {
 			const act = await createAct(data.projectId, `Act ${acts.length + 1}`, acts.length);
 			acts = [...acts, act];
+
+			/* Pre-seed default milestones for the new act */
+			const seeds: { title: string; description: string }[] = [
+				{ title: 'Disruption of normal', description: 'Introduce a destabilizing event that interrupts the protagonist\u2019s current state.' },
+				{ title: 'Active commitment', description: 'The protagonist makes a conscious choice to engage with the central conflict.' },
+				{ title: 'Irreversible shift', description: 'A decision or event that prevents returning to the previous state.' },
+			];
+			const created = await Promise.all(
+				seeds.map((s, i) => createMilestoneApi(act.id, data.projectId, s.title, i, s.description)),
+			);
+			milestones = [...milestones, ...created];
+
 			selectItem('acts', act.id);
 		} else if (mode === 'chapters') {
 			const chapter = await createChapter({
@@ -344,6 +357,51 @@
 		void updateMilestoneApi(milestoneId, { chapterIds: updated });
 		milestones = milestones.map((m) => (m.id === milestoneId ? { ...m, chapterIds: updated } : m));
 	}
+
+	/* ── Chapter-specific handlers ── */
+	function handleUpdateChapter(id: string, changes: Partial<ChapterWithScenes>) {
+		void updateChapter(id, changes);
+		chapters = chapters.map((c) => (c.id === id ? { ...c, ...changes } : c));
+	}
+
+	/* ── Chapter → Scene CRUD ── */
+	async function handleCreateChapterScene(chapterId: string) {
+		const ch = chapters.find((c) => c.id === chapterId);
+		if (!ch) return;
+		const scene = await createScene({
+			projectId: data.projectId,
+			chapterId,
+			title: `Scene ${ch.scenes.length + 1}`,
+			summary: '',
+			povCharacterId: null,
+			locationId: null,
+			timelineEventId: null,
+			order: ch.scenes.length,
+			content: '',
+			wordCount: 0,
+			characterIds: [],
+			locationIds: [],
+		});
+		scenes = [...scenes, scene];
+		chapters = chapters.map((c) =>
+			c.id === chapterId ? { ...c, scenes: [...c.scenes, scene] } : c,
+		);
+	}
+
+	function handleUpdateChapterScene(id: string, changes: Partial<Scene>) {
+		void updateScene(id, changes);
+		scenes = scenes.map((s) => (s.id === id ? { ...s, ...changes } : s));
+		chapters = chapters.map((c) => ({
+			...c,
+			scenes: c.scenes.map((s) => (s.id === id ? { ...s, ...changes } : s)),
+		}));
+	}
+
+	function handleDeleteChapterScene(id: string) {
+		void removeScene(id);
+		scenes = scenes.filter((s) => s.id !== id);
+		chapters = chapters.map((c) => ({ ...c, scenes: c.scenes.filter((s) => s.id !== id) }));
+	}
 </script>
 
 <svelte:head>
@@ -439,6 +497,41 @@
                         onDeleteMilestone={handleDeleteMilestone}
                         onLinkChapter={handleLinkChapterToMilestone}
                         onUnlinkChapter={handleUnlinkChapterFromMilestone}
+                />
+        </div>
+{:else if mode === 'chapters'}
+        <div class="workspace-board-view">
+                <div class="board-header-row">
+                        <div class="collection-header">
+                                <span class="collection-label item-selection-row">
+                                        {#each collectionItems as item, i (item.id)}
+                                                <button
+                                                        class="item-selector"
+                                                        class:item-selector--active={selectedId === item.id}
+                                                        onclick={() => handleSelectItem(item.id)}
+                                                >
+                                                        {item.title ? item.title.toUpperCase() : `CH ${i + 1}`}
+                                                </button>
+                                                {#if i < collectionItems.length - 1}
+                                                        <span class="divider"> | </span>
+                                                {/if}
+                                        {/each}
+                                        <button class="item-selector item-new-btn" onclick={handleCreate}>+ New</button>
+                                </span>
+                                <button class="help-toggle" onclick={() => (showHelp = true)} aria-label="Show conceptual help">
+                                        ?
+                                </button>
+                        </div>
+                </div>
+
+                <ChaptersWorkspace
+                        chapter={heroItem as ChapterWithScenes | null}
+                        projectId={data.projectId}
+                        onUpdateChapter={handleUpdateChapter}
+                        onDeleteChapter={handleDelete}
+                        onCreateScene={handleCreateChapterScene}
+                        onUpdateScene={handleUpdateChapterScene}
+                        onDeleteScene={handleDeleteChapterScene}
                 />
         </div>
 {:else}

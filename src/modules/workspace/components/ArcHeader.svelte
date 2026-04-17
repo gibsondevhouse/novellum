@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Arc, ArcStatus } from '$lib/db/types.js';
-	import { ARC_STATUSES } from '../constants.js';
+	import type { Arc, ArcStatus, ArcType } from '$lib/db/types.js';
+	import { ARC_STATUSES, CORE_ARC_TYPES } from '../constants.js';
 
 	let { arc, onUpdateArc, onDeleteArc } = $props<{
 		arc: Arc;
@@ -10,12 +10,16 @@
 
 	let editArc = $state({
 		title: '',
-		arcType: '',
+		arcType: '' as ArcType | '',
 		purpose: '',
 		description: '',
 		status: 'planned' as ArcStatus,
 		characterIds: [] as string[]
 	});
+
+	let typePicker = $state(false);
+	let customInput = $state(false);
+	let customValue = $state('');
 
 	$effect(() => {
 		if (arc) {
@@ -28,9 +32,30 @@
 		}
 	});
 
+	const arcTypeLabel = $derived.by(() => {
+		const t = editArc.arcType;
+		if (!t) return null;
+		if (t.startsWith('custom:')) return t.slice(7);
+		return CORE_ARC_TYPES.find((o) => o.value === t)?.label ?? null;
+	});
+
 	function handleFieldUpdate(field: keyof typeof editArc, value: string) {
 		(editArc as Record<string, unknown>)[field] = value;
 		onUpdateArc?.(arc.id, { [field]: value });
+	}
+
+	function selectArcType(value: ArcType) {
+		editArc.arcType = value;
+		typePicker = false;
+		customInput = false;
+		onUpdateArc?.(arc.id, { arcType: value });
+	}
+
+	function submitCustomType() {
+		const trimmed = customValue.trim();
+		if (!trimmed) return;
+		selectArcType(`custom:${trimmed}` as ArcType);
+		customValue = '';
 	}
 </script>
 
@@ -38,7 +63,52 @@
 	<div class="panel-left">
 		<div class="title-row">
 			<input type="text" class="arc-title-input" bind:value={editArc.title} onchange={() => handleFieldUpdate('title', editArc.title)} placeholder="Untitled Arc" />
-			<input type="text" class="arc-type-input" bind:value={editArc.arcType} onchange={() => handleFieldUpdate('arcType', editArc.arcType)} placeholder="Type" />
+			<div class="type-picker-anchor">
+				<button
+					class="arc-type-pill"
+					class:arc-type-pill--set={!!editArc.arcType}
+					onclick={() => { typePicker = !typePicker; customInput = false; }}
+					aria-label="Set arc type"
+					aria-expanded={typePicker}
+				>
+					{arcTypeLabel ?? 'Set type\u2026'}
+				</button>
+				{#if typePicker}
+					<!-- svelte-ignore a11y_click_events_have_key_events -->
+					<!-- svelte-ignore a11y_no_static_element_interactions -->
+					<div class="type-picker-backdrop" onclick={() => { typePicker = false; customInput = false; }}></div>
+					<div class="type-picker" role="dialog" aria-label="Choose arc type">
+						<p class="type-picker__label">Arc Type</p>
+						<div class="type-picker__list">
+							{#each CORE_ARC_TYPES as t (t.value)}
+								<button
+									class="type-option"
+									class:type-option--active={editArc.arcType === t.value}
+									onclick={() => selectArcType(t.value)}
+								>
+									<span class="type-option__label">{t.label}</span>
+									<span class="type-option__desc">{t.description}</span>
+								</button>
+							{/each}
+						</div>
+						<div class="type-picker__custom">
+							{#if customInput}
+								<form class="custom-input-row" onsubmit={(e) => { e.preventDefault(); submitCustomType(); }}>
+									<input
+										type="text"
+										class="custom-type-input"
+										bind:value={customValue}
+										placeholder="e.g. Spiritual, Political"
+									/>
+									<button type="submit" class="custom-submit-btn" disabled={!customValue.trim()}>Add</button>
+								</form>
+							{:else}
+								<button class="custom-toggle-btn" onclick={() => { customInput = true; }}>+ Custom type</button>
+							{/if}
+						</div>
+					</div>
+				{/if}
+			</div>
 			<button class="delete-arc-btn" onclick={() => onDeleteArc?.(arc.id)} title="Delete arc">&times;</button>
 		</div>
 		<textarea class="arc-purpose-input" bind:value={editArc.purpose} onchange={() => handleFieldUpdate('purpose', editArc.purpose)} placeholder="Arc Purpose..."></textarea>
@@ -219,24 +289,173 @@
 		min-width: 0;
 	}
 
-	.arc-type-input {
+	.type-picker-anchor {
+		position: relative;
+		flex-shrink: 0;
+		align-self: center;
+	}
+
+	.arc-type-pill {
+		font-family: inherit;
 		font-size: var(--text-xs);
 		font-weight: var(--font-weight-medium);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		color: var(--color-text-muted);
-		border: 1px solid var(--color-border-subtle);
-		background: var(--color-surface-raised);
+		border: 1px dashed var(--color-border-subtle);
+		background: transparent;
 		padding: 2px var(--space-2);
 		border-radius: var(--radius-full);
-		transition: background var(--duration-base) var(--ease-standard),
-			border-color var(--duration-base) var(--ease-standard);
-		width: auto;
+		cursor: pointer;
+		transition: all var(--duration-base) var(--ease-standard);
 		min-width: 72px;
-		max-width: 120px;
 		text-align: center;
-		flex-shrink: 0;
-		align-self: center;
+	}
+
+	.arc-type-pill--set {
+		border-style: solid;
+		background: var(--color-surface-raised);
+		color: var(--color-text-secondary);
+	}
+
+	.arc-type-pill:hover {
+		background: var(--color-surface-hover);
+		border-color: var(--color-border-default);
+		color: var(--color-text-primary);
+	}
+
+	.type-picker-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 90;
+	}
+
+	.type-picker {
+		position: absolute;
+		top: calc(100% + var(--space-2));
+		left: 0;
+		z-index: 91;
+		background: var(--color-surface-raised);
+		border: 1px solid var(--color-border-subtle);
+		border-radius: var(--radius-md);
+		padding: var(--space-3);
+		min-width: 280px;
+		box-shadow: var(--shadow-lg, 0 4px 16px rgba(0,0,0,.25));
+	}
+
+	.type-picker__label {
+		font-size: var(--text-xs);
+		font-weight: var(--font-weight-medium);
+		color: var(--color-text-muted);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+		margin: 0 0 var(--space-2);
+	}
+
+	.type-picker__list {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-1);
+	}
+
+	.type-option {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		padding: var(--space-2);
+		background: transparent;
+		border: 1px solid transparent;
+		border-radius: var(--radius-sm);
+		text-align: left;
+		cursor: pointer;
+		font-family: inherit;
+		transition: all var(--duration-base) var(--ease-standard);
+	}
+
+	.type-option:hover {
+		background: var(--color-surface-hover);
+	}
+
+	.type-option--active {
+		background: var(--color-surface-sunken);
+		border-color: var(--color-border-focus);
+	}
+
+	.type-option__label {
+		font-size: var(--text-sm);
+		font-weight: var(--font-weight-medium);
+		color: var(--color-text-primary);
+	}
+
+	.type-option__desc {
+		font-size: var(--text-xs);
+		color: var(--color-text-muted);
+		line-height: 1.4;
+	}
+
+	.type-picker__custom {
+		margin-top: var(--space-2);
+		padding-top: var(--space-2);
+		border-top: 1px solid var(--color-border-subtle);
+	}
+
+	.custom-toggle-btn {
+		font-family: inherit;
+		font-size: var(--text-xs);
+		color: var(--color-text-muted);
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		padding: var(--space-1) 0;
+		transition: color var(--duration-base) var(--ease-standard);
+	}
+
+	.custom-toggle-btn:hover {
+		color: var(--color-text-primary);
+	}
+
+	.custom-input-row {
+		display: flex;
+		gap: var(--space-2);
+	}
+
+	.custom-type-input {
+		flex: 1;
+		font-family: inherit;
+		font-size: var(--text-sm);
+		color: var(--color-text-primary);
+		background: var(--color-surface-sunken);
+		border: 1px solid var(--color-border-subtle);
+		padding: var(--space-1) var(--space-2);
+		border-radius: var(--radius-sm);
+	}
+
+	.custom-type-input:focus {
+		border-color: var(--color-border-focus);
+		outline: none;
+	}
+
+	.custom-submit-btn {
+		font-family: inherit;
+		font-size: var(--text-xs);
+		font-weight: var(--font-weight-medium);
+		color: var(--color-text-secondary);
+		background: var(--color-surface-raised);
+		border: 1px solid var(--color-border-subtle);
+		padding: var(--space-1) var(--space-2);
+		border-radius: var(--radius-sm);
+		cursor: pointer;
+		transition: all var(--duration-base) var(--ease-standard);
+	}
+
+	.custom-submit-btn:hover:not(:disabled) {
+		background: var(--color-surface-hover);
+		border-color: var(--color-border-default);
+	}
+
+	.custom-submit-btn:disabled {
+		opacity: 0.4;
+		cursor: default;
 	}
 
 	.arc-purpose-input, .arc-desc-input {
@@ -272,13 +491,7 @@
 		background: var(--color-surface-hover);
 	}
 
-	.arc-type-input:hover {
-		background: var(--color-surface-hover);
-		border-color: var(--color-border-default);
-	}
-
 	.arc-title-input:focus,
-	.arc-type-input:focus,
 	.arc-purpose-input:focus,
 	.arc-desc-input:focus {
 		background: var(--color-surface-raised);

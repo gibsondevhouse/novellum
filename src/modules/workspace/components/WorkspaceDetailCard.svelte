@@ -109,9 +109,11 @@
 	});
 
 	const currentArcType = $derived(mode === 'arcs' ? ((item as Arc).arcType ?? null) : null);
-	const currentArcTypeLabel = $derived(
-		currentArcType ? (ARC_TYPES.find((t) => t.value === currentArcType)?.label ?? null) : null,
-	);
+	const currentArcTypeLabel = $derived.by(() => {
+		if (!currentArcType) return null;
+		if (currentArcType.startsWith('custom:')) return currentArcType.slice(7);
+		return ARC_TYPES.find((t) => t.value === currentArcType)?.label ?? null;
+	});
 </script>
 
 {#key item.id}

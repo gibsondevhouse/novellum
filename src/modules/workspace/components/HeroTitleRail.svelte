@@ -12,7 +12,7 @@
 		{ value: 'character', label: 'Character' },
 		{ value: 'plot', label: 'Plot' },
 		{ value: 'relationship', label: 'Relationship' },
-		{ value: 'thematic', label: 'Thematic' },
+		{ value: 'theme', label: 'Theme' },
 		{ value: 'world', label: 'World' },
 	];
 
