@@ -5,7 +5,7 @@
 -->
 <script lang="ts">
 	import type { WorkspaceMode } from '../types.js';
-	import type { ArcType } from '$lib/db/types.js';
+	import type { CoreArcType, ArcType } from '$lib/db/types.js';
 
 	let {
 		mode,
@@ -23,7 +23,7 @@
 		tip: string;
 	};
 
-	const arcTypeContent: Record<ArcType, EmptyDetail> = {
+	const arcTypeContent: Record<CoreArcType, EmptyDetail> = {
 		character: {
 			eyebrow: 'Arc Type',
 			heading: 'Character Arc',
@@ -51,13 +51,13 @@
 				'Acts create the conditions for relationship change. Each act should shift the relational dynamic in a meaningful way — a betrayal, a confession, a test of loyalty, a moment of rupture or reunion. By the act boundary, the relationship should be in a different state than it entered.',
 			tip: "Map each act's effect on your characters' dynamic. If an act ends and the relationship is unchanged, something is missing.",
 		},
-		thematic: {
+		theme: {
 			eyebrow: 'Arc Type',
-			heading: 'Thematic Arc',
+			heading: 'Theme Arc',
 			intro:
-				"A thematic arc is the story's argument — the central question it raises, explores, and ultimately answers or leaves open. It is what the story is about beneath the surface of what happens.",
+				"A theme arc is the story's argument — the central question it raises, explores, and ultimately answers or leaves open. It is what the story is about beneath the surface of what happens.",
 			relationship:
-				'Acts develop the thematic arc by putting the central idea under increasing pressure. Each act should introduce a new dimension or complication of the theme — perhaps first presenting the question, then offering false answers, then forcing a confrontation with the truth. The final act is where the theme lands.',
+				'Acts develop the theme arc by putting the central idea under increasing pressure. Each act should introduce a new dimension or complication of the theme — perhaps first presenting the question, then offering false answers, then forcing a confrontation with the truth. The final act is where the theme lands.',
 			tip: 'Name the thematic question in one sentence. Then trace how each act makes that question harder to answer easily.',
 		},
 		world: {
@@ -111,7 +111,9 @@
 	};
 
 	const c = $derived(
-		mode === 'arcs' && focusedArcType !== null ? arcTypeContent[focusedArcType] : content[mode],
+		mode === 'arcs' && focusedArcType !== null && focusedArcType in arcTypeContent
+			? arcTypeContent[focusedArcType as CoreArcType]
+			: content[mode],
 	);
 </script>
 

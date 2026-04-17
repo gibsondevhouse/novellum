@@ -5,7 +5,7 @@
 -->
 <script lang="ts">
 	import type { WorkspaceMode } from '../types.js';
-	import type { ArcType } from '$lib/db/types.js';
+	import type { CoreArcType, ArcType } from '$lib/db/types.js';
 
 	let { mode, focusedArcType = null }: { mode: WorkspaceMode; focusedArcType?: ArcType | null } =
 		$props();
@@ -48,7 +48,7 @@
 		},
 	};
 
-	const arcTypeDeep: Record<ArcType, { label: string; body: string; hint: string }> = {
+	const arcTypeDeep: Record<CoreArcType, { label: string; body: string; hint: string }> = {
 		character: {
 			label: 'Character Arc',
 			body: 'A character arc follows the inner transformation of a person — their beliefs, identity, or moral stance — driven by external events and internal resistance.',
@@ -64,9 +64,9 @@
 			body: 'A relationship arc charts how the bond between two or more characters evolves — trust built or broken, alliances forged, love strained, and loyalties tested.',
 			hint: 'Think: "How does the connection between these people change the story?"',
 		},
-		thematic: {
-			label: 'Thematic Arc',
-			body: "A thematic arc is the story's argument — the idea it explores, challenges, and ultimately affirms or subverts across its full span.",
+		theme: {
+			label: 'Theme Arc',
+			body: "A theme arc is the story's argument — the idea it explores, challenges, and ultimately affirms or subverts across its full span.",
 			hint: 'Think: "What question is this story asking, and what does it answer by the end?"',
 		},
 		world: {
@@ -77,7 +77,9 @@
 	};
 
 	const explainer = $derived(
-		mode === 'arcs' && focusedArcType !== null ? arcTypeDeep[focusedArcType] : modeDeep[mode],
+		mode === 'arcs' && focusedArcType !== null && focusedArcType in arcTypeDeep
+			? arcTypeDeep[focusedArcType as CoreArcType]
+			: modeDeep[mode],
 	);
 </script>
 

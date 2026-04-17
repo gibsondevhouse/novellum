@@ -35,3 +35,8 @@ export { default as StatusDotDropdown } from './components/StatusDotDropdown.sve
 export { default as ActHeader } from './components/ActHeader.svelte';
 export { default as ActsWorkspace } from './components/ActsWorkspace.svelte';
 export { default as MilestoneCard } from './components/MilestoneCard.svelte';
+
+// Components — chapter-specific
+export { default as ChapterHeader } from './components/ChapterHeader.svelte';
+export { default as ChaptersWorkspace } from './components/ChaptersWorkspace.svelte';
+export { default as SceneCard } from './components/SceneCard.svelte';
