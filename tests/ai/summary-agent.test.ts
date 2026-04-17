@@ -23,6 +23,7 @@ const mockSceneCtx = {
 		order: 0,
 		content: 'The hero crossed the bridge.',
 		wordCount: 5,
+		notes: '',
 		characterIds: [],
 		locationIds: [],
 		createdAt: '',

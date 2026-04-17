@@ -35,6 +35,7 @@ const baseScene = {
 	summary: 'The start',
 	content: 'It began in darkness.',
 	wordCount: 4,
+	notes: '',
 	order: 1,
 	povCharacterId: null,
 	locationId: null,

@@ -24,6 +24,7 @@ const mockSceneCtx = {
 		order: 0,
 		content: 'He runned fast.',
 		wordCount: 3,
+		notes: '',
 		characterIds: [],
 		locationIds: [],
 		createdAt: '',

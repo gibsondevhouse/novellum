@@ -32,6 +32,7 @@ const richCtx: AiContext = {
 		summary: 'The protagonist arrives.',
 		content: 'She stepped off the train into the fog.',
 		wordCount: 10,
+		notes: '',
 		order: 1,
 		povCharacterId: 'char-1',
 		locationId: 'loc-1',

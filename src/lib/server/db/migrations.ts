@@ -38,6 +38,13 @@ function ensureStylePresetIdColumn(db: Database.Database): void {
 	}
 }
 
+function ensureScenesNotesColumn(db: Database.Database): void {
+	const columns = db.prepare('PRAGMA table_info(scenes)').all() as Array<{ name: string }>;
+	if (!columns.some((c) => c.name === 'notes')) {
+		db.exec("ALTER TABLE scenes ADD COLUMN notes TEXT NOT NULL DEFAULT ''");
+	}
+}
+
 export function runMigrations(db: Database.Database): void {
 	db.transaction(() => {
 		db.exec(SCHEMA_SQL);
@@ -45,6 +52,7 @@ export function runMigrations(db: Database.Database): void {
 		ensureProjectsPromptColumns(db);
 		ensureProjectTypeAndLastOpened(db);
 		ensureStylePresetIdColumn(db);
+		ensureScenesNotesColumn(db);
 		db.exec(INDEX_SQL);
 	})();
 }
