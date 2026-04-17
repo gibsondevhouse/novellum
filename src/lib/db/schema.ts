@@ -77,3 +77,9 @@ export const schemaV10 = {
     ...schemaV9,
     milestones: 'id, actId, projectId, order'
 };
+
+// Version 11 — adds arcId index to acts for hierarchy support.
+export const schemaV11 = {
+    ...schemaV10,
+    acts: 'id, projectId, order, arcId'
+};

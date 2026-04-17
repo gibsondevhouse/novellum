@@ -27,7 +27,7 @@ export async function getActsByProjectId(projectId: string): Promise<Act[]> {
 	return db.acts.where('projectId').equals(projectId).sortBy('order');
 }
 
-export async function createAct(projectId: string, title: string, order: number): Promise<Act> {
+export async function createAct(projectId: string, title: string, order: number, arcId?: string): Promise<Act> {
 	const now = new Date().toISOString();
 	const act: Act = {
 		id: crypto.randomUUID(),
@@ -37,6 +37,7 @@ export async function createAct(projectId: string, title: string, order: number)
 		planningNotes: '',
 		createdAt: now,
 		updatedAt: now,
+		...(arcId ? { arcId } : {}),
 	};
 	await db.acts.add(act);
 	return act;
