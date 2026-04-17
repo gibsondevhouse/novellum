@@ -52,47 +52,43 @@
 	{#if parentContextLabel}
 		<div class="parent-context">{parentContextLabel}</div>
 	{/if}
-	<div class="selector-row">
-		<div class="selector-track">
+	<div class="subheader-row">
+		<nav class="switcher" aria-label="Item selector">
 			{#if needsArrows}
 				<button
 					class="arrow-btn"
-					class:arrow-btn--hidden={!canScrollLeft}
+					class:arrow-btn--disabled={!canScrollLeft}
 					disabled={!canScrollLeft}
 					onclick={scrollLeft}
 					aria-label="Scroll left"
 				>‹</button>
 			{/if}
 
-			<span class="selector-items">
-				{#each visibleItems as item, i (item.id)}
-					<button
-						class="selector-btn"
-						class:selector-btn--active={selectedId === item.id}
-						class:selector-btn--unassigned={item.isUnassigned}
-						onclick={() => onSelect?.(item.id)}
-					>
-						{item.title ? item.title.toUpperCase() : `${fallbackLabel} ${(needsArrows ? windowStart : 0) + i + 1}`}
-					</button>
-					{#if i < visibleItems.length - 1}
-						<span class="divider"> | </span>
-					{/if}
-				{/each}
-				{#if onCreate}
-					<button class="selector-btn new-btn" onclick={onCreate}>+ New</button>
-				{/if}
-			</span>
+			{#each visibleItems as item, i (item.id)}
+				<button
+					class="switcher-btn"
+					class:active={selectedId === item.id}
+					class:unassigned={item.isUnassigned}
+					onclick={() => onSelect?.(item.id)}
+					type="button"
+				>
+					{item.title ? item.title.toUpperCase() : `${fallbackLabel} ${(needsArrows ? windowStart : 0) + i + 1}`}
+				</button>
+			{/each}
+			{#if onCreate}
+				<button class="switcher-btn switcher-btn--new" onclick={onCreate} type="button">+ New</button>
+			{/if}
 
 			{#if needsArrows}
 				<button
 					class="arrow-btn"
-					class:arrow-btn--hidden={!canScrollRight}
+					class:arrow-btn--disabled={!canScrollRight}
 					disabled={!canScrollRight}
 					onclick={scrollRight}
 					aria-label="Scroll right"
 				>›</button>
 			{/if}
-		</div>
+		</nav>
 
 		{#if onHelp}
 			<button class="help-toggle" onclick={onHelp} aria-label="Show conceptual help">
@@ -117,100 +113,89 @@
 		opacity: 0.6;
 	}
 
-	.selector-row {
+	.subheader-row {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 0 var(--space-1);
+		gap: var(--space-3);
 	}
 
-	.selector-track {
-		display: inline-flex;
+	/* ── Pill switcher (matches AppHeader .workspace-switcher) ── */
+
+	.switcher {
+		display: flex;
 		align-items: center;
-		gap: var(--space-1);
+		background: var(--color-surface-elevated);
+		border: 1px solid var(--color-border-default);
+		border-radius: var(--radius-full);
+		padding: 2px;
+		gap: 2px;
 	}
 
-	.selector-items {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--space-2);
+	.switcher-btn {
+		background: transparent;
+		border: none;
+		padding: var(--space-1) var(--space-4);
+		border-radius: var(--radius-full);
 		font-size: var(--text-xs);
 		font-weight: var(--font-weight-semibold);
-		text-transform: uppercase;
-		letter-spacing: var(--tracking-widest);
 		color: var(--color-text-muted);
-		opacity: 0.4;
-		user-select: none;
-	}
-
-	.selector-btn {
-		background: none;
-		border: none;
-		color: var(--color-text-secondary);
-		font-family: var(--font-sans);
-		font-size: var(--text-sm);
-		font-weight: var(--font-weight-medium);
-		letter-spacing: var(--tracking-wider);
 		cursor: pointer;
-		padding: var(--space-1) var(--space-2);
-		border-radius: var(--radius-sm);
-		transition: color 150ms ease, background 150ms ease;
+		transition: all var(--duration-fast) var(--ease-standard);
+		letter-spacing: var(--tracking-wide);
+		white-space: nowrap;
+		font-family: inherit;
 	}
 
-	.selector-btn:hover {
+	.switcher-btn:hover {
 		color: var(--color-text-primary);
-		background: rgba(255, 255, 255, 0.05);
 	}
 
-	.selector-btn--active {
-		color: var(--color-nova-blue);
+	.switcher-btn.active {
+		background: var(--color-surface-hover);
+		color: var(--color-text-primary);
+		box-shadow: var(--shadow-sm);
 	}
 
-	.selector-btn--unassigned {
+	.switcher-btn.unassigned {
 		opacity: 0.45;
 		font-style: italic;
 	}
 
-	.new-btn {
+	.switcher-btn--new {
 		color: var(--color-text-tertiary);
-		margin-left: var(--space-2);
-	}
-
-	.divider {
-		color: var(--color-text-muted);
-		opacity: 0.3;
-		user-select: none;
 	}
 
 	/* ── Overflow arrows ── */
 
 	.arrow-btn {
 		background: none;
-		border: 1px solid var(--color-border-subtle);
-		color: var(--color-text-secondary);
+		border: none;
+		color: var(--color-text-muted);
 		width: 22px;
 		height: 22px;
-		border-radius: var(--radius-sm);
+		border-radius: var(--radius-full);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		font-size: var(--text-sm);
 		line-height: 1;
 		cursor: pointer;
-		transition: color 150ms ease, background 150ms ease, opacity 150ms ease, border-color 150ms ease;
+		transition: all var(--duration-fast) var(--ease-standard);
 		flex-shrink: 0;
 	}
 
 	.arrow-btn:hover:not(:disabled) {
 		color: var(--color-text-primary);
-		background: rgba(255, 255, 255, 0.05);
-		border-color: var(--color-border-strong);
+		background: var(--color-surface-hover);
 	}
 
-	.arrow-btn--hidden {
+	.arrow-btn--disabled {
 		opacity: 0.2;
 		pointer-events: none;
 	}
+
+	/* ── Help toggle ── */
 
 	.help-toggle {
 		background: var(--color-surface-glass);
