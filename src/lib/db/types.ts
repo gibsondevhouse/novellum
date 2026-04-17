@@ -43,6 +43,7 @@ export interface Scene {
 	order: number;
 	content: string;
 	wordCount: number;
+	notes: string;
 	characterIds: string[];
 	locationIds: string[];
 	arcRefs?: ArcRef[];

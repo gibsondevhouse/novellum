@@ -65,6 +65,7 @@ describe('portability roundtrip', () => {
 			order: 1,
 			content: 'It was a dark and stormy night...',
 			wordCount: 8,
+			notes: '',
 			characterIds: ['char-rt-1'],
 			locationIds: [],
 			arcRefs: [],

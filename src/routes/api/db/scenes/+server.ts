@@ -23,6 +23,7 @@ const config = {
 		order: { default: 0 },
 		content: { default: '' },
 		wordCount: { default: 0 },
+		notes: { default: '' },
 		characterIds: { default: [], json: true },
 		locationIds: { default: [], json: true },
 		arcRefs: { default: [], json: true },

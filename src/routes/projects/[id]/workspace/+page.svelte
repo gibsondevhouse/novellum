@@ -28,6 +28,7 @@
 		createScene,
 		updateScene,
 		removeScene,
+		reorderScenes,
 	} from '$modules/editor/services/scene-repository.js';
 	import {
 		createBeat,
@@ -40,10 +41,10 @@
 		removeStage,
 	} from '$modules/editor/services/stage-repository.js';
 	import WorkspaceHelpModal from '$modules/workspace/components/WorkspaceHelpModal.svelte';
-	import StructureCarousel from '$modules/workspace/components/StructureCarousel.svelte';
 	import ArcWorkspace from '$modules/workspace/components/ArcWorkspace.svelte';
 	import ActsWorkspace from '$modules/workspace/components/ActsWorkspace.svelte';
 	import ChaptersWorkspace from '$modules/workspace/components/ChaptersWorkspace.svelte';
+	import ScenesWorkspace from '$modules/workspace/components/ScenesWorkspace.svelte';
 	import { WORKSPACE_MODE_LABELS } from '$modules/workspace/types.js';
 
 	let { data } = $props<{
@@ -206,6 +207,7 @@
 				order: scenes.length,
 				content: '',
 				wordCount: 0,
+				notes: '',
 				characterIds: [],
 				locationIds: [],
 			});
@@ -379,6 +381,7 @@
 			order: ch.scenes.length,
 			content: '',
 			wordCount: 0,
+			notes: '',
 			characterIds: [],
 			locationIds: [],
 		});
@@ -401,6 +404,62 @@
 		void removeScene(id);
 		scenes = scenes.filter((s) => s.id !== id);
 		chapters = chapters.map((c) => ({ ...c, scenes: c.scenes.filter((s) => s.id !== id) }));
+	}
+
+	function handleReorderChapterScenes(chapterId: string, orderedIds: string[]) {
+		void reorderScenes(chapterId, orderedIds);
+		chapters = chapters.map((c) => {
+			if (c.id !== chapterId) return c;
+			const reordered = orderedIds.map((id, i) => {
+				const s = c.scenes.find((sc) => sc.id === id);
+				return s ? { ...s, order: i } : s;
+			}).filter(Boolean) as typeof c.scenes;
+			return { ...c, scenes: reordered };
+		});
+	}
+
+	/* ── Scene Workspace handlers ── */
+	function handleUpdateWorkspaceScene(id: string, changes: Partial<Scene>) {
+		void updateScene(id, changes);
+		scenes = scenes.map((s) => (s.id === id ? { ...s, ...changes } : s));
+		chapters = chapters.map((c) => ({
+			...c,
+			scenes: c.scenes.map((s) => (s.id === id ? { ...s, ...changes } : s)),
+		}));
+	}
+
+	let sceneDragId = $state<string | null>(null);
+
+	function handleSceneDragStart(e: DragEvent, id: string) {
+		sceneDragId = id;
+		e.dataTransfer?.setData('text/plain', id);
+	}
+
+	function handleSceneDrop(targetIdx: number) {
+		if (sceneDragId === null) return;
+		const sorted = scenes.slice().sort((a, b) => a.order - b.order);
+		const fromIdx = sorted.findIndex((s) => s.id === sceneDragId);
+		if (fromIdx === targetIdx) {
+			sceneDragId = null;
+			return;
+		}
+		const reordered = [...sorted];
+		const [moved] = reordered.splice(fromIdx, 1);
+		reordered.splice(targetIdx, 0, moved);
+		const orderedIds = reordered.map((s) => s.id);
+		scenes = reordered.map((s, i) => ({ ...s, order: i }));
+		// Sync chapter scenes too
+		chapters = chapters.map((c) => ({
+			...c,
+			scenes: c.scenes.map((s) => {
+				const newOrder = orderedIds.indexOf(s.id);
+				return newOrder >= 0 ? { ...s, order: newOrder } : s;
+			}),
+		}));
+		if (moved) {
+			void reorderScenes(moved.chapterId, orderedIds);
+		}
+		sceneDragId = null;
 	}
 </script>
 
@@ -532,42 +591,48 @@
                         onCreateScene={handleCreateChapterScene}
                         onUpdateScene={handleUpdateChapterScene}
                         onDeleteScene={handleDeleteChapterScene}
+                        onReorderScenes={handleReorderChapterScenes}
                 />
         </div>
-{:else}
-        <div class="workspace-surface">
-
-                <div class="collection-header">
-                        <span class="collection-label">
-                                {collectionItems.length}
-                                {WORKSPACE_MODE_LABELS[mode].toLowerCase()}
-                        </span>
-                        <button class="help-toggle" onclick={() => (showHelp = true)} aria-label="Show conceptual help">
-                                ?
-                        </button>
+{:else if mode === 'scenes'}
+        <div class="workspace-board-view">
+                <div class="board-header-row">
+                        <div class="collection-header">
+                                <span class="collection-label item-selection-row">
+                                        {#each collectionItems as item, i (item.id)}
+                                                <button
+                                                        class="item-selector"
+                                                        class:item-selector--active={selectedId === item.id}
+                                                        onclick={() => handleSelectItem(item.id)}
+                                                >
+                                                        {item.title ? item.title.toUpperCase() : `SCENE ${i + 1}`}
+                                                </button>
+                                                {#if i < collectionItems.length - 1}
+                                                        <span class="divider"> | </span>
+                                                {/if}
+                                        {/each}
+                                        <button class="item-selector item-new-btn" onclick={handleCreate}>+ New</button>
+                                </span>
+                                <button class="help-toggle" onclick={() => (showHelp = true)} aria-label="Show conceptual help">
+                                        ?
+                                </button>
+                        </div>
                 </div>
 
-                <StructureCarousel
-                        items={collectionItems}
-                        {selectedId}
-                        {mode}
-                        onCreate={handleCreate}
-                        onSelect={handleSelectItem}
-                        onRename={handleRename}
-                        onDelete={handleDelete}
+                <ScenesWorkspace
+                        scene={heroItem as Scene | null}
+                        allScenes={scenes}
+                        projectId={data.projectId}
+                        onSelectScene={(id) => handleSelectItem(id)}
+                        onUpdateScene={handleUpdateWorkspaceScene}
+                        onDeleteScene={handleDelete}
+                        onCreateScene={handleCreate}
+                        onDragStart={handleSceneDragStart}
+                        onDrop={handleSceneDrop}
                 />
         </div>
 {/if}
 <style>
-	.workspace-surface {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-4);
-		max-width: 1000px;
-		margin: 0 auto;
-		padding: var(--space-6) var(--space-6) var(--space-10);
-		min-height: 100%;
-	}
 	.collection-header {
 		display: flex;
 		align-items: center;
@@ -603,11 +668,6 @@
 		color: var(--color-text-muted);
 		opacity: 0.4;
 		user-select: none;
-	}
-	@media (max-width: 640px) {
-		.workspace-surface {
-			padding: var(--space-4) var(--space-4) var(--space-8);
-		}
 	}
 
         /* ── Board View (Arcs) ── */

@@ -1,17 +1,27 @@
 <script lang="ts">
 	import type { Scene } from '$lib/db/types.js';
 
-	let { scene, selected, onSelect, onUpdateTitle, onUpdateSummary } = $props<{
+	let { scene, ordinal, selected, onSelect, onUpdateTitle, onUpdateSummary, onDragStart } = $props<{
 		scene: Scene;
+		ordinal: number;
 		selected: boolean;
 		onSelect: () => void;
 		onUpdateTitle: (value: string) => void;
 		onUpdateSummary: (value: string) => void;
+		onDragStart?: (e: DragEvent, id: string) => void;
 	}>();
 </script>
 
-<div class="scene-card" class:selected>
+<div
+	class="scene-card"
+	class:selected
+	role="listitem"
+	draggable="true"
+	ondragstart={(e) => onDragStart?.(e, scene.id)}
+>
 	<div class="scene-card-header">
+		<span class="drag-handle" aria-hidden="true">⠿</span>
+		<span class="scene-ordinal">{ordinal}</span>
 		<input
 			type="text"
 			class="scene-title-input"
@@ -27,7 +37,7 @@
 		class="scene-summary-input"
 		value={scene.summary}
 		oninput={(e) => onUpdateSummary(e.currentTarget.value)}
-		placeholder="What happens in this scene..."
+		placeholder="What changes in this scene?"
 		rows="2"
 		onclick={() => { if (!selected) onSelect(); }}
 	></textarea>
@@ -57,12 +67,45 @@
 	.scene-card.selected {
 		border-color: var(--color-primary);
 		box-shadow: 0 0 0 1px var(--color-primary);
+		background: color-mix(in srgb, var(--color-primary) 4%, var(--color-surface-raised));
+	}
+
+	.scene-card.selected .scene-ordinal {
+		color: var(--color-primary);
+		font-weight: var(--font-weight-bold);
 	}
 
 	.scene-card-header {
 		display: flex;
 		align-items: center;
 		gap: var(--space-2);
+	}
+
+	.drag-handle {
+		cursor: grab;
+		color: var(--color-text-tertiary);
+		font-size: var(--text-sm);
+		user-select: none;
+		line-height: 1;
+		transition: color 0.15s ease;
+	}
+
+	.drag-handle:hover {
+		color: var(--color-text-muted);
+	}
+
+	.scene-ordinal {
+		font-size: var(--text-xs);
+		font-weight: var(--font-weight-semibold);
+		color: var(--color-text-muted);
+		min-width: 1.6em;
+		height: 1.6em;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: var(--radius-sm);
+		background: var(--color-surface-sunken);
+		flex-shrink: 0;
 	}
 
 	.scene-title-input {

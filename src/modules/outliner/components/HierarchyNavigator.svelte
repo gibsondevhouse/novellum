@@ -82,6 +82,7 @@
 			summary: '',
 			content: '',
 			wordCount: 0,
+			notes: '',
 			order: chapter.scenes.length,
 			povCharacterId: null,
 			locationId: null,

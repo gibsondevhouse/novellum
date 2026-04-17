@@ -40,3 +40,7 @@ export { default as MilestoneCard } from './components/MilestoneCard.svelte';
 export { default as ChapterHeader } from './components/ChapterHeader.svelte';
 export { default as ChaptersWorkspace } from './components/ChaptersWorkspace.svelte';
 export { default as SceneCard } from './components/SceneCard.svelte';
+
+// Components — scene-specific
+export { default as SceneDetailHeader } from './components/SceneDetailHeader.svelte';
+export { default as ScenesWorkspace } from './components/ScenesWorkspace.svelte';

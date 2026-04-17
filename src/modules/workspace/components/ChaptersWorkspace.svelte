@@ -13,6 +13,7 @@
 		onCreateScene,
 		onUpdateScene,
 		onDeleteScene,
+		onReorderScenes,
 	} = $props<{
 		chapter: ChapterWithScenes | null;
 		projectId: string;
@@ -21,6 +22,7 @@
 		onCreateScene?: (chapterId: string) => void;
 		onUpdateScene?: (id: string, changes: Partial<Scene>) => void;
 		onDeleteScene?: (id: string) => void;
+		onReorderScenes?: (chapterId: string, orderedIds: string[]) => void;
 	}>();
 
 	/** Scenes for this chapter, sorted by order. */
@@ -30,6 +32,31 @@
 
 	let selectedSceneId = $state<string | null>(null);
 	const selectedScene = $derived(chapterScenes.find((s: Scene) => s.id === selectedSceneId) ?? null);
+
+	/* ── Drag-and-drop state ── */
+	let dragId = $state<string | null>(null);
+	let dragOverIdx = $state<number | null>(null);
+
+	function onDragStart(e: DragEvent, id: string) {
+		dragId = id;
+		e.dataTransfer?.setData('text/plain', id);
+	}
+
+	function onDrop(targetIdx: number) {
+		if (!chapter || dragId === null) return;
+		const fromIdx = chapterScenes.findIndex((s: Scene) => s.id === dragId);
+		if (fromIdx === targetIdx) {
+			dragId = null;
+			dragOverIdx = null;
+			return;
+		}
+		const reordered = [...chapterScenes];
+		const [moved] = reordered.splice(fromIdx, 1);
+		reordered.splice(targetIdx, 0, moved);
+		onReorderScenes?.(chapter.id, reordered.map((s) => s.id));
+		dragId = null;
+		dragOverIdx = null;
+	}
 
 	function selectScene(id: string) {
 		selectedSceneId = selectedSceneId === id ? null : id;
@@ -70,20 +97,36 @@
 
 	{#snippet main()}
 		<div class="scene-sequence">
-			<div class="scenes">
-				{#each chapterScenes as scene (scene.id)}
-					<SceneCard
-						{scene}
-						selected={selectedSceneId === scene.id}
-						onSelect={() => selectScene(scene.id)}
-						onUpdateTitle={(value) => onUpdateScene?.(scene.id, { title: value })}
-						onUpdateSummary={(value) => onUpdateScene?.(scene.id, { summary: value })}
-					/>
+			<div class="scenes" role="list">
+				{#each chapterScenes as scene, i (scene.id)}
+					<div
+						class="scene-slot"
+						class:drag-over={dragOverIdx === i}
+						role="group"
+						ondragover={(e) => { e.preventDefault(); dragOverIdx = i; }}
+						ondragleave={() => (dragOverIdx = null)}
+						ondrop={() => onDrop(i)}
+					>
+						<SceneCard
+							{scene}
+							ordinal={i + 1}
+							selected={selectedSceneId === scene.id}
+							onSelect={() => selectScene(scene.id)}
+							onUpdateTitle={(value) => onUpdateScene?.(scene.id, { title: value })}
+							onUpdateSummary={(value) => onUpdateScene?.(scene.id, { summary: value })}
+							{onDragStart}
+						/>
+					</div>
 				{/each}
 				{#if chapterScenes.length === 0}
 					<div class="empty-scenes">
-						<p class="empty-heading">Build this chapter's content</p>
-						<p class="empty-body">Add scenes to define what the reader experiences in this chapter. Each scene is a continuous unit of action, dialogue, or reflection.</p>
+						<p class="empty-heading">Shape this chapter's reading flow</p>
+						<p class="empty-body">Each scene defines a moment the reader moves through. Add scenes to outline the chapter's progression.</p>
+						<div class="chapter-flow-cues">
+							<span class="flow-cue">Entry — what does the reader step into?</span>
+							<span class="flow-cue">Development — what builds or shifts?</span>
+							<span class="flow-cue">Exit — what does the reader carry forward?</span>
+						</div>
 					</div>
 				{/if}
 				<button class="add-scene-btn" onclick={addScene}>
@@ -108,7 +151,7 @@
 							class="detail-textarea"
 							value={selectedScene.summary}
 							oninput={(e) => onUpdateScene?.(selectedScene.id, { summary: e.currentTarget.value })}
-							placeholder="Describe what happens in this scene..."
+							placeholder="What changes in this scene?"
 							rows="3"
 						></textarea>
 					</div>
@@ -117,19 +160,12 @@
 						<span class="detail-label">Word Count</span>
 						<span class="detail-value">{selectedScene.wordCount > 0 ? selectedScene.wordCount.toLocaleString() : '—'}</span>
 					</div>
-
-					{#if selectedScene.povCharacterId}
-						<div class="detail-section">
-							<span class="detail-label">POV Character</span>
-							<span class="detail-value">{selectedScene.povCharacterId}</span>
-						</div>
-					{/if}
 				</div>
 			{:else}
 				<div class="chapter-overview">
 					<h3>Chapter Overview</h3>
 					<div class="overview-content">
-						<p>{chapterScenes.length === 0 ? 'Add scenes to start shaping this chapter.' : 'Select a scene to view and edit its details.'}</p>
+						<p>{chapterScenes.length === 0 ? 'No scenes yet. Add scenes to shape this chapter\u2019s flow.' : 'Select a scene to view its details.'}</p>
 						<div class="chapter-metrics">
 							<div class="metric">
 								<span class="label">Scenes</span>
@@ -168,6 +204,15 @@
 		gap: var(--space-3);
 	}
 
+	.scene-slot {
+		border-radius: var(--radius-md);
+		transition: box-shadow 0.15s ease;
+	}
+
+	.scene-slot.drag-over {
+		box-shadow: 0 -2px 0 0 var(--color-primary);
+	}
+
 	.empty-scenes {
 		text-align: center;
 		padding: var(--space-6) var(--space-4);
@@ -185,9 +230,28 @@
 		font-size: var(--text-sm);
 		color: var(--color-text-muted);
 		margin: 0;
-		max-width: 36ch;
+		max-width: 42ch;
 		margin-inline: auto;
 		line-height: 1.6;
+	}
+
+	.chapter-flow-cues {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-1);
+		margin-top: var(--space-4);
+		padding: var(--space-3) var(--space-4);
+		background: var(--color-surface-sunken);
+		border-radius: var(--radius-md);
+		max-width: 42ch;
+		margin-inline: auto;
+	}
+
+	.flow-cue {
+		font-size: var(--text-xs);
+		color: var(--color-text-tertiary);
+		line-height: 1.6;
+		font-style: italic;
 	}
 
 	.add-scene-btn {

@@ -48,6 +48,7 @@ export const sceneSchema = z.object({
 	order: z.number(),
 	content: z.string(),
 	wordCount: z.number(),
+	notes: z.string().default(''),
 	characterIds: z.array(z.string()),
 	locationIds: z.array(z.string()),
 	arcRefs: z.array(arcRefSchema).optional(),

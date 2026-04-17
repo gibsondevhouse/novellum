@@ -24,6 +24,7 @@ const mockSceneCtx = {
 		order: 0,
 		content: 'She was very tired.',
 		wordCount: 4,
+		notes: '',
 		characterIds: [],
 		locationIds: [],
 		createdAt: '',
