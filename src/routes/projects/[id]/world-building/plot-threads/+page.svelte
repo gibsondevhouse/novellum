@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PlotThread, Scene } from '$lib/db/types.js';
 	import PlotThreadForm from '$modules/bible/components/PlotThreadForm.svelte';
+	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
 	import {
 		getPlotThreads,
 		getPlotThreadSaving,
@@ -12,9 +13,8 @@
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 
-	let { data } = $props<{
-		data: { projectId: string; plotThreads: PlotThread[]; scenes: Scene[] };
-	}>();
+	let { data }: { data: { projectId: string; plotThreads: PlotThread[]; scenes: Scene[] } } =
+		$props();
 
 	$effect(() => {
 		initPlotThreads(data.plotThreads);
@@ -58,28 +58,31 @@
 </script>
 
 <svelte:head>
-	<title>Plot Threads — Novellum</title>
+	<title>Major Arcs — Novellum</title>
 </svelte:head>
 
-<div class="bible-page">
-	<div class="bible-page-header">
-		<div>
-			<a class="bible-back-link" href="/projects/{data.projectId}/world-building"
-				>← World Building</a
-			>
-			<h1>Plot Threads</h1>
-		</div>
-		<PrimaryButton
-			onclick={() => {
-				showForm = !showForm;
-				editingThread = null;
-			}}
-		>
-			{showForm && !editingThread ? 'Cancel' : '+ Add Thread'}
-		</PrimaryButton>
-	</div>
+<div class="worldbuilding-section-view">
+	<WorldBuildingSubheaderNav projectId={data.projectId} topSection="plot-threads" activeId="major-arcs" ariaLabel="Threads sections" />
 
-	{#if showForm || editingThread}
+	<div class="bible-page">
+		<div class="bible-page-header">
+			<div>
+				<a class="bible-back-link" href="/projects/{data.projectId}/world-building/plot-threads"
+					>← Threads</a
+				>
+				<h1>Major Arcs</h1>
+			</div>
+			<PrimaryButton
+				onclick={() => {
+					showForm = !showForm;
+					editingThread = null;
+				}}
+			>
+				{showForm && !editingThread ? 'Cancel' : '+ Add Arc'}
+			</PrimaryButton>
+		</div>
+
+		{#if showForm || editingThread}
 		<div class="bible-form-section">
 			<PlotThreadForm
 				thread={editingThread ?? undefined}
@@ -92,14 +95,14 @@
 				}}
 			/>
 		</div>
-	{/if}
+		{/if}
 
-	{#if getPlotThreads().length === 0 && !showForm}
+		{#if getPlotThreads().length === 0 && !showForm}
 		<div class="bible-empty-state">
-			<p>No plot threads yet.</p>
-			<GhostButton onclick={() => (showForm = true)}>+ Add your first thread</GhostButton>
+			<p>No major arcs yet.</p>
+			<GhostButton onclick={() => (showForm = true)}>+ Add your first arc</GhostButton>
 		</div>
-	{:else}
+		{:else}
 		<ul class="bible-entity-list">
 			{#each getPlotThreads() as thread (thread.id)}
 				<li class="bible-entity-item">
@@ -141,5 +144,6 @@
 				</li>
 			{/each}
 		</ul>
-	{/if}
+		{/if}
+	</div>
 </div>

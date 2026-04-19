@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Location } from '$lib/db/types.js';
 	import LocationForm from '$modules/bible/components/LocationForm.svelte';
+	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
 	import {
 		getLocations,
 		getLocationSaving,
@@ -12,9 +13,7 @@
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 
-	let { data } = $props<{
-		data: { projectId: string; locations: Location[] };
-	}>();
+	let { data }: { data: { projectId: string; locations: Location[] } } = $props();
 
 	$effect(() => {
 		initLocations(data.locations);
@@ -46,28 +45,31 @@
 </script>
 
 <svelte:head>
-	<title>Locations — Novellum</title>
+	<title>Realms — Novellum</title>
 </svelte:head>
 
-<div class="bible-page">
-	<div class="bible-page-header">
-		<div>
-			<a class="bible-back-link" href="/projects/{data.projectId}/world-building"
-				>← World Building</a
-			>
-			<h1>Locations</h1>
-		</div>
-		<PrimaryButton
-			onclick={() => {
-				showForm = !showForm;
-				editingLocation = null;
-			}}
-		>
-			{showForm ? 'Cancel' : '+ Add Location'}
-		</PrimaryButton>
-	</div>
+<div class="worldbuilding-section-view">
+	<WorldBuildingSubheaderNav projectId={data.projectId} topSection="locations" activeId="realms" ariaLabel="Atlas sections" />
 
-	{#if showForm}
+	<div class="bible-page">
+		<div class="bible-page-header">
+			<div>
+				<a class="bible-back-link" href="/projects/{data.projectId}/world-building/locations"
+					>← Atlas</a
+				>
+				<h1>Realms</h1>
+			</div>
+			<PrimaryButton
+				onclick={() => {
+					showForm = !showForm;
+					editingLocation = null;
+				}}
+			>
+				{showForm ? 'Cancel' : '+ Add Realm'}
+			</PrimaryButton>
+		</div>
+
+		{#if showForm}
 		<div class="bible-form-section">
 			<LocationForm
 				saving={getLocationSaving()}
@@ -75,7 +77,7 @@
 				onCancel={() => (showForm = false)}
 			/>
 		</div>
-	{:else if editingLocation}
+		{:else if editingLocation}
 		<div class="bible-form-section">
 			<LocationForm
 				location={editingLocation}
@@ -84,14 +86,14 @@
 				onCancel={() => (editingLocation = null)}
 			/>
 		</div>
-	{/if}
+		{/if}
 
-	{#if getLocations().length === 0 && !showForm}
+		{#if getLocations().length === 0 && !showForm}
 		<div class="bible-empty-state">
-			<p>No locations yet.</p>
-			<GhostButton onclick={() => (showForm = true)}>+ Add your first location</GhostButton>
+			<p>No realms yet.</p>
+			<GhostButton onclick={() => (showForm = true)}>+ Add your first realm</GhostButton>
 		</div>
-	{:else}
+		{:else}
 		<ul class="bible-entity-list">
 			{#each getLocations() as loc (loc.id)}
 				<li class="bible-entity-item">
@@ -120,5 +122,6 @@
 				</li>
 			{/each}
 		</ul>
-	{/if}
+		{/if}
+	</div>
 </div>

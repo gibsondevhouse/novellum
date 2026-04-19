@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { TimelineEvent, Character } from '$lib/db/types.js';
 	import TimelineEventForm from '$modules/bible/components/TimelineEventForm.svelte';
+	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
 	import {
 		getTimelineEvents,
 		getTimelineSaving,
@@ -12,9 +13,8 @@
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 
-	let { data } = $props<{
-		data: { projectId: string; timelineEvents: TimelineEvent[]; characters: Character[] };
-	}>();
+	let { data }: { data: { projectId: string; timelineEvents: TimelineEvent[]; characters: Character[] } } =
+		$props();
 
 	$effect(() => {
 		initTimelineEvents(data.timelineEvents);
@@ -52,28 +52,31 @@
 </script>
 
 <svelte:head>
-	<title>Timeline — Novellum</title>
+	<title>Eras — Novellum</title>
 </svelte:head>
 
-<div class="bible-page">
-	<div class="bible-page-header">
-		<div>
-			<a class="bible-back-link" href="/projects/{data.projectId}/world-building"
-				>← World Building</a
-			>
-			<h1>Timeline</h1>
-		</div>
-		<PrimaryButton
-			onclick={() => {
-				showForm = !showForm;
-				editingEvent = null;
-			}}
-		>
-			{showForm && !editingEvent ? 'Cancel' : '+ Add Event'}
-		</PrimaryButton>
-	</div>
+<div class="worldbuilding-section-view">
+	<WorldBuildingSubheaderNav projectId={data.projectId} topSection="timeline" activeId="eras" ariaLabel="Chronicles sections" />
 
-	{#if showForm || editingEvent}
+	<div class="bible-page">
+		<div class="bible-page-header">
+			<div>
+				<a class="bible-back-link" href="/projects/{data.projectId}/world-building/timeline"
+					>← Chronicles</a
+				>
+				<h1>Eras</h1>
+			</div>
+			<PrimaryButton
+				onclick={() => {
+					showForm = !showForm;
+					editingEvent = null;
+				}}
+			>
+				{showForm && !editingEvent ? 'Cancel' : '+ Add Era Event'}
+			</PrimaryButton>
+		</div>
+
+		{#if showForm || editingEvent}
 		<div class="bible-form-section">
 			<TimelineEventForm
 				event={editingEvent ?? undefined}
@@ -86,14 +89,14 @@
 				}}
 			/>
 		</div>
-	{/if}
+		{/if}
 
-	{#if getTimelineEvents().length === 0 && !showForm}
+		{#if getTimelineEvents().length === 0 && !showForm}
 		<div class="bible-empty-state">
-			<p>No timeline events yet.</p>
-			<GhostButton onclick={() => (showForm = true)}>+ Add your first event</GhostButton>
+			<p>No era events yet.</p>
+			<GhostButton onclick={() => (showForm = true)}>+ Add your first era event</GhostButton>
 		</div>
-	{:else}
+		{:else}
 		<ol class="timeline-list">
 			{#each sorted as event (event.id)}
 				<li class="timeline-item">
@@ -131,5 +134,6 @@
 				</li>
 			{/each}
 		</ol>
-	{/if}
+		{/if}
+	</div>
 </div>

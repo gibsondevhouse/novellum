@@ -2,10 +2,22 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import ModelSelector from './ModelSelector.svelte';
+	import PillNav from './ui/PillNav.svelte';
 	import { getActiveMode, setMode } from '../../modules/workspace/stores/workspace-mode.svelte.js';
 	import { WORKSPACE_MODES } from '../../modules/workspace/types.js';
+	import {
+		WORLD_BUILDING_TOP_ITEMS,
+		getWorldBuildingTopSection,
+	} from '$modules/bible/worldbuilding-navigation.js';
+
+	const modeItems = $derived(
+		WORKSPACE_MODES.map((m) => ({ id: m, label: m.toUpperCase() }))
+	);
 
 	let isWorkspaceRoute = $derived(page.url.pathname.includes('/workspace'));
+	let isWorldBuildingRoute = $derived(page.url.pathname.includes('/world-building'));
+
+	let worldBuildingActiveId = $derived(getWorldBuildingTopSection(page.url.pathname));
 
 	let isSettingsRoute = $derived(page.url.pathname.startsWith('/settings'));
 	let isNovaRoute = $derived(page.url.pathname === '/nova');
@@ -29,6 +41,11 @@
 	function handleNewProject() {
 		goto('/');
 	}
+
+	function handleWorldBuildingSelect(id: string) {
+		if (!page.params?.id) return;
+		goto(`/projects/${page.params.id}/world-building/${id}`);
+	}
 </script>
 
 <header class="app-header">
@@ -50,17 +67,19 @@
 
 		<div class="header-center">
 		{#if isWorkspaceRoute}
-			<div class="workspace-switcher">
-				{#each WORKSPACE_MODES as m}
-					<button
-						class="workspace-switcher-btn"
-						class:active={getActiveMode() === m}
-						onclick={() => setMode(m)}
-					>
-						{m.toUpperCase()}
-					</button>
-				{/each}
-			</div>
+			<PillNav
+				items={modeItems}
+				activeId={getActiveMode()}
+				onSelect={(id) => setMode(id as typeof WORKSPACE_MODES[number])}
+				ariaLabel="Workspace mode"
+			/>
+		{:else if isWorldBuildingRoute}
+			<PillNav
+				items={WORLD_BUILDING_TOP_ITEMS}
+				activeId={worldBuildingActiveId}
+				onSelect={handleWorldBuildingSelect}
+				ariaLabel="World building sections"
+			/>
 		{/if}
 	</div>
 
@@ -129,7 +148,6 @@
 		height: 48px;
 		padding: 0 var(--space-4);
 		background-color: var(--color-surface-base);
-		border-bottom: 1px solid var(--color-border-default);
 		flex-shrink: 0;
 	}
 
@@ -137,6 +155,7 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-3);
+		flex: 1;
 		min-width: 0;
 	}
 
@@ -168,6 +187,8 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-1);
+		flex: 1;
+		justify-content: flex-end;
 	}
 
 	.header-action {
@@ -214,41 +235,10 @@
 
 	.header-center {
 		display: flex;
-		flex: 1;
 		justify-content: center;
 		align-items: center;
 	}
 
-	.workspace-switcher {
-		display: flex;
-		background: var(--color-surface-elevated);
-		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-full);
-		padding: 2px;
-		gap: 2px;
-	}
 
-	.workspace-switcher-btn {
-		background: transparent;
-		border: none;
-		padding: var(--space-1) var(--space-4);
-		border-radius: var(--radius-full);
-		font-size: var(--text-xs);
-		font-weight: var(--font-weight-semibold);
-		color: var(--color-text-muted);
-		cursor: pointer;
-		transition: all var(--duration-fast) var(--ease-standard);
-		letter-spacing: var(--tracking-wide);
-	}
-
-	.workspace-switcher-btn:hover {
-		color: var(--color-text-primary);
-	}
-
-	.workspace-switcher-btn.active {
-		background: var(--color-surface-hover);
-		color: var(--color-text-primary);
-		box-shadow: var(--shadow-sm);
-	}
 
 </style>

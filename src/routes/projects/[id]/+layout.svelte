@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, setContext } from 'svelte';
+	import { setContext } from 'svelte';
 	import type { Project } from '$lib/db';
 	import EditProjectForm from '$modules/project/components/EditProjectForm.svelte';
 	import DeleteProjectDialog from '$modules/project/components/DeleteProjectDialog.svelte';
@@ -68,7 +68,8 @@
 	.project-shell {
 		display: flex;
 		flex-direction: column;
-		min-height: 100vh;
+		height: 100%;
+		min-height: 0;
 	}
 
 	/* Shared centered frame */
@@ -92,6 +93,7 @@
 	/* ── Mode content ── */
 	.mode-content {
 		flex: 1;
+		min-height: 0;
 		overflow: auto;
 		view-transition-name: project-mode-content;
 	}

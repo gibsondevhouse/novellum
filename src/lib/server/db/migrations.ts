@@ -52,6 +52,31 @@ function ensureActsArcIdColumn(db: Database.Database): void {
 	}
 }
 
+function ensureCharacterPresentationColumns(db: Database.Database): void {
+	const columns = db.prepare('PRAGMA table_info(characters)').all() as Array<{ name: string }>;
+	if (!columns.some((c) => c.name === 'pronunciation')) {
+		db.exec("ALTER TABLE characters ADD COLUMN pronunciation TEXT NOT NULL DEFAULT ''");
+	}
+	if (!columns.some((c) => c.name === 'aliases')) {
+		db.exec("ALTER TABLE characters ADD COLUMN aliases TEXT NOT NULL DEFAULT '[]'");
+	}
+	if (!columns.some((c) => c.name === 'diasporaOrigin')) {
+		db.exec("ALTER TABLE characters ADD COLUMN diasporaOrigin TEXT NOT NULL DEFAULT ''");
+	}
+	if (!columns.some((c) => c.name === 'photoUrl')) {
+		db.exec("ALTER TABLE characters ADD COLUMN photoUrl TEXT NOT NULL DEFAULT ''");
+	}
+	if (!columns.some((c) => c.name === 'bio')) {
+		db.exec("ALTER TABLE characters ADD COLUMN bio TEXT NOT NULL DEFAULT ''");
+	}
+	if (!columns.some((c) => c.name === 'faction')) {
+		db.exec("ALTER TABLE characters ADD COLUMN faction TEXT NOT NULL DEFAULT ''");
+	}
+	if (!columns.some((c) => c.name === 'anomalies')) {
+		db.exec("ALTER TABLE characters ADD COLUMN anomalies TEXT NOT NULL DEFAULT '[]'");
+	}
+}
+
 export function runMigrations(db: Database.Database): void {
 	db.transaction(() => {
 		db.exec(SCHEMA_SQL);
@@ -61,6 +86,7 @@ export function runMigrations(db: Database.Database): void {
 		ensureStylePresetIdColumn(db);
 		ensureScenesNotesColumn(db);
 		ensureActsArcIdColumn(db);
+		ensureCharacterPresentationColumns(db);
 		db.exec(INDEX_SQL);
 	})();
 }

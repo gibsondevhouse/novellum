@@ -46,7 +46,7 @@
 <div class="page">
 	<div class="page-header">
 		<Breadcrumb items={[
-			{ label: 'Characters', href: `/projects/${data.projectId}/world-building/characters` },
+			{ label: 'Individuals', href: `/projects/${data.projectId}/world-building/characters` },
 			{ label: data.character.name },
 		]} />
 		<div class="header-row">

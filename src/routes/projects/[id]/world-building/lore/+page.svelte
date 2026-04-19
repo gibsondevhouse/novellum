@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { LoreEntry } from '$lib/db/types.js';
 	import LoreEntryForm from '$modules/bible/components/LoreEntryForm.svelte';
+	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
 	import {
 		getLoreEntries,
 		getLoreSaving,
@@ -12,7 +13,7 @@
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 
-	let { data } = $props<{ data: { projectId: string; loreEntries: LoreEntry[] } }>();
+	let { data }: { data: { projectId: string; loreEntries: LoreEntry[] } } = $props();
 
 	$effect(() => {
 		initLoreEntries(data.loreEntries);
@@ -55,27 +56,30 @@
 	}
 </script>
 
-<svelte:head><title>Lore — Novellum</title></svelte:head>
+<svelte:head><title>Myths — Novellum</title></svelte:head>
 
-<div class="bible-page">
-	<div class="bible-page-header">
-		<div>
-			<a class="bible-back-link" href="/projects/{data.projectId}/world-building"
-				>← World Building</a
+<div class="worldbuilding-section-view">
+	<WorldBuildingSubheaderNav projectId={data.projectId} topSection="lore" activeId="myths" ariaLabel="Archive sections" />
+
+	<div class="bible-page">
+		<div class="bible-page-header">
+			<div>
+				<a class="bible-back-link" href="/projects/{data.projectId}/world-building/lore"
+					>← The Archive</a
+				>
+				<h1>Myths</h1>
+			</div>
+			<PrimaryButton
+				onclick={() => {
+					showForm = !showForm;
+					editingEntry = null;
+				}}
 			>
-			<h1>Lore</h1>
+				{showForm && !editingEntry ? 'Cancel' : '+ Add Entry'}
+			</PrimaryButton>
 		</div>
-		<PrimaryButton
-			onclick={() => {
-				showForm = !showForm;
-				editingEntry = null;
-			}}
-		>
-			{showForm && !editingEntry ? 'Cancel' : '+ Add Entry'}
-		</PrimaryButton>
-	</div>
 
-	{#if showForm || editingEntry}
+		{#if showForm || editingEntry}
 		<div class="bible-form-section">
 			<LoreEntryForm
 				entry={editingEntry ?? undefined}
@@ -87,9 +91,9 @@
 				}}
 			/>
 		</div>
-	{/if}
+		{/if}
 
-	{#if categories.length > 0}
+		{#if categories.length > 0}
 		<div class="filter-bar" role="group" aria-label="Filter by category">
 			<button class="pill" class:active={!activeCategory} onclick={() => (activeCategory = '')}
 				>All</button
@@ -102,16 +106,16 @@
 				>
 			{/each}
 		</div>
-	{/if}
+		{/if}
 
-	{#if getLoreEntries().length === 0 && !showForm}
+		{#if getLoreEntries().length === 0 && !showForm}
 		<div class="bible-empty-state">
 			<p>No lore entries yet.</p>
 			<GhostButton onclick={() => (showForm = true)}>+ Add your first entry</GhostButton>
 		</div>
-	{:else if filtered.length === 0}
+		{:else if filtered.length === 0}
 		<p class="empty-filter">No entries in this category.</p>
-	{:else}
+		{:else}
 		<ul class="bible-entity-list">
 			{#each filtered as entry (entry.id)}
 				<li class="bible-entity-item">
@@ -141,5 +145,6 @@
 				</li>
 			{/each}
 		</ul>
-	{/if}
+		{/if}
+	</div>
 </div>

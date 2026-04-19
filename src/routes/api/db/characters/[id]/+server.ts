@@ -5,6 +5,8 @@ import { db, encodeJson, decodeJson } from '$lib/server/db/index.js';
 function decodeRow(row: Record<string, unknown>) {
 	return {
 		...row,
+		aliases: decodeJson<string[]>(row.aliases as string),
+		anomalies: decodeJson<string[]>(row.anomalies as string),
 		traits: decodeJson<string[]>(row.traits as string),
 		goals: decodeJson<string[]>(row.goals as string),
 		flaws: decodeJson<string[]>(row.flaws as string),
@@ -26,13 +28,22 @@ export const GET: RequestHandler = async ({ params }) => {
 export const PUT: RequestHandler = async ({ params, request }) => {
 	const body = await request.json();
 	const updates: Record<string, unknown> = {};
-	const simpleAllowed = ['name', 'role', 'notes'];
+	const simpleAllowed = [
+		'name',
+		'role',
+		'pronunciation',
+		'diasporaOrigin',
+		'photoUrl',
+		'bio',
+		'faction',
+		'notes',
+	];
 
 	for (const key of simpleAllowed) {
 		if (key in body) updates[key] = body[key];
 	}
 
-	const jsonFields = ['traits', 'goals', 'flaws', 'arcs', 'tags'];
+	const jsonFields = ['aliases', 'anomalies', 'traits', 'goals', 'flaws', 'arcs', 'tags'];
 	for (const key of jsonFields) {
 		if (key in body) updates[key] = encodeJson(body[key]);
 	}

@@ -1,4 +1,7 @@
 <script lang="ts">
+	import PillNav from '$lib/components/ui/PillNav.svelte';
+	import type { PillNavItem } from '$lib/components/ui/PillNav.svelte';
+
 	const VISIBLE_LIMIT = 6;
 
 	type SubheaderItem = { id: string; title: string; isUnassigned?: boolean };
@@ -29,6 +32,15 @@
 	const canScrollLeft = $derived(windowStart > 0);
 	const canScrollRight = $derived(windowEnd < items.length);
 
+	const pillItems = $derived<PillNavItem[]>([
+		...visibleItems.map((item: SubheaderItem, i: number) => ({
+			id: item.id,
+			label: `${fallbackLabel} ${(needsArrows ? windowStart : 0) + i + 1}`,
+			isUnassigned: item.isUnassigned,
+		})),
+		...(onCreate ? [{ id: '__new__', label: '+ New' }] : []),
+	]);
+
 	// Keep selected item in view
 	$effect(() => {
 		if (!needsArrows || !selectedId) return;
@@ -46,6 +58,14 @@
 	function scrollRight() {
 		windowStart = Math.min(items.length - VISIBLE_LIMIT, windowStart + 1);
 	}
+
+	function handlePillSelect(id: string) {
+		if (id === '__new__') {
+			onCreate?.();
+		} else {
+			onSelect?.(id);
+		}
+	}
 </script>
 
 <div class="subheader">
@@ -53,42 +73,32 @@
 		<div class="parent-context">{parentContextLabel}</div>
 	{/if}
 	<div class="subheader-row">
-		<nav class="switcher" aria-label="Item selector">
-			{#if needsArrows}
-				<button
-					class="arrow-btn"
-					class:arrow-btn--disabled={!canScrollLeft}
-					disabled={!canScrollLeft}
-					onclick={scrollLeft}
-					aria-label="Scroll left"
-				>‹</button>
-			{/if}
+		{#if needsArrows}
+			<button
+				class="arrow-btn"
+				class:arrow-btn--disabled={!canScrollLeft}
+				disabled={!canScrollLeft}
+				onclick={scrollLeft}
+				aria-label="Scroll left"
+			>‹</button>
+		{/if}
 
-			{#each visibleItems as item, i (item.id)}
-				<button
-					class="switcher-btn"
-					class:active={selectedId === item.id}
-					class:unassigned={item.isUnassigned}
-					onclick={() => onSelect?.(item.id)}
-					type="button"
-				>
-					{item.title ? item.title.toUpperCase() : `${fallbackLabel} ${(needsArrows ? windowStart : 0) + i + 1}`}
-				</button>
-			{/each}
-			{#if onCreate}
-				<button class="switcher-btn switcher-btn--new" onclick={onCreate} type="button">+ New</button>
-			{/if}
+		<PillNav
+			items={pillItems}
+			activeId={selectedId}
+			onSelect={handlePillSelect}
+			ariaLabel="Item selector"
+		/>
 
-			{#if needsArrows}
-				<button
-					class="arrow-btn"
-					class:arrow-btn--disabled={!canScrollRight}
-					disabled={!canScrollRight}
-					onclick={scrollRight}
-					aria-label="Scroll right"
-				>›</button>
-			{/if}
-		</nav>
+		{#if needsArrows}
+			<button
+				class="arrow-btn"
+				class:arrow-btn--disabled={!canScrollRight}
+				disabled={!canScrollRight}
+				onclick={scrollRight}
+				aria-label="Scroll right"
+			>›</button>
+		{/if}
 
 		{#if onHelp}
 			<button class="help-toggle" onclick={onHelp} aria-label="Show conceptual help">
@@ -101,8 +111,7 @@
 <style>
 	.subheader {
 		flex-shrink: 0;
-		padding: var(--space-3) var(--space-6);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		padding: var(--space-1) var(--space-6);
 	}
 
 	.parent-context {
@@ -111,59 +120,15 @@
 		letter-spacing: var(--tracking-wider);
 		padding-bottom: var(--space-1);
 		opacity: 0.6;
+		text-align: center;
 	}
 
 	.subheader-row {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
+		justify-content: center;
 		gap: var(--space-3);
-	}
-
-	/* ── Pill switcher (matches AppHeader .workspace-switcher) ── */
-
-	.switcher {
-		display: flex;
-		align-items: center;
-		background: var(--color-surface-elevated);
-		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-full);
-		padding: 2px;
-		gap: 2px;
-	}
-
-	.switcher-btn {
-		background: transparent;
-		border: none;
-		padding: var(--space-1) var(--space-4);
-		border-radius: var(--radius-full);
-		font-size: var(--text-xs);
-		font-weight: var(--font-weight-semibold);
-		color: var(--color-text-muted);
-		cursor: pointer;
-		transition: all var(--duration-fast) var(--ease-standard);
-		letter-spacing: var(--tracking-wide);
-		white-space: nowrap;
-		font-family: inherit;
-	}
-
-	.switcher-btn:hover {
-		color: var(--color-text-primary);
-	}
-
-	.switcher-btn.active {
-		background: var(--color-surface-hover);
-		color: var(--color-text-primary);
-		box-shadow: var(--shadow-sm);
-	}
-
-	.switcher-btn.unassigned {
-		opacity: 0.45;
-		font-style: italic;
-	}
-
-	.switcher-btn--new {
-		color: var(--color-text-tertiary);
+		position: relative;
 	}
 
 	/* ── Overflow arrows ── */
@@ -198,6 +163,8 @@
 	/* ── Help toggle ── */
 
 	.help-toggle {
+		position: absolute;
+		right: 0;
 		background: var(--color-surface-glass);
 		border: 1px solid var(--color-border-subtle);
 		color: var(--color-text-secondary);

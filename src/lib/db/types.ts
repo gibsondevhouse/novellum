@@ -81,6 +81,13 @@ export interface Character {
 	projectId: string;
 	name: string;
 	role: string;
+	pronunciation: string;
+	aliases: string[];
+	diasporaOrigin: string;
+	photoUrl: string;
+	bio: string;
+	faction: string;
+	anomalies: string[];
 	traits: string[];
 	goals: string[];
 	flaws: string[];

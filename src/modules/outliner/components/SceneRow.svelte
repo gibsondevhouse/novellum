@@ -1,4 +1,7 @@
 <script lang="ts">
+	import Check from '@lucide/svelte/icons/check';
+	import Pencil from '@lucide/svelte/icons/pencil';
+	import X from '@lucide/svelte/icons/x';
 	import { untrack } from 'svelte';
 	import type { Scene } from '$lib/db/types.js';
 
@@ -77,7 +80,9 @@
 				onblur={saveTitle}
 				onkeydown={handleKeydown}
 			/>
-			<button class="btn-icon btn-save" onclick={saveTitle} aria-label="Save">✓</button>
+			<button class="btn-icon btn-save" onclick={saveTitle} aria-label="Save">
+				<Check class="btn-icon__glyph" aria-hidden="true" />
+			</button>
 		</div>
 	{:else}
 		<div class="scene-header">
@@ -92,8 +97,12 @@
 				<span class="wc-badge">{scene.wordCount}w</span>
 			{/if}
 			<div class="scene-actions" role="toolbar" aria-label="Scene actions">
-				<button class="btn-icon" onclick={startEditing} aria-label="Rename scene">✎</button>
-				<button class="btn-icon btn-del" onclick={handleDelete} aria-label="Delete scene">✕</button>
+				<button class="btn-icon" onclick={startEditing} aria-label="Rename scene">
+					<Pencil class="btn-icon__glyph" aria-hidden="true" />
+				</button>
+				<button class="btn-icon btn-del" onclick={handleDelete} aria-label="Delete scene">
+					<X class="btn-icon__glyph" aria-hidden="true" />
+				</button>
 			</div>
 		</div>
 		{#if summary}
@@ -222,13 +231,18 @@
 		border: none;
 		color: var(--color-text-muted);
 		cursor: pointer;
-		font-size: var(--text-xs);
-		padding: var(--space-1) var(--space-2);
+		padding: var(--space-1);
 		border-radius: var(--radius-sm);
-		line-height: 1;
+		line-height: 0;
 		transition:
 			color 0.1s,
 			background 0.1s;
+	}
+
+	:global(.btn-icon__glyph) {
+		width: 14px;
+		height: 14px;
+		stroke-width: 2;
 	}
 
 	.btn-icon:hover {

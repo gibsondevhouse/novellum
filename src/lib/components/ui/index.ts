@@ -7,3 +7,7 @@ export { default as SurfacePanel } from './SurfacePanel.svelte';
 export { default as SectionHeader } from './SectionHeader.svelte';
 export { default as EmptyStatePanel } from './EmptyStatePanel.svelte';
 export { default as Input } from './Input.svelte';
+export { default as PillNav } from './PillNav.svelte';
+export type { PillNavItem } from './PillNav.svelte';
+export { Button, buttonVariants } from './button/index.js';
+export type { ButtonSize, ButtonVariant } from './button/index.js';

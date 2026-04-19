@@ -4,6 +4,8 @@ import { decodeJson } from '$lib/server/db/index.js';
 function decodeRow(row: Record<string, unknown>) {
 	return {
 		...row,
+		aliases: decodeJson<string[]>(row.aliases as string),
+		anomalies: decodeJson<string[]>(row.anomalies as string),
 		traits: decodeJson<string[]>(row.traits as string),
 		goals: decodeJson<string[]>(row.goals as string),
 		flaws: decodeJson<string[]>(row.flaws as string),
@@ -18,6 +20,13 @@ const config = {
 		projectId: { required: true },
 		name: { required: true },
 		role: { default: '' },
+		pronunciation: { default: '' },
+		aliases: { default: [], json: true },
+		diasporaOrigin: { default: '' },
+		photoUrl: { default: '' },
+		bio: { default: '' },
+		faction: { default: '' },
+		anomalies: { default: [], json: true },
 		traits: { default: [], json: true },
 		goals: { default: [], json: true },
 		flaws: { default: [], json: true },

@@ -1,4 +1,7 @@
 <script lang="ts">
+	import Link2 from '@lucide/svelte/icons/link-2';
+	import Plus from '@lucide/svelte/icons/plus';
+	import X from '@lucide/svelte/icons/x';
 	import type { Character, CharacterRelationship } from '$lib/db/types.js';
 	import {
 		getRelationships,
@@ -8,11 +11,12 @@
 	} from '../stores/bible-crud.svelte.ts';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 
-	let { characterId, projectId, allCharacters, initialRelationships } = $props<{
+	let { characterId, projectId, allCharacters, initialRelationships, onSelectCharacter } = $props<{
 		characterId: string;
 		projectId: string;
 		allCharacters: Character[];
 		initialRelationships: CharacterRelationship[];
+		onSelectCharacter?: (characterId: string) => void;
 	}>();
 
 	$effect(() => {
@@ -58,6 +62,10 @@
 		const otherId = rel.characterAId === characterId ? rel.characterBId : rel.characterAId;
 		return allCharacters.find((c: Character) => c.id === otherId)?.name ?? otherId;
 	}
+
+	function getOtherId(rel: CharacterRelationship): string {
+		return rel.characterAId === characterId ? rel.characterBId : rel.characterAId;
+	}
 </script>
 
 <section class="rel-editor">
@@ -69,15 +77,26 @@
 		<ul class="rel-list">
 			{#each myRelationships as rel (rel.id)}
 				<li class="rel-item">
-					<span class="rel-other">{getOtherName(rel)}</span>
+					<button
+						class="rel-other"
+						type="button"
+						onclick={() => onSelectCharacter?.(getOtherId(rel))}
+					>
+						<Link2 class="rel-icon" aria-hidden="true" />
+						<span>{getOtherName(rel)}</span>
+					</button>
 					<span class="rel-type">{rel.type}</span>
 					{#if rel.description}
 						<span class="rel-desc">{rel.description}</span>
 					{/if}
 					<button
-						class="btn-ghost btn-xs"
+						class="btn-xs"
 						onclick={() => submitDeleteRelationship(rel.id)}
-						aria-label="Remove relationship">✕</button
+						aria-label="Remove relationship"
+						type="button"
+					>
+						<X class="rel-icon" aria-hidden="true" />
+					</button
 					>
 				</li>
 			{/each}
@@ -100,7 +119,10 @@
 				placeholder="Type (e.g. friend, rival)"
 			/>
 			<input class="input" type="text" bind:value={relDesc} placeholder="Description (optional)" />
-			<PrimaryButton class="btn-sm" onclick={handleAdd}>Add</PrimaryButton>
+			<PrimaryButton class="btn-sm" onclick={handleAdd}>
+				<Plus class="rel-icon" aria-hidden="true" />
+				<span>Add</span>
+			</PrimaryButton>
 		</div>
 		{#if addError}
 			<p class="error-text" role="alert">{addError}</p>
@@ -131,12 +153,13 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-2);
-		margin-bottom: var(--space-4);
+		padding: 0;
+		margin: 0 0 var(--space-4);
 	}
 
 	.rel-item {
-		display: flex;
-		align-items: center;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto auto;
 		gap: var(--space-3);
 		padding: var(--space-2) var(--space-3);
 		background-color: var(--color-surface-overlay);
@@ -145,22 +168,31 @@
 	}
 
 	.rel-other {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
 		font-weight: var(--font-weight-medium);
 		color: var(--color-text-primary);
 		font-size: var(--text-sm);
+		background: none;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+		text-align: left;
 	}
 
 	.rel-type {
 		font-size: var(--text-xs);
-		color: var(--color-teal);
+		color: color-mix(in srgb, var(--color-nova-blue) 72%, #b5ff3d 22%);
 		text-transform: uppercase;
 		letter-spacing: var(--tracking-wide);
+		font-family: var(--font-mono);
 	}
 
 	.rel-desc {
 		font-size: var(--text-sm);
 		color: var(--color-text-secondary);
-		flex: 1;
+		grid-column: 1 / span 2;
 	}
 
 	.add-title {
@@ -182,8 +214,8 @@
 		border: 1px solid var(--color-border-default);
 		border-radius: var(--radius-sm);
 		padding: var(--space-2) var(--space-3);
-		color: var(--color-text-primary);
 		font-size: var(--text-sm);
+		color: var(--color-text-primary);
 		font-family: var(--font-sans);
 		flex: 1;
 		min-width: 120px;
@@ -191,25 +223,42 @@
 	}
 
 	.input:focus {
-		outline: none;
 		border-color: var(--color-border-focus);
+		outline: none;
 		box-shadow: var(--focus-ring);
 	}
 
+	:global(.rel-icon) {
+		width: 0.95rem;
+		height: 0.95rem;
+		stroke-width: 1.5;
+	}
+
 	.btn-xs {
-		padding: var(--space-1);
-		font-size: var(--text-xs);
-		border: 1px solid transparent;
-		border-radius: var(--radius-xs);
-		background: none;
+		display: inline-grid;
+		place-items: center;
+		width: 2rem;
+		height: 2rem;
+		border: 1px solid color-mix(in srgb, var(--color-error) 24%, transparent);
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--color-error) 8%, transparent);
 		cursor: pointer;
-		color: var(--color-text-muted);
+		color: color-mix(in srgb, var(--color-error) 80%, white 10%);
 		transition: var(--transition-color);
-		margin-left: auto;
 	}
 
 	.btn-xs:hover {
-		color: var(--color-error);
+		border-color: color-mix(in srgb, var(--color-error) 55%, transparent);
+	}
+
+	@media (max-width: 640px) {
+		.rel-item {
+			grid-template-columns: 1fr;
+		}
+
+		.rel-desc {
+			grid-column: auto;
+		}
 	}
 
 	.error-text {
