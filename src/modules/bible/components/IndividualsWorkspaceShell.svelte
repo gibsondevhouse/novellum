@@ -12,6 +12,8 @@
 		onSelectCharacter,
 		onCreateCharacter,
 		hasSelection,
+		listAriaLabel = 'Character names',
+		createLabel = 'new +',
 		dossier,
 		empty,
 	}: {
@@ -20,17 +22,19 @@
 		onSelectCharacter: (id: string) => void;
 		onCreateCharacter: () => void | Promise<void>;
 		hasSelection: boolean;
+		listAriaLabel?: string;
+		createLabel?: string;
 		dossier?: Snippet;
 		empty?: Snippet;
 	} = $props();
 </script>
 
 <div class="individuals-workspace">
-	<aside class="individuals-sidebar" aria-label="Character names">
+	<aside class="individuals-sidebar" aria-label={listAriaLabel}>
 		<div class="names-scroll">
 			<ul class="names-list">
 				<li>
-					<button type="button" class="name-item name-item--new" onclick={() => void onCreateCharacter()}>new +</button>
+					<button type="button" class="name-item name-item--new" onclick={() => void onCreateCharacter()}>{createLabel}</button>
 				</li>
 				{#each characterOptions as character (character.id)}
 					<li>
