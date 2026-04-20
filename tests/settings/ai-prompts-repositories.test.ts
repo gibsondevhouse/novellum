@@ -74,6 +74,7 @@ describe('AI Data Repositories', () => {
 		});
 
 		it('should handle 404 when getting by id', async () => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			vi.mocked(apiGet).mockRejectedValue(new (ApiError as any)(404));
 			const result = await getWritingStyleById('w1');
 			expect(result).toBeUndefined();
@@ -120,6 +121,7 @@ describe('AI Data Repositories', () => {
 		});
 		
 		it('should handle get by id and 404', async () => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			vi.mocked(apiGet).mockRejectedValue(new (ApiError as any)(404));
 			const result = await getTemplateById('t1');
 			expect(result).toBeUndefined();
@@ -152,6 +154,7 @@ describe('AI Data Repositories', () => {
 		});
 		
 		it('should handle get by id and 404', async () => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			vi.mocked(apiGet).mockRejectedValue(new (ApiError as any)(404));
 			const result = await getSystemPromptById('t1');
 			expect(result).toBeUndefined();
@@ -184,6 +187,7 @@ describe('AI Data Repositories', () => {
 		});
 		
 		it('should handle get by id and 404', async () => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			vi.mocked(apiGet).mockRejectedValue(new (ApiError as any)(404));
 			const result = await getChatInstructionById('t1');
 			expect(result).toBeUndefined();

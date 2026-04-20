@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Project } from '$lib/db/types.js';
 
-	type LibraryCardDestination = 'reader' | 'workspace' | 'hub';
+	type LibraryCardDestination = 'reader' | 'outline' | 'hub';
 
 	let {
 		project,
@@ -46,15 +46,15 @@
 	const cardHref = $derived(
 		destination === 'hub'
 			? `/projects/${project.id}/hub`
-			: destination === 'workspace'
-				? `/projects/${project.id}/workspace`
+			: destination === 'outline'
+				? `/projects/${project.id}/outline`
 				: `/books/${project.id}`,
 	);
 	const cardActionLabel = $derived(
 		destination === 'hub'
 			? 'Open project hub for'
-			: destination === 'workspace'
-				? 'Open workspace for'
+			: destination === 'outline'
+				? 'Open outline for'
 				: 'Open reader for',
 	);
 </script>

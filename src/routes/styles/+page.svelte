@@ -19,6 +19,7 @@
 	let isSaving = $state(false);
 	let isEditingPreset = $state(false);
 	let errorMessage = $state('');
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let editingItem = $state<any>(null);
 
 	let itemName = $state('');
@@ -38,6 +39,7 @@
 		{ id: 'instructions', label: 'Chat Instructions' },
 	];
 
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	function openEditor(item: any, isPreset = false) {
 		editingItem = item;
 		isEditingPreset = isPreset;
@@ -69,6 +71,7 @@
 			'chat_instructions';
 
 		const isNew = !editingItem?.id;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		let payload: any = { ...editingItem };
 
 		if (isNew) {
@@ -102,8 +105,8 @@
 
 			await invalidateAll();
 			isEditing = false;
-		} catch (err: any) {
-			errorMessage = err.message || 'An error occurred while saving.';
+		} catch (err: unknown) {
+			errorMessage = err instanceof Error ? err.message : 'An error occurred while saving.';
 		} finally {
 			isSaving = false;
 		}

@@ -1,8 +1,11 @@
 <script lang="ts">
-	let { onAdd, active = $bindable(false) } = $props<{
+	let { onAdd, active = $bindable(false), entityLabel = 'Chapter', placeholder } = $props<{
 		onAdd: (title: string) => void;
 		active?: boolean;
+		entityLabel?: string;
+		placeholder?: string;
 	}>();
+	const inputPlaceholder = $derived(placeholder ?? `${entityLabel} title...`);
 
 	let title = $state('');
 	let inputEl = $state<HTMLInputElement | undefined>(undefined);
@@ -39,7 +42,7 @@
 			bind:this={inputEl}
 			class="add-input"
 			type="text"
-			placeholder="Chapter title…"
+			placeholder={inputPlaceholder}
 			bind:value={title}
 			onkeydown={handleKeydown}
 		/>
@@ -49,7 +52,7 @@
 {:else}
 	<button class="btn-add-chapter" onclick={open}>
 		<span class="btn-icon-plus" aria-hidden="true">+</span>
-		Add Chapter
+		Add {entityLabel}
 	</button>
 {/if}
 

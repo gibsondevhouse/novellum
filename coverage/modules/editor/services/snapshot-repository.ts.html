@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">87.5% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>7/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>1/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>1/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">87.5% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>7/8</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -91,21 +91,21 @@
 <a name='L26'></a><a href='#L26'>26</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -116,21 +116,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { apiGet, apiPost, apiDel } from '$lib/api-client.js';
 import type { SceneSnapshot } from '$lib/db/types.js';
 &nbsp;
-const MAX_SNAPSHOTS = <span class="cstat-no" title="statement not covered" >20;</span>
+const MAX_SNAPSHOTS = 20;
 &nbsp;
-export async function <span class="fstat-no" title="function not covered" >createSnapshot(</span>
+export async function createSnapshot(
 	sceneId: string,
 	projectId: string,
 	text: string,
 ): Promise&lt;void&gt; {
-<span class="cstat-no" title="statement not covered" >	await apiPost('/api/db/scene_snapshots', { sceneId, projectId, text });</span>
+	await apiPost('/api/db/scene_snapshots', { sceneId, projectId, text });
 &nbsp;
-	const allSnapshots = <span class="cstat-no" title="statement not covered" >await apiGet&lt;SceneSnapshot[]&gt;('/api/db/scene_snapshots', { sceneId });</span>
+	const allSnapshots = await apiGet&lt;SceneSnapshot[]&gt;('/api/db/scene_snapshots', { sceneId });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >	if (allSnapshots.length &gt; MAX_SNAPSHOTS) {</span>
-		const excess = <span class="cstat-no" title="statement not covered" >allSnapshots.slice(MAX_SNAPSHOTS);</span>
-<span class="cstat-no" title="statement not covered" >		for (const s of excess) {</span>
-<span class="cstat-no" title="statement not covered" >			await apiDel(`/api/db/scene_snapshots/${s.id}`);</span>
+	<span class="missing-if-branch" title="else path not taken" >E</span>if (allSnapshots.length &gt; MAX_SNAPSHOTS) {
+		const excess = allSnapshots.slice(MAX_SNAPSHOTS);
+		for (const s of excess) {
+			await apiDel(`/api/db/scene_snapshots/${s.id}`);
 		}
 	}
 }
@@ -145,7 +145,7 @@ export async function <span class="fstat-no" title="function not covered" >listB
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-16T21:31:05.615Z
+                at 2026-04-20T04:35:10.043Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

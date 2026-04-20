@@ -1,6 +1,6 @@
 <script lang="ts">
-	let { onAddFirstChapter } = $props<{
-		onAddFirstChapter: () => void;
+	let { onAddFirstAct } = $props<{
+		onAddFirstAct: () => void;
 	}>();
 </script>
 
@@ -17,11 +17,11 @@
 	<div class="empty-text">
 		<h2 class="empty-heading">Begin your story structure</h2>
 		<p class="empty-body">
-			Create chapters to organize your manuscript,<br />
-			then break each into scenes.
+			Create acts to shape the high-level flow,<br />
+			then add chapters and scenes inside each act.
 		</p>
 	</div>
-	<button class="btn-cta" onclick={onAddFirstChapter}> Add First Chapter </button>
+	<button class="btn-cta" onclick={onAddFirstAct}> Add First Act </button>
 </div>
 
 <style>

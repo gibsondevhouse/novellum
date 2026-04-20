@@ -13,8 +13,6 @@
 		reorderScenes,
 	} from '$modules/editor/services/scene-repository.js';
 	import { toggleChapter } from '$modules/outliner/stores/outliner.svelte.js';
-	import { computeMetrics } from '$modules/outliner/services/pacing-telemetry.js';
-	import OutlinePlanningHeader from './OutlinePlanningHeader.svelte';
 	import OutlineEmptyState from './OutlineEmptyState.svelte';
 	import AddChapterForm from './AddChapterForm.svelte';
 	import ActGroup from './ActGroup.svelte';
@@ -44,7 +42,7 @@
 
 	// eslint-disable-next-line svelte/prefer-writable-derived
 	let localChapters = $state<ChapterWithScenes[]>(untrack(() => chapters));
-	let addChapterActive = $state(false);
+	let addActActive = $state(false);
 	let dragId = $state<string | null>(null);
 	let dragOverIdx = $state<number | null>(null);
 
@@ -52,21 +50,20 @@
 		localChapters = chapters;
 	});
 
-	const metrics = $derived(computeMetrics(acts, localChapters));
-
 	const unassignedChapters = $derived(localChapters.filter((ch) => !ch.actId));
 
 	function chaptersForAct(actId: string): ChapterWithScenes[] {
 		return localChapters.filter((ch) => ch.actId === actId);
 	}
 
-	async function handleAddChapter(title: string) {
+	async function handleAddChapter(actId: string, title: string) {
 		const ch = await createChapter({
 			projectId,
 			title,
 			order: localChapters.length,
 			summary: '',
 			wordCount: 0,
+			actId,
 		});
 		const next: ChapterWithScenes[] = [...localChapters, { ...ch, scenes: [] }];
 		localChapters = next;
@@ -196,14 +193,8 @@
 </script>
 
 <div class="hierarchy-navigator" role="tree" aria-label="Story outline">
-	<OutlinePlanningHeader
-		chapterCount={localChapters.length}
-		sceneCount={localChapters.reduce((n, ch) => n + ch.scenes.length, 0)}
-		{metrics}
-	/>
-
-	{#if localChapters.length === 0 && !addChapterActive}
-		<OutlineEmptyState onAddFirstChapter={() => (addChapterActive = true)} />
+	{#if acts.length === 0 && localChapters.length === 0 && !addActActive}
+		<OutlineEmptyState onAddFirstAct={() => (addActActive = true)} />
 	{/if}
 
 	{#if acts.length > 0}
@@ -215,6 +206,7 @@
 				{onSelectChapter}
 				{onSelectScene}
 				{onSelectAct}
+				onAddChapter={handleAddChapter}
 				onAddScene={handleAddScene}
 				onDeleteScene={handleDeleteScene}
 				onReorderScenes={handleReorderScenes}
@@ -274,16 +266,14 @@
 		</div>
 	{/if}
 
-	{#if localChapters.length > 0 || addChapterActive}
-		<div class="add-chapter-row">
-			<AddChapterForm onAdd={handleAddChapter} bind:active={addChapterActive} />
-		</div>
-	{/if}
-	{#if acts.length === 0}
-		<div class="add-act-row">
-			<button class="btn-add-act" onclick={() => onAddAct('New Act')}>+ Add Act</button>
-		</div>
-	{/if}
+	<div class="add-act-row">
+		<AddChapterForm
+			onAdd={onAddAct}
+			bind:active={addActActive}
+			entityLabel="Act"
+			placeholder="Act title..."
+		/>
+	</div>
 </div>
 
 <style>
@@ -317,35 +307,7 @@
 		padding: var(--space-1) var(--space-2) var(--space-2);
 	}
 
-	.add-chapter-row {
-		margin-top: var(--space-5);
-	}
-
 	.add-act-row {
-		margin-top: var(--space-3);
-	}
-
-	.btn-add-act {
-		background: none;
-		border: 1px dashed var(--color-border-subtle);
-		border-radius: var(--radius-sm);
-		color: var(--color-text-muted);
-		font-size: var(--text-xs);
-		font-family: inherit;
-		cursor: pointer;
-		padding: var(--space-1) var(--space-3);
-		transition:
-			border-color 0.1s,
-			color 0.1s;
-	}
-
-	.btn-add-act:hover {
-		border-color: var(--color-border-default);
-		color: var(--color-text-secondary);
-	}
-
-	.btn-add-act:focus-visible {
-		outline: none;
-		box-shadow: var(--focus-ring);
+		margin-top: var(--space-5);
 	}
 </style>

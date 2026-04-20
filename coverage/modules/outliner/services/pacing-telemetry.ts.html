@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">87.5% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/16</span>
+                <span class='fraction'>14/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/11</span>
+                <span class='fraction'>11/11</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -137,7 +137,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -146,30 +146,28 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -178,7 +176,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -196,38 +196,38 @@ export interface PacingMetrics {
 	sparsity: 'healthy' | 'sparse' | 'very-sparse';
 }
 &nbsp;
-function <span class="fstat-no" title="function not covered" >hasBeatArray(v</span>: unknown): v is { beats: unknown[] } {
-<span class="cstat-no" title="statement not covered" >	return (</span>
+function hasBeatArray(v: unknown): v is { beats: unknown[] } {
+	return (
 		typeof v === 'object' &amp;&amp;
 		v !== null &amp;&amp;
 		'beats' in v &amp;&amp;
-		Array.isArray((v as Record&lt;string, unknown&gt;).beats)
+<span class="branch-3 cbranch-no" title="branch not covered" >		Array.isArray((v as Record&lt;string, unknown&gt;).beats)</span>
 	);
 }
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >computeMetrics(a</span>cts: Act[], chapters: ChapterWithScenes[]): PacingMetrics {
-	const chapterCount = <span class="cstat-no" title="statement not covered" >chapters.length;</span>
-	const sceneCount = <span class="cstat-no" title="statement not covered" >chapters.<span class="fstat-no" title="function not covered" >reduce((n</span>, ch) =&gt; <span class="cstat-no" title="statement not covered" >n + ch.scenes.length, 0</span>);</span>
-	const beatCount = <span class="cstat-no" title="statement not covered" >chapters.<span class="fstat-no" title="function not covered" >reduce(</span></span>
+export function computeMetrics(acts: Act[], chapters: ChapterWithScenes[]): PacingMetrics {
+	const chapterCount = chapters.length;
+	const sceneCount = chapters.reduce((n, ch) =&gt; n + ch.scenes.length, 0);
+	const beatCount = chapters.reduce(
 		(n, ch) =&gt;
-<span class="cstat-no" title="statement not covered" >			n +</span>
-			ch.scenes.<span class="fstat-no" title="function not covered" >reduce(</span>
-				(m, sc) =&gt; <span class="cstat-no" title="statement not covered" >m + (hasBeatArray(sc) ? sc.beats.length : 0),</span>
+			n +
+			ch.scenes.reduce(
+				(m, sc) =&gt; m + (hasBeatArray(sc) ? <span class="branch-0 cbranch-no" title="branch not covered" >sc.beats.length : 0</span>),
 				0,
 			),
 		0,
 	);
-	const avgScenesPerChapter = <span class="cstat-no" title="statement not covered" >chapterCount &gt; 0 ? sceneCount / chapterCount : 0;</span>
-	const avgBeatsPerScene = <span class="cstat-no" title="statement not covered" >sceneCount &gt; 0 ? beatCount / sceneCount : 0;</span>
+	const avgScenesPerChapter = chapterCount &gt; 0 ? sceneCount / chapterCount : 0;
+	const avgBeatsPerScene = sceneCount &gt; 0 ? beatCount / sceneCount : 0;
 	const sparsity: PacingMetrics['sparsity'] =
-<span class="cstat-no" title="statement not covered" >		chapterCount === 0</span>
+		chapterCount === 0
 			? 'healthy'
 			: avgScenesPerChapter &lt; 1
 				? 'very-sparse'
 				: avgScenesPerChapter &lt; 2
 					? 'sparse'
 					: 'healthy';
-<span class="cstat-no" title="statement not covered" >	return {</span>
+	return {
 		actCount: acts.length,
 		chapterCount,
 		sceneCount,
@@ -238,7 +238,7 @@ export function <span class="fstat-no" title="function not covered" >computeMetr
 	};
 }
 &nbsp;
-export const SPARSITY_THRESHOLDS = <span class="cstat-no" title="statement not covered" >{</span>
+export const SPARSITY_THRESHOLDS = {
 	'very-sparse': { minScenesPerChapter: 0, label: 'Very sparse — consider adding scenes' },
 	sparse: { minScenesPerChapter: 1, label: 'Sparse — chapters could use more scenes' },
 	healthy: { minScenesPerChapter: 2, label: 'Healthy structure' },
@@ -250,7 +250,7 @@ export const SPARSITY_THRESHOLDS = <span class="cstat-no" title="statement not c
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-16T21:31:05.615Z
+                at 2026-04-20T04:35:10.043Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

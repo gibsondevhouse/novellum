@@ -25,3 +25,7 @@ export { default as ProjectHeroCover } from './components/ProjectHeroCover.svelt
 export { default as ProjectHeroContent } from './components/ProjectHeroContent.svelte';
 export { default as StructuralMetricCard } from './components/StructuralMetricCard.svelte';
 export { default as StructuralMetricsCarousel } from './components/StructuralMetricsCarousel.svelte';
+export { default as HubActionBar } from './components/HubActionBar.svelte';
+export { default as HubProgressCard } from './components/HubProgressCard.svelte';
+export { default as HubNextStepCard } from './components/HubNextStepCard.svelte';
+export { default as HubDetailsPanel } from './components/HubDetailsPanel.svelte';

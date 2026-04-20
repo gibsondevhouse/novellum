@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import WorldBuildingPlaceholderPage from '$modules/bible/components/WorldBuildingPlaceholderPage.svelte';
+	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
+	import IndividualsWorkspaceShell from '$modules/bible/components/IndividualsWorkspaceShell.svelte';
 
 	const projectId = $derived(page.params.id ?? '');
 </script>
@@ -9,14 +10,38 @@
 	<title>Sub-plots — Novellum</title>
 </svelte:head>
 
-<WorldBuildingPlaceholderPage
-	projectId={projectId}
-	topSection="plot-threads"
-	activeId="sub-plots"
-	breadcrumbHref={`/projects/${projectId}/world-building/plot-threads`}
-	breadcrumbLabel="Threads"
-	heading="Sub-plots"
-	emptyTitle="No sub-plots yet"
-	emptyDescription="Track secondary narrative movements that enrich or challenge your major arcs."
-	subNavLabel="Threads sections"
-/>
+<div class="worldbuilding-section-view">
+	<WorldBuildingSubheaderNav
+		projectId={projectId}
+		topSection="plot-threads"
+		activeId="sub-plots"
+		ariaLabel="Threads sections"
+	/>
+	<IndividualsWorkspaceShell
+		characterOptions={[]}
+		selectedCharacterId={null}
+		onSelectCharacter={() => {}}
+		onCreateCharacter={() => {}}
+		hasSelection={false}
+		listAriaLabel="Sub-plots"
+		createLabel="new +"
+	>
+		{#snippet empty()}
+			<div class="entity-empty">
+				<p>Track secondary narrative movements that enrich or challenge your major arcs.</p>
+			</div>
+		{/snippet}
+	</IndividualsWorkspaceShell>
+</div>
+
+<style>
+	.entity-empty {
+		padding: var(--space-8);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--space-4);
+		color: var(--color-text-muted);
+		text-align: center;
+	}
+</style>

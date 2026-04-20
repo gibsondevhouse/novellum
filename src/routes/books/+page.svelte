@@ -35,7 +35,7 @@
 <div class="library-hub">
 	<SectionHeader
 		title="Books"
-		description="Your active projects shelf. Select a book to open its workspace."
+		description="Your active projects shelf. Select a book to open its outline."
 	>
 		{#snippet actions()}
 			<PrimaryButton onclick={openCreateProject}>New Project</PrimaryButton>
@@ -63,7 +63,7 @@
 		<SurfacePanel>
 			<ul class="library-column" role="list" aria-label="Project library">
 				{#each getProjects() as project, i (project.id)}
-					<LibraryHeroCard {project} cardIndex={i} destination="workspace" />
+					<LibraryHeroCard {project} cardIndex={i} destination="outline" />
 				{/each}
 			</ul>
 		</SurfacePanel>

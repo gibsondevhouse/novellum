@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import WorldBuildingPlaceholderPage from '$modules/bible/components/WorldBuildingPlaceholderPage.svelte';
+	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
+	import IndividualsWorkspaceShell from '$modules/bible/components/IndividualsWorkspaceShell.svelte';
 
 	const projectId = $derived(page.params.id ?? '');
 </script>
@@ -9,14 +10,38 @@
 	<title>Key Events — Novellum</title>
 </svelte:head>
 
-<WorldBuildingPlaceholderPage
-	projectId={projectId}
-	topSection="timeline"
-	activeId="key-events"
-	breadcrumbHref={`/projects/${projectId}/world-building/timeline`}
-	breadcrumbLabel="Chronicles"
-	heading="Key Events"
-	emptyTitle="No key events yet"
-	emptyDescription="Track turning points that redefine eras, alliances, and stakes across your timeline."
-	subNavLabel="Chronicles sections"
-/>
+<div class="worldbuilding-section-view">
+	<WorldBuildingSubheaderNav
+		projectId={projectId}
+		topSection="timeline"
+		activeId="key-events"
+		ariaLabel="Chronicles sections"
+	/>
+	<IndividualsWorkspaceShell
+		characterOptions={[]}
+		selectedCharacterId={null}
+		onSelectCharacter={() => {}}
+		onCreateCharacter={() => {}}
+		hasSelection={false}
+		listAriaLabel="Key Events"
+		createLabel="new +"
+	>
+		{#snippet empty()}
+			<div class="entity-empty">
+				<p>Track turning points that redefine eras, alliances, and stakes across your timeline.</p>
+			</div>
+		{/snippet}
+	</IndividualsWorkspaceShell>
+</div>
+
+<style>
+	.entity-empty {
+		padding: var(--space-8);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--space-4);
+		color: var(--color-text-muted);
+		text-align: center;
+	}
+</style>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import WorldBuildingPlaceholderPage from '$modules/bible/components/WorldBuildingPlaceholderPage.svelte';
+	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
+	import IndividualsWorkspaceShell from '$modules/bible/components/IndividualsWorkspaceShell.svelte';
 
 	const projectId = $derived(page.params.id ?? '');
 </script>
@@ -9,14 +10,38 @@
 	<title>Landmarks — Novellum</title>
 </svelte:head>
 
-<WorldBuildingPlaceholderPage
-	projectId={projectId}
-	topSection="locations"
-	activeId="landmarks"
-	breadcrumbHref={`/projects/${projectId}/world-building/locations`}
-	breadcrumbLabel="Atlas"
-	heading="Landmarks"
-	emptyTitle="No landmarks yet"
-	emptyDescription="Add specific high-impact sites, monuments, and critical waypoints in your world."
-	subNavLabel="Atlas sections"
-/>
+<div class="worldbuilding-section-view">
+	<WorldBuildingSubheaderNav
+		projectId={projectId}
+		topSection="locations"
+		activeId="landmarks"
+		ariaLabel="Atlas sections"
+	/>
+	<IndividualsWorkspaceShell
+		characterOptions={[]}
+		selectedCharacterId={null}
+		onSelectCharacter={() => {}}
+		onCreateCharacter={() => {}}
+		hasSelection={false}
+		listAriaLabel="Landmarks"
+		createLabel="new +"
+	>
+		{#snippet empty()}
+			<div class="entity-empty">
+				<p>Add specific high-impact sites, monuments, and critical waypoints in your world.</p>
+			</div>
+		{/snippet}
+	</IndividualsWorkspaceShell>
+</div>
+
+<style>
+	.entity-empty {
+		padding: var(--space-8);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--space-4);
+		color: var(--color-text-muted);
+		text-align: center;
+	}
+</style>

@@ -1,8 +1,9 @@
 # Project Configuration
 
-- **Language**: TypeScript
-- **Package Manager**: pnpm
-- **Add-ons**: none
+- **Language**: TypeScript (v6+)
+- **Package Manager**: pnpm (v9+)
+- **UI Framework**: Svelte 5 (Runes)
+- **Database**: SQLite (via `better-sqlite3`) & Dexie (Migration/Portability)
 
 ---
 
@@ -18,20 +19,14 @@ The project is organized into two distinct layers: the **Meta-Agent Layer** (for
 
 ### 1. Meta-Agent Layer (`.github/`)
 This directory houses critical configuration and definitions for the Gemini CLI and its development agents.
-- **`agents/`**: Defines specialized AI agents for development tasks.
-  - `planner.agent.md`: Orchestrates development tasks and generates multi-tier plans.
-  - `backend.agent.md`: Manages server-side logic, SQLite, and services.
-  - `architect.agent.md`: Senior layout architect for route shells, layout composition, and structural systems.
-  - `stylist.agent.md`: Senior UI stylist for design tokens, accessibility, interaction states, and visual polish.
-  - `reviewer.agent.md`: Ensures code quality and modular boundary compliance.
-  - `ai.agent.md`: Manages AI models, prompts, and context logic.
+- **`agents/`**: Defines specialized AI agents for development tasks (Planner, Reviewer, Architect, Stylist, Backend, AI).
 - **`skills/`**: Reusable modules or capabilities for dev-agents (e.g., `ai-context/`, `svelte5-runes/`, `modular-boundaries/`).
 - **`instructions/`**, **`prompts/`**, **`workflows/`**: High-level guidance for agent interactions.
 
 ### 2. Product Agent Layer (`src/lib/ai/`)
 Runtime agents that power the Novellum application features.
-- **Core Agents**: `ContinuityAgent`, `EditAgent`, `RewriteAgent`, `StyleAgent`, etc.
-- **Infrastructure**: `ContextEngine`, `PromptBuilder`, `ModelRouter`, `Orchestrator`.
+- **Core Agents**: `ContinuityAgent`, `EditAgent`, `RewriteAgent`, `StyleAgent`, `BrainstormAgent`, `OutlineAgent`, `DraftAgent`, `SummaryAgent`.
+- **Infrastructure**: `ContextEngine`, `PromptBuilder`, `ModelRouter`, `OpenRouterClient` (Streaming HTTP implementation).
 - **See also**: [`AGENTS.md`](./AGENTS.md) for a comprehensive breakdown of all agents.
 
 ### 3. Documentation & Planning (`dev-docs/`)
@@ -41,14 +36,14 @@ Runtime agents that power the Novellum application features.
 ## Development Conventions and Workflow
 
 ### Modular Architecture
-Functionality is organized by **vertical domain slices** (e.g., `bible`, `workspace`, `editor`).
-- **Strict Boundaries**: Import boundaries are enforced via ESLint to prevent cross-module leakage.
+Functionality is organized by **vertical domain slices** (e.g., `bible`, `workspace`, `editor`, `outliner`, `continuity`).
+- **Strict Boundaries**: Import boundaries are enforced via ESLint (`eslint-plugin-boundaries`) to prevent cross-module leakage.
 - **Rules**: Every module owns its components, services, and stores. Read `dev-docs/modular-boundaries.md` before coding.
 
 ### Technical Stack Standards
-- **Svelte 5 Runes**: All new UI components MUST use `$state`, `$derived`, and `.svelte.ts` patterns.
-- **Linearization UI**: All UI components must adhere to the Linear-inspired UI design system. Use `SurfaceCard`, `SurfacePanel`, `SectionHeader`, and standard buttons (`PrimaryButton`, `GhostButton`). Do not use hardcoded pixel values for padding or margins (use `--space-*` tokens). Respect tonal layering and `prefers-reduced-motion`.
-- **SQLite Persistence**: The live data store is a server-side SQLite database accessed via `/api/db/*`.
+- **Svelte 5 Runes**: All new UI components MUST use `$state`, `$derived`, and `.svelte.ts` patterns. Old Svelte 4 patterns are deprecated.
+- **Linearization UI**: All UI components must adhere to the Linear-inspired UI design system. Use `SurfaceCard`, `SurfacePanel`, `SectionHeader`, and standard buttons (`PrimaryButton`, `GhostButton`). Use `--space-*` tokens for all layout.
+- **SQLite Persistence**: The primary data store is a server-side SQLite database accessed via `/api/db/*`. Dexie is used only for legacy migration and portability snapshots.
 - **AI Pipeline**: Follows the `ROLE -> TASK -> CONTEXT -> CONSTRAINTS -> OUTPUT FORMAT` prompt pattern.
 
 ## Building and Running
@@ -56,8 +51,8 @@ Functionality is organized by **vertical domain slices** (e.g., `bible`, `worksp
 - **Package Manager**: pnpm ≥ 9
 - **Node**: ≥ 20 (required for `better-sqlite3`)
 - **Dev server**: `pnpm run dev` → <http://localhost:5173>
-- **Lint**: `pnpm run lint` (checks boundaries and types)
-- **Tests**: `pnpm test` (Vitest)
+- **Lint**: `pnpm run lint` (checks boundaries, types, and visual tokens)
+- **Tests**: `pnpm test` (Vitest), `pnpm run test:visual` (Playwright)
 
 ### Environment Variables
 
@@ -66,22 +61,27 @@ Functionality is organized by **vertical domain slices** (e.g., `bible`, `worksp
 | `NOVELLUM_DB_PATH` | `./novellum.db` | File path for the SQLite database |
 | `VITE_OPENROUTER_API_KEY` | (none) | Required for AI features (OpenRouter) |
 
-## Planning & Quality Gates
+## Recent Accomplishments
 
-- **Hierarchy**: Plan -> Stage -> Phase -> Part.
-- **Verification**: Every part requires explicit evidence (commits, test output, lint status).
-- **Quality Gates**: No plan closure without passing `lint`, `typecheck`, and `tests`.
+- **Plan-012 (Codebase Extraction)**: Major refactor of duplicated repository patterns and store CRUD boilerplate (~840 lines reduced).
+- **Refactor-010 (Visual Consistency)**: Enforced visual consistency across route families through baseline rulebooks and automated token checks.
+- **AI Engine Implementation**: `OpenRouterClient` is fully implemented with streaming support and model fallback logic.
+- **Frontend Hardening**: Production-grade error boundaries, accessibility improvements, and design system enforcement.
+
+## Current Focus (Active Plans)
+
+- **Plan-013 (Workspace Hierarchy Flow)**: Wiring the full Arc → Act → Chapter → Scene parent-child data flow across all workspace modes.
 
 ## Vulnerabilities and Fragilities
 
-- **AI Implementation Stub**: `OpenRouterClient` in `src/lib/ai/openrouter.ts` is currently a stub. AI features require the HTTP layer and real API keys.
-- **Transition State**: The project is migrating from Svelte 4 to Svelte 5 and from Dexie to SQLite. Be vigilant about reactivity and persistence patterns.
-- **Data Model Complexity**: Large projects with many entities (Beats, Lore) may hit performance bottlenecks; use scoped context loading.
+- **Legacy Persistence**: Dexie code still exists in `src/lib/db`, `src/lib/migration`, and `src/modules/export` for migration and snapshotting. Be careful not to use it for new features.
+- **Transition State**: While Svelte 5 usage is high, some older components or patterns might still linger in less-frequented routes.
+- **Data Model Complexity**: The deep hierarchy (Arc/Act/Chapter/Scene) being implemented in Plan-013 requires careful foreign key management and UI filtering.
 
 ## Plan Completion and Continuity Checklist
 
 - [ ] All plan parts marked complete with evidence links.
-- [ ] Required quality gates (`lint`, `check`, `test`) passed.
+- [ ] Required quality gates (`lint`, `check`, `test`, `check:tokens`) passed.
 - [ ] Documentation (`dev-docs/`) synchronized with code changes.
 - [ ] `GEMINI.md` and `AGENTS.md` updated if architectural shifts occurred.
 - [ ] Next candidate plan identified and queued.

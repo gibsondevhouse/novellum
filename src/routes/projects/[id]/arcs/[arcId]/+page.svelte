@@ -6,8 +6,8 @@
 	<div class="coming-soon__content">
 		<span class="coming-soon__eyebrow">Arc Dashboard</span>
 		<p class="coming-soon__body">The arc development workspace will be available via updates.</p>
-		<a class="coming-soon__back" href="/projects/{page.params.id}/workspace">
-			← Back to Workspace
+		<a class="coming-soon__back" href="/projects/{page.params.id}/world-building/plot-threads">
+			← Back to Threads
 		</a>
 	</div>
 </div>

@@ -35,7 +35,7 @@
 
 	async function handleDelete() {
 		await submitDeleteCharacter(data.character.id);
-		goto(`/projects/${data.projectId}/world-building/characters`);
+		goto(`/projects/${data.projectId}/world-building/characters/individuals`);
 	}
 </script>
 
@@ -46,7 +46,7 @@
 <div class="page">
 	<div class="page-header">
 		<Breadcrumb items={[
-			{ label: 'Individuals', href: `/projects/${data.projectId}/world-building/characters` },
+			{ label: 'Individuals', href: `/projects/${data.projectId}/world-building/characters/individuals` },
 			{ label: data.character.name },
 		]} />
 		<div class="header-row">
@@ -71,7 +71,7 @@
 		character={data.character}
 		saving={getCharacterSaving()}
 		onSave={handleSave}
-		onCancel={() => goto(`/projects/${data.projectId}/world-building/characters`)}
+		onCancel={() => goto(`/projects/${data.projectId}/world-building/characters/individuals`)}
 	/>
 
 	<RelationshipEditor

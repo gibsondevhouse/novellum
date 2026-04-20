@@ -2,6 +2,7 @@
 	import type { Act, Chapter, Scene } from '$lib/db/types.js';
 	import type { ChapterWithScenes } from '$modules/outliner/types.js';
 	import ChapterGroup from './ChapterGroup.svelte';
+	import AddChapterForm from './AddChapterForm.svelte';
 
 	let {
 		act,
@@ -11,6 +12,7 @@
 		onSelectScene,
 		onSelectAct,
 		onAddScene,
+		onAddChapter,
 		onDeleteScene,
 		onReorderScenes,
 		onMoveScene,
@@ -22,12 +24,14 @@
 		onSelectScene: (scene: Scene) => void;
 		onSelectAct: (act: Act) => void;
 		onAddScene: (chapter: ChapterWithScenes, title: string) => void;
+		onAddChapter: (actId: string, title: string) => void;
 		onDeleteScene: (chapter: ChapterWithScenes, sceneId: string) => void;
 		onReorderScenes: (chapter: ChapterWithScenes, ids: string[]) => void;
 		onMoveScene: (sceneId: string, fromChapterId: string, toChapterId: string, index: number) => void;
 	}>();
 
 	let expanded = $state(true);
+	let addChapterActive = $state(false);
 
 	function handleHeaderKeydown(e: KeyboardEvent) {
 		if (e.key === 'Enter' || e.key === ' ') {
@@ -73,6 +77,14 @@
 					{onMoveScene}
 				/>
 			{/each}
+			<div class="act-add-chapter">
+				<AddChapterForm
+					onAdd={(title) => onAddChapter(act.id, title)}
+					bind:active={addChapterActive}
+					entityLabel="Chapter"
+					placeholder="Chapter title..."
+				/>
+			</div>
 		</div>
 	{/if}
 </div>
@@ -154,5 +166,9 @@
 
 	.act-chapters {
 		padding-left: var(--space-4);
+	}
+
+	.act-add-chapter {
+		margin-top: var(--space-2);
 	}
 </style>

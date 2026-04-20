@@ -78,6 +78,7 @@ export async function submitCreate(data: {
 			status: 'drafting',
 			projectType: data.projectType ?? 'novel',
 			stylePresetId: '',
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			lastOpenedAt: new Date().toISOString(),
 		});
 		// active project store update removed as it's now reactively derived from URL
@@ -91,6 +92,7 @@ export async function submitCreate(data: {
 
 export function selectProject(project: Project): void {
 	// Update lastOpenedAt implicitly in background
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity
 	updateProject(project.id, { lastOpenedAt: new Date().toISOString() }).catch(console.error);
 	// active project store update removed as it's now reactively derived from URL
 	goto(`/projects/${project.id}`);
@@ -98,6 +100,7 @@ export function selectProject(project: Project): void {
 
 export function openReader(project: Project): void {
         // Update lastOpenedAt implicitly in background
+        // eslint-disable-next-line svelte/prefer-svelte-reactivity
         updateProject(project.id, { lastOpenedAt: new Date().toISOString() }).catch(console.error);
         goto(`/books/${project.id}`);
 }

@@ -49,8 +49,15 @@ async function flush(): Promise<void> {
 	const text = pending;
 	pending = null;
 	const now = new Date().toISOString();
-	await updateScene(sceneId, { content: text, updatedAt: now });
-	await createSnapshot(sceneId, projectId, text);
-	onStatusChange?.('saved');
+	try {
+		await updateScene(sceneId, { content: text, updatedAt: now });
+		if (text.trim().length > 0) {
+			await createSnapshot(sceneId, projectId, text);
+		}
+		onStatusChange?.('saved');
+	} catch {
+		onStatusChange?.('idle');
+		return;
+	}
 	setTimeout(() => onStatusChange?.('idle'), 2000);
 }

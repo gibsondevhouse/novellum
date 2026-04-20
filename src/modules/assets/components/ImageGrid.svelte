@@ -181,7 +181,7 @@
 							</select>
 							<select bind:value={assignProjectId} class="assign-select">
 								<option value="">-- Select Project --</option>
-								{#each store.albums as album}
+								{#each store.albums as album (album.id)}
 									{#if album.id !== 'global'}
 										<option value={album.id}>{album.title}</option>
 									{/if}

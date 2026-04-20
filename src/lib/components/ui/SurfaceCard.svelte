@@ -8,7 +8,7 @@
 		interactive?: boolean;
 		class?: string;
 		href?: string;
-		element?: keyof HTMLElementTagNameMap;
+		element?: string;
 	}
 
 	let {
@@ -26,7 +26,7 @@
 	<a
 		{href}
 		class="surface-card variant-{variant} interactive {className}"
-		{...rest as any}
+		{...(rest as Record<string, unknown>)}
 	>
 		{@render children?.()}
 	</a>

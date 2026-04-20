@@ -47,7 +47,7 @@
 				</svg>
 			{/snippet}
 		</SidebarItem>
-		<SidebarItem href="{base}/workspace" label="Workspace">
+		<SidebarItem href="{base}/world-building/plot-threads" label="Threads">
 			{#snippet icon()}
 				<svg
 					xmlns="http://www.w3.org/2000/svg"

@@ -5,7 +5,7 @@
 		label?: string;
 		error?: string;
 		class?: string;
-		value?: any;
+		value?: HTMLInputAttributes['value'];
 	}
 
 	let {

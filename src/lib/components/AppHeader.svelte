@@ -3,18 +3,10 @@
 	import { goto } from '$app/navigation';
 	import ModelSelector from './ModelSelector.svelte';
 	import PillNav from './ui/PillNav.svelte';
-	import { getActiveMode, setMode } from '../../modules/workspace/stores/workspace-mode.svelte.js';
-	import { WORKSPACE_MODES } from '../../modules/workspace/types.js';
 	import {
 		WORLD_BUILDING_TOP_ITEMS,
 		getWorldBuildingTopSection,
 	} from '$modules/bible/worldbuilding-navigation.js';
-
-	const modeItems = $derived(
-		WORKSPACE_MODES.map((m) => ({ id: m, label: m.toUpperCase() }))
-	);
-
-	let isWorkspaceRoute = $derived(page.url.pathname.includes('/workspace'));
 	let isWorldBuildingRoute = $derived(page.url.pathname.includes('/world-building'));
 
 	let worldBuildingActiveId = $derived(getWorldBuildingTopSection(page.url.pathname));
@@ -66,14 +58,7 @@
 	</div>
 
 		<div class="header-center">
-		{#if isWorkspaceRoute}
-			<PillNav
-				items={modeItems}
-				activeId={getActiveMode()}
-				onSelect={(id) => setMode(id as typeof WORKSPACE_MODES[number])}
-				ariaLabel="Workspace mode"
-			/>
-		{:else if isWorldBuildingRoute}
+		{#if isWorldBuildingRoute}
 			<PillNav
 				items={WORLD_BUILDING_TOP_ITEMS}
 				activeId={worldBuildingActiveId}
