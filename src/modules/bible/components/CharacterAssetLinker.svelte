@@ -212,7 +212,7 @@
 	.asset-linker__dropzone:focus-visible,
 	.asset-linker__dropzone--active {
 		border-color: color-mix(in srgb, var(--color-nova-blue) 60%, var(--color-border-default));
-		box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-nova-blue) 25%, transparent);
+		box-shadow: var(--shadow-xs);
 		transform: translateY(-1px);
 	}
 

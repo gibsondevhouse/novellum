@@ -153,6 +153,8 @@
 				name: character.name,
 				role: character.role,
 				summary: character.summary,
+				subtitle: character.role?.trim() || 'Role not set',
+				meta: character.summary?.trim() || 'No summary yet',
 			}))
 			.sort((a, b) => a.name.localeCompare(b.name)),
 	);

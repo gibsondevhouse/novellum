@@ -83,3 +83,9 @@ export const schemaV11 = {
     ...schemaV10,
     acts: 'id, projectId, order, arcId'
 };
+
+// Version 12 — adds narrative location indexes for realms and landmarks.
+export const schemaV12 = {
+	...schemaV11,
+	locations: 'id, projectId, kind, realmId'
+};

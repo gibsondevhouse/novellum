@@ -119,16 +119,25 @@
 
 <div class="styles-page">
 	<div class="styles-header">
-		<h1 class="styles-header__title">Writing Styles</h1>
-		<p class="styles-header__description">
-			Customize formatting, tone, and behavior rules for Nova.
-		</p>
+		<div>
+			<p class="styles-header__eyebrow">Configuration Library</p>
+			<h1 class="styles-header__title">Writing Styles</h1>
+			<p class="styles-header__description">
+				Customize formatting, tone, and behavior rules for Nova.
+			</p>
+		</div>
+		<div class="styles-header__summary" aria-label="Styles summary">
+			<span>{tabs.find((tab) => tab.id === activeTab)?.label}</span>
+			<strong>{activeTab === 'styles' ? styles.length : activeTab === 'prompts' ? systemPrompts.length : instructions.length} items</strong>
+		</div>
 	</div>
 
-	<div class="tab-navigation">
+	<div class="tab-navigation" aria-label="Styles sections">
 		{#each tabs as tab (tab.id)}
 			<button
 				class="tab-btn {activeTab === tab.id ? 'tab-btn--active' : ''}"
+				type="button"
+				aria-current={activeTab === tab.id ? 'true' : undefined}
 				onclick={() => { activeTab = tab.id; }}
 			>
 				{tab.label}
@@ -306,10 +315,22 @@
 
 	.styles-header {
 		display: flex;
-		flex-direction: column;
-		align-items: center;
-		text-align: center;
+		justify-content: space-between;
+		align-items: flex-start;
 		gap: var(--space-4);
+	}
+
+	.styles-header__eyebrow,
+	.styles-header__title,
+	.styles-header__description {
+		margin: 0;
+	}
+
+	.styles-header__eyebrow {
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+		color: var(--color-text-muted);
 	}
 
 	.styles-header__title {
@@ -323,7 +344,29 @@
 		font-size: var(--text-base);
 		color: var(--color-text-secondary);
 		max-width: 500px;
-		margin: 0;
+		margin-top: var(--space-2);
+	}
+
+	.styles-header__summary {
+		display: grid;
+		gap: 0.2rem;
+		padding: var(--space-3);
+		border: 1px solid var(--color-border-subtle);
+		border-radius: var(--radius-lg);
+		background: color-mix(in srgb, var(--color-surface-overlay) 82%, transparent);
+		min-width: 12rem;
+	}
+
+	.styles-header__summary span {
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+		color: var(--color-text-muted);
+	}
+
+	.styles-header__summary strong {
+		font-size: var(--text-sm);
+		color: var(--color-text-primary);
 	}
 
 	.tab-navigation {
@@ -338,18 +381,23 @@
 		background: none;
 		border: none;
 		padding: var(--space-3) var(--space-1);
-		font-family: var(--font-body);
+		font-family: var(--font-sans);
 		font-size: var(--text-base);
 		font-weight: var(--font-weight-medium);
 		color: var(--color-text-muted);
 		cursor: pointer;
 		border-bottom: 2px solid transparent;
-		transition: all var(--transition-fast) ease-in-out;
+		transition: all var(--duration-fast) var(--ease-standard);
 		margin-bottom: -1px;
 	}
 
 	.tab-btn:hover {
 		color: var(--color-text-secondary);
+	}
+
+	.tab-btn:focus-visible {
+		outline: none;
+		box-shadow: var(--focus-ring);
 	}
 
 	.tab-btn--active {
@@ -368,6 +416,19 @@
 		justify-content: space-between;
 		align-items: flex-start;
 		margin-bottom: var(--space-4);
+	}
+
+	@media (max-width: 760px) {
+		.styles-header,
+		.panel-header-actions {
+			flex-direction: column;
+			align-items: stretch;
+		}
+
+		.tab-navigation {
+			justify-content: flex-start;
+			overflow-x: auto;
+		}
 	}
 
 	.settings-grid {
@@ -510,7 +571,7 @@ line-clamp: 3;
 		background: var(--color-surface-overlay);
 		border-left: 1px solid var(--color-border-default);
 		box-shadow: -8px 0 32px rgba(0, 0, 0, 0.1);
-		animation: slideIn var(--duration-base) var(--ease-out-back);
+		animation: slideIn var(--duration-base) var(--ease-editorial);
 		display: flex;
 		flex-direction: column;
 	}

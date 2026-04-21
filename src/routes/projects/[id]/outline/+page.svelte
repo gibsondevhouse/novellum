@@ -137,6 +137,17 @@
 		return arcs.find((arc) => arc.id === selectedAct.arcId) ?? null;
 	});
 
+	const totalSceneCount = $derived.by(() =>
+		chapters.reduce((total, chapter) => total + chapter.scenes.length, 0),
+	);
+
+	const selectionSummary = $derived.by(() => {
+		if (selectedScene) return `Scene focus: ${selectedScene.title}`;
+		if (selectedChapter) return `Chapter focus: ${selectedChapter.title}`;
+		if (selectedAct) return `Act focus: ${selectedAct.title}`;
+		return 'Select a node to start planning';
+	});
+
 	async function handleUpdateSelectedAct(patch: Partial<Omit<Act, 'id' | 'projectId' | 'createdAt'>>) {
 		if (!selectedAct) return;
 		await updateAct(selectedAct.id, patch);
@@ -235,7 +246,36 @@
 	<title>Outline — Novellum</title>
 </svelte:head>
 
-<div class="outline-workspace" role="main">
+<div class="outline-shell" role="main">
+	<section class="storyboard-hero" aria-labelledby="storyboard-title">
+		<div>
+			<p class="storyboard-eyebrow">Storyboard Room</p>
+			<h1 id="storyboard-title">Narrative Structure</h1>
+			<p class="storyboard-copy">
+				Map acts, chapters, and scenes as production beats. Keep structure explicit before entering manuscript drafting.
+			</p>
+		</div>
+		<div class="storyboard-metrics" aria-label="Outline metrics">
+			<div class="metric-card">
+				<span>Acts</span>
+				<strong>{acts.length}</strong>
+			</div>
+			<div class="metric-card">
+				<span>Chapters</span>
+				<strong>{chapters.length}</strong>
+			</div>
+			<div class="metric-card">
+				<span>Scenes</span>
+				<strong>{totalSceneCount}</strong>
+			</div>
+			<div class="metric-card metric-card--wide">
+				<span>Selection</span>
+				<strong>{selectionSummary}</strong>
+			</div>
+		</div>
+	</section>
+
+	<div class="outline-workspace">
 	<aside class="outline-sidebar" aria-label="Outline selector">
 		<div class="outline-sidebar-scroll">
 			<HierarchyNavigator {...navigatorProps} />
@@ -281,14 +321,90 @@
 			</div>
 		{/if}
 	</section>
+	</div>
 </div>
 
 <style>
+	.outline-shell {
+		display: grid;
+		gap: var(--space-5);
+		padding: var(--space-5) 0 var(--space-8);
+	}
+
+	.storyboard-hero {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+		gap: var(--space-4);
+		padding: var(--space-5);
+		border: 1px solid var(--color-border-subtle);
+		border-radius: var(--radius-xl);
+		background:
+			radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--color-teal) 12%, transparent), transparent 40%),
+			linear-gradient(165deg, var(--color-surface-overlay), var(--color-surface-ground));
+	}
+
+	.storyboard-eyebrow,
+	.storyboard-hero h1,
+	.storyboard-copy {
+		margin: 0;
+	}
+
+	.storyboard-eyebrow {
+		font-size: var(--text-xs);
+		letter-spacing: var(--tracking-wide);
+		text-transform: uppercase;
+		color: var(--color-text-muted);
+	}
+
+	.storyboard-hero h1 {
+		margin-top: var(--space-1);
+		font-size: var(--text-2xl);
+	}
+
+	.storyboard-copy {
+		margin-top: var(--space-2);
+		max-width: 60ch;
+		font-size: var(--text-sm);
+		line-height: var(--leading-relaxed);
+		color: var(--color-text-secondary);
+	}
+
+	.storyboard-metrics {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--space-3);
+	}
+
+	.metric-card {
+		display: grid;
+		gap: 0.15rem;
+		padding: var(--space-3);
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--color-border-subtle);
+		background: color-mix(in srgb, var(--color-surface-overlay) 76%, transparent);
+	}
+
+	.metric-card span {
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+		color: var(--color-text-muted);
+	}
+
+	.metric-card strong {
+		font-size: var(--text-sm);
+		color: var(--color-text-primary);
+	}
+
+	.metric-card--wide {
+		grid-column: 1 / -1;
+	}
+
 	.outline-workspace {
 		display: grid;
 		grid-template-columns: minmax(280px, 340px) 1fr;
 		gap: var(--space-4);
-		padding: var(--space-6);
+		padding: 0 var(--space-2) var(--space-1);
 		height: calc(100vh - var(--header-height, 64px));
 		overflow: hidden;
 		box-sizing: border-box;
@@ -348,6 +464,10 @@
 	}
 
 	@media (max-width: 960px) {
+		.storyboard-hero {
+			grid-template-columns: 1fr;
+		}
+
 		.outline-workspace {
 			grid-template-columns: 1fr;
 			height: auto;

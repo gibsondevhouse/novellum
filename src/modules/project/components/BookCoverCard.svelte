@@ -177,13 +177,13 @@
         .status-completed {
                 background-color: var(--color-success-subtle);
                 color: var(--color-success-on-dark);
-                border-color: rgba(74, 222, 128, 0.3);
+                border-color: color-mix(in srgb, var(--color-success) 30%, transparent);
         }
 
         .status-drafting {
-                background-color: rgba(6, 182, 212, 0.15); /* teal */
-                color: #67e8f9;
-                border-color: rgba(6, 182, 212, 0.3);
+                background-color: color-mix(in srgb, var(--color-teal) 15%, transparent);
+                color: var(--color-teal);
+                border-color: color-mix(in srgb, var(--color-teal) 30%, transparent);
         }
 
         .card-footer {

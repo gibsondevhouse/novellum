@@ -52,7 +52,7 @@
 						</svg>
 					</span>
 				{/if}
-				<span class="header-context__title">{displayTitle}</span>
+				<span class="header-context__title" title={displayTitle}>{displayTitle}</span>
 			</div>
 		{/if}
 	</div>
@@ -133,7 +133,11 @@
 		height: 48px;
 		padding: 0 var(--space-4);
 		background-color: var(--color-surface-base);
+		border-bottom: 1px solid var(--color-border-subtle);
 		flex-shrink: 0;
+		position: sticky;
+		top: 0;
+		z-index: 20;
 	}
 
 	.header-left {
@@ -163,6 +167,7 @@
 		font-size: var(--text-sm);
 		font-weight: var(--font-weight-medium);
 		color: var(--color-text-primary);
+		max-width: clamp(140px, 28vw, 420px);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -173,6 +178,7 @@
 		align-items: center;
 		gap: var(--space-1);
 		flex: 1;
+		min-width: 0;
 		justify-content: flex-end;
 	}
 
@@ -222,6 +228,29 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		min-width: 0;
+	}
+
+	@media (max-width: 960px) {
+		.header-center {
+			display: none;
+		}
+
+		.app-header {
+			gap: var(--space-2);
+			padding: 0 var(--space-3);
+		}
+	}
+
+	@media (max-width: 640px) {
+		.header-context__title {
+			max-width: 46vw;
+		}
+
+		.header-action {
+			width: 30px;
+			height: 30px;
+		}
 	}
 
 

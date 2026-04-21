@@ -44,10 +44,10 @@
 
 <style>
 	.hub {
-		max-width: 1000px;
+		max-width: 1120px;
 		margin: 0 auto;
 		width: 100%;
-		padding: var(--space-10) var(--space-6);
+		padding: var(--space-8) var(--space-6) var(--space-10);
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-6);
@@ -58,10 +58,15 @@
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
 		gap: var(--space-4);
+		align-items: stretch;
 	}
 
 	/* ── Responsive ── */
 	@media (max-width: 767px) {
+		.hub {
+			padding: var(--space-6) var(--space-4) var(--space-8);
+		}
+
 		.hub-grid {
 			grid-template-columns: repeat(2, 1fr);
 		}

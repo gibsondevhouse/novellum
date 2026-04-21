@@ -27,7 +27,14 @@
 	const selectedEvent = $derived(
 		selectedId ? (sorted.find((e) => e.id === selectedId) ?? null) : null,
 	);
-	const options = $derived(sorted.map((e) => ({ id: e.id, name: e.title })));
+	const options = $derived(
+		sorted.map((e) => ({
+			id: e.id,
+			name: e.title,
+			subtitle: e.date?.trim() || 'Date pending',
+			meta: e.description?.trim() ? 'Context drafted' : 'No context yet',
+		})),
+	);
 
 	function selectEvent(id: string) {
 		selectedId = id;

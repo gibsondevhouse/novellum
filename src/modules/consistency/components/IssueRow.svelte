@@ -18,15 +18,29 @@
 	const truncated = $derived(
 		issue.description.length > 120 ? issue.description.slice(0, 120) + '…' : issue.description,
 	);
+
+	const severityLabel = $derived(issue.severity === 'error' ? 'High severity' : 'Warning severity');
+	const severityGlyph = $derived(issue.severity === 'error' ? '!' : '~');
+	const statusLabel = $derived.by(() => {
+		switch (issue.status) {
+			case 'resolved':
+				return 'Resolved';
+			case 'dismissed':
+				return 'Dismissed';
+			default:
+				return 'Open';
+		}
+	});
 </script>
 
 <div class="issue-row" data-severity={issue.severity} data-status={issue.status}>
 	<div class="issue-meta">
-		<span class="badge badge--{issue.severity}">{issue.severity}</span>
+		<span class="badge badge--{issue.severity}" aria-label={severityLabel}>
+			<span aria-hidden="true" class="badge-glyph">{severityGlyph}</span>
+			{severityLabel}
+		</span>
 		<span class="issue-type">{issue.type.replace('_', ' ')}</span>
-		{#if issue.status !== 'open'}
-			<span class="status-chip status-chip--{issue.status}">{issue.status}</span>
-		{/if}
+		<span class="status-chip status-chip--{issue.status}">{statusLabel}</span>
 	</div>
 
 	<div class="issue-description">
@@ -70,12 +84,27 @@
 	}
 
 	.badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
 		padding: var(--space-1) var(--space-2);
 		border-radius: var(--radius-sm);
 		font-size: var(--text-xs);
 		font-weight: var(--font-weight-medium);
 		text-transform: uppercase;
 		letter-spacing: var(--tracking-wide);
+	}
+
+	.badge-glyph {
+		display: inline-flex;
+		width: 1rem;
+		height: 1rem;
+		align-items: center;
+		justify-content: center;
+		border-radius: var(--radius-full);
+		font-size: 0.75rem;
+		font-weight: var(--font-weight-bold);
+		background: color-mix(in srgb, currentColor 20%, transparent);
 	}
 
 	.badge--warning {
@@ -121,6 +150,7 @@
 		display: flex;
 		gap: var(--space-2);
 		flex-wrap: wrap;
+		padding-top: var(--space-1);
 	}
 
 	.btn-resolve,
@@ -133,6 +163,13 @@
 		font-size: var(--text-xs);
 		font-weight: var(--font-weight-medium);
 		transition: background-color var(--duration-fast) var(--ease-standard);
+	}
+
+	.btn-resolve:focus-visible,
+	.btn-dismiss:focus-visible,
+	.btn-reopen:focus-visible {
+		outline: none;
+		box-shadow: var(--focus-ring);
 	}
 
 	.btn-resolve {

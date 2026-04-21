@@ -102,6 +102,25 @@ CREATE TABLE IF NOT EXISTS locations (
 	name TEXT NOT NULL,
 	description TEXT NOT NULL DEFAULT '',
 	tags TEXT NOT NULL DEFAULT '[]',
+	kind TEXT NOT NULL DEFAULT '',
+	realmType TEXT NOT NULL DEFAULT '',
+	realityRules TEXT NOT NULL DEFAULT '',
+	culturalBaseline TEXT NOT NULL DEFAULT '',
+	powerStructure TEXT NOT NULL DEFAULT '',
+	conflictPressure TEXT NOT NULL DEFAULT '',
+	storyRole TEXT NOT NULL DEFAULT '',
+	tone TEXT NOT NULL DEFAULT '',
+	realmId TEXT NOT NULL DEFAULT '',
+	environment TEXT NOT NULL DEFAULT '',
+	notableFeatures TEXT NOT NULL DEFAULT '[]',
+	purpose TEXT NOT NULL DEFAULT '',
+	activityType TEXT NOT NULL DEFAULT '',
+	emotionalTone TEXT NOT NULL DEFAULT '',
+	changeOverTime TEXT NOT NULL DEFAULT '',
+	landmarkIds TEXT NOT NULL DEFAULT '[]',
+	factionIds TEXT NOT NULL DEFAULT '[]',
+	characterIds TEXT NOT NULL DEFAULT '[]',
+	threadIds TEXT NOT NULL DEFAULT '[]',
 	createdAt TEXT NOT NULL,
 	updatedAt TEXT NOT NULL
 );
@@ -286,6 +305,8 @@ CREATE INDEX IF NOT EXISTS idx_character_relationships_projectId ON character_re
 CREATE INDEX IF NOT EXISTS idx_character_relationships_characterAId ON character_relationships(characterAId);
 CREATE INDEX IF NOT EXISTS idx_character_relationships_characterBId ON character_relationships(characterBId);
 CREATE INDEX IF NOT EXISTS idx_locations_projectId ON locations(projectId);
+CREATE INDEX IF NOT EXISTS idx_locations_kind ON locations(projectId, kind);
+CREATE INDEX IF NOT EXISTS idx_locations_realmId ON locations(projectId, realmId);
 CREATE INDEX IF NOT EXISTS idx_lore_entries_projectId ON lore_entries(projectId);
 CREATE INDEX IF NOT EXISTS idx_lore_entries_category ON lore_entries(projectId, category);
 CREATE INDEX IF NOT EXISTS idx_plot_threads_projectId ON plot_threads(projectId);

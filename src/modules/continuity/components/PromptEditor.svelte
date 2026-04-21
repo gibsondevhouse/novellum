@@ -24,6 +24,9 @@
 		systemPrompt !== (project.systemPrompt || '') || negativePrompt !== (project.negativePrompt || '')
 	);
 
+	const systemLength = $derived(systemPrompt.trim().length);
+	const negativeLength = $derived(negativePrompt.trim().length);
+
 	async function handleSave() {
 		saving = true;
 
@@ -45,7 +48,15 @@
 
 <div class="prompt-editor" role="region" aria-label="Project Prompts">
 	<div class="header">
-		<h2>Prompts</h2>
+		<div>
+			<p class="header-eyebrow">Prompt Controls</p>
+			<h2>Project Prompt Settings</h2>
+			<p class="header-description">These instructions are injected into AI tasks before domain context is assembled.</p>
+		</div>
+		<div class="header-metrics" aria-label="Prompt field summary">
+			<span>System: {systemLength}</span>
+			<span>Negative: {negativeLength}</span>
+		</div>
 	</div>
 
 	<div class="grid">
@@ -79,7 +90,7 @@
 	{#if hasChanges}
 		<div class="actions">
 			<button class="save-button" onclick={handleSave} disabled={saving}>
-				{saving ? 'Saving...' : 'Save Changes'}
+				{saving ? 'Saving...' : 'Save Prompt Settings'}
 			</button>
 		</div>
 	{/if}
@@ -94,14 +105,50 @@
 	
 	.header {
 		display: flex;
-		align-items: center;
+		align-items: flex-start;
 		justify-content: space-between;
+		gap: var(--space-4);
+	}
+
+	.header-eyebrow,
+	.header h2,
+	.header-description {
+		margin: 0;
+	}
+
+	.header-eyebrow {
+		font-size: var(--text-xs);
+		letter-spacing: var(--tracking-wide);
+		text-transform: uppercase;
+		color: var(--color-text-muted);
 	}
 	
 	.header h2 {
 		font-family: var(--font-display);
 		font-size: var(--text-lg);
-		margin: 0;
+		margin-top: var(--space-1);
+	}
+
+	.header-description {
+		margin-top: var(--space-2);
+		font-size: var(--text-sm);
+		color: var(--color-text-secondary);
+		max-width: 62ch;
+	}
+
+	.header-metrics {
+		display: inline-flex;
+		gap: var(--space-2);
+		flex-wrap: wrap;
+	}
+
+	.header-metrics span {
+		font-size: var(--text-xs);
+		padding: 0.25rem 0.55rem;
+		border-radius: var(--radius-full);
+		border: 1px solid var(--color-border-subtle);
+		background: color-mix(in srgb, var(--color-surface-overlay) 80%, transparent);
+		color: var(--color-text-secondary);
 	}
 
 	.grid {
@@ -159,6 +206,8 @@
 	.actions {
 		display: flex;
 		justify-content: flex-end;
+		padding-top: var(--space-2);
+		border-top: 1px solid var(--color-border-subtle);
 	}
 
 	.save-button {
@@ -180,5 +229,11 @@
 	.save-button:disabled {
 		opacity: 0.7;
 		cursor: not-allowed;
+	}
+
+	@media (max-width: 900px) {
+		.header {
+			flex-direction: column;
+		}
 	}
 </style>

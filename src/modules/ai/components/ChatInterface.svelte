@@ -20,9 +20,10 @@
 	];
 
 	const quickLinks = [
-		{ label: 'Story Bible', href: '/books', icon: 'edit' as const },
-		{ label: 'Outline', href: '/stories', icon: 'list' as const },
+		{ label: 'Projects', href: '/projects', icon: 'book' as const },
+		{ label: 'Images', href: '/images', icon: 'list' as const },
 		{ label: 'Settings', href: '/settings', icon: 'settings' as const },
+		{ label: 'Styles', href: '/styles', icon: 'code' as const },
 	];
 
 	let messages = $state<Message[]>([]);
@@ -101,6 +102,11 @@
 		<!-- ─── Empty / home state ─── -->
 		<div class="home">
 			<div class="home__prompt-group">
+				<div class="home__intro">
+					<p class="home__eyebrow">Prompt Stage</p>
+					<h2>What do you need from Nova?</h2>
+					<p>Start with a prompt, then keep the conversation focused on one creative problem at a time.</p>
+				</div>
 				<div class="prompt-shell">
 					<PromptInput
 						bind:value={promptValue}
@@ -138,7 +144,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		padding: 10vh var(--space-6) 0;
+		padding: min(11vh, 7rem) var(--space-6) 0;
 	}
 
 	.home__prompt-group {
@@ -146,7 +152,36 @@
 		max-width: 580px;
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-10);
+		gap: var(--space-8);
+	}
+
+	.home__intro {
+		display: grid;
+		gap: var(--space-2);
+		text-align: center;
+	}
+
+	.home__eyebrow,
+	.home__intro h2,
+	.home__intro p {
+		margin: 0;
+	}
+
+	.home__eyebrow {
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+		color: var(--color-text-muted);
+	}
+
+	.home__intro h2 {
+		font-size: clamp(1.4rem, 1.6vw + 1rem, 2rem);
+	}
+
+	.home__intro p {
+		font-size: var(--text-sm);
+		line-height: var(--leading-relaxed);
+		color: var(--color-text-secondary);
 	}
 
 	/* ── Outer shell: wraps subcard + chips ── */
@@ -154,8 +189,10 @@
 		display: flex;
 		flex-direction: column;
 		border-radius: 26px;
-		border: 1px solid rgba(255, 255, 255, 0.075);
+		border: 1px solid var(--color-border-subtle);
+		background: color-mix(in srgb, var(--color-surface-overlay) 76%, transparent);
 		padding: 12px;
+		box-shadow: var(--shadow-xs);
 	}
 
 	/* ──────────────────────────── Footer ─── */
@@ -208,7 +245,7 @@
 	}
 
 	.msg__bubble--user {
-		background-color: var(--color-surface-overlay);
+		background-color: color-mix(in srgb, var(--color-nova-blue) 12%, var(--color-surface-overlay));
 		color: var(--color-text-primary);
 		padding: var(--space-3) var(--space-4);
 		border-radius: var(--radius-lg);
@@ -220,6 +257,11 @@
 
 	.msg__bubble--assistant {
 		width: 100%;
+	}
+
+	:global(.msg__bubble--assistant.surface-card) {
+		border-color: var(--color-border-subtle);
+		background: color-mix(in srgb, var(--color-surface-overlay) 82%, transparent);
 	}
 
 	/* ──────────────────────── Prose (markdown) ─── */

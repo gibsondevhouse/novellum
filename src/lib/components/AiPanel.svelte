@@ -108,8 +108,8 @@
 <style>
 	.ai-panel {
 		width: 280px;
-		background-color: var(--color-surface-overlay);
-		border-left: 1px solid var(--color-border-default);
+		background: linear-gradient(180deg, var(--color-surface-overlay), var(--color-surface-ground));
+		border-left: 1px solid var(--color-border-subtle);
 		box-shadow: var(--shadow-lg);
 		display: flex;
 		flex-direction: column;
@@ -128,7 +128,7 @@
 	.panel-title {
 		font-size: var(--text-sm);
 		font-weight: var(--font-weight-semibold);
-		color: var(--color-teal);
+		color: var(--color-text-primary);
 	}
 
 	.btn-close {
@@ -190,7 +190,7 @@
 	.suggestion {
 		flex: 1;
 		overflow-y: auto;
-		background-color: var(--color-ai-tint);
+		background-color: color-mix(in srgb, var(--color-ai-tint) 72%, var(--color-surface-overlay));
 		border: 1px solid var(--color-border-subtle);
 		border-radius: var(--radius-sm);
 		padding: var(--space-3);
@@ -210,7 +210,7 @@
 	}
 
 	.btn-accept {
-		background-color: var(--color-nova-blue);
+		background-color: color-mix(in srgb, var(--color-nova-blue) 78%, white 22%);
 		color: var(--color-text-primary);
 		border: none;
 		padding: var(--space-2) var(--space-3);
@@ -224,7 +224,7 @@
 	}
 
 	.btn-regenerate {
-		background: none;
+		background: color-mix(in srgb, var(--color-surface-overlay) 80%, transparent);
 		border: 1px solid var(--color-border);
 		color: var(--color-text-secondary);
 		padding: var(--space-2) var(--space-3);
@@ -234,8 +234,8 @@
 	}
 
 	.btn-reject {
-		background: none;
-		border: none;
+		background: transparent;
+		border: 1px solid transparent;
 		color: var(--color-text-muted);
 		padding: var(--space-2) var(--space-3);
 		border-radius: var(--radius-sm);

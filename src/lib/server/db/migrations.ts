@@ -77,6 +77,40 @@ function ensureCharacterPresentationColumns(db: Database.Database): void {
 	}
 }
 
+function ensureLocationNarrativeColumns(db: Database.Database): void {
+	const columns = db.prepare('PRAGMA table_info(locations)').all() as Array<{ name: string }>;
+
+	const stringColumns = [
+		['kind', "TEXT NOT NULL DEFAULT ''"],
+		['realmType', "TEXT NOT NULL DEFAULT ''"],
+		['realityRules', "TEXT NOT NULL DEFAULT ''"],
+		['culturalBaseline', "TEXT NOT NULL DEFAULT ''"],
+		['powerStructure', "TEXT NOT NULL DEFAULT ''"],
+		['conflictPressure', "TEXT NOT NULL DEFAULT ''"],
+		['storyRole', "TEXT NOT NULL DEFAULT ''"],
+		['tone', "TEXT NOT NULL DEFAULT ''"],
+		['realmId', "TEXT NOT NULL DEFAULT ''"],
+		['environment', "TEXT NOT NULL DEFAULT ''"],
+		['purpose', "TEXT NOT NULL DEFAULT ''"],
+		['activityType', "TEXT NOT NULL DEFAULT ''"],
+		['emotionalTone', "TEXT NOT NULL DEFAULT ''"],
+		['changeOverTime', "TEXT NOT NULL DEFAULT ''"],
+	] as const;
+
+	for (const [columnName, columnType] of stringColumns) {
+		if (!columns.some((column) => column.name === columnName)) {
+			db.exec(`ALTER TABLE locations ADD COLUMN ${columnName} ${columnType}`);
+		}
+	}
+
+	const jsonColumns = ['notableFeatures', 'landmarkIds', 'factionIds', 'characterIds', 'threadIds'] as const;
+	for (const columnName of jsonColumns) {
+		if (!columns.some((column) => column.name === columnName)) {
+			db.exec(`ALTER TABLE locations ADD COLUMN ${columnName} TEXT NOT NULL DEFAULT '[]'`);
+		}
+	}
+}
+
 export function runMigrations(db: Database.Database): void {
 	db.transaction(() => {
 		db.exec(SCHEMA_SQL);
@@ -87,6 +121,7 @@ export function runMigrations(db: Database.Database): void {
 		ensureScenesNotesColumn(db);
 		ensureActsArcIdColumn(db);
 		ensureCharacterPresentationColumns(db);
+		ensureLocationNarrativeColumns(db);
 		db.exec(INDEX_SQL);
 	})();
 }

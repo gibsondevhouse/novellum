@@ -1,55 +1,148 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import type { Location } from '$lib/db/types.js';
-	import LocationForm from '$modules/bible/components/LocationForm.svelte';
+	import RealmDossierPane from '$modules/bible/components/RealmDossierPane.svelte';
+	import RealmEmptyState from '$modules/bible/components/RealmEmptyState.svelte';
 	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
 	import IndividualsWorkspaceShell from '$modules/bible/components/IndividualsWorkspaceShell.svelte';
+	import {
+		formatLocationSubtitle,
+		formatRealmMeta,
+		isRealmLocation,
+	} from '$modules/bible/narrative-locations.js';
 	import {
 		getLocations,
 		getLocationSaving,
 		initLocations,
 		submitCreateLocation,
-		submitUpdateLocation,
 		submitDeleteLocation,
+		submitUpdateLocation,
 	} from '$modules/bible/stores/bible-crud.svelte.js';
 
 	let { data }: { data: { projectId: string; locations: Location[] } } = $props();
+
+	let creating = $state(false);
+	let selectedId = $state<string | null>(
+		untrack(() => data.locations.find((location) => isRealmLocation(location))?.id ?? null),
+	);
+	let confirmDeleteId = $state<string | null>(null);
+	let realmPhotoUrls = $state<Record<string, string>>({});
+
+	const REALM_PHOTO_STORAGE_KEY_PREFIX = 'novellum.realm.photo';
 
 	$effect(() => {
 		initLocations(data.locations);
 	});
 
-	let creating = $state(false);
-	let selectedId: string | null = $state(null);
-	let confirmDeleteId: string | null = $state(null);
+	const realms = $derived.by(() => getLocations().filter((location) => isRealmLocation(location)));
 
-	const selectedLocation = $derived(
-		selectedId ? (getLocations().find((l) => l.id === selectedId) ?? null) : null,
+	const selectedLocation = $derived.by(() =>
+		selectedId ? realms.find((location) => location.id === selectedId) ?? null : null,
 	);
-	const options = $derived(getLocations().map((l) => ({ id: l.id, name: l.name })));
+
+	const options = $derived.by(() =>
+		realms
+			.map((location) => ({
+				id: location.id,
+				name: location.name,
+				subtitle: formatRealmMeta(location),
+				meta: formatLocationSubtitle(location, 'Narrative environment'),
+			}))
+			.sort((a, b) => a.name.localeCompare(b.name)),
+	);
+
+	$effect(() => {
+		if (selectedId && realms.some((location) => location.id === selectedId)) {
+			return;
+		}
+
+		selectedId = realms[0]?.id ?? null;
+	});
+
+	$effect(() => {
+		if (typeof window === 'undefined') return;
+
+		const next: Record<string, string> = {};
+		for (const realm of realms) {
+			const key = `${REALM_PHOTO_STORAGE_KEY_PREFIX}:${data.projectId}:${realm.id}`;
+			const saved = window.localStorage.getItem(key);
+			if (saved) {
+				next[realm.id] = saved;
+			}
+		}
+
+		realmPhotoUrls = next;
+	});
 
 	function selectLocation(id: string) {
+		confirmDeleteId = null;
 		selectedId = id;
 		creating = false;
+	}
+
+	async function createNewRealm() {
+		creating = true;
 	}
 
 	async function handleCreate(
 		formData: Omit<Location, 'id' | 'projectId' | 'createdAt' | 'updatedAt'>,
 	) {
-		await submitCreateLocation(data.projectId, formData);
+		const created = await submitCreateLocation(data.projectId, formData);
+		selectedId = created.id;
 		creating = false;
+		confirmDeleteId = null;
+	}
+
+	function readFileAsDataUrl(file: File): Promise<string> {
+		return new Promise((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onload = (event) => {
+				const result = event.target?.result;
+				if (typeof result !== 'string') {
+					reject(new Error('Failed to read selected image.'));
+					return;
+				}
+				resolve(result);
+			};
+			reader.onerror = () =>
+				reject(reader.error ?? new Error('Failed to read selected image.'));
+			reader.readAsDataURL(file);
+		});
+	}
+
+	async function handleRealmPhotoUpload(file: File): Promise<void> {
+		if (!selectedLocation || typeof window === 'undefined') return;
+
+		const photoData = await readFileAsDataUrl(file);
+		realmPhotoUrls = { ...realmPhotoUrls, [selectedLocation.id]: photoData };
+
+		const key = `${REALM_PHOTO_STORAGE_KEY_PREFIX}:${data.projectId}:${selectedLocation.id}`;
+		window.localStorage.setItem(key, photoData);
 	}
 
 	async function handleUpdate(
 		formData: Omit<Location, 'id' | 'projectId' | 'createdAt' | 'updatedAt'>,
 	) {
-		if (!selectedLocation) return;
-		await submitUpdateLocation(selectedLocation.id, formData);
+		if (!selectedId) return;
+		await submitUpdateLocation(selectedId, formData);
 	}
 
 	async function handleDelete(id: string) {
 		await submitDeleteLocation(id);
 		confirmDeleteId = null;
 		selectedId = null;
+	}
+
+	function cancelDelete() {
+		confirmDeleteId = null;
+	}
+
+	function handleDeleteAction(id: string): void | Promise<void> {
+		if (confirmDeleteId === id) {
+			return handleDelete(id);
+		}
+
+		confirmDeleteId = id;
 	}
 </script>
 
@@ -69,79 +162,57 @@
 		characterOptions={options}
 		selectedCharacterId={selectedId}
 		onSelectCharacter={selectLocation}
-		onCreateCharacter={() => {
-			creating = true;
-			selectedId = null;
-		}}
+		onCreateCharacter={createNewRealm}
 		hasSelection={creating || selectedId !== null}
 		listAriaLabel="Realms"
 		createLabel="new +"
 	>
 		{#snippet dossier()}
 			{#if creating}
-				<div class="entity-dossier">
-					<h2 class="dossier-title">New Realm</h2>
-					<LocationForm
-						saving={getLocationSaving()}
-						onSave={handleCreate}
-						onCancel={() => (creating = false)}
-					/>
-				</div>
+				<RealmDossierPane
+					realm={null}
+					isCreating={true}
+					saving={getLocationSaving()}
+					showDeleteConfirm={false}
+					onSave={handleCreate}
+					onCancel={() => (creating = false)}
+					onDelete={() => {}}
+					formatMeta={formatRealmMeta}
+				/>
 			{:else if selectedLocation}
-				<div class="entity-dossier">
-					<div class="dossier-header">
-						<h2 class="dossier-title">{selectedLocation.name}</h2>
-						{#if confirmDeleteId === selectedLocation.id}
-							<button class="bible-btn-sm bible-btn-danger" onclick={() => handleDelete(selectedLocation.id)}>Confirm</button>
-							<button class="bible-btn-sm" onclick={() => (confirmDeleteId = null)}>Cancel</button>
-						{:else}
-							<button class="bible-btn-sm bible-btn-danger" onclick={() => (confirmDeleteId = selectedLocation.id)}>Delete</button>
-						{/if}
-					</div>
-					<LocationForm
-						location={selectedLocation}
-						saving={getLocationSaving()}
-						onSave={handleUpdate}
-						onCancel={() => (selectedId = null)}
-					/>
-				</div>
+				<RealmDossierPane
+					realm={selectedLocation}
+					saving={getLocationSaving()}
+					showDeleteConfirm={confirmDeleteId === selectedLocation.id}
+					onSave={handleUpdate}
+					onCancel={cancelDelete}
+					onDelete={() => handleDeleteAction(selectedLocation.id)}
+					onPhotoUpload={handleRealmPhotoUpload}
+					photoUrl={realmPhotoUrls[selectedLocation.id] ?? ''}
+					formatMeta={formatRealmMeta}
+				/>
 			{/if}
 		{/snippet}
 		{#snippet empty()}
-			<div class="entity-empty">
-				<p>No realms yet.</p>
-				<button class="bible-btn-sm" onclick={() => (creating = true)}>+ Add your first realm</button>
-			</div>
+			<RealmEmptyState onCreate={createNewRealm} />
 		{/snippet}
 	</IndividualsWorkspaceShell>
 </div>
 
 <style>
-	.entity-dossier {
-		padding: var(--space-6);
-		overflow-y: auto;
+	.worldbuilding-section-view {
+		display: grid;
+		grid-template-rows: auto minmax(0, 1fr);
+		height: 100%;
+		min-height: 0;
+		overflow: hidden;
+		overscroll-behavior: none;
 	}
 
-	.dossier-header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: var(--space-3);
-		margin-bottom: var(--space-4);
-	}
-
-	.dossier-title {
-		margin: 0;
-		font-size: var(--text-xl);
-		font-weight: var(--font-weight-semibold);
-	}
-
-	.entity-empty {
-		padding: var(--space-8);
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: var(--space-4);
-		color: var(--color-text-muted);
+	@media (max-width: 768px) {
+		.worldbuilding-section-view {
+			height: auto;
+			overflow: visible;
+		}
 	}
 </style>

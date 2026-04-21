@@ -171,13 +171,29 @@
 		<section class="hero" aria-labelledby="worldbuilding-hero-title">
 			<SectionHeader
 				title="World Building"
-				description="Build an internal universe with continuity, tension, and memory. This landing page is your orientation layer: read top to bottom once, then enter any domain with intent."
+				description="Build an internal universe with continuity, tension, and memory. Start with a domain below, then drill down into entities and records with intent."
 			/>
 			<div class="hero-actions" role="navigation" aria-label="Jump to world-building domains">
 				{#each sections as section (section.id)}
 					<a class="hero-jump" href={`#${section.id}`}>{section.label}</a>
 				{/each}
 			</div>
+		</section>
+
+		<section class="domain-grid" aria-label="World-building domains">
+			{#each sections as section (section.id)}
+				<article class="domain-tile">
+					<div class="domain-tile__top">
+						<h2>{section.label}</h2>
+						<p>{section.tagline}</p>
+					</div>
+					<p class="domain-tile__body">{section.purpose}</p>
+					<div class="domain-tile__actions">
+						<a class="domain-tile__cta" href={section.entryHref}>Open {section.label}</a>
+						<a class="domain-tile__jump" href={`#${section.id}`}>Read Guide</a>
+					</div>
+				</article>
+			{/each}
 		</section>
 
 		<section class="manifesto" aria-labelledby="manifesto-title">
@@ -266,8 +282,8 @@
 		inset: -20% -10% auto;
 		height: 480px;
 		background:
-			radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.2), transparent 42%),
-			radial-gradient(circle at 75% 10%, rgba(6, 182, 212, 0.14), transparent 38%);
+			radial-gradient(circle at 20% 30%, color-mix(in srgb, var(--color-nova-blue) 20%, transparent), transparent 42%),
+			radial-gradient(circle at 75% 10%, color-mix(in srgb, var(--color-teal) 14%, transparent), transparent 38%);
 		pointer-events: none;
 	}
 
@@ -293,7 +309,7 @@
 
 	.hero-actions {
 		position: sticky;
-		top: 0;
+		top: calc(48px + var(--space-2));
 		z-index: 3;
 		display: flex;
 		gap: var(--space-3);
@@ -323,6 +339,84 @@
 		border-color: var(--color-border-focus);
 		color: var(--color-text-primary);
 		text-decoration: none;
+	}
+
+	.domain-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--space-4);
+	}
+
+	.domain-tile {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3);
+		padding: var(--space-5);
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--color-border-subtle);
+		background: linear-gradient(145deg, var(--color-surface-raised) 0%, var(--color-surface-overlay) 100%);
+		box-shadow: var(--shadow-xs);
+	}
+
+	.domain-tile__top h2 {
+		margin: 0;
+		font-family: var(--font-display);
+		font-size: var(--text-xl);
+	}
+
+	.domain-tile__top p {
+		margin: var(--space-1) 0 0;
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-widest);
+		color: var(--color-text-muted);
+	}
+
+	.domain-tile__body {
+		margin: 0;
+		color: var(--color-text-secondary);
+		line-height: var(--leading-relaxed);
+	}
+
+	.domain-tile__actions {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+		margin-top: auto;
+	}
+
+	.domain-tile__cta {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: var(--space-2) var(--space-4);
+		border-radius: var(--radius-md);
+		border: 1px solid color-mix(in srgb, var(--color-nova-blue) 45%, var(--color-border-default));
+		background: color-mix(in srgb, var(--color-nova-blue) 18%, transparent);
+		color: var(--color-text-primary);
+		text-decoration: none;
+		font-size: var(--text-sm);
+		font-weight: var(--font-weight-medium);
+	}
+
+	.domain-tile__cta:hover,
+	.domain-tile__cta:focus-visible {
+		outline: none;
+		background: color-mix(in srgb, var(--color-nova-blue) 26%, transparent);
+		border-color: var(--color-border-focus);
+	}
+
+	.domain-tile__jump {
+		font-size: var(--text-sm);
+		color: var(--color-text-secondary);
+		text-decoration: none;
+	}
+
+	.domain-tile__jump:hover,
+	.domain-tile__jump:focus-visible {
+		color: var(--color-text-primary);
+		text-decoration: underline;
+		outline: none;
 	}
 
 	.manifesto {
@@ -470,6 +564,10 @@
 	}
 
 	@media (max-width: 768px) {
+		.domain-grid {
+			grid-template-columns: 1fr;
+		}
+
 		.hero-actions {
 			overflow-x: auto;
 			flex-wrap: nowrap;

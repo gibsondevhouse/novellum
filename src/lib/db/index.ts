@@ -32,6 +32,7 @@ import {
 	schemaV9,
 	schemaV10,
 	schemaV11,
+	schemaV12,
 } from './schema.js';
 
 export class AppDB extends Dexie {
@@ -98,6 +99,8 @@ export class AppDB extends Dexie {
 		this.version(10).stores(schemaV10);
 		// v11 → adds arcId index to acts for hierarchy support
 		this.version(11).stores(schemaV11);
+		// v12 → adds narrative location indexes for realms and landmarks
+		this.version(12).stores(schemaV12);
 	}
 }
 

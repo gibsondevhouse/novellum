@@ -9,7 +9,11 @@
 	} from '$modules/bible/stores/bible-crud.svelte.js';
 	import { goto } from '$app/navigation';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
-	import GhostButton from '$lib/components/ui/GhostButton.svelte';
+	import {
+		DestructiveButton,
+		GhostButton,
+		SurfacePanel,
+	} from '$lib/components/ui/index.js';
 
 	let { data } = $props<{
 		data: {
@@ -45,22 +49,27 @@
 
 <div class="page">
 	<div class="page-header">
-		<Breadcrumb items={[
-			{ label: 'Individuals', href: `/projects/${data.projectId}/world-building/characters/individuals` },
-			{ label: data.character.name },
-		]} />
-		<div class="header-row">
-			<h1>{data.character.name}</h1>
-			<div class="header-actions">
-				{#if confirmDelete}
-					<span class="confirm-text">Delete this character?</span>
-					<button class="btn-danger" onclick={handleDelete}>Yes, delete</button>
-					<GhostButton onclick={() => (confirmDelete = false)}>Cancel</GhostButton>
-				{:else}
-					<GhostButton onclick={() => (confirmDelete = true)}>Delete</GhostButton>
-				{/if}
+		<SurfacePanel>
+			<Breadcrumb items={[
+				{ label: 'Individuals', href: `/projects/${data.projectId}/world-building/characters/individuals` },
+				{ label: data.character.name },
+			]} />
+			<div class="header-row">
+				<div>
+					<h1>{data.character.name}</h1>
+					<p class="header-subtitle">Edit dossier details, then commit relationship updates below.</p>
+				</div>
+				<div class="header-actions">
+					{#if confirmDelete}
+						<span class="confirm-text">Delete this character?</span>
+						<DestructiveButton onclick={handleDelete}>Yes, delete</DestructiveButton>
+						<GhostButton onclick={() => (confirmDelete = false)}>Cancel</GhostButton>
+					{:else}
+						<GhostButton onclick={() => (confirmDelete = true)}>Delete</GhostButton>
+					{/if}
+				</div>
 			</div>
-		</div>
+		</SurfacePanel>
 	</div>
 
 	{#if saveSuccess}
@@ -84,11 +93,14 @@
 
 <style>
 	.page {
-		padding: var(--space-4) 0;
+		padding: var(--space-4) 0 var(--space-8);
+		display: grid;
+		gap: var(--space-4);
 	}
 
 	.page-header {
-		margin-bottom: var(--space-4);
+		display: grid;
+		gap: var(--space-3);
 	}
 
 	.header-row {
@@ -99,6 +111,12 @@
 
 	.header-row h1 {
 		margin: 0;
+	}
+
+	.header-subtitle {
+		margin: var(--space-1) 0 0;
+		color: var(--color-text-secondary);
+		font-size: var(--text-sm);
 	}
 
 	.header-actions {
@@ -115,6 +133,14 @@
 	.success-text {
 		font-size: var(--text-sm);
 		color: var(--color-success);
-		margin-bottom: var(--space-3);
+		margin: 0;
+	}
+
+	@media (max-width: 768px) {
+		.header-row,
+		.header-actions {
+			flex-direction: column;
+			align-items: stretch;
+		}
 	}
 </style>

@@ -72,101 +72,111 @@
 
 <SurfacePanel class="character-form-panel">
 	<form class="character-form" onsubmit={handleSubmit}>
-		<Input
-			id="char-name"
-			label="Name *"
-			type="text"
-			bind:value={name}
-			error={nameError}
-			aria-required="true"
-			aria-invalid={!!nameError}
-			aria-describedby={nameError ? 'char-name-error' : undefined}
-		/>
-
-		<Input
-			id="char-role"
-			label="Role"
-			type="text"
-			bind:value={role}
-			placeholder="protagonist, antagonist…"
-		/>
-
-		<Input
-			id="char-pronunciation"
-			label="Pronunciation"
-			type="text"
-			bind:value={pronunciation}
-			placeholder="nah-VEHL, sahy-ree-uhn…"
-		/>
-
-		<div class="supporting-field">
-			<Input id="char-aliases" label="Aliases" type="text" bind:value={aliasesRaw} />
-			<p class="field-hint">Comma-separated aliases, codenames, or honorifics.</p>
+		<div class="form-intro">
+			<p>Capture identity anchors first, then record pressures, goals, and continuity notes.</p>
 		</div>
 
-		<Input
-			id="char-diaspora-origin"
-			label="Diaspora Origin"
-			type="text"
-			bind:value={diasporaOrigin}
-			placeholder="Glass Delta, Ring Nine, Tideward caravans…"
-		/>
+		<section class="form-section" aria-labelledby="section-identity">
+			<h3 id="section-identity">Identity and Positioning</h3>
+			<Input
+				id="char-name"
+				label="Name *"
+				type="text"
+				bind:value={name}
+				error={nameError}
+				aria-required="true"
+				aria-invalid={!!nameError}
+				aria-describedby={nameError ? 'char-name-error' : undefined}
+			/>
 
-		<Input
-			id="char-faction"
-			label="Faction"
-			type="text"
-			bind:value={faction}
-			placeholder="Court of Glass, Iron Choir…"
-		/>
+			<Input
+				id="char-role"
+				label="Role"
+				type="text"
+				bind:value={role}
+				placeholder="protagonist, antagonist..."
+			/>
 
-		<Input
-			id="char-photo"
-			label="Photo URL"
-			type="url"
-			bind:value={photoUrl}
-			placeholder="https://..."
-		/>
+			<Input
+				id="char-pronunciation"
+				label="Pronunciation"
+				type="text"
+				bind:value={pronunciation}
+				placeholder="nah-VEHL, sahy-ree-uhn..."
+			/>
 
-		<div class="text-field">
-			<label class="text-field__label" for="char-bio">Bio</label>
-			<textarea id="char-bio" class="text-field__control" bind:value={bio} rows={4}></textarea>
-		</div>
+			<div class="supporting-field">
+				<Input id="char-aliases" label="Aliases" type="text" bind:value={aliasesRaw} />
+				<p class="field-hint">Comma-separated aliases, codenames, or honorifics.</p>
+			</div>
 
-		<div class="supporting-field">
-			<Input id="char-anomalies" label="Anomalies & Traits" type="text" bind:value={anomaliesRaw} />
-			<p class="field-hint">Comma-separated spiritual, technical, or uncanny signatures.</p>
-		</div>
+			<Input
+				id="char-diaspora-origin"
+				label="Diaspora Origin"
+				type="text"
+				bind:value={diasporaOrigin}
+				placeholder="Glass Delta, Ring Nine, Tideward caravans..."
+			/>
 
-		<div class="supporting-field">
-			<Input id="char-traits" label="Traits" type="text" bind:value={traitsRaw} />
-			<p class="field-hint">Comma-separated descriptors.</p>
-		</div>
+			<Input
+				id="char-faction"
+				label="Faction"
+				type="text"
+				bind:value={faction}
+				placeholder="Court of Glass, Iron Choir..."
+			/>
 
-		<div class="supporting-field">
-			<Input id="char-goals" label="Goals" type="text" bind:value={goalsRaw} />
-			<p class="field-hint">Comma-separated objectives or wants.</p>
-		</div>
+			<Input
+				id="char-photo"
+				label="Photo URL"
+				type="url"
+				bind:value={photoUrl}
+				placeholder="https://..."
+			/>
 
-		<div class="supporting-field">
-			<Input id="char-flaws" label="Flaws" type="text" bind:value={flawsRaw} />
-			<p class="field-hint">Comma-separated vulnerabilities or blind spots.</p>
-		</div>
+			<div class="text-field">
+				<label class="text-field__label" for="char-bio">Bio</label>
+				<textarea id="char-bio" class="text-field__control" bind:value={bio} rows={4}></textarea>
+			</div>
+		</section>
 
-		<div class="supporting-field">
-			<Input id="char-arcs" label="Arcs" type="text" bind:value={arcsRaw} />
-			<p class="field-hint">Comma-separated transformation beats or trajectories.</p>
-		</div>
+		<section class="form-section" aria-labelledby="section-signals">
+			<h3 id="section-signals">Signals and Continuity</h3>
+			<div class="supporting-field">
+				<Input id="char-anomalies" label="Anomalies & Traits" type="text" bind:value={anomaliesRaw} />
+				<p class="field-hint">Comma-separated spiritual, technical, or uncanny signatures.</p>
+			</div>
 
-		<div class="text-field">
-			<label class="text-field__label" for="char-notes">Notes</label>
-			<textarea id="char-notes" class="text-field__control" bind:value={notes} rows={4}></textarea>
-		</div>
+			<div class="supporting-field">
+				<Input id="char-traits" label="Traits" type="text" bind:value={traitsRaw} />
+				<p class="field-hint">Comma-separated descriptors.</p>
+			</div>
 
-		<div class="supporting-field">
-			<Input id="char-tags" label="Tags" type="text" bind:value={tagsRaw} />
-			<p class="field-hint">Comma-separated filing tags for search and grouping.</p>
-		</div>
+			<div class="supporting-field">
+				<Input id="char-goals" label="Goals" type="text" bind:value={goalsRaw} />
+				<p class="field-hint">Comma-separated objectives or wants.</p>
+			</div>
+
+			<div class="supporting-field">
+				<Input id="char-flaws" label="Flaws" type="text" bind:value={flawsRaw} />
+				<p class="field-hint">Comma-separated vulnerabilities or blind spots.</p>
+			</div>
+
+			<div class="supporting-field">
+				<Input id="char-arcs" label="Arcs" type="text" bind:value={arcsRaw} />
+				<p class="field-hint">Comma-separated transformation beats or trajectories.</p>
+			</div>
+
+			<div class="text-field">
+				<label class="text-field__label" for="char-notes">Notes</label>
+				<textarea id="char-notes" class="text-field__control" bind:value={notes} rows={4}></textarea>
+			</div>
+
+			<div class="supporting-field">
+				<Input id="char-tags" label="Tags" type="text" bind:value={tagsRaw} />
+				<p class="field-hint">Comma-separated filing tags for search and grouping.</p>
+			</div>
+		</section>
 
 		<div class="form-actions">
 			<GhostButton onclick={onCancel} disabled={saving} type="button">Cancel</GhostButton>
@@ -181,6 +191,32 @@
 	.character-form {
 		display: grid;
 		gap: var(--space-4);
+	}
+
+	.form-intro p,
+	.form-section h3 {
+		margin: 0;
+	}
+
+	.form-intro p {
+		font-size: var(--text-sm);
+		color: var(--color-text-secondary);
+	}
+
+	.form-section {
+		display: grid;
+		gap: var(--space-4);
+		padding: var(--space-4);
+		border: 1px solid var(--color-border-subtle);
+		border-radius: var(--radius-lg);
+		background: color-mix(in srgb, var(--color-surface-overlay) 65%, transparent);
+	}
+
+	.form-section h3 {
+		font-size: var(--text-sm);
+		letter-spacing: var(--tracking-wide);
+		text-transform: uppercase;
+		color: var(--color-text-muted);
 	}
 
 	.supporting-field,

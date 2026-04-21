@@ -82,6 +82,11 @@
 		transition: var(--transition-color);
 	}
 
+	.sidebar-item:focus-visible {
+		outline: 2px solid var(--color-border-focus);
+		outline-offset: -2px;
+	}
+
 	.sidebar-item:hover:not(.sidebar-item--locked) {
 		background: var(--color-surface-glass);
 	}
@@ -89,6 +94,7 @@
 	.sidebar-item.active {
 		border-left-color: var(--color-teal);
 		background: var(--color-surface-glass);
+		font-weight: var(--font-weight-medium);
 	}
 
 	.sidebar-item--locked {

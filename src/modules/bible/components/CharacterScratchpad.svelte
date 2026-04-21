@@ -161,7 +161,7 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.45rem;
-		color: color-mix(in srgb, var(--color-nova-blue) 70%, #b5ff3d 30%);
+		color: color-mix(in srgb, var(--color-nova-blue) 70%, var(--color-teal) 30%);
 	}
 
 	.scratchpad-panel__meta :global(svg) {
@@ -197,7 +197,7 @@
 	.scratchpad-panel__textarea:focus {
 		outline: none;
 		border-color: var(--color-nova-blue);
-		box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-nova-blue) 45%, transparent);
+		box-shadow: var(--focus-ring);
 	}
 
 	.scratchpad-panel__error {

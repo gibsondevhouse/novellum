@@ -10,6 +10,7 @@
 	const store = createAssetsStore(() => projectId || undefined);
 	let selectedAsset = $state<Asset | null>(null);
 	let isAssigning = $state(false);
+	let confirmDelete = $state(false);
 	let assignProjectId = $state('');
 	let assignUseFor = $state('cover');
 
@@ -61,6 +62,7 @@
 		if (selectedAsset?.id === id) {
 			selectedAsset = null;
 			isAssigning = false;
+			confirmDelete = false;
 		}
 	}
 
@@ -109,10 +111,10 @@
 					<h3 class="album-title">{album.title}</h3>
 					<div class="grid">
 						{#if album.coverUrl}
-							<!-- svelte-ignore a11y_click_events_have_key_events -->
-							<!-- svelte-ignore a11y_no_static_element_interactions -->
-							<div
+							<button
+								type="button"
 								class="asset-card cover-card"
+								aria-label={`Open ${album.title} cover artwork`}
 								onclick={() => {
 									selectedAsset = {
 										id: `cover-${album.id}`,
@@ -124,6 +126,7 @@
 										createdAt: new Date().toISOString(),
 										updatedAt: new Date().toISOString()
 									};
+									confirmDelete = false;
 								}}
 							>
 								<div class="img-wrapper">
@@ -132,23 +135,27 @@
 								<div class="asset-meta">
 									<span class="asset-name">Cover Artwork</span>
 								</div>
-							</div>
+							</button>
 						{/if}
 						{#each album.assets as asset (asset.id)}
-							<!-- svelte-ignore a11y_click_events_have_key_events -->
-							<!-- svelte-ignore a11y_no_static_element_interactions -->
-							<div
+							<button
+								type="button"
 								class="asset-card"
-								onclick={() => (selectedAsset = asset)}
 								class:selected={selectedAsset?.id === asset.id}
+								aria-label={`Open asset ${asset.name}`}
+								onclick={() => {
+									selectedAsset = asset;
+									confirmDelete = false;
+								}}
 							>
 								<div class="img-wrapper">
 									<img src={asset.data} alt={asset.name} />
 								</div>
 								<div class="asset-meta">
 									<span class="asset-name">{asset.name}</span>
+									<span class="asset-type">{bytesToSize(asset.sizeBytes)}</span>
 								</div>
-							</div>
+							</button>
 						{/each}
 					</div>
 				</section>
@@ -160,7 +167,7 @@
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div class="dialog-backdrop" onclick={() => (selectedAsset = null)}>
-			<div class="dialog" onclick={(e) => e.stopPropagation()}>
+			<div class="dialog" role="dialog" tabindex="-1" aria-modal="true" aria-label={selectedAsset.name} onclick={(e) => e.stopPropagation()}>
 				<div class="dialog-header">
 					<h2>{selectedAsset.name}</h2>
 					<button class="close-btn" onclick={() => { selectedAsset = null; isAssigning = false; }}>✕</button>
@@ -171,6 +178,15 @@
 						<span>Size: {bytesToSize(selectedAsset.sizeBytes)}</span>
 						<span>Date: {new Date(selectedAsset.createdAt).toLocaleDateString()}</span>
 					</div>
+					{#if confirmDelete}
+						<div class="delete-confirm" role="alert">
+							<p>Delete this asset from the gallery?</p>
+							<div class="delete-confirm__actions">
+								<button class="btn-danger" onclick={() => selectedAsset && deleteAsset(selectedAsset.id)}>Confirm Delete</button>
+								<button class="btn-ghost" onclick={() => (confirmDelete = false)}>Cancel</button>
+							</div>
+						</div>
+					{/if}
 					
 					{#if isAssigning}
 						<div class="assign-form">
@@ -197,8 +213,8 @@
 					<button class="btn-ghost" onclick={() => isAssigning = !isAssigning}>
 						{isAssigning ? 'Cancel' : 'Assign to Project...'}
 					</button>
-					<button class="btn-danger" onclick={() => deleteAsset(selectedAsset!.id)}>
-						Delete Image
+					<button class="btn-danger" onclick={() => (confirmDelete = true)} disabled={confirmDelete}>
+						{confirmDelete ? 'Awaiting confirmation' : 'Delete Image'}
 					</button>
 				</div>
 			</div>
@@ -262,7 +278,8 @@
 		gap: var(--space-4);
 	}
 	.asset-card {
-		background: var(--color-surface);
+		appearance: none;
+		background: var(--color-surface-overlay);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-md);
 		overflow: hidden;
@@ -273,7 +290,7 @@
 	}
 	.asset-card:hover {
 		transform: translateY(-2px);
-		border-color: var(--color-border-hover);
+		border-color: var(--color-border-strong);
 	}
 	.asset-card.selected {
 		border-color: var(--color-text-primary);
@@ -294,7 +311,7 @@
 	}
 	.asset-meta {
 		padding: var(--space-3);
-		background: var(--color-surface);
+		background: var(--color-surface-overlay);
 	}
 	.asset-name {
 		font-size: var(--text-sm);
@@ -303,6 +320,13 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+
+	.asset-type {
+		display: block;
+		margin-top: var(--space-1);
+		font-size: var(--text-xs);
+		color: var(--color-text-muted);
 	}
 	
 	.dialog-backdrop {
@@ -320,7 +344,7 @@
 		padding: var(--space-4);
 	}
 	.dialog {
-		background: var(--color-surface);
+		background: var(--color-surface-overlay);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-lg);
 		width: 100%;
@@ -385,6 +409,26 @@
 		justify-content: flex-end;
 		gap: var(--space-4);
 	}
+
+	.delete-confirm {
+		width: 100%;
+		max-width: 420px;
+		padding: var(--space-4);
+		border: 1px solid color-mix(in srgb, var(--color-error) 35%, var(--color-border-default));
+		border-radius: var(--radius-md);
+		background: color-mix(in srgb, var(--color-error) 8%, var(--color-surface-overlay));
+	}
+
+	.delete-confirm p {
+		margin: 0;
+		color: var(--color-text-primary);
+	}
+
+	.delete-confirm__actions {
+		display: flex;
+		gap: var(--space-3);
+		margin-top: var(--space-3);
+	}
 	.assign-form {
 		display: flex;
 		flex-direction: column;
@@ -393,7 +437,7 @@
 		max-width: 400px;
 		margin-top: var(--space-4);
 		padding: var(--space-4);
-		background: var(--color-surface);
+		background: var(--color-surface-overlay);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-md);
 	}
@@ -401,7 +445,7 @@
 		padding: var(--space-2);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-md);
-		background: var(--color-surface);
+		background: var(--color-surface-overlay);
 		color: var(--color-text-primary);
 	}
 </style>

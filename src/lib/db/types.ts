@@ -115,6 +115,25 @@ export interface Location {
 	name: string;
 	description: string;
 	tags: string[];
+	kind?: 'realm' | 'landmark' | '';
+	realmType?: 'physical' | 'metaphysical' | 'political' | 'hybrid' | '';
+	realityRules?: string;
+	culturalBaseline?: string;
+	powerStructure?: string;
+	conflictPressure?: string;
+	storyRole?: string;
+	tone?: string;
+	realmId?: string;
+	environment?: string;
+	notableFeatures?: string[];
+	purpose?: string;
+	activityType?: string;
+	emotionalTone?: string;
+	changeOverTime?: string;
+	landmarkIds?: string[];
+	factionIds?: string[];
+	characterIds?: string[];
+	threadIds?: string[];
 	createdAt: string;
 	updatedAt: string;
 }

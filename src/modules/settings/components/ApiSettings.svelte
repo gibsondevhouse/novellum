@@ -50,6 +50,7 @@
 
 <div class="api-settings-panel">
 	<header class="panel-header">
+		<p class="panel-eyebrow">Primary Integration</p>
 		<h2>AI Integration</h2>
 		<p class="panel-desc">Configure your OpenRouter API key to enable AI assistance features.</p>
 	</header>
@@ -85,21 +86,35 @@
 
 <style>
 	.api-settings-panel {
-		background: var(--color-surface-overlay);
-		border: 1px solid var(--color-border-default);
+		background: linear-gradient(165deg, var(--color-surface-overlay), var(--color-surface-ground));
+		border: 1px solid var(--color-border-subtle);
 		border-radius: var(--radius-lg);
 		padding: var(--space-6);
 		max-width: 600px;
 	}
 
+	.panel-eyebrow,
+	.panel-header h2,
+	.panel-desc {
+		margin: 0;
+	}
+
+	.panel-eyebrow {
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+		color: var(--color-text-muted);
+	}
+
 	.panel-header h2 {
-		margin: 0 0 var(--space-2) 0;
+		margin-top: var(--space-1);
 		font-size: var(--text-xl);
 		font-weight: var(--font-weight-medium);
 	}
 
 	.panel-desc {
-		margin: 0 0 var(--space-6) 0;
+		margin-top: var(--space-2);
+		margin-bottom: var(--space-6);
 		color: var(--color-text-muted);
 		font-size: var(--text-sm);
 	}

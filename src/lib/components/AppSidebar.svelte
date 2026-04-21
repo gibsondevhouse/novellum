@@ -23,7 +23,13 @@
 </script>
 
 <aside class="app-sidebar" class:collapsed aria-label="Navigation">
-	<button class="toggle-btn" onclick={toggleSidebar} aria-label="Toggle Navigation">
+	<button
+		class="toggle-btn"
+		onclick={toggleSidebar}
+		aria-label="Toggle Navigation"
+		aria-expanded={!collapsed}
+		aria-controls="sidebar-nav-content"
+	>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			width="1.2em"
@@ -68,8 +74,9 @@
 		</div>
 	{/if}
 
-	<SidebarSection>
-		<SidebarItem href="/" label="Home" active={isHomeActive}>
+	<div id="sidebar-nav-content" class="sidebar-scroll">
+		<SidebarSection>
+			<SidebarItem href="/" label="Home" active={isHomeActive}>
 			{#snippet icon()}
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -86,8 +93,8 @@
 					<polyline points="9 22 9 12 15 12 15 22"></polyline>
 				</svg>
 			{/snippet}
-		</SidebarItem>
-		<SidebarItem href="/nova" label="Nova" active={isNovaActive}>
+			</SidebarItem>
+			<SidebarItem href="/nova" label="Nova" active={isNovaActive}>
 			{#snippet icon()}
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -105,8 +112,8 @@
 					></polygon>
 				</svg>
 			{/snippet}
-		</SidebarItem>
-		<SidebarItem href="/images" label="Images" active={isImagesActive}>
+			</SidebarItem>
+			<SidebarItem href="/images" label="Images" active={isImagesActive}>
 			{#snippet icon()}
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -124,8 +131,8 @@
 					<polyline points="21 15 16 10 5 21"></polyline>
 				</svg>
 			{/snippet}
-		</SidebarItem>
-		<SidebarItem href="/styles" label="Styles" active={isStylesActive}>
+			</SidebarItem>
+			<SidebarItem href="/styles" label="Styles" active={isStylesActive}>
 			{#snippet icon()}
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -141,8 +148,8 @@
 					<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
 				</svg>
 			{/snippet}
-		</SidebarItem>
-		<SidebarItem href="/projects" label="Projects" active={isProjectsActive}>
+			</SidebarItem>
+			<SidebarItem href="/projects" label="Projects" active={isProjectsActive}>
 			{#snippet icon()}
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -161,11 +168,11 @@
 					<rect x="3" y="14" width="7" height="7"></rect>
 				</svg>
 			{/snippet}
-		</SidebarItem>
-	</SidebarSection>
+			</SidebarItem>
+		</SidebarSection>
 
-	<SidebarSection label="RECENT" collapsible>
-		<SidebarItem label="Recent sessions" locked={true}>
+		<SidebarSection label="RECENT" collapsible>
+			<SidebarItem label="Recent sessions" locked={true}>
 			{#snippet icon()}
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -182,15 +189,15 @@
 					<polyline points="12 6 12 12 16 14"></polyline>
 				</svg>
 			{/snippet}
-		</SidebarItem>
-	</SidebarSection>
+			</SidebarItem>
+		</SidebarSection>
 
-	<ActiveProjectSection />
+		<ActiveProjectSection />
 
-	<hr class="sidebar-divider" />
+		<hr class="sidebar-divider" />
 
-	<SidebarSection>
-		<SidebarItem href="/settings" label="Settings" active={isSettingsActive}>
+		<SidebarSection>
+			<SidebarItem href="/settings" label="Settings" active={isSettingsActive}>
 			{#snippet icon()}
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -207,8 +214,9 @@
 					<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
 				</svg>
 			{/snippet}
-		</SidebarItem>
-	</SidebarSection>
+			</SidebarItem>
+		</SidebarSection>
+	</div>
 
 	{#if !collapsed}
 		<div class="sidebar-bottom">
@@ -248,7 +256,14 @@
 	}
 
 	.app-sidebar.collapsed {
-		width: 64px;
+		width: var(--sidebar-collapsed-width);
+	}
+
+	.sidebar-scroll {
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
+		overflow-x: hidden;
 	}
 
 	.toggle-btn {
@@ -269,6 +284,11 @@
 
 	.toggle-btn:hover {
 		color: var(--color-text-primary);
+	}
+
+	.toggle-btn:focus-visible {
+		outline: 2px solid var(--color-border-focus);
+		outline-offset: -2px;
 	}
 
 	.app-sidebar.collapsed :global(.sidebar-item__label),
@@ -317,6 +337,12 @@
 		color: var(--color-text-muted);
 	}
 
+	.sidebar-search__input:focus-visible {
+		outline: 2px solid var(--color-border-focus);
+		outline-offset: 2px;
+		border-radius: var(--radius-sm);
+	}
+
 	.sidebar-bottom {
 		margin-top: auto;
 		padding: var(--space-3);
@@ -340,8 +366,24 @@
 		color: var(--color-text-primary);
 	}
 
+	.sidebar-bottom__link:focus-visible {
+		outline: 2px solid var(--color-border-focus);
+		outline-offset: 2px;
+		border-radius: var(--radius-sm);
+	}
+
 	.sidebar-bottom__separator {
 		color: var(--color-text-muted);
 		font-size: var(--text-xs);
+	}
+
+	@media (max-width: 900px) {
+		.app-sidebar {
+			width: var(--sidebar-collapsed-width);
+		}
+
+		.sidebar-search {
+			display: none;
+		}
 	}
 </style>

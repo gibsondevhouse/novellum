@@ -4,7 +4,10 @@
 	let {
 		coverUrl: initialCoverUrl,
 		onUpload,
-	}: { coverUrl?: string; onUpload?: (file: File) => void | Promise<void> } = $props();
+	}: {
+		coverUrl?: string;
+		onUpload?: (file: File) => void | Promise<void>;
+	} = $props();
 
 	let localCoverUrl = $state<string | undefined>(undefined);
 	let lastSyncedCoverUrl = $state<string | undefined>(undefined);
@@ -12,6 +15,8 @@
 	let fileInputEl = $state<HTMLInputElement | null>(null);
 
 	const displayUrl = $derived(localCoverUrl ?? initialCoverUrl);
+	const coverTitle = 'No Cover';
+	const coverInitial = 'N';
 
 	function openFilePicker() {
 		fileInputEl?.click();
@@ -84,8 +89,11 @@
 			</button>
 		</div>
 	{:else}
-		<div class="hero-cover-placeholder">
-			<span class="hero-cover-label">Add Cover</span>
+		<div class="hero-cover-placeholder" aria-hidden="true">
+			<div class="hero-cover-foil"></div>
+			<span class="hero-cover-initial">{coverInitial}</span>
+			<span class="hero-cover-spine">{coverTitle}</span>
+			<span class="hero-cover-label">Upload Cover</span>
 			<div class="cover-actions" role="group" aria-label="Cover options">
 				<button
 					class="cover-action-btn cover-action-btn--upload"
@@ -161,13 +169,45 @@
 			var(--color-surface-elevated) 0%,
 			var(--color-surface-overlay) 100%
 		);
+		position: relative;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 		gap: var(--space-4);
 	}
+	.hero-cover-foil {
+		position: absolute;
+		inset: 0;
+		background:
+			radial-gradient(circle at 22% 18%, color-mix(in srgb, white 26%, transparent) 0%, transparent 45%),
+			linear-gradient(125deg, color-mix(in srgb, white 12%, transparent), transparent 55%);
+		mix-blend-mode: screen;
+		pointer-events: none;
+	}
+	.hero-cover-initial {
+		position: relative;
+		font-family: var(--font-display);
+		font-size: clamp(2.5rem, 6vw, 3.6rem);
+		line-height: 1;
+		color: color-mix(in srgb, white 88%, var(--color-text-primary));
+		text-shadow: 0 2px 18px color-mix(in srgb, black 45%, transparent);
+	}
+	.hero-cover-spine {
+		position: absolute;
+		left: var(--space-3);
+		right: var(--space-3);
+		bottom: var(--space-3);
+		text-transform: uppercase;
+		font-size: var(--text-xs);
+		letter-spacing: var(--tracking-wide);
+		color: color-mix(in srgb, white 78%, var(--color-text-primary));
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
 	.hero-cover-label {
+		position: relative;
 		font-size: 10px;
 		font-weight: var(--font-weight-semibold);
 		text-transform: uppercase;
@@ -175,6 +215,7 @@
 		color: var(--color-text-muted);
 	}
 	.cover-actions {
+		position: relative;
 		display: flex;
 		gap: var(--space-3);
 	}

@@ -72,8 +72,23 @@
 </script>
 
 <div class="migrate-page">
-	<h1>Migrate Data</h1>
-	<p class="subtitle">Transfer existing browser data (IndexedDB) to the shared SQLite database.</p>
+	<div class="migrate-hero">
+		<div>
+			<p class="migrate-eyebrow">Data Portability</p>
+			<h1>Migrate Data</h1>
+			<p class="subtitle">Transfer existing browser data (IndexedDB) to the shared SQLite database.</p>
+		</div>
+		<div class="migrate-summary">
+			<div class="summary-item">
+				<span>Phase</span>
+				<strong>{phase}</strong>
+			</div>
+			<div class="summary-item">
+				<span>Tables</span>
+				<strong>{tables.length}</strong>
+			</div>
+		</div>
+	</div>
 
 	{#if phase === 'loading'}
 		<p class="status-msg">Checking databases…</p>
@@ -182,20 +197,74 @@
 
 <style>
 	.migrate-page {
-		max-width: 48rem;
+		max-width: 56rem;
 		margin: 0 auto;
-		padding: var(--space-6) var(--space-4);
+		padding: var(--space-6) var(--space-4) var(--space-10);
+		display: grid;
+		gap: var(--space-5);
+	}
+
+	.migrate-hero {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: var(--space-4);
+		padding: var(--space-5);
+		border: 1px solid var(--color-border-subtle);
+		border-radius: var(--radius-xl);
+		background: linear-gradient(165deg, var(--color-surface-overlay), var(--color-surface-ground));
+	}
+
+	.migrate-eyebrow,
+		.subtitle,
+		h1 {
+		margin: 0;
+	}
+
+	.migrate-eyebrow {
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+		color: var(--color-text-muted);
 	}
 
 	h1 {
 		font-size: var(--text-2xl);
 		font-weight: var(--font-weight-bold);
-		margin-bottom: var(--space-2);
+		margin-top: var(--space-1);
 	}
 
 	.subtitle {
 		color: var(--color-text-secondary);
-		margin-bottom: var(--space-6);
+		margin-top: var(--space-2);
+	}
+
+	.migrate-summary {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--space-3);
+		min-width: 14rem;
+	}
+
+	.summary-item {
+		display: grid;
+		gap: 0.2rem;
+		padding: var(--space-3);
+		border: 1px solid var(--color-border-subtle);
+		border-radius: var(--radius-lg);
+		background: color-mix(in srgb, var(--color-surface-overlay) 80%, transparent);
+	}
+
+	.summary-item span {
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+		color: var(--color-text-muted);
+	}
+
+	.summary-item strong {
+		font-size: var(--text-sm);
+		text-transform: capitalize;
 	}
 
 	.status-msg {
@@ -293,5 +362,16 @@
 		padding-left: var(--space-4);
 		max-height: 16rem;
 		overflow-y: auto;
+	}
+
+	@media (max-width: 760px) {
+		.migrate-hero {
+			flex-direction: column;
+		}
+
+		.migrate-summary {
+			width: 100%;
+			min-width: 0;
+		}
 	}
 </style>

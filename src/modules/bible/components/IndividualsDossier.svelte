@@ -405,8 +405,8 @@
 		inset: -20% -10% auto;
 		height: 460px;
 		background:
-			radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.2), transparent 42%),
-			radial-gradient(circle at 75% 10%, rgba(6, 182, 212, 0.14), transparent 38%);
+			radial-gradient(circle at 20% 30%, color-mix(in srgb, var(--color-nova-blue) 20%, transparent), transparent 42%),
+			radial-gradient(circle at 75% 10%, color-mix(in srgb, var(--color-teal) 14%, transparent), transparent 38%);
 		pointer-events: none;
 	}
 
@@ -588,7 +588,7 @@
 	.persona-list__item--active {
 		background: color-mix(in srgb, var(--color-nova-blue) 10%, var(--color-surface-overlay));
 		border-color: color-mix(in srgb, var(--color-nova-blue) 35%, var(--color-border-default));
-		box-shadow: inset 2px 0 0 color-mix(in srgb, var(--color-nova-blue) 70%, transparent);
+		box-shadow: var(--shadow-xs);
 	}
 
 	.persona-list__avatar {
@@ -764,7 +764,7 @@
 		position: fixed;
 		inset: 0;
 		z-index: 30;
-		background: rgba(3, 6, 10, 0.72);
+		background: color-mix(in srgb, var(--color-surface-base) 72%, transparent);
 		backdrop-filter: blur(4px);
 		display: flex;
 		justify-content: flex-end;

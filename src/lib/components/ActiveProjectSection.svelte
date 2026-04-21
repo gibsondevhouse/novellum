@@ -1,11 +1,17 @@
 <script lang="ts">
         import { page } from '$app/state';
+	import { browser } from '$app/environment';
         import SidebarSection from './SidebarSection.svelte';
         import SidebarItem from './SidebarItem.svelte';
 
         let base = $state<string | null>(null);
 
         $effect(() => {
+			if (!browser) {
+				base = null;
+				return;
+			}
+
                 const currentId = page.params.id;
                 const isProjectRoute = page.url.pathname.startsWith('/projects/');
                 

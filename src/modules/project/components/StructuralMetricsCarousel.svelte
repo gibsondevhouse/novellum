@@ -18,24 +18,28 @@
 						label: 'Arcs',
 						count: metrics.arcs.count,
 						ready: metrics.arcs.ready,
+						statusLine: metrics.arcs.ready ? 'Ready' : 'Not available yet',
 						href: `/projects/${projectId}/arcs`,
 					},
 					{
 						label: 'Acts',
 						count: metrics.acts.count,
 						ready: metrics.acts.ready,
+						statusLine: metrics.acts.ready ? 'Ready' : 'Not available yet',
 						href: `/projects/${projectId}/acts`,
 					},
 					{
 						label: 'Chapters',
 						count: metrics.chapters.count,
 						ready: metrics.chapters.ready,
+						statusLine: metrics.chapters.ready ? 'Ready' : 'Not available yet',
 						href: `/projects/${projectId}/outline`,
 					},
 					{
 						label: 'Scenes',
 						count: metrics.scenes.count,
 						ready: metrics.scenes.ready,
+						statusLine: metrics.scenes.ready ? 'Ready' : 'Not available yet',
 						href: `/projects/${projectId}/outline`,
 					},
 				]

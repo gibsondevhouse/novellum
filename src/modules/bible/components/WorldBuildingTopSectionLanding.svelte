@@ -69,6 +69,10 @@
 				<p class="lane-entry">
 					Continue into <a href={link.href}>{link.label}</a>.
 				</p>
+
+				<div class="lane-actions">
+					<a class="lane-cta" href={link.href}>Open {link.label}</a>
+				</div>
 			</section>
 		{/each}
 	</div>
@@ -86,8 +90,8 @@
 		inset: -20% -10% auto;
 		height: 420px;
 		background:
-			radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.15), transparent 40%),
-			radial-gradient(circle at 75% 10%, rgba(6, 182, 212, 0.12), transparent 36%);
+			radial-gradient(circle at 20% 30%, color-mix(in srgb, var(--color-nova-blue) 15%, transparent), transparent 40%),
+			radial-gradient(circle at 75% 10%, color-mix(in srgb, var(--color-teal) 12%, transparent), transparent 36%);
 		pointer-events: none;
 	}
 
@@ -112,6 +116,9 @@
 	}
 
 	.hero-actions {
+		position: sticky;
+		top: calc(48px + var(--space-2));
+		z-index: 4;
 		display: flex;
 		gap: var(--space-3);
 		flex-wrap: wrap;
@@ -218,6 +225,32 @@
 
 	.lane-entry a:hover {
 		text-decoration: underline;
+	}
+
+	.lane-actions {
+		display: flex;
+		justify-content: flex-start;
+	}
+
+	.lane-cta {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: var(--space-2) var(--space-4);
+		border-radius: var(--radius-md);
+		border: 1px solid color-mix(in srgb, var(--color-nova-blue) 45%, var(--color-border-default));
+		background: color-mix(in srgb, var(--color-nova-blue) 18%, transparent);
+		color: var(--color-text-primary);
+		text-decoration: none;
+		font-size: var(--text-sm);
+		font-weight: var(--font-weight-medium);
+	}
+
+	.lane-cta:hover,
+	.lane-cta:focus-visible {
+		outline: none;
+		background: color-mix(in srgb, var(--color-nova-blue) 26%, transparent);
+		border-color: var(--color-border-focus);
 	}
 
 	@media (max-width: 768px) {

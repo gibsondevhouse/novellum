@@ -30,19 +30,39 @@
 </script>
 
 <section class="hub-hero" aria-label="Story identity">
+	<div class="hub-hero__glow" aria-hidden="true"></div>
 	<div class="hero-grid">
-		<ProjectHeroCover coverUrl={project.coverUrl} onUpload={handleCoverUpload} />
+		<ProjectHeroCover
+			coverUrl={project.coverUrl}
+			onUpload={handleCoverUpload}
+		/>
 		<ProjectHeroContent {project} />
 	</div>
 </section>
 
 <style>
 	.hub-hero {
-		background: var(--color-surface-raised);
+		position: relative;
+		overflow: hidden;
+		background:
+			linear-gradient(150deg, var(--color-surface-raised) 0%, var(--color-surface-overlay) 100%),
+			var(--gradient-spotlight);
 		padding: var(--space-10);
 		border-radius: var(--radius-lg);
+		border: 1px solid var(--color-border-default);
+		box-shadow: var(--shadow-sm);
+	}
+	.hub-hero__glow {
+		position: absolute;
+		inset: -32% -20% auto;
+		height: 420px;
+		background:
+			radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--color-nova-blue) 22%, transparent), transparent 44%),
+			radial-gradient(circle at 80% 0%, color-mix(in srgb, var(--color-teal) 12%, transparent), transparent 36%);
+		pointer-events: none;
 	}
 	.hero-grid {
+		position: relative;
 		display: grid;
 		grid-template-columns: 240px 1fr;
 		gap: var(--space-10);

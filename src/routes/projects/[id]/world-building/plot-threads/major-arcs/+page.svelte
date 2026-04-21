@@ -26,7 +26,14 @@
 	const selectedThread = $derived(
 		selectedId ? (getPlotThreads().find((t) => t.id === selectedId) ?? null) : null,
 	);
-	const options = $derived(getPlotThreads().map((t) => ({ id: t.id, name: t.title })));
+	const options = $derived(
+		getPlotThreads().map((t) => ({
+			id: t.id,
+			name: t.title,
+			subtitle: t.status || 'Status unset',
+			meta: t.description?.trim() ? 'Arc brief ready' : 'No brief yet',
+		})),
+	);
 
 	function selectThread(id: string) {
 		selectedId = id;

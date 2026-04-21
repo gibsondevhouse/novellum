@@ -10,6 +10,18 @@
 	let saveStatus = $state<'saving' | 'saved' | 'idle'>('idle');
 	let showHistory = $state(false);
 
+	const sceneWordCount = $derived.by(() => {
+		const normalized = editorState.pendingText.replace(/<[^>]+>/g, ' ').trim();
+		if (!normalized) return 0;
+		return normalized.split(/\s+/).length;
+	});
+
+	const saveLabel = $derived.by(() => {
+		if (saveStatus === 'saving') return 'Saving changes...';
+		if (saveStatus === 'saved') return 'Saved';
+		return 'Idle';
+	});
+
 	$effect(() => {
 		editorState.setActiveScene(data.scene);
 		autosaveService.mount(data.scene.id, data.scene.projectId, (s) => (saveStatus = s));
@@ -36,19 +48,21 @@
 
 <div class="editor-page">
 	<header class="editor-header">
-		<Breadcrumb items={[
-			{ label: 'Editor', href: `/projects/${data.scene.projectId}/editor` },
-			...(data.chapter ? [{ label: data.chapter.title, href: `/projects/${data.scene.projectId}/editor` }] : []),
-			{ label: data.scene.title },
-		]} />
-		<h1 class="scene-title">{data.scene.title}</h1>
-		<div class="header-actions">
-			{#if saveStatus === 'saving'}
-				<span class="save-indicator saving">Saving…</span>
-			{:else if saveStatus === 'saved'}
-				<span class="save-indicator saved">Saved ✓</span>
-			{/if}
-			<button class="btn-history" onclick={() => (showHistory = !showHistory)}>History</button>
+		<div class="header-main">
+			<Breadcrumb items={[
+				{ label: 'Editor', href: `/projects/${data.scene.projectId}/editor` },
+				...(data.chapter ? [{ label: data.chapter.title, href: `/projects/${data.scene.projectId}/editor` }] : []),
+				{ label: data.scene.title },
+			]} />
+			<h1 class="scene-title">{data.scene.title}</h1>
+			<p class="scene-subtitle">Focused drafting studio for the current scene.</p>
+		</div>
+		<div class="header-actions" aria-label="Editor controls">
+			<span class="meta-chip">Words: {sceneWordCount}</span>
+			<span class="save-indicator" class:saving={saveStatus === 'saving'} class:saved={saveStatus === 'saved'}>{saveLabel}</span>
+			<button class="btn-history" type="button" onclick={() => (showHistory = !showHistory)}>
+				{showHistory ? 'Close History' : 'History'}
+			</button>
 		</div>
 	</header>
 
@@ -75,17 +89,28 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-		background-color: var(--color-surface-raised);
+		background:
+			radial-gradient(circle at 8% 8%, color-mix(in srgb, var(--color-nova-blue) 8%, transparent), transparent 36%),
+			var(--color-surface-raised);
+		border: 1px solid var(--color-border-subtle);
+		border-radius: var(--radius-xl);
+		overflow: hidden;
 	}
 
 	.editor-header {
 		display: flex;
-		align-items: center;
-		gap: var(--space-2);
-		padding: var(--space-4) var(--space-6);
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: var(--space-4);
+		padding: var(--space-4) var(--space-5);
 		border-bottom: 1px solid var(--color-border-default);
 		background-color: var(--color-surface-ground);
 		flex-shrink: 0;
+	}
+
+	.header-main {
+		display: grid;
+		gap: var(--space-1);
 	}
 
 	.scene-title {
@@ -94,37 +119,71 @@
 		font-weight: var(--font-weight-medium);
 		color: var(--color-text-primary);
 		margin: 0;
-		flex: 1;
+	}
+
+	.scene-subtitle {
+		margin: 0;
+		font-size: var(--text-sm);
+		color: var(--color-text-secondary);
 	}
 
 	.header-actions {
 		display: flex;
 		align-items: center;
 		gap: var(--space-3);
-		margin-left: auto;
+		flex-wrap: wrap;
+	}
+
+	.meta-chip {
+		font-size: var(--text-xs);
+		padding: 0.2rem 0.55rem;
+		border-radius: var(--radius-full);
+		border: 1px solid var(--color-border-subtle);
+		background: color-mix(in srgb, var(--color-surface-overlay) 80%, transparent);
+		color: var(--color-text-secondary);
 	}
 
 	.save-indicator {
-		font-size: var(--text-sm);
+		font-size: var(--text-xs);
+		padding: 0.2rem 0.55rem;
+		border-radius: var(--radius-full);
+		border: 1px solid var(--color-border-subtle);
+		color: var(--color-text-muted);
 	}
 
 	.save-indicator.saving {
 		color: var(--color-text-secondary);
+		border-color: var(--color-border-default);
 	}
 
 	.save-indicator.saved {
 		color: var(--color-success);
+		border-color: color-mix(in srgb, var(--color-success) 45%, var(--color-border-default));
 	}
 
 	.btn-history {
 		font-size: var(--text-sm);
 		padding: var(--space-1) var(--space-3);
+		border: 1px solid var(--color-border-default);
+		border-radius: var(--radius-md);
+		background: color-mix(in srgb, var(--color-surface-overlay) 82%, transparent);
+		color: var(--color-text-primary);
 		cursor: pointer;
+	}
+
+	.btn-history:hover {
+		background: color-mix(in srgb, var(--color-nova-blue) 16%, transparent);
 	}
 
 	.editor-body {
 		display: flex;
 		flex: 1;
 		overflow: hidden;
+	}
+
+	@media (max-width: 900px) {
+		.editor-header {
+			flex-direction: column;
+		}
 	}
 </style>

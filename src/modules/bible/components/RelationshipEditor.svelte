@@ -183,7 +183,7 @@
 
 	.rel-type {
 		font-size: var(--text-xs);
-		color: color-mix(in srgb, var(--color-nova-blue) 72%, #b5ff3d 22%);
+		color: color-mix(in srgb, var(--color-nova-blue) 72%, var(--color-teal) 22%);
 		text-transform: uppercase;
 		letter-spacing: var(--tracking-wide);
 		font-family: var(--font-mono);

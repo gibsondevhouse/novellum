@@ -475,8 +475,8 @@
 <div class="editor-page" class:ai-open={aiPanel.isOpen}>
 	<aside class="doc-list" aria-label="Scene navigator">
 		<div class="doc-list-header">
-			<div class="doc-list-title">Scenes</div>
-			<div class="doc-list-meta">{data.scenes.length} total</div>
+			<div class="doc-list-title">Draft Queue</div>
+			<div class="doc-list-meta">{data.scenes.length} scenes · {data.chapters.length} chapters</div>
 		</div>
 		{#if data.scenes.length === 0}
 			<EmptyState title="No scenes yet" />
@@ -513,6 +513,7 @@
 	<main class="editor-area" aria-label="Writing workspace">
 		<header class="editor-toolbar">
 			<div class="scene-context">
+				<p class="scene-context__eyebrow">Drafting Studio</p>
 				<h1>{activeScene?.title ?? 'Scene'}</h1>
 				<p>{activeChapter?.title ?? 'Unassigned chapter'}{#if data.project} · {data.project.title}{/if}</p>
 			</div>
@@ -535,11 +536,14 @@
 				<button class="nav-btn" onclick={() => goToScene(-1)} disabled={activeSceneIndex <= 0}>Previous</button>
 				<button class="nav-btn" onclick={() => goToScene(1)} disabled={activeSceneIndex < 0 || activeSceneIndex >= data.scenes.length - 1}>Next</button>
 			</div>
-			<div class="ai-actions" role="toolbar" aria-label="AI scene tools">
+			<div class="ai-actions-wrap">
+				<span class="ai-actions-label">AI Commands</span>
+				<div class="ai-actions" role="toolbar" aria-label="AI scene tools">
 				<GhostButton onclick={() => handleAskAi('continue')} title="Continue scene">Continue</GhostButton>
 				<GhostButton onclick={() => handleAskAi('dialogue')} title="Punch up dialogue">Dialogue</GhostButton>
 				<GhostButton onclick={() => handleAskAi('tension')} title="Raise tension">Tension</GhostButton>
 				<GhostButton onclick={() => handleAskAi('summary')} title="Summarize scene">Summary</GhostButton>
+				</div>
 			</div>
 		</header>
 		{#if data.scenes.length === 0}
@@ -685,6 +689,8 @@
 		overflow: hidden;
 		transition: grid-template-columns var(--duration-enter) var(--ease-standard);
 		background: linear-gradient(180deg, var(--color-surface-ground), var(--color-surface-raised));
+		border: 1px solid var(--color-border-subtle);
+		border-radius: var(--radius-xl);
 	}
 
 	.editor-page.ai-open {
@@ -692,11 +698,11 @@
 	}
 
 	.doc-list {
-		background-color: var(--color-surface-ground);
-		border-right: 1px solid var(--color-border-default);
+		background-color: color-mix(in srgb, var(--color-surface-ground) 92%, transparent);
+		border-right: 1px solid var(--color-border-subtle);
 		padding: var(--space-3);
 		overflow-y: auto;
-		border-radius: var(--radius-md);
+		border-radius: var(--radius-lg);
 	}
 
 	.doc-list-header {
@@ -804,6 +810,14 @@
 		font-weight: var(--font-weight-semibold);
 	}
 
+	.scene-context__eyebrow {
+		margin: 0 0 var(--space-1);
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+		color: var(--color-text-muted);
+	}
+
 	.scene-context p {
 		margin: 0;
 		font-size: var(--text-xs);
@@ -833,6 +847,18 @@
 		gap: var(--space-2);
 	}
 
+	.ai-actions-wrap {
+		display: grid;
+		gap: var(--space-1);
+	}
+
+	.ai-actions-label {
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+		color: var(--color-text-muted);
+	}
+
 	.nav-btn {
 		background: none;
 		border: 1px solid var(--color-border-default);
@@ -851,16 +877,18 @@
 	.editor-scroll {
 		flex: 1;
 		overflow: auto;
-		padding: var(--space-5) var(--space-4);
+		padding: var(--space-6) var(--space-4);
+		background: linear-gradient(180deg, color-mix(in srgb, var(--color-surface-ground) 75%, transparent), transparent 35%);
 	}
 
 	.editor-surface {
 		max-width: 86ch;
 		margin: 0 auto;
-		background: var(--color-surface-ground);
+		background: color-mix(in srgb, var(--color-surface-ground) 94%, transparent);
 		border: 1px solid var(--color-border-subtle);
-		border-radius: var(--radius-lg);
-		padding: var(--space-4);
+		border-radius: calc(var(--radius-lg) + 0.25rem);
+		padding: var(--space-5);
+		box-shadow: var(--shadow-xs);
 	}
 
 	.editor-meta-row {
@@ -922,9 +950,9 @@
 	}
 
 	.story-compass {
-		border: 1px solid var(--color-border-default);
+		border: 1px solid var(--color-border-subtle);
 		border-radius: var(--radius-md);
-		background: var(--color-surface-ground);
+		background: color-mix(in srgb, var(--color-surface-ground) 95%, transparent);
 		display: flex;
 		flex-direction: column;
 		overflow: auto;
@@ -948,7 +976,7 @@
 
 	.collapse-btn {
 		border: 1px solid var(--color-border-default);
-		background: none;
+		background: color-mix(in srgb, var(--color-surface-overlay) 78%, transparent);
 		border-radius: var(--radius-sm);
 		padding: var(--space-1) var(--space-2);
 		font-size: var(--text-xs);

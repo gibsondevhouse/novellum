@@ -67,6 +67,7 @@
 
 	<div class="header-info">
 		<div class="identity-quick">
+			<p class="dossier-eyebrow">Identity Dossier</p>
 			<input
 				class="character-name input-inline"
 				type="text"
@@ -90,6 +91,10 @@
 					oninput={(event) => onFieldChange('occupation', (event.currentTarget as HTMLInputElement).value)}
 					placeholder="Occupation"
 				/>
+			</div>
+			<div class="identity-tags" aria-label="Identity quick tags">
+				<span>{character?.role?.trim() || 'Role pending'}</span>
+				<span>{character?.occupation?.trim() || 'Occupation pending'}</span>
 			</div>
 			<textarea
 				class="character-summary input-inline"
@@ -201,12 +206,21 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-4);
+		padding: var(--space-2) 0;
 	}
 
 	.identity-quick {
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-2);
+	}
+
+	.dossier-eyebrow {
+		margin: 0;
+		font-size: var(--text-xs);
+		letter-spacing: var(--tracking-wide);
+		text-transform: uppercase;
+		color: var(--color-text-muted);
 	}
 
 	.character-name {
@@ -232,6 +246,7 @@
 		max-width: 60ch;
 		line-height: var(--leading-relaxed);
 		resize: vertical;
+		min-height: 4.5rem;
 	}
 
 	.role-row {
@@ -243,6 +258,21 @@
 	.role-separator {
 		font-size: var(--text-sm);
 		color: var(--color-text-muted);
+	}
+
+	.identity-tags {
+		display: flex;
+		gap: var(--space-2);
+		flex-wrap: wrap;
+	}
+
+	.identity-tags span {
+		padding: 0.3rem 0.6rem;
+		border-radius: var(--radius-full);
+		font-size: var(--text-xs);
+		color: var(--color-text-secondary);
+		background: color-mix(in srgb, var(--color-surface-overlay) 78%, transparent);
+		border: 1px solid var(--color-border-default);
 	}
 
 	.input-inline {
@@ -304,6 +334,10 @@
 	@media (max-width: 768px) {
 		.character-header {
 			gap: var(--space-4);
+		}
+
+		.role-row {
+			flex-wrap: wrap;
 		}
 
 		.attributes-grid {
