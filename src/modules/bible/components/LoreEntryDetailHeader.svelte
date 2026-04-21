@@ -29,6 +29,10 @@
 		}
 		return entry.content.substring(0, 80).trim() + (entry.content.length > 80 ? '...' : '');
 	});
+
+	const categoryLabel = $derived.by(() => entry?.category?.replace(/[:-]/g, ' ').trim() || 'Category pending');
+
+	const statusLabel = $derived.by(() => (entry?.content?.trim() ? 'Drafted' : 'Status pending'));
 </script>
 
 <div class="lore-header">
@@ -40,7 +44,17 @@
 
 	<div class="header-info">
 		<div class="identity-quick">
+			<p class="dossier-eyebrow">Identity Dossier</p>
 			<h2 class="entry-title">{entry?.title?.trim() || 'New Entry'}</h2>
+			<div class="role-row">
+				<p class="entry-role">{meta?.toLowerCase() || 'Type pending'}</p>
+				<span class="role-separator">•</span>
+				<p class="entry-role">{statusLabel}</p>
+			</div>
+			<div class="identity-tags" aria-label="Entry quick tags">
+				<span>{categoryLabel}</span>
+				<span>{statusLabel}</span>
+			</div>
 			<p class="entry-preview">{contentPreview}</p>
 		</div>
 
@@ -86,16 +100,59 @@
 	}
 
 	.entry-title,
+	.entry-role,
 	.entry-preview,
+	.dossier-eyebrow,
 	.attribute-value,
 	.attribute-label {
 		margin: 0;
+	}
+
+	.dossier-eyebrow {
+		font-size: var(--text-xs);
+		letter-spacing: var(--tracking-wide);
+		text-transform: uppercase;
+		color: var(--color-text-muted);
 	}
 
 	.entry-title {
 		font-size: var(--text-xl);
 		font-weight: var(--font-weight-semibold);
 		color: var(--color-text-primary);
+	}
+
+	.entry-role {
+		font-size: var(--text-sm);
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--color-text-muted);
+		font-weight: var(--font-weight-semibold);
+	}
+
+	.role-row {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+	}
+
+	.role-separator {
+		font-size: var(--text-sm);
+		color: var(--color-text-muted);
+	}
+
+	.identity-tags {
+		display: flex;
+		gap: var(--space-2);
+		flex-wrap: wrap;
+	}
+
+	.identity-tags span {
+		padding: 0.3rem 0.6rem;
+		border-radius: var(--radius-full);
+		font-size: var(--text-xs);
+		color: var(--color-text-secondary);
+		background: color-mix(in srgb, var(--color-surface-overlay) 78%, transparent);
+		border: 1px solid var(--color-border-default);
 	}
 
 	.entry-preview {
@@ -174,6 +231,10 @@
 	@media (max-width: 860px) {
 		.attributes-grid {
 			grid-template-columns: repeat(2, 1fr);
+		}
+
+		.role-row {
+			flex-wrap: wrap;
 		}
 	}
 

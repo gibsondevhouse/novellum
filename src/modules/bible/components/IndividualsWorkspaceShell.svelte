@@ -253,6 +253,30 @@
 		justify-content: center;
 	}
 
+	.dossier-scroll :global(.character-dossier) {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-7);
+		max-width: 920px;
+		width: 100%;
+		padding-right: var(--space-6);
+	}
+
+	.dossier-scroll :global(.dossier-flow) {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-6);
+	}
+
+	.dossier-scroll :global(.dossier-footer-actions) {
+		display: flex;
+		justify-content: flex-end;
+		gap: var(--space-2);
+		flex-wrap: wrap;
+		padding-top: var(--space-2);
+		padding-bottom: var(--space-6);
+	}
+
 	@media (max-width: 768px) {
 		.individuals-workspace {
 			grid-template-columns: 1fr;
@@ -275,6 +299,10 @@
 		.individuals-main {
 			height: auto;
 			overflow: visible;
+		}
+
+		.dossier-scroll :global(.character-dossier) {
+			padding-right: 0;
 		}
 	}
 </style>

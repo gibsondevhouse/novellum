@@ -270,18 +270,17 @@
 	.archive-section {
 		display: grid;
 		gap: var(--space-4);
-		padding: var(--space-4);
-		border: 1px solid var(--color-border-subtle);
-		border-radius: var(--radius-md);
-		background: color-mix(in srgb, var(--color-surface-overlay) 60%, transparent);
+		padding-top: var(--space-4);
+		border-top: 1px solid color-mix(in srgb, var(--color-border-subtle) 65%, transparent);
 	}
 
 	h3 {
 		margin: 0;
-		font-size: var(--text-sm);
+		font-size: var(--text-xs);
 		text-transform: uppercase;
-		letter-spacing: var(--tracking-wide);
+		letter-spacing: 0.08em;
 		color: var(--color-text-muted);
+		font-weight: var(--font-weight-semibold);
 	}
 
 	.archive-grid {
@@ -299,18 +298,30 @@
 	}
 
 	.archive-label {
-		font-size: var(--text-sm);
-		font-weight: var(--font-weight-semibold);
+		font-size: var(--text-xs);
+		letter-spacing: 0.03em;
+		color: var(--color-text-muted);
+		font-weight: var(--font-weight-medium);
 	}
 
 	.archive-input {
 		width: 100%;
-		padding: 0.35rem 0.45rem;
-		border: 1px solid color-mix(in srgb, var(--color-border-default) 75%, transparent);
+		padding: 0.2rem 0.25rem;
+		border: 1px solid transparent;
 		border-radius: var(--radius-sm);
-		background: color-mix(in srgb, var(--color-surface-ground) 70%, transparent);
+		background: transparent;
 		color: var(--color-text-primary);
 		font: inherit;
+	}
+
+	.archive-input:hover {
+		border-color: color-mix(in srgb, var(--color-border-subtle) 75%, transparent);
+	}
+
+	.archive-input:focus {
+		outline: none;
+		border-color: color-mix(in srgb, var(--color-nova-blue) 45%, var(--color-border-default));
+		background: color-mix(in srgb, var(--color-surface-overlay) 35%, transparent);
 	}
 
 	.archive-textarea {

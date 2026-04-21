@@ -1,8 +1,13 @@
 <script lang="ts">
-	import type { PlotThread, Scene } from '$lib/db/types.js';
-	import PlotThreadForm from '$modules/bible/components/PlotThreadForm.svelte';
+	import type { PlotThread } from '$lib/db/types.js';
+	import ThreadSystemForm from '$modules/bible/components/ThreadSystemForm.svelte';
 	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
 	import IndividualsWorkspaceShell from '$modules/bible/components/IndividualsWorkspaceShell.svelte';
+	import {
+		isThreadKind,
+		optionMeta,
+		optionSubtitle,
+	} from '$modules/bible/thread-systems.js';
 	import {
 		getPlotThreads,
 		getPlotThreadSaving,
@@ -12,7 +17,7 @@
 		submitDeletePlotThread,
 	} from '$modules/bible/stores/bible-crud.svelte.js';
 
-	let { data }: { data: { projectId: string; plotThreads: PlotThread[]; scenes: Scene[] } } =
+	let { data }: { data: { projectId: string; plotThreads: PlotThread[] } } =
 		$props();
 
 	$effect(() => {
@@ -23,15 +28,22 @@
 	let selectedId: string | null = $state(null);
 	let confirmDeleteId: string | null = $state(null);
 
+	const majorArcs = $derived(getPlotThreads().filter((thread) => isThreadKind(thread, 'major-arc')));
+
+	$effect(() => {
+		if (selectedId && majorArcs.some((thread) => thread.id === selectedId)) return;
+		selectedId = majorArcs[0]?.id ?? null;
+	});
+
 	const selectedThread = $derived(
-		selectedId ? (getPlotThreads().find((t) => t.id === selectedId) ?? null) : null,
+		selectedId ? (majorArcs.find((thread) => thread.id === selectedId) ?? null) : null,
 	);
 	const options = $derived(
-		getPlotThreads().map((t) => ({
-			id: t.id,
-			name: t.title,
-			subtitle: t.status || 'Status unset',
-			meta: t.description?.trim() ? 'Arc brief ready' : 'No brief yet',
+		majorArcs.map((thread) => ({
+			id: thread.id,
+			name: thread.title,
+			subtitle: optionSubtitle(thread, 'major-arc'),
+			meta: optionMeta(thread, 'major-arc'),
 		})),
 	);
 
@@ -43,7 +55,8 @@
 	async function handleCreate(
 		formData: Omit<PlotThread, 'id' | 'projectId' | 'createdAt' | 'updatedAt'>,
 	) {
-		await submitCreatePlotThread(data.projectId, formData);
+		const created = await submitCreatePlotThread(data.projectId, formData);
+		selectedId = created.id;
 		creating = false;
 	}
 
@@ -87,19 +100,36 @@
 	>
 		{#snippet dossier()}
 			{#if creating}
-				<div class="entity-dossier">
-					<h2 class="dossier-title">New Arc</h2>
-					<PlotThreadForm
-						scenes={data.scenes}
-						saving={getPlotThreadSaving()}
-						onSave={handleCreate}
-						onCancel={() => (creating = false)}
-					/>
-				</div>
+				<section class="character-dossier">
+					<div class="dossier-header">
+						<h2 class="dossier-title">New Major Arc</h2>
+						<p class="dossier-copy">Primary causal chain that drives the story from setup to resolution.</p>
+					</div>
+					<div class="dossier-flow" aria-label="Major arc system form">
+						<ThreadSystemForm
+							kind="major-arc"
+							saving={getPlotThreadSaving()}
+							onSave={handleCreate}
+							onCancel={() => (creating = false)}
+						/>
+					</div>
+				</section>
 			{:else if selectedThread}
-				<div class="entity-dossier">
+				<section class="character-dossier">
 					<div class="dossier-header">
 						<h2 class="dossier-title">{selectedThread.title}</h2>
+						<p class="dossier-copy">Causality spine: pressure compounds until continuation becomes impossible.</p>
+					</div>
+					<div class="dossier-flow" aria-label="Major arc system form">
+						<ThreadSystemForm
+							thread={selectedThread}
+							kind="major-arc"
+							saving={getPlotThreadSaving()}
+							onSave={handleUpdate}
+							onCancel={() => (selectedId = null)}
+						/>
+					</div>
+					<div class="dossier-footer-actions">
 						{#if confirmDeleteId === selectedThread.id}
 							<button class="bible-btn-sm bible-btn-danger" onclick={() => handleDelete(selectedThread.id)}>Confirm</button>
 							<button class="bible-btn-sm" onclick={() => (confirmDeleteId = null)}>Cancel</button>
@@ -107,19 +137,12 @@
 							<button class="bible-btn-sm bible-btn-danger" onclick={() => (confirmDeleteId = selectedThread.id)}>Delete</button>
 						{/if}
 					</div>
-					<PlotThreadForm
-						thread={selectedThread}
-						scenes={data.scenes}
-						saving={getPlotThreadSaving()}
-						onSave={handleUpdate}
-						onCancel={() => (selectedId = null)}
-					/>
-				</div>
+				</section>
 			{/if}
 		{/snippet}
 		{#snippet empty()}
 			<div class="entity-empty">
-				<p>No major arcs yet.</p>
+				<p>No major arcs yet. Start with 1-3 primary causal chains.</p>
 				<button class="bible-btn-sm" onclick={() => (creating = true)}>+ Add your first arc</button>
 			</div>
 		{/snippet}
@@ -127,23 +150,21 @@
 </div>
 
 <style>
-	.entity-dossier {
-		padding: var(--space-6);
-		overflow-y: auto;
-	}
-
 	.dossier-header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: var(--space-3);
-		margin-bottom: var(--space-4);
+		display: grid;
+		gap: var(--space-2);
 	}
 
 	.dossier-title {
 		margin: 0;
 		font-size: var(--text-xl);
 		font-weight: var(--font-weight-semibold);
+	}
+
+	.dossier-copy {
+		margin: 0;
+		color: var(--color-text-secondary);
+		max-width: 72ch;
 	}
 
 	.entity-empty {

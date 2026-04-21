@@ -1,9 +1,88 @@
 <script lang="ts">
-	import { page } from '$app/state';
+	import type { PlotThread } from '$lib/db/types.js';
 	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
 	import IndividualsWorkspaceShell from '$modules/bible/components/IndividualsWorkspaceShell.svelte';
+	import ThreadSystemForm from '$modules/bible/components/ThreadSystemForm.svelte';
+	import {
+		isThreadKind,
+		optionMeta,
+		optionSubtitle,
+	} from '$modules/bible/thread-systems.js';
+	import {
+		getPlotThreads,
+		getPlotThreadSaving,
+		initPlotThreads,
+		submitCreatePlotThread,
+		submitDeletePlotThread,
+		submitUpdatePlotThread,
+	} from '$modules/bible/stores/bible-crud.svelte.js';
 
-	const projectId = $derived(page.params.id ?? '');
+	let { data }: { data: { projectId: string; plotThreads: PlotThread[] } } = $props();
+
+	$effect(() => {
+		initPlotThreads(data.plotThreads);
+	});
+
+	let creating = $state(false);
+	let selectedId = $state<string | null>(null);
+	let confirmDeleteId = $state<string | null>(null);
+
+	const motivations = $derived(
+		getPlotThreads().filter((thread) => isThreadKind(thread, 'motivation')),
+	);
+
+	const majorArcs = $derived(getPlotThreads().filter((thread) => isThreadKind(thread, 'major-arc')));
+
+	$effect(() => {
+		if (selectedId && motivations.some((thread) => thread.id === selectedId)) return;
+		selectedId = motivations[0]?.id ?? null;
+	});
+
+	const selectedThread = $derived(
+		selectedId ? (motivations.find((thread) => thread.id === selectedId) ?? null) : null,
+	);
+
+	const options = $derived(
+		motivations.map((thread) => ({
+			id: thread.id,
+			name: thread.title,
+			subtitle: optionSubtitle(thread, 'motivation'),
+			meta: optionMeta(thread, 'motivation'),
+		})),
+	);
+
+	const arcOptions = $derived(
+		majorArcs.map((thread) => ({
+			id: thread.id,
+			name: thread.title,
+		})),
+	);
+
+	function selectThread(id: string) {
+		selectedId = id;
+		creating = false;
+	}
+
+	async function handleCreate(
+		formData: Omit<PlotThread, 'id' | 'projectId' | 'createdAt' | 'updatedAt'>,
+	) {
+		const created = await submitCreatePlotThread(data.projectId, formData);
+		selectedId = created.id;
+		creating = false;
+	}
+
+	async function handleUpdate(
+		formData: Omit<PlotThread, 'id' | 'projectId' | 'createdAt' | 'updatedAt'>,
+	) {
+		if (!selectedThread) return;
+		await submitUpdatePlotThread(selectedThread.id, formData);
+	}
+
+	async function handleDelete(id: string) {
+		await submitDeletePlotThread(id);
+		confirmDeleteId = null;
+		selectedId = null;
+	}
 </script>
 
 <svelte:head>
@@ -12,29 +91,94 @@
 
 <div class="worldbuilding-section-view">
 	<WorldBuildingSubheaderNav
-		projectId={projectId}
+		projectId={data.projectId}
 		topSection="plot-threads"
 		activeId="motivations"
 		ariaLabel="Threads sections"
 	/>
 	<IndividualsWorkspaceShell
-		characterOptions={[]}
-		selectedCharacterId={null}
-		onSelectCharacter={() => {}}
-		onCreateCharacter={() => {}}
-		hasSelection={false}
+		characterOptions={options}
+		selectedCharacterId={selectedId}
+		onSelectCharacter={selectThread}
+		onCreateCharacter={() => {
+			creating = true;
+			selectedId = null;
+		}}
+		hasSelection={creating || selectedId !== null}
 		listAriaLabel="Motivations"
 		createLabel="new +"
 	>
+		{#snippet dossier()}
+			{#if creating}
+				<section class="character-dossier">
+					<div class="dossier-header">
+						<h2 class="dossier-title">New Motivation</h2>
+						<p class="dossier-copy">Decision logic beneath action: desire, fear, belief, trigger, and escalation.</p>
+					</div>
+					<div class="dossier-flow" aria-label="Motivation system form">
+						<ThreadSystemForm
+							kind="motivation"
+							arcOptions={arcOptions}
+							saving={getPlotThreadSaving()}
+							onSave={handleCreate}
+							onCancel={() => (creating = false)}
+						/>
+					</div>
+				</section>
+			{:else if selectedThread}
+				<section class="character-dossier">
+					<div class="dossier-header">
+						<h2 class="dossier-title">{selectedThread.title}</h2>
+						<p class="dossier-copy">Motivation should produce decisions that move arcs and increase conflict pressure.</p>
+					</div>
+					<div class="dossier-flow" aria-label="Motivation system form">
+						<ThreadSystemForm
+							thread={selectedThread}
+							kind="motivation"
+							arcOptions={arcOptions}
+							saving={getPlotThreadSaving()}
+							onSave={handleUpdate}
+							onCancel={() => (selectedId = null)}
+						/>
+					</div>
+					<div class="dossier-footer-actions">
+						{#if confirmDeleteId === selectedThread.id}
+							<button class="bible-btn-sm bible-btn-danger" onclick={() => handleDelete(selectedThread.id)}>Confirm</button>
+							<button class="bible-btn-sm" onclick={() => (confirmDeleteId = null)}>Cancel</button>
+						{:else}
+							<button class="bible-btn-sm bible-btn-danger" onclick={() => (confirmDeleteId = selectedThread.id)}>Delete</button>
+						{/if}
+					</div>
+				</section>
+			{/if}
+		{/snippet}
 		{#snippet empty()}
 			<div class="entity-empty">
-				<p>Log the why behind character and faction actions so threads remain coherent over time.</p>
+				<p>No motivations yet. Define the decision engines behind major choices and events.</p>
+				<button class="bible-btn-sm" onclick={() => (creating = true)}>+ Add first motivation</button>
 			</div>
 		{/snippet}
 	</IndividualsWorkspaceShell>
 </div>
 
 <style>
+	.dossier-header {
+		display: grid;
+		gap: var(--space-2);
+	}
+
+	.dossier-title {
+		margin: 0;
+		font-size: var(--text-xl);
+		font-weight: var(--font-weight-semibold);
+	}
+
+	.dossier-copy {
+		margin: 0;
+		color: var(--color-text-secondary);
+		max-width: 72ch;
+	}
+
 	.entity-empty {
 		padding: var(--space-8);
 		display: flex;

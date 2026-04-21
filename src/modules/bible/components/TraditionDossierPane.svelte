@@ -48,35 +48,3 @@
 		</div>
 	{/if}
 </section>
-
-<style>
-	.character-dossier {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-7);
-		max-width: 920px;
-		width: 100%;
-		padding-right: var(--space-6);
-	}
-
-	.dossier-flow {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-6);
-		padding: 0 var(--space-6);
-	}
-
-	.dossier-footer-actions {
-		display: flex;
-		justify-content: flex-end;
-		gap: var(--space-2);
-		flex-wrap: wrap;
-		padding: 0 var(--space-6) var(--space-6);
-	}
-
-	@media (max-width: 768px) {
-		.character-dossier {
-			padding-right: 0;
-		}
-	}
-</style>

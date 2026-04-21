@@ -7,6 +7,7 @@
 	import { aiPanel } from '$lib/stores/ai-panel.svelte';
 	import { editorState } from '../../../../modules/editor/stores/editor.svelte.ts';
 	import * as autosaveService from '$modules/editor/services/autosave-service.js';
+	import ManuscriptSurface from '$modules/editor/components/ManuscriptSurface.svelte';
 	import { updateScene } from '$modules/editor/services/scene-repository.js';
 	import { GhostButton } from '$lib/components/ui/index.js';
 
@@ -265,15 +266,36 @@
 		};
 	});
 
-	function handleContentInput() {
+	function handleManuscriptChange(html: string): void {
 		const sceneId = editorState.activeSceneId;
 		if (!sceneId) return;
 		const scene = data.scenes.find((s: Scene) => s.id === sceneId);
 		if (scene) {
-			scene.content = activeContent;
-			autosaveService.schedule(activeContent);
+			activeContent = html;
+			scene.content = html;
+			autosaveService.schedule(html);
 			saveStatus = 'saving';
 		}
+	}
+
+	function escapeHtml(text: string): string {
+		return text
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;')
+			.replace(/'/g, '&#39;');
+	}
+
+	function toParagraphHtml(text: string): string {
+		const parts = text
+			.split(/\n\s*\n/)
+			.map((part) => part.trim())
+			.filter(Boolean);
+		if (parts.length === 0) return '';
+		return parts
+			.map((part) => `<p>${escapeHtml(part).replace(/\n/g, '<br>')}</p>`)
+			.join('');
 	}
 
 	function countWords(text: string): number {
@@ -437,7 +459,8 @@
 	async function handleAccept(text: string) {
 		const sceneId = editorState.activeSceneId;
 		if (!sceneId) return;
-		const updated = activeContent + '\n\n' + text;
+		const appendix = toParagraphHtml(text);
+		const updated = appendix ? `${activeContent}${appendix}` : activeContent;
 		activeContent = updated;
 
 		const scene = data.scenes.find((s: Scene) => s.id === sceneId);
@@ -550,20 +573,15 @@
 			<EmptyState title="No scenes yet" description="Add one from the Outline." />
 		{:else}
 			<div class="editor-scroll">
-				<div class="editor-surface">
-					<div class="editor-meta-row">
-						<span>POV: {data.characters.find((c: Character) => c.id === activeScene?.povCharacterId)?.name ?? 'Unassigned'}</span>
-						<span>{activeWordCount} words</span>
-						<span>{saveStatus === 'saving' ? 'Saving...' : saveStatus === 'saved' ? 'Saved' : 'Idle'}</span>
-					</div>
-					<textarea
-						class="editor-textarea"
-						bind:value={activeContent}
-						oninput={handleContentInput}
-						placeholder="Start writing your scene..."
-						aria-label="Scene manuscript editor"
-					></textarea>
+				<div class="editor-meta-row">
+					<span>POV: {data.characters.find((c: Character) => c.id === activeScene?.povCharacterId)?.name ?? 'Unassigned'}</span>
+					<span>{activeWordCount} words</span>
+					<span>{saveStatus === 'saving' ? 'Saving...' : saveStatus === 'saved' ? 'Saved' : 'Idle'}</span>
 				</div>
+				<ManuscriptSurface
+					content={activeContent}
+					onContentChange={handleManuscriptChange}
+				/>
 			</div>
 		{/if}
 		<footer class="editor-footer" aria-label="Writing progress">
@@ -790,9 +808,9 @@
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
-		border: 1px solid var(--color-border-default);
+		border: 1px solid color-mix(in srgb, var(--color-border-subtle) 80%, transparent);
 		border-radius: var(--radius-md);
-		background: var(--color-surface-raised);
+		background: color-mix(in srgb, var(--color-surface-raised) 94%, transparent);
 	}
 
 	.editor-toolbar {
@@ -876,19 +894,12 @@
 
 	.editor-scroll {
 		flex: 1;
-		overflow: auto;
-		padding: var(--space-6) var(--space-4);
-		background: linear-gradient(180deg, color-mix(in srgb, var(--color-surface-ground) 75%, transparent), transparent 35%);
-	}
-
-	.editor-surface {
-		max-width: 86ch;
-		margin: 0 auto;
-		background: color-mix(in srgb, var(--color-surface-ground) 94%, transparent);
-		border: 1px solid var(--color-border-subtle);
-		border-radius: calc(var(--radius-lg) + 0.25rem);
-		padding: var(--space-5);
-		box-shadow: var(--shadow-xs);
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
+		background:
+			linear-gradient(180deg, color-mix(in srgb, var(--color-surface-ground) 72%, transparent), transparent 33%),
+			var(--color-surface-raised);
 	}
 
 	.editor-meta-row {
@@ -897,8 +908,8 @@
 		gap: var(--space-2);
 		font-size: var(--text-xs);
 		color: var(--color-text-muted);
-		padding-bottom: var(--space-3);
-		border-bottom: 1px solid var(--color-border-subtle);
+		padding: var(--space-2) var(--space-4);
+		border-bottom: 1px solid color-mix(in srgb, var(--color-border-subtle) 75%, transparent);
 	}
 
 	.editor-footer {
@@ -932,21 +943,6 @@
 
 	.meter-fill.session {
 		background: color-mix(in srgb, var(--color-teal) 72%, white);
-	}
-
-	.editor-textarea {
-		width: 100%;
-		min-height: 60vh;
-		background-color: transparent;
-		color: var(--color-text-primary);
-		border: none;
-		padding: var(--space-4) 0 0;
-		font-family: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
-		font-size: var(--text-base);
-		line-height: 1.75;
-		resize: none;
-		outline: none;
-		caret-color: var(--color-nova-blue);
 	}
 
 	.story-compass {

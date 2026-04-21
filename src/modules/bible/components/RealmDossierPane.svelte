@@ -54,12 +54,6 @@
 		uploadDisabled={isCreating || !realm}
 	/>
 
-	<div class="realm-identity-intro">
-		<p class="dossier-eyebrow">{eyebrow}</p>
-		<h2 class="dossier-title">{title}</h2>
-		<p class="dossier-copy">{copy}</p>
-	</div>
-
 	<div class="dossier-flow" aria-label="Realm dossier sections">
 		<RealmForm realm={realm} {saving} {onSave} {onCancel} />
 	</div>
@@ -75,62 +69,3 @@
 		</div>
 	{/if}
 </section>
-
-<style>
-	.character-dossier {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-7);
-		max-width: 920px;
-		width: 100%;
-		padding-right: var(--space-6);
-	}
-
-	.realm-identity-intro {
-		display: grid;
-		gap: var(--space-2);
-	}
-
-	.dossier-flow {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-6);
-	}
-
-	.dossier-eyebrow,
-	.dossier-copy {
-		margin: 0;
-	}
-
-	.dossier-eyebrow {
-		font-size: var(--text-xs);
-		text-transform: uppercase;
-		letter-spacing: var(--tracking-wide);
-		color: var(--color-text-muted);
-	}
-
-	.dossier-title {
-		margin: 0;
-		font-size: var(--text-xl);
-		font-weight: var(--font-weight-semibold);
-	}
-
-	.dossier-copy {
-		margin-top: var(--space-2);
-		max-width: 70ch;
-		color: var(--color-text-secondary);
-	}
-
-	.dossier-footer-actions {
-		display: flex;
-		justify-content: flex-end;
-		gap: var(--space-2);
-		flex-wrap: wrap;
-	}
-
-	@media (max-width: 768px) {
-		.character-dossier {
-			padding-right: 0;
-		}
-	}
-</style>

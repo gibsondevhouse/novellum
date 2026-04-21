@@ -463,28 +463,6 @@
 		overscroll-behavior: none;
 	}
 
-	.character-dossier {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-7);
-		max-width: 920px;
-		width: 100%;
-		padding-right: var(--space-6);
-	}
-
-	.dossier-flow {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-6);
-	}
-
-	.dossier-footer-actions {
-		display: flex;
-		justify-content: flex-end;
-		padding-top: var(--space-2);
-		padding-bottom: var(--space-6);
-	}
-
 	.delete-character-btn {
 		border: 1px solid color-mix(in srgb, var(--color-semantic-error-fg) 50%, var(--color-border-default));
 		background: color-mix(in srgb, var(--color-semantic-error-bg) 35%, transparent);
@@ -509,10 +487,6 @@
 		.worldbuilding-section-view {
 			height: auto;
 			overflow: visible;
-		}
-
-		.character-dossier {
-			padding-right: 0;
 		}
 	}
 

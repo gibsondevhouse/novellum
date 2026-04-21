@@ -54,4 +54,5 @@ export {
 // Components
 export { default as DocumentEditorFrame } from './components/DocumentEditorFrame.svelte';
 export { default as EditModeToolbar } from './components/EditModeToolbar.svelte';
+export { default as ManuscriptSurface } from './components/ManuscriptSurface.svelte';
 export { default as VersionHistoryPanel } from './components/VersionHistoryPanel.svelte';
