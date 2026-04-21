@@ -77,6 +77,9 @@
 		return data.scenes.find((scene: Scene) => scene.id === sceneId) ?? null;
 	});
 
+	const selectedChapterId = $derived(page.url.searchParams.get('chapterId'));
+	const selectedSceneId = $derived(page.url.searchParams.get('sceneId'));
+
 	const activeSceneIndex = $derived.by((): number => {
 		if (!activeScene) return -1;
 		return data.scenes.findIndex((scene: Scene) => scene.id === activeScene.id);
@@ -237,6 +240,32 @@
 	});
 
 	$effect(() => {
+		if (!selectedSceneId || data.scenes.length === 0) return;
+
+		const requestedScene = data.scenes.find((scene: Scene) => scene.id === selectedSceneId);
+		if (!requestedScene) return;
+
+		if (editorState.activeSceneId !== requestedScene.id) {
+			editorState.setActiveSceneId(requestedScene.id);
+		}
+	});
+
+	$effect(() => {
+		if (!selectedChapterId || data.scenes.length === 0) return;
+
+		const active = data.scenes.find((scene: Scene) => scene.id === editorState.activeSceneId);
+		if (active?.chapterId === selectedChapterId) return;
+
+		const firstSceneInChapter = data.scenes.find(
+			(scene: Scene) => scene.chapterId === selectedChapterId,
+		);
+
+		if (firstSceneInChapter) {
+			editorState.setActiveSceneId(firstSceneInChapter.id);
+		}
+	});
+
+	$effect(() => {
 		if (!initializedBaseline && data.scenes.length > 0) {
 			initialTotalWords = data.scenes.reduce((sum: number, scene: Scene) => sum + countWords(scene.content ?? ''), 0);
 			initializedBaseline = true;
@@ -276,6 +305,12 @@
 			autosaveService.schedule(html);
 			saveStatus = 'saving';
 		}
+	}
+
+	function handleTitleChange(newTitle: string): void {
+		if (!activeScene) return;
+		activeScene.title = newTitle;
+		void persistActiveScenePatch({ title: newTitle });
 	}
 
 	function escapeHtml(text: string): string {
@@ -573,14 +608,11 @@
 			<EmptyState title="No scenes yet" description="Add one from the Outline." />
 		{:else}
 			<div class="editor-scroll">
-				<div class="editor-meta-row">
-					<span>POV: {data.characters.find((c: Character) => c.id === activeScene?.povCharacterId)?.name ?? 'Unassigned'}</span>
-					<span>{activeWordCount} words</span>
-					<span>{saveStatus === 'saving' ? 'Saving...' : saveStatus === 'saved' ? 'Saved' : 'Idle'}</span>
-				</div>
 				<ManuscriptSurface
 					content={activeContent}
+					title={activeScene?.title ?? ''}
 					onContentChange={handleManuscriptChange}
+					onTitleChange={handleTitleChange}
 				/>
 			</div>
 		{/if}
@@ -701,26 +733,22 @@
 <style>
 	.editor-page {
 		display: grid;
-		grid-template-columns: 280px 1fr 340px 0;
+		grid-template-columns: 1fr;
 		height: calc(100vh - 120px);
-		gap: var(--space-2);
+		gap: 0;
 		overflow: hidden;
 		transition: grid-template-columns var(--duration-enter) var(--ease-standard);
-		background: linear-gradient(180deg, var(--color-surface-ground), var(--color-surface-raised));
-		border: 1px solid var(--color-border-subtle);
-		border-radius: var(--radius-xl);
+		background: var(--color-surface-base);
+		border: none;
+		border-radius: 0;
 	}
 
 	.editor-page.ai-open {
-		grid-template-columns: 280px 1fr 340px 320px;
+		grid-template-columns: 1fr;
 	}
 
 	.doc-list {
-		background-color: color-mix(in srgb, var(--color-surface-ground) 92%, transparent);
-		border-right: 1px solid var(--color-border-subtle);
-		padding: var(--space-3);
-		overflow-y: auto;
-		border-radius: var(--radius-lg);
+		display: none;
 	}
 
 	.doc-list-header {
@@ -808,18 +836,13 @@
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
-		border: 1px solid color-mix(in srgb, var(--color-border-subtle) 80%, transparent);
-		border-radius: var(--radius-md);
-		background: color-mix(in srgb, var(--color-surface-raised) 94%, transparent);
+		border: none;
+		border-radius: 0;
+		background: var(--color-surface-base);
 	}
 
 	.editor-toolbar {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: var(--space-3) var(--space-4);
-		border-bottom: 1px solid var(--color-border-default);
-		gap: var(--space-3);
+		display: none;
 	}
 
 	.scene-context h1 {
@@ -897,28 +920,12 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 0;
-		background:
-			linear-gradient(180deg, color-mix(in srgb, var(--color-surface-ground) 72%, transparent), transparent 33%),
-			var(--color-surface-raised);
-	}
-
-	.editor-meta-row {
-		display: flex;
-		justify-content: space-between;
-		gap: var(--space-2);
-		font-size: var(--text-xs);
-		color: var(--color-text-muted);
-		padding: var(--space-2) var(--space-4);
-		border-bottom: 1px solid color-mix(in srgb, var(--color-border-subtle) 75%, transparent);
+		background: var(--color-surface-base);
+		overflow: auto;
 	}
 
 	.editor-footer {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: var(--space-3);
-		border-top: 1px solid var(--color-border-default);
-		padding: var(--space-3) var(--space-4);
-		background: var(--color-surface-ground);
+		display: none;
 	}
 
 	.progress-block {
@@ -946,14 +953,11 @@
 	}
 
 	.story-compass {
-		border: 1px solid var(--color-border-subtle);
-		border-radius: var(--radius-md);
-		background: color-mix(in srgb, var(--color-surface-ground) 95%, transparent);
-		display: flex;
-		flex-direction: column;
-		overflow: auto;
-		padding: var(--space-3);
-		gap: var(--space-3);
+		display: none;
+	}
+
+	:global(.ai-panel) {
+		display: none;
 	}
 
 	.compass-header {

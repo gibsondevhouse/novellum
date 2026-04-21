@@ -6,14 +6,21 @@
 
 	interface Props {
 		content: string;
+		title: string;
 		onContentChange: (html: string) => void;
+		onTitleChange?: (title: string) => void;
 	}
 
-	let { content, onContentChange }: Props = $props();
+	let { content, title = '', onContentChange, onTitleChange }: Props = $props();
 
 	let editorHost: HTMLElement;
+	let bubbleMenuHost: HTMLElement | null = null;
 	let editor: any = null;
 	let updateTick = $state(0);
+	let isSelecting = $state(false);
+	let bubbleMenuVisible = $state(false);
+	let bubbleMenuPosition = $state({ top: 0, left: 0 });
+	let localTitle = $state('');
 
 	const isReady = $derived(editor !== null);
 
@@ -22,10 +29,14 @@
 			element: editorHost,
 			extensions: [
 				StarterKit.configure({
-					heading: { levels: [1, 2, 3] },
+					heading: { levels: [1, 2] },
+					bulletList: { keepMarks: true },
+					orderedList: { keepMarks: true },
 				}),
 				Placeholder.configure({
-					placeholder: 'Draft the scene as it unfolds on the page...',
+					placeholder: 'Begin drafting...',
+					showOnlyCurrent: false,
+					emptyEditorClass: 'is-empty',
 				}),
 			],
 			content,
@@ -33,16 +44,21 @@
 				onContentChange(currentEditor.getHTML());
 				updateTick += 1;
 			},
-			onSelectionUpdate: () => {
+			onSelectionUpdate: ({ editor: currentEditor }: { editor: any }) => {
+				const hasSelection = !currentEditor.state.selection.empty;
+				isSelecting = hasSelection;
+				if (hasSelection) {
+					updateBubbleMenuPosition(currentEditor);
+				}
 				updateTick += 1;
 			},
 			editorProps: {
 				attributes: {
 					class: 'manuscript-canvas',
+					spellcheck: 'true',
 				},
 			},
 		});
-		updateTick += 1;
 	});
 
 	onDestroy(() => {
@@ -57,6 +73,55 @@
 			editor.commands.setContent(content || '<p></p>', { emitUpdate: false });
 		}
 	});
+
+	$effect(() => {
+		localTitle = title;
+	});
+
+	function updateBubbleMenuPosition(currentEditor: any): void {
+		if (!bubbleMenuHost || !currentEditor) return;
+
+		const { from, to } = currentEditor.state.selection;
+		if (from === to) {
+			bubbleMenuVisible = false;
+			return;
+		}
+
+		const view = currentEditor.view;
+		if (!view.coordsAtPos) {
+			bubbleMenuVisible = false;
+			return;
+		}
+
+		try {
+			const start = view.coordsAtPos(from);
+			const end = view.coordsAtPos(to);
+			if (!start || !end) {
+				bubbleMenuVisible = false;
+				return;
+			}
+
+			const editorRect = editorHost?.getBoundingClientRect();
+			if (!editorRect) {
+				bubbleMenuVisible = false;
+				return;
+			}
+
+			const menuRect = bubbleMenuHost?.getBoundingClientRect();
+			if (!menuRect) {
+				bubbleMenuVisible = false;
+				return;
+			}
+
+			const top = start.top - editorRect.top - 50;
+			const left = (start.left + end.left) / 2 - editorRect.left - menuRect.width / 2;
+
+			bubbleMenuPosition = { top, left };
+			bubbleMenuVisible = true;
+		} catch (e) {
+			bubbleMenuVisible = false;
+		}
+	}
 
 	function exec(command: () => void): void {
 		if (!editor) return;
@@ -73,278 +138,355 @@
 		void updateTick;
 		return editor ? check() : false;
 	}
+
+	function handleTitleChange(newTitle: string): void {
+		localTitle = newTitle;
+		onTitleChange?.(newTitle);
+	}
 </script>
 
-<div class="surface-shell">
-	<div class="toolbar-wrap">
-		<div class="format-toolbar" role="toolbar" aria-label="Manuscript formatting toolbar">
-			<button
-				type="button"
-				class="tool-btn"
-				class:active={pressed(() => editor!.isActive('paragraph'))}
-				onclick={() => exec(() => editor!.chain().focus().setParagraph().run())}
-			>
-				Paragraph
-			</button>
-			<button
-				type="button"
-				class="tool-btn"
-				class:active={pressed(() => editor!.isActive('heading', { level: 1 }))}
-				onclick={() => exec(() => editor!.chain().focus().toggleHeading({ level: 1 }).run())}
-			>
-				H1
-			</button>
-			<button
-				type="button"
-				class="tool-btn"
-				class:active={pressed(() => editor!.isActive('heading', { level: 2 }))}
-				onclick={() => exec(() => editor!.chain().focus().toggleHeading({ level: 2 }).run())}
-			>
-				H2
-			</button>
-			<button
-				type="button"
-				class="tool-btn"
-				class:active={pressed(() => editor!.isActive('bold'))}
-				onclick={() => exec(() => editor!.chain().focus().toggleBold().run())}
-			>
-				Bold
-			</button>
-			<button
-				type="button"
-				class="tool-btn"
-				class:active={pressed(() => editor!.isActive('italic'))}
-				onclick={() => exec(() => editor!.chain().focus().toggleItalic().run())}
-			>
-				Italic
-			</button>
-			<button
-				type="button"
-				class="tool-btn"
-				class:active={pressed(() => editor!.isActive('underline'))}
-				onclick={() => exec(() => editor!.chain().focus().toggleUnderline().run())}
-			>
-				Underline
-			</button>
-			<button
-				type="button"
-				class="tool-btn"
-				class:active={pressed(() => editor!.isActive('strike'))}
-				onclick={() => exec(() => editor!.chain().focus().toggleStrike().run())}
-			>
-				Strike
-			</button>
-			<button
-				type="button"
-				class="tool-btn"
-				class:active={pressed(() => editor!.isActive('bulletList'))}
-				onclick={() => exec(() => editor!.chain().focus().toggleBulletList().run())}
-			>
-				Bullets
-			</button>
-			<button
-				type="button"
-				class="tool-btn"
-				class:active={pressed(() => editor!.isActive('orderedList'))}
-				onclick={() => exec(() => editor!.chain().focus().toggleOrderedList().run())}
-			>
-				Numbered
-			</button>
-			<button
-				type="button"
-				class="tool-btn"
-				class:active={pressed(() => editor!.isActive('blockquote'))}
-				onclick={() => exec(() => editor!.chain().focus().toggleBlockquote().run())}
-			>
-				Quote
-			</button>
-			<span class="toolbar-divider" aria-hidden="true"></span>
-			<button
-				type="button"
-				class="tool-btn"
-				disabled={!canRun(() => editor!.can().chain().focus().undo().run())}
-				onclick={() => exec(() => editor!.chain().focus().undo().run())}
-			>
-				Undo
-			</button>
-			<button
-				type="button"
-				class="tool-btn"
-				disabled={!canRun(() => editor!.can().chain().focus().redo().run())}
-				onclick={() => exec(() => editor!.chain().focus().redo().run())}
-			>
-				Redo
-			</button>
-		</div>
+<div class="editor-root">
+	<div class="editor-column">
+		<!-- Title Input -->
+		<input
+			type="text"
+			class="title-input"
+			placeholder="Title"
+			value={localTitle}
+			onchange={(e) => handleTitleChange((e.target as HTMLInputElement).value)}
+			onkeyup={(e) => {
+				const target = e.target as HTMLInputElement;
+				if (e.key !== 'Enter') {
+					handleTitleChange(target.value);
+				}
+			}}
+			aria-label="Scene title"
+		/>
+
+		<!-- Editor Canvas -->
+		<div bind:this={editorHost} class="editor-host"></div>
 	</div>
 
-	<div class="canvas-wrap" class:ready={isReady}>
-		<div class="canvas-column">
-			<div bind:this={editorHost} class="editor-host"></div>
-		</div>
+	<!-- Bubble Menu -->
+	<div
+		class="bubble-menu"
+		class:visible={bubbleMenuVisible && isSelecting}
+		style:top="{bubbleMenuPosition.top}px"
+		style:left="{bubbleMenuPosition.left}px"
+		bind:this={bubbleMenuHost}
+		role="toolbar"
+		aria-label="Text formatting menu"
+		tabindex="-1"
+		onclick={(e) => e.stopPropagation()}
+		onkeydown={(e) => {
+			if (e.key === 'Escape') {
+				isSelecting = false;
+				bubbleMenuVisible = false;
+			}
+		}}
+	>
+		<button
+			type="button"
+			class="bubble-btn"
+			class:active={pressed(() => editor!.isActive('bold'))}
+			onclick={() => exec(() => editor!.chain().focus().toggleBold().run())}
+			title="Bold"
+			aria-label="Toggle bold"
+		>
+			<span class="bubble-icon">B</span>
+		</button>
+		<button
+			type="button"
+			class="bubble-btn"
+			class:active={pressed(() => editor!.isActive('italic'))}
+			onclick={() => exec(() => editor!.chain().focus().toggleItalic().run())}
+			title="Italic"
+			aria-label="Toggle italic"
+		>
+			<span class="bubble-icon">I</span>
+		</button>
+		<button
+			type="button"
+			class="bubble-btn"
+			class:active={pressed(() => editor!.isActive('strike'))}
+			onclick={() => exec(() => editor!.chain().focus().toggleStrike().run())}
+			title="Strikethrough"
+			aria-label="Toggle strikethrough"
+		>
+			<span class="bubble-icon">S</span>
+		</button>
+		<span class="bubble-divider"></span>
+		<button
+			type="button"
+			class="bubble-btn"
+			class:active={pressed(() => editor!.isActive('heading', { level: 1 }))}
+			onclick={() => exec(() => editor!.chain().focus().toggleHeading({ level: 1 }).run())}
+			title="Heading 1"
+			aria-label="Toggle heading 1"
+		>
+			<span class="bubble-icon">H1</span>
+		</button>
+		<button
+			type="button"
+			class="bubble-btn"
+			class:active={pressed(() => editor!.isActive('heading', { level: 2 }))}
+			onclick={() => exec(() => editor!.chain().focus().toggleHeading({ level: 2 }).run())}
+			title="Heading 2"
+			aria-label="Toggle heading 2"
+		>
+			<span class="bubble-icon">H2</span>
+		</button>
+		<button
+			type="button"
+			class="bubble-btn"
+			class:active={pressed(() => editor!.isActive('bulletList'))}
+			onclick={() => exec(() => editor!.chain().focus().toggleBulletList().run())}
+			title="Bullet list"
+			aria-label="Toggle bullet list"
+		>
+			<span class="bubble-icon">•</span>
+		</button>
+		<button
+			type="button"
+			class="bubble-btn"
+			class:active={pressed(() => editor!.isActive('blockquote'))}
+			onclick={() => exec(() => editor!.chain().focus().toggleBlockquote().run())}
+			title="Blockquote"
+			aria-label="Toggle blockquote"
+		>
+			<span class="bubble-icon">"</span>
+		</button>
 	</div>
 </div>
 
 <style>
-	.surface-shell {
+	.editor-root {
 		display: flex;
 		flex: 1;
 		min-height: 0;
 		flex-direction: column;
-	}
-
-	.toolbar-wrap {
-		padding: var(--space-2) var(--space-4);
-		border-bottom: 1px solid color-mix(in srgb, var(--color-border-subtle) 80%, transparent);
-		background: color-mix(in srgb, var(--color-surface-ground) 92%, transparent);
-	}
-
-	.format-toolbar {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--space-1);
-		align-items: center;
-	}
-
-	.tool-btn {
-		border: 1px solid transparent;
+		padding: 0;
 		background: transparent;
-		color: var(--color-text-secondary);
-		padding: 0.3rem 0.52rem;
-		font-size: var(--text-xs);
-		line-height: 1.2;
-		border-radius: var(--radius-sm);
-		cursor: pointer;
+		position: relative;
 	}
 
-	.tool-btn:hover:not(:disabled),
-	.tool-btn:focus-visible {
-		outline: none;
-		background: color-mix(in srgb, var(--color-surface-overlay) 72%, transparent);
-		color: var(--color-text-primary);
-	}
-
-	.tool-btn.active {
-		border-color: color-mix(in srgb, var(--color-border-default) 80%, transparent);
-		background: color-mix(in srgb, var(--color-surface-overlay) 90%, transparent);
-		color: var(--color-text-primary);
-	}
-
-	.tool-btn:disabled {
-		opacity: 0.38;
-		cursor: not-allowed;
-	}
-
-	.toolbar-divider {
-		width: 1px;
-		height: 1rem;
-		background: color-mix(in srgb, var(--color-border-subtle) 90%, transparent);
-		margin: 0 var(--space-1);
-	}
-
-	.canvas-wrap {
-		flex: 1;
-		min-height: 0;
-		overflow: auto;
-		padding: clamp(1rem, 2vw, 2rem);
-		background:
-			linear-gradient(180deg, color-mix(in srgb, var(--color-surface-ground) 70%, transparent), transparent 28%),
-			radial-gradient(circle at 50% -20%, color-mix(in srgb, var(--color-surface-overlay) 55%, transparent), transparent 68%);
-	}
-
-	.canvas-column {
-		max-width: min(900px, 100%);
+	.editor-column {
+		max-width: 720px;
 		margin: 0 auto;
-		background: color-mix(in srgb, var(--color-surface-ground) 96%, transparent);
-		border: 1px solid color-mix(in srgb, var(--color-border-subtle) 80%, transparent);
-		border-radius: calc(var(--radius-lg) + 0.2rem);
-		box-shadow: var(--shadow-xs);
+		width: 100%;
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		padding: clamp(4rem, 8vw, 6rem) clamp(1rem, 4vw, 3rem) clamp(3rem, 6vw, 4rem);
+		box-sizing: border-box;
+		background: transparent;
+		border: none;
+		box-shadow: none;
+	}
+
+	.title-input {
+		appearance: none;
+		border: none;
+		outline: none;
+		background: transparent;
+		font-family: var(--font-sans);
+		font-size: clamp(2rem, 5vw, 2.5rem);
+		font-weight: 700;
+		line-height: 1.2;
+		letter-spacing: -0.01em;
+		color: var(--color-text-primary);
+		margin: 0 0 clamp(2rem, 4vw, 3rem);
+		padding: 0;
+		width: 100%;
+		text-align: left;
+
+		&::placeholder {
+			color: var(--color-text-muted);
+			opacity: 0.4;
+		}
+
+		&:focus {
+			outline: none;
+		}
 	}
 
 	.editor-host {
-		padding: clamp(1.2rem, 2vw, 2.5rem);
-		min-height: max(62vh, 460px);
-	}
-
-	:global(.editor-host .manuscript-canvas) {
+		flex: 1;
 		outline: none;
 		font-family: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
-		font-size: clamp(1rem, 0.95rem + 0.2vw, 1.08rem);
-		line-height: 1.8;
-		letter-spacing: 0.01em;
+		font-size: clamp(1rem, 1vw + 0.9rem, 1.1rem);
+		line-height: 1.9;
+		letter-spacing: 0.005em;
 		color: var(--color-text-primary);
 		caret-color: var(--color-nova-blue);
 	}
 
-	:global(.editor-host .manuscript-canvas > * + *) {
-		margin-top: 0.95em;
+	:global(.editor-host .manuscript-canvas) {
+		outline: none;
+		font-family: inherit;
+		font-size: inherit;
+		line-height: inherit;
+		letter-spacing: inherit;
+		color: inherit;
+	}
+
+	:global(.editor-host .manuscript-canvas.is-empty div.is-editor-empty:first-child::before) {
+		color: var(--color-text-muted);
+		content: attr(data-placeholder);
+		float: left;
+		height: 0;
+		pointer-events: none;
+		opacity: 0.35;
+	}
+
+	:global(.editor-host .manuscript-canvas p) {
+		margin: 0 0 1.2em;
+	}
+
+	:global(.editor-host .manuscript-canvas p:last-child) {
+		margin-bottom: 0;
 	}
 
 	:global(.editor-host .manuscript-canvas h1),
-	:global(.editor-host .manuscript-canvas h2),
-	:global(.editor-host .manuscript-canvas h3) {
+	:global(.editor-host .manuscript-canvas h2) {
 		font-family: var(--font-sans);
-		line-height: 1.25;
-		margin-top: 1.35em;
-		margin-bottom: 0.45em;
-		color: color-mix(in srgb, var(--color-text-primary) 94%, black);
+		font-weight: 700;
+		line-height: 1.3;
+		letter-spacing: -0.01em;
+		margin: 1.8em 0 0.6em;
+		color: var(--color-text-primary);
 	}
 
 	:global(.editor-host .manuscript-canvas h1) {
-		font-size: 1.5rem;
+		font-size: 1.8rem;
 	}
 
 	:global(.editor-host .manuscript-canvas h2) {
-		font-size: 1.3rem;
+		font-size: 1.4rem;
 	}
 
-	:global(.editor-host .manuscript-canvas h3) {
-		font-size: 1.15rem;
+	:global(.editor-host .manuscript-canvas h1:first-child),
+	:global(.editor-host .manuscript-canvas h2:first-child) {
+		margin-top: 0;
 	}
 
 	:global(.editor-host .manuscript-canvas ul),
 	:global(.editor-host .manuscript-canvas ol) {
-		padding-left: 1.4rem;
+		margin: 1.2em 0;
+		padding-left: 1.8em;
+	}
+
+	:global(.editor-host .manuscript-canvas li) {
+		margin-bottom: 0.6em;
 	}
 
 	:global(.editor-host .manuscript-canvas blockquote) {
-		margin: 1.2rem 0;
-		padding-left: 1rem;
-		border-left: 2px solid color-mix(in srgb, var(--color-border-default) 85%, transparent);
+		margin: 1.6em 0;
+		padding-left: 1.2em;
+		border-left: 3px solid var(--color-border-subtle);
 		color: var(--color-text-secondary);
-	}
-
-	:global(.editor-host .manuscript-canvas hr) {
-		border: none;
-		height: 1px;
-		margin: 1.4rem 0;
-		background: color-mix(in srgb, var(--color-border-default) 90%, transparent);
-	}
-
-	:global(.editor-host .manuscript-canvas p.is-editor-empty:first-child::before) {
-		content: attr(data-placeholder);
-		float: left;
-		color: var(--color-text-muted);
-		pointer-events: none;
-		height: 0;
 		font-style: italic;
 	}
 
-	@media (max-width: 900px) {
-		.toolbar-wrap {
-			padding-inline: var(--space-3);
+	:global(.editor-host .manuscript-canvas strong) {
+		font-weight: 600;
+	}
+
+	:global(.editor-host .manuscript-canvas em) {
+		font-style: italic;
+	}
+
+	:global(.editor-host .manuscript-canvas s) {
+		text-decoration: line-through;
+		opacity: 0.7;
+	}
+
+	.bubble-menu {
+		position: fixed;
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+		padding: 0.5rem;
+		background: var(--color-surface-base);
+		border: 1px solid var(--color-border-default);
+		border-radius: var(--radius-md);
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+		opacity: 0;
+		pointer-events: none;
+		transform: translateX(-50%);
+		z-index: 100;
+		transition: opacity 0.15s ease-out;
+		backdrop-filter: blur(8px);
+	}
+
+	.bubble-menu.visible {
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	.bubble-btn {
+		appearance: none;
+		border: none;
+		outline: none;
+		background: transparent;
+		color: var(--color-text-secondary);
+		padding: 0.4rem 0.6rem;
+		font-size: 0.85rem;
+		font-weight: 500;
+		line-height: 1;
+		border-radius: 4px;
+		cursor: pointer;
+		transition: all 0.1s ease;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		&:hover {
+			background: color-mix(in srgb, var(--color-surface-overlay) 72%, transparent);
+			color: var(--color-text-primary);
 		}
 
-		.tool-btn {
-			font-size: 11px;
+		&:active {
+			transform: scale(0.95);
 		}
 
-		.canvas-wrap {
-			padding: var(--space-3);
+		&.active {
+			background: color-mix(in srgb, var(--color-nova-blue) 15%, transparent);
+			color: var(--color-nova-blue);
+			font-weight: 600;
+		}
+	}
+
+	.bubble-icon {
+		font-family: var(--font-sans);
+		font-weight: 600;
+		letter-spacing: 0.02em;
+	}
+
+	.bubble-divider {
+		width: 1px;
+		height: 1.2rem;
+		background: var(--color-border-subtle);
+		margin: 0 0.25rem;
+	}
+
+	@media (max-width: 768px) {
+		.editor-column {
+			padding: clamp(3rem, 6vw, 4rem) clamp(0.75rem, 3vw, 1.5rem) clamp(2rem, 4vw, 3rem);
 		}
 
-		.editor-host {
-			padding: var(--space-4);
+		.title-input {
+			font-size: clamp(1.5rem, 5vw, 2rem);
+		}
+
+		.bubble-menu {
+			gap: 0;
+			padding: 0.4rem;
+		}
+
+		.bubble-btn {
+			padding: 0.35rem 0.5rem;
+			font-size: 0.8rem;
 		}
 	}
 </style>

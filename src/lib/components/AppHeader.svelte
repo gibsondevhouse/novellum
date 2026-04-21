@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import type { Chapter, Scene } from '$lib/db/types.js';
+	import { getChaptersByProjectId } from '$modules/project/services/chapter-repository.js';
+	import { getScenesByProjectId } from '$modules/editor/services/scene-repository.js';
 	import ModelSelector from './ModelSelector.svelte';
 	import PillNav from './ui/PillNav.svelte';
 	import {
@@ -16,6 +19,7 @@
 	let isProjectRoute = $derived(page.url.pathname.startsWith('/projects/'));
 	let isBooksRoute = $derived(page.url.pathname.startsWith('/books'));
 	let isImagesRoute = $derived(page.url.pathname.startsWith('/images'));
+	let isEditorRoute = $derived(/^\/projects\/[^/]+\/editor$/.test(page.url.pathname));
 
 	let projectTitle = $derived(
 		isProjectRoute && page.data?.project ? (page.data.project as { title: string }).title : '',
@@ -30,6 +34,72 @@
 		return 'Novellum';
 	});
 
+	let editorChapters = $state<Chapter[]>([]);
+	let editorScenes = $state<Scene[]>([]);
+
+	$effect(() => {
+		if (!isEditorRoute || !page.params?.id) {
+			editorChapters = [];
+			editorScenes = [];
+			return;
+		}
+
+		let cancelled = false;
+
+		const fromPageData = (page.data?.chapters as Chapter[] | undefined) ?? [];
+		if (fromPageData.length > 0) {
+			editorChapters = [...fromPageData].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+		} else {
+			void getChaptersByProjectId(page.params.id).then((chapters) => {
+				if (cancelled) return;
+				editorChapters = [...chapters].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+			});
+		}
+
+		const scenesFromPageData = (page.data?.scenes as Scene[] | undefined) ?? [];
+		if (scenesFromPageData.length > 0) {
+			editorScenes = [...scenesFromPageData].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+		} else {
+			void getScenesByProjectId(page.params.id).then((scenes) => {
+				if (cancelled) return;
+				editorScenes = [...scenes].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+			});
+		}
+
+		return () => {
+			cancelled = true;
+		};
+	});
+
+	let editorChapterItems = $derived.by(() => {
+		return editorChapters.map((chapter, index) => ({
+			id: chapter.id,
+			label: `CH ${index + 1}`,
+		}));
+	});
+
+	let editorActiveChapterId = $derived.by(() => {
+		const requested = page.url.searchParams.get('chapterId');
+		if (requested) return requested;
+		return editorChapters[0]?.id ?? null;
+	});
+
+	let editorSceneItems = $derived.by(() => {
+		if (!editorActiveChapterId) return [];
+		const chapterScenes = editorScenes.filter((scene) => scene.chapterId === editorActiveChapterId);
+		return chapterScenes.map((scene, index) => ({
+			id: scene.id,
+			label: `SC ${index + 1}`,
+			title: scene.title || `Scene ${index + 1}`,
+		}));
+	});
+
+	let editorActiveSceneId = $derived.by(() => {
+		const requestedSceneId = page.url.searchParams.get('sceneId');
+		if (requestedSceneId) return requestedSceneId;
+		return editorSceneItems[0]?.id ?? null;
+	});
+
 	function handleNewProject() {
 		goto('/');
 	}
@@ -37,6 +107,25 @@
 	function handleWorldBuildingSelect(id: string) {
 		if (!page.params?.id) return;
 		goto(`/projects/${page.params.id}/world-building/${id}`);
+	}
+
+	function handleEditorChapterSelect(id: string) {
+		const params = new URLSearchParams(page.url.searchParams);
+		params.set('chapterId', id);
+		params.delete('sceneId');
+		const query = params.toString();
+		void goto(`${page.url.pathname}${query ? `?${query}` : ''}`);
+	}
+
+	function handleEditorSceneSelect(id: string) {
+		const selectedScene = editorScenes.find((scene) => scene.id === id);
+		if (!selectedScene) return;
+
+		const params = new URLSearchParams(page.url.searchParams);
+		params.set('chapterId', selectedScene.chapterId);
+		params.set('sceneId', id);
+		const query = params.toString();
+		void goto(`${page.url.pathname}${query ? `?${query}` : ''}`);
 	}
 </script>
 
@@ -57,13 +146,20 @@
 		{/if}
 	</div>
 
-		<div class="header-center">
+	<div class="header-center">
 		{#if isWorldBuildingRoute}
 			<PillNav
 				items={WORLD_BUILDING_TOP_ITEMS}
 				activeId={worldBuildingActiveId}
 				onSelect={handleWorldBuildingSelect}
 				ariaLabel="World building sections"
+			/>
+		{:else if isEditorRoute && editorChapterItems.length > 0}
+			<PillNav
+				items={editorChapterItems}
+				activeId={editorActiveChapterId}
+				onSelect={handleEditorChapterSelect}
+				ariaLabel="Chapter selection"
 			/>
 		{/if}
 	</div>
@@ -124,6 +220,24 @@
 		</a>
 	</div>
 </header>
+
+{#if isEditorRoute && editorSceneItems.length > 0}
+	<nav class="editor-subheader" aria-label="Scene selection">
+		<div class="editor-subheader__track">
+			{#each editorSceneItems as item (item.id)}
+				<button
+					type="button"
+					class="editor-subheader__pill"
+					class:active={item.id === editorActiveSceneId}
+					onclick={() => handleEditorSceneSelect(item.id)}
+					title={item.title}
+				>
+					{item.label}
+				</button>
+			{/each}
+		</div>
+	</nav>
+{/if}
 
 <style>
 	.app-header {
@@ -231,6 +345,54 @@
 		min-width: 0;
 	}
 
+	.editor-subheader {
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0 var(--space-4);
+		border-bottom: 1px solid var(--color-border-subtle);
+		background: color-mix(in srgb, var(--color-surface-base) 88%, var(--color-surface-ground));
+	}
+
+	.editor-subheader__track {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		overflow-x: auto;
+		max-width: min(980px, 100%);
+		padding-bottom: 2px;
+		scrollbar-width: thin;
+	}
+
+	.editor-subheader__pill {
+		border: 1px solid var(--color-border-default);
+		background: transparent;
+		color: var(--color-text-muted);
+		border-radius: var(--radius-full);
+		padding: 4px 12px;
+		font-size: var(--text-xs);
+		font-weight: var(--font-weight-semibold);
+		letter-spacing: var(--tracking-wide);
+		cursor: pointer;
+		white-space: nowrap;
+		transition:
+			background-color var(--duration-fast) var(--ease-standard),
+			border-color var(--duration-fast) var(--ease-standard),
+			color var(--duration-fast) var(--ease-standard);
+	}
+
+	.editor-subheader__pill:hover {
+		color: var(--color-text-primary);
+		border-color: var(--color-border-strong);
+	}
+
+	.editor-subheader__pill.active {
+		background: color-mix(in srgb, var(--color-surface-hover) 88%, transparent);
+		color: var(--color-text-primary);
+		border-color: color-mix(in srgb, var(--color-border-strong) 80%, transparent);
+	}
+
 	@media (max-width: 960px) {
 		.header-center {
 			display: none;
@@ -238,6 +400,10 @@
 
 		.app-header {
 			gap: var(--space-2);
+			padding: 0 var(--space-3);
+		}
+
+		.editor-subheader {
 			padding: 0 var(--space-3);
 		}
 	}
