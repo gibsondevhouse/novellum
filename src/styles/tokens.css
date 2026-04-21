@@ -121,6 +121,8 @@
 	--radius-sm: 4px;
 	--radius-md: 6px;
 	--radius-lg: 10px;
+	--radius-xl: 16px;
+	--radius-2xl: 24px;
 	--radius-full: 9999px;
 
 	/* ── Shadows (dark-surface tuned) ── */
@@ -129,6 +131,13 @@
 	--shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.4);
 	--shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
 	--shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.7), 0 4px 16px rgba(0, 0, 0, 0.5);
+
+	/* ── Gradients ── */
+	--gradient-spotlight: radial-gradient(
+		80% 80% at 50% 0%,
+		rgba(59, 130, 246, 0.08) 0%,
+		rgba(0, 0, 0, 0) 100%
+	);
 
 	/* ── Motion ── */
 	--duration-instant: 80ms;
