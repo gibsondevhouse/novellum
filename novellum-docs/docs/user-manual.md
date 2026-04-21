@@ -14,7 +14,7 @@ The entry point for all your books. Here you can create cross-book series or sin
 
 ### 2.2 World Building
 
-A living encyclopedia of your universe. It stores Characters, Locations, Items, and Lore. The World Building module heavily feeds into the context engine, ensuring the AI deeply understands the nuances, relationships, and history present within your story.
+A living encyclopedia of your universe, organized into five sub-sections: Personae (people, factions, lineages), Atlas (realms, landmarks, maps), Archive (myths, technology, traditions), Threads (arcs, sub-plots), and Chronicles (eras, key events, personal histories). The World Building module heavily feeds into the context engine, ensuring the AI deeply understands the nuances, relationships, and history present within your story.
 
 ### 2.3 Workspace
 

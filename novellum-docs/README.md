@@ -1,25 +1,29 @@
 # Novellum User Documentation
 
-Novellum is a local-first, AI-assisted novel production system designed to guide writers from idea to fully polished manuscript, integrating seamlessly with the Gemini CLI for terminal-based workflow orchestration.
+User-facing documentation for Novellum, a local-first, AI-assisted novel production system.
 
-## Core Philosophy
+## Updated
 
-- Local-first storage
-- AI as assistant, not author
-- Structured storytelling workflow
-- Continuity-first design
+- Last updated: 2026-04-20
+
+## Core Principles
+
+- Local-first project ownership
+- AI as collaborator, not autonomous author
+- Structured creative workflow from planning to export
+- Continuity and causality as first-class editing concerns
 
 ## Documentation Index
 
-- [Setup Guide](./docs/setup-guide.md): Prerequisites, installation, and running the development server.
-- [User Manual](./docs/user-manual.md): Comprehensive guide to using Novellum's modules (Project Hub, Story Bible, Outliner, Draft Editor, Consistency Engine, Export) and leveraging its AI integration.
+- [Setup Guide](./docs/setup-guide.md): Prerequisites, install, and local run instructions.
+- [User Manual](./docs/user-manual.md): Product walkthrough for core workspaces and AI-assisted flows.
 
-## Modules
+## Feature Areas
 
-- **Project Hub**: Manage novel projects.
-- **Story Bible**: Track characters, places, and lore ensuring AI context continuity.
-- **Outliner**: Tiptap-based high-level story structuring.
-- **Draft Editor**: ONLYOFFICE-backed, rich-text chapter writing.
-- **Consistency Engine**: Validates narrative consistency using AI.
-- **Editing Layer**: Deep AI-assisted review and rewrite capabilities.
-- **Export System**: Generate publication-ready manuscripts.
+- Project Hub: Create and manage writing projects.
+- World Building: Personae, Atlas, Archive, Threads, and Chronicles.
+- Outliner: Build and refine narrative structure.
+- Editor Workspace: Scene drafting, writing flow, and progress tooling.
+- Continuity Engine: Detect timeline/lore/character inconsistencies.
+- AI Assist: Context-scoped brainstorming, rewriting, editing, and summaries.
+- Export: Produce distributable manuscript formats.
