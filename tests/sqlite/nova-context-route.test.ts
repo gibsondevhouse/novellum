@@ -4,7 +4,7 @@ import { SCHEMA_SQL, INDEX_SQL } from '$lib/server/db/schema.js';
 import {
 	buildNovaContextHttpResponse,
 	normalizeNovaContextRequest,
-} from '../../src/routes/api/nova/context/+server.js';
+} from '../../src/routes/api/nova/context/http.js';
 
 function createTestDb() {
 	const database = new Database(':memory:');

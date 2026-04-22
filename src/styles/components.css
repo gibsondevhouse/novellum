@@ -47,7 +47,7 @@
 .input:focus {
 	outline: none;
 	border-color: var(--color-border-focus);
-	box-shadow: 0 0 0 2px var(--color-border-focus);
+	box-shadow: var(--focus-ring);
 }
 
 .input-error {
@@ -263,7 +263,7 @@
 .skeleton {
 	background: var(--color-surface-elevated, var(--color-surface-raised));
 	border-radius: var(--radius-sm);
-	animation: skeleton-pulse 1.5s ease-in-out infinite;
+	animation: skeleton-pulse var(--duration-pulse) var(--ease-standard) infinite;
 }
 
 @keyframes skeleton-pulse {
@@ -284,7 +284,7 @@
 	border: 2px solid var(--color-border-subtle);
 	border-top-color: var(--color-nova-blue);
 	border-radius: 50%;
-	animation: spinner-rotate 0.7s linear infinite;
+	animation: spinner-rotate var(--duration-spinner) var(--ease-linear) infinite;
 	flex-shrink: 0;
 }
 

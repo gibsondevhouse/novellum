@@ -4,6 +4,8 @@
 	import Placeholder from '@tiptap/extension-placeholder';
 	import StarterKit from '@tiptap/starter-kit';
 
+	/* eslint-disable @typescript-eslint/no-explicit-any */
+
 	interface Props {
 		content: string;
 		title: string;
@@ -20,9 +22,7 @@
 	let isSelecting = $state(false);
 	let bubbleMenuVisible = $state(false);
 	let bubbleMenuPosition = $state({ top: 0, left: 0 });
-	let localTitle = $state('');
-
-	const isReady = $derived(editor !== null);
+	let localTitle = $derived(title);
 
 	onMount(() => {
 		editor = new (TipTapEditor as any)({
@@ -74,10 +74,6 @@
 		}
 	});
 
-	$effect(() => {
-		localTitle = title;
-	});
-
 	function updateBubbleMenuPosition(currentEditor: any): void {
 		if (!bubbleMenuHost || !currentEditor) return;
 
@@ -118,7 +114,7 @@
 
 			bubbleMenuPosition = { top, left };
 			bubbleMenuVisible = true;
-		} catch (e) {
+		} catch {
 			bubbleMenuVisible = false;
 		}
 	}
@@ -130,11 +126,6 @@
 	}
 
 	function pressed(check: () => boolean): boolean {
-		void updateTick;
-		return editor ? check() : false;
-	}
-
-	function canRun(check: () => boolean): boolean {
 		void updateTick;
 		return editor ? check() : false;
 	}

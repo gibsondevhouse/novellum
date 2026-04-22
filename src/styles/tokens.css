@@ -169,11 +169,14 @@
 	--duration-enter: 200ms;
 	--duration-slow: 250ms;
 	--duration-page: 320ms;
+	--duration-spinner: 700ms;
+	--duration-pulse: 1500ms;
 
 	--ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 	--ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
 	--ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
 	--ease-exit: cubic-bezier(0.4, 0, 1, 1);
+	--ease-linear: linear;
 	--ease-editorial: cubic-bezier(0.16, 1, 0.3, 1); /* spring-like panel settle */
 
 	--transition-color:

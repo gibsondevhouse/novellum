@@ -50,23 +50,25 @@
 	</header>
 
 	{#if showCreate}
-		<SurfacePanel class="create-story-panel">
-			<SectionHeader title="Start a New Story" />
-			<div class="create-story-form">
-				<Input
-					label="Story Title"
-					placeholder="Enter the title of your short story..."
-					bind:value={newStoryTitle}
-					onkeydown={(e) => e.key === 'Enter' && handleCreateStory()}
-				/>
-				<div class="form-actions">
-					<PrimaryButton onclick={handleCreateStory} disabled={!newStoryTitle.trim()}>
-						Create Story
-					</PrimaryButton>
-					<GhostButton onclick={() => showCreate = false}>Cancel</GhostButton>
+		<div class="create-story-panel">
+			<SurfacePanel>
+				<SectionHeader title="Start a New Story" />
+				<div class="create-story-form">
+					<Input
+						label="Story Title"
+						placeholder="Enter the title of your short story..."
+						bind:value={newStoryTitle}
+						onkeydown={(e) => e.key === 'Enter' && handleCreateStory()}
+					/>
+					<div class="form-actions">
+						<PrimaryButton onclick={handleCreateStory} disabled={!newStoryTitle.trim()}>
+							Create Story
+						</PrimaryButton>
+						<GhostButton onclick={() => showCreate = false}>Cancel</GhostButton>
+					</div>
 				</div>
-			</div>
-		</SurfacePanel>
+			</SurfacePanel>
+		</div>
 	{/if}
 
 	{#if getLoading()}

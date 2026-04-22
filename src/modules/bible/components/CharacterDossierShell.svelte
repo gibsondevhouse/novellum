@@ -1,9 +1,20 @@
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+
+	interface Props {
+		header?: Snippet;
+		children?: Snippet;
+	}
+
+	let { header, children }: Props = $props();
+</script>
+
 <div class="character-dossier-shell">
 	<div class="dossier-header">
-		<slot name="header" />
+		{@render header?.()}
 	</div>
 	<div class="dossier-flow" aria-label="Character dossier sections">
-		<slot />
+		{@render children?.()}
 	</div>
 </div>
 

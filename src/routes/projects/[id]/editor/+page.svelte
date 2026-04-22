@@ -63,7 +63,6 @@
 
 	let activeContent = $state('');
 	let currentSceneId = $state<string | null>(null);
-	let saveStatus = $state<'idle' | 'saving' | 'saved'>('idle');
 	let sceneDefinition = $state<SceneDefinition>({ ...EMPTY_DEFINITION });
 	let quickIntent = $state<QuickIntent>({ ...EMPTY_QUICK_INTENT });
 	let locationTag = $state('');
@@ -282,9 +281,7 @@
 			sceneDefinition = loadSceneDefinition(scene);
 			quickIntent = loadQuickIntent(scene);
 			locationTag = scene.locationId ?? '';
-			autosaveService.mount(scene.id, scene.projectId, (status) => {
-				saveStatus = status;
-			});
+			autosaveService.mount(scene.id, scene.projectId);
 		}
 	});
 
@@ -303,7 +300,6 @@
 			activeContent = html;
 			scene.content = html;
 			autosaveService.schedule(html);
-			saveStatus = 'saving';
 		}
 	}
 

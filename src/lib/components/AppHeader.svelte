@@ -6,6 +6,7 @@
 	import { getScenesByProjectId } from '$modules/editor/services/scene-repository.js';
 	import ModelSelector from './ModelSelector.svelte';
 	import PillNav from './ui/PillNav.svelte';
+	import { SvelteURLSearchParams } from 'svelte/reactivity';
 	import { locale } from '$lib/i18n';
 	import {
 		buildWorldBuildingTopItems,
@@ -112,7 +113,7 @@
 	}
 
 	function handleEditorChapterSelect(id: string) {
-		const params = new URLSearchParams(page.url.searchParams);
+		const params = new SvelteURLSearchParams(page.url.searchParams);
 		params.set('chapterId', id);
 		params.delete('sceneId');
 		const query = params.toString();
@@ -123,7 +124,7 @@
 		const selectedScene = editorScenes.find((scene) => scene.id === id);
 		if (!selectedScene) return;
 
-		const params = new URLSearchParams(page.url.searchParams);
+		const params = new SvelteURLSearchParams(page.url.searchParams);
 		params.set('chapterId', selectedScene.chapterId);
 		params.set('sceneId', id);
 		const query = params.toString();

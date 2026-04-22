@@ -18,8 +18,10 @@
 	}}
 />
 
-<Story name="With Action" args={{ title: 'No myths yet.', description: 'Create a belief system entry to start the archive.' }}>
-	{#snippet actions()}
-		<PrimaryButton>Add first myth</PrimaryButton>
-	{/snippet}
+<Story name="With Action">
+	<EmptyStatePanel title="No myths yet." description="Create a belief system entry to start the archive.">
+		{#snippet actions()}
+			<PrimaryButton>Add first myth</PrimaryButton>
+		{/snippet}
+	</EmptyStatePanel>
 </Story>

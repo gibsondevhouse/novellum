@@ -1,4 +1,3 @@
-import { browser } from '$app/environment';
 import { derived, get, writable } from 'svelte/store';
 import en from './locales/en.json';
 import es from './locales/es.json';
@@ -7,6 +6,7 @@ export type Locale = 'en' | 'es';
 
 const LOCALE_STORAGE_KEY = 'novellum.locale';
 export const DEFAULT_LOCALE: Locale = 'en';
+const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
 
 const DICTIONARIES: Record<Locale, Record<string, string>> = {
 	en,
@@ -14,6 +14,19 @@ const DICTIONARIES: Record<Locale, Record<string, string>> = {
 };
 
 export const SUPPORTED_LOCALES = Object.keys(DICTIONARIES) as Locale[];
+
+function getStorage(): Pick<Storage, 'getItem' | 'setItem'> | null {
+	if (!isBrowser) return null;
+	try {
+		const storage = window.localStorage;
+		if (typeof storage?.getItem === 'function' && typeof storage?.setItem === 'function') {
+			return storage;
+		}
+	} catch {
+		return null;
+	}
+	return null;
+}
 
 function isSupportedLocale(value: string | null | undefined): value is Locale {
 	return value === 'en' || value === 'es';
@@ -39,7 +52,7 @@ function interpolate(template: string, params?: Record<string, string | number>)
 export const locale = writable<Locale>(DEFAULT_LOCALE);
 
 export function setDocumentLang(nextLocale: Locale): void {
-	if (!browser) return;
+	if (!isBrowser) return;
 	document.documentElement.lang = nextLocale;
 }
 
@@ -47,15 +60,17 @@ export function setLocale(nextLocale: string): Locale {
 	const normalized = normalizeLocale(nextLocale);
 	locale.set(normalized);
 	setDocumentLang(normalized);
-	if (browser) {
-		window.localStorage.setItem(LOCALE_STORAGE_KEY, normalized);
+	const storage = getStorage();
+	if (storage) {
+		storage.setItem(LOCALE_STORAGE_KEY, normalized);
 	}
 	return normalized;
 }
 
 export function initLocale(): Locale {
-	if (!browser) return DEFAULT_LOCALE;
-	const persisted = window.localStorage.getItem(LOCALE_STORAGE_KEY);
+	if (!isBrowser) return DEFAULT_LOCALE;
+	const storage = getStorage();
+	const persisted = storage?.getItem(LOCALE_STORAGE_KEY) ?? null;
 	const fromNavigator = normalizeLocale(window.navigator.language);
 	const resolved = normalizeLocale(persisted ?? fromNavigator);
 	return setLocale(resolved);
