@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { translator } from '$lib/i18n';
 	import { createAssetsStore } from '$modules/assets/stores/assets.svelte';
 	import EmptyFactionState from '$modules/bible/components/EmptyFactionState.svelte';
 	import FactionContinuityPanel from '$modules/bible/components/FactionContinuityPanel.svelte';
@@ -9,8 +10,7 @@
 	import FactionMembersPanel from '$modules/bible/components/FactionMembersPanel.svelte';
 	import FactionRelationshipPanel from '$modules/bible/components/FactionRelationshipPanel.svelte';
 	import FactionStoryFunctionPanel from '$modules/bible/components/FactionStoryFunctionPanel.svelte';
-	import IndividualsWorkspaceShell from '$modules/bible/components/IndividualsWorkspaceShell.svelte';
-	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
+	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
 
 	type FactionRelationship = {
 		id: string;
@@ -245,59 +245,55 @@
 </script>
 
 <svelte:head>
-	<title>Factions — Novellum</title>
+	<title>{$translator('worldbuilding.page.factions.title')}</title>
 </svelte:head>
 
-<div class="worldbuilding-section-view">
-	<WorldBuildingSubheaderNav projectId={data.projectId} topSection="characters" activeId="factions" ariaLabel="Personae sections" />
-	<IndividualsWorkspaceShell
-		characterOptions={factionOptions}
-		selectedCharacterId={selectedFactionId}
-		onSelectCharacter={selectFaction}
-		onCreateCharacter={createNewFaction}
-		hasSelection={!!selectedFaction}
-		listAriaLabel="Faction names"
-		createLabel="new +"
-	>
-		{#snippet dossier()}
-			<div class="faction-dossier">
-				<FactionDetailHeader faction={selectedFaction} onFieldChange={updateFactionField} onPhotoUpload={handleFactionPhotoUpload} />
+<WorldBuildingWorkspacePage
+	projectId={data.projectId}
+	topSection="characters"
+	activeId="factions"
+	ariaLabel={$translator('worldbuilding.aria.personaeSections')}
+	options={factionOptions}
+	selectedId={selectedFactionId}
+	onSelect={selectFaction}
+	onCreate={createNewFaction}
+	hasSelection={!!selectedFaction}
+	listAriaLabel={$translator('worldbuilding.list.factionNames')}
+	createLabel={$translator('worldbuilding.workspace.common.createLabel')}
+>
+	{#snippet dossier()}
+		<div class="faction-dossier">
+			<FactionDetailHeader
+				faction={selectedFaction}
+				onFieldChange={updateFactionField}
+				onPhotoUpload={handleFactionPhotoUpload}
+			/>
 
-				<div class="dossier-flow" aria-label="Faction dossier sections">
-					<FactionCoreIdentityPanel faction={selectedFaction} onFieldChange={updateFactionField} />
-					<FactionStoryFunctionPanel faction={selectedFaction} onFieldChange={updateFactionField} />
-					<FactionCurrentStatePanel faction={selectedFaction} onFieldChange={updateFactionField} />
-					<FactionCulturePanel faction={selectedFaction} onFieldChange={updateFactionField} />
-					<FactionContinuityPanel faction={selectedFaction} onFieldChange={updateFactionField} />
-					<FactionRelationshipPanel
-						faction={selectedFaction}
-						factions={factionOptions}
-						currentFactionId={selectedFaction?.id || ''}
-						onRelationshipFieldChange={updateRelationshipField}
-						onAddRelationship={addRelationship}
-						onRemoveRelationship={removeRelationship}
-					/>
-					<FactionMembersPanel faction={selectedFaction} onFieldChange={updateFactionField} />
-				</div>
+			<div class="dossier-flow" aria-label="Faction dossier sections">
+				<FactionCoreIdentityPanel faction={selectedFaction} onFieldChange={updateFactionField} />
+				<FactionStoryFunctionPanel faction={selectedFaction} onFieldChange={updateFactionField} />
+				<FactionCurrentStatePanel faction={selectedFaction} onFieldChange={updateFactionField} />
+				<FactionCulturePanel faction={selectedFaction} onFieldChange={updateFactionField} />
+				<FactionContinuityPanel faction={selectedFaction} onFieldChange={updateFactionField} />
+				<FactionRelationshipPanel
+					faction={selectedFaction}
+					factions={factionOptions}
+					currentFactionId={selectedFaction?.id || ''}
+					onRelationshipFieldChange={updateRelationshipField}
+					onAddRelationship={addRelationship}
+					onRemoveRelationship={removeRelationship}
+				/>
+				<FactionMembersPanel faction={selectedFaction} onFieldChange={updateFactionField} />
 			</div>
-		{/snippet}
+		</div>
+	{/snippet}
 
-		{#snippet empty()}
-			<EmptyFactionState />
-		{/snippet}
-	</IndividualsWorkspaceShell>
-</div>
+	{#snippet empty()}
+		<EmptyFactionState />
+	{/snippet}
+</WorldBuildingWorkspacePage>
 
 <style>
-	.worldbuilding-section-view {
-		display: grid;
-		grid-template-rows: auto minmax(0, 1fr);
-		height: 100%;
-		min-height: 0;
-		overflow: hidden;
-		overscroll-behavior: none;
-	}
-
 	.faction-dossier {
 		display: flex;
 		flex-direction: column;
@@ -314,11 +310,6 @@
 	}
 
 	@media (max-width: 768px) {
-		.worldbuilding-section-view {
-			height: auto;
-			overflow: visible;
-		}
-
 		.faction-dossier {
 			padding-right: 0;
 		}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { translator } from '$lib/i18n';
 	import { SectionHeader } from '$lib/components/ui/index.js';
 	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
 	import type { WorldBuildingTopSectionId } from '$modules/bible/worldbuilding-navigation.js';
@@ -43,7 +44,11 @@
 	<div class="landing-page">
 		<section class="hero" aria-labelledby="top-section-hero-title">
 			<SectionHeader title={title} {description} />
-			<div class="hero-actions" role="navigation" aria-label="Jump to subsection cards">
+			<div
+				class="hero-actions"
+				role="navigation"
+				aria-label={$translator('worldbuilding.landing.jumpNavAria')}
+			>
 				{#each links as link (link.id)}
 					<a class="hero-jump" href={`#${link.id}`}>{link.label}</a>
 				{/each}
@@ -67,11 +72,13 @@
 				</div>
 
 				<p class="lane-entry">
-					Continue into <a href={link.href}>{link.label}</a>.
+					{$translator('worldbuilding.landing.continueInto')} <a href={link.href}
+						>{link.label}</a
+					>.
 				</p>
 
 				<div class="lane-actions">
-					<a class="lane-cta" href={link.href}>Open {link.label}</a>
+					<a class="lane-cta" href={link.href}>{$translator('worldbuilding.landing.open')} {link.label}</a>
 				</div>
 			</section>
 		{/each}

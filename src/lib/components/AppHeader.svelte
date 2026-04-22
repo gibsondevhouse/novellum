@@ -6,13 +6,15 @@
 	import { getScenesByProjectId } from '$modules/editor/services/scene-repository.js';
 	import ModelSelector from './ModelSelector.svelte';
 	import PillNav from './ui/PillNav.svelte';
+	import { locale } from '$lib/i18n';
 	import {
-		WORLD_BUILDING_TOP_ITEMS,
+		buildWorldBuildingTopItems,
 		getWorldBuildingTopSection,
 	} from '$modules/bible/worldbuilding-navigation.js';
 	let isWorldBuildingRoute = $derived(page.url.pathname.includes('/world-building'));
 
 	let worldBuildingActiveId = $derived(getWorldBuildingTopSection(page.url.pathname));
+	let worldBuildingTopItems = $derived.by(() => buildWorldBuildingTopItems($locale));
 
 	let isSettingsRoute = $derived(page.url.pathname.startsWith('/settings'));
 	let isNovaRoute = $derived(page.url.pathname === '/nova');
@@ -149,7 +151,7 @@
 	<div class="header-center">
 		{#if isWorldBuildingRoute}
 			<PillNav
-				items={WORLD_BUILDING_TOP_ITEMS}
+				items={worldBuildingTopItems}
 				activeId={worldBuildingActiveId}
 				onSelect={handleWorldBuildingSelect}
 				ariaLabel="World building sections"

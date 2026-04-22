@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { LoreEntry } from '$lib/db/types.js';
+	import { translator } from '$lib/i18n';
 	import TraditionDossierPane from '$modules/bible/components/TraditionDossierPane.svelte';
-	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
-	import IndividualsWorkspaceShell from '$modules/bible/components/IndividualsWorkspaceShell.svelte';
+	import WorldBuildingWorkspaceEmptyState from '$modules/bible/components/WorldBuildingWorkspaceEmptyState.svelte';
+	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
 	import {
 		getLoreEntries,
 		getLoreSaving,
@@ -34,9 +35,7 @@
 		return entry.category === 'tradition' || entry.category.startsWith('tradition:');
 	}
 
-	const traditionEntries = $derived(
-		getLoreEntries().filter((entry) => isTraditionEntry(entry)),
-	);
+	const traditionEntries = $derived(getLoreEntries().filter((entry) => isTraditionEntry(entry)));
 
 	$effect(() => {
 		const currentSelection = untrack(() => selectedId);
@@ -103,80 +102,50 @@
 </script>
 
 <svelte:head>
-	<title>Traditions — Novellum</title>
+	<title>{$translator('worldbuilding.page.traditions.title')}</title>
 </svelte:head>
 
-<div class="worldbuilding-section-view">
-	<WorldBuildingSubheaderNav
-		projectId={data.projectId}
-		topSection="lore"
-		activeId="traditions"
-		ariaLabel="Archive sections"
-	/>
-	<IndividualsWorkspaceShell
-		characterOptions={options}
-		selectedCharacterId={selectedId}
-		onSelectCharacter={selectEntry}
-		onCreateCharacter={createNewTradition}
-		hasSelection={creating || selectedId !== null}
-		listAriaLabel="Traditions"
-		createLabel="new +"
-	>
-		{#snippet dossier()}
-			{#if creating}
-				<TraditionDossierPane
-					entry={null}
-					isCreating={true}
-					saving={getLoreSaving()}
-					showDeleteConfirm={false}
-					onSave={handleCreate}
-					onCancel={() => (creating = false)}
-					onDelete={() => {}}
-				/>
-			{:else if selectedEntry}
-				<TraditionDossierPane
-					entry={selectedEntry}
-					saving={getLoreSaving()}
-					showDeleteConfirm={confirmDeleteId === selectedEntry.id}
-					onSave={handleUpdate}
-					onCancel={cancelDelete}
-					onDelete={() => handleDeleteAction(selectedEntry.id)}
-				/>
-			{/if}
-		{/snippet}
-		{#snippet empty()}
-			<div class="tradition-empty-state">
-				<p>No traditions yet. Add practices that appear in scenes and carry consequences.</p>
-				<button class="bible-btn-sm" onclick={createNewTradition}>+ Add first tradition</button>
-			</div>
-		{/snippet}
-	</IndividualsWorkspaceShell>
-</div>
-
-<style>
-	.worldbuilding-section-view {
-		display: grid;
-		grid-template-rows: auto minmax(0, 1fr);
-		height: 100%;
-		min-height: 0;
-		overflow: hidden;
-		overscroll-behavior: none;
-	}
-
-	.tradition-empty-state {
-		padding: var(--space-8);
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: var(--space-4);
-		color: var(--color-text-muted);
-		text-align: center;
-	}
-
-	@media (max-width: 768px) {
-		.worldbuilding-section-view {
-			height: auto;
-			overflow: visible;
-		}
-	}
-</style>
+<WorldBuildingWorkspacePage
+	projectId={data.projectId}
+	topSection="lore"
+	activeId="traditions"
+	ariaLabel={$translator('worldbuilding.aria.archiveSections')}
+	{options}
+	{selectedId}
+	onSelect={selectEntry}
+	onCreate={createNewTradition}
+	hasSelection={creating || selectedId !== null}
+	listAriaLabel={$translator('worldbuilding.list.traditions')}
+	createLabel={$translator('worldbuilding.workspace.common.createLabel')}
+>
+	{#snippet dossier()}
+		{#if creating}
+			<TraditionDossierPane
+				entry={null}
+				isCreating={true}
+				saving={getLoreSaving()}
+				showDeleteConfirm={false}
+				onSave={handleCreate}
+				onCancel={() => (creating = false)}
+				onDelete={() => {}}
+			/>
+		{:else if selectedEntry}
+			<TraditionDossierPane
+				entry={selectedEntry}
+				saving={getLoreSaving()}
+				showDeleteConfirm={confirmDeleteId === selectedEntry.id}
+				onSave={handleUpdate}
+				onCancel={cancelDelete}
+				onDelete={() => handleDeleteAction(selectedEntry.id)}
+			/>
+		{/if}
+	{/snippet}
+	{#snippet empty()}
+		<WorldBuildingWorkspaceEmptyState
+			title={$translator('worldbuilding.workspace.traditions.emptyTitle')}
+			description={$translator('worldbuilding.workspace.traditions.emptyDescription')}
+			actionLabel={$translator('worldbuilding.workspace.common.firstTradition')}
+			onAction={createNewTradition}
+		/>
+	{/snippet}
+</WorldBuildingWorkspacePage>

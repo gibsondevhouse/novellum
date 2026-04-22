@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { LoreEntry } from '$lib/db/types.js';
+	import { DestructiveButton, GhostButton } from '$lib/components/ui/index.js';
 	import LoreEntryDetailHeader from './LoreEntryDetailHeader.svelte';
 	import TechnologyEntryForm from './TechnologyEntryForm.svelte';
 
@@ -16,7 +17,9 @@
 		saving?: boolean;
 		isCreating?: boolean;
 		showDeleteConfirm?: boolean;
-		onSave: (formData: Omit<LoreEntry, 'id' | 'projectId' | 'createdAt' | 'updatedAt'>) => void | Promise<void>;
+		onSave: (
+			formData: Omit<LoreEntry, 'id' | 'projectId' | 'createdAt' | 'updatedAt'>,
+		) => void | Promise<void>;
 		onCancel: () => void;
 		onDelete: () => void | Promise<void>;
 	} = $props();
@@ -28,10 +31,7 @@
 </script>
 
 <section class="character-dossier">
-	<LoreEntryDetailHeader
-		{entry}
-		formatMeta={() => eyebrow}
-	/>
+	<LoreEntryDetailHeader {entry} formatMeta={() => eyebrow} />
 
 	<div class="dossier-flow" aria-label="Technology dossier sections">
 		<TechnologyEntryForm {entry} {saving} {onSave} {onCancel} />
@@ -40,10 +40,14 @@
 	{#if !isCreating && entry}
 		<div class="dossier-footer-actions">
 			{#if showDeleteConfirm}
-				<button class="bible-btn-sm bible-btn-danger" onclick={() => void onDelete()}>Confirm Delete</button>
-				<button class="bible-btn-sm" onclick={onCancel}>Cancel</button>
+				<DestructiveButton size="sm" onclick={() => void onDelete()}
+					>Confirm Delete</DestructiveButton
+				>
+				<GhostButton size="sm" onclick={onCancel}>Cancel</GhostButton>
 			{:else}
-				<button class="bible-btn-sm bible-btn-danger" onclick={() => void onDelete()}>Delete Technology</button>
+				<DestructiveButton size="sm" onclick={() => void onDelete()}
+					>Delete Technology</DestructiveButton
+				>
 			{/if}
 		</div>
 	{/if}

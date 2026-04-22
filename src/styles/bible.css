@@ -99,35 +99,6 @@
 	gap: var(--space-2);
 }
 
-/* Shared small action button for bible pages */
-.bible-btn-sm {
-	padding: var(--space-1) var(--space-2);
-	font-size: var(--text-xs);
-	border-radius: var(--radius-sm);
-	border: 1px solid var(--color-border-default);
-	background: none;
-	cursor: pointer;
-	color: var(--color-text-secondary);
-	transition:
-		color var(--duration-base) var(--ease-standard),
-		border-color var(--duration-base) var(--ease-standard);
-}
-
-.bible-btn-sm:hover {
-	color: var(--color-text-primary);
-	border-color: var(--color-border-strong);
-}
-
-.bible-btn-danger {
-	color: var(--color-error);
-	border-color: var(--color-error);
-}
-
-.bible-btn-danger:hover {
-	background-color: var(--color-error);
-	color: var(--color-surface-base);
-}
-
 .bible-confirm-text {
 	font-size: var(--text-sm);
 	color: var(--color-warning);

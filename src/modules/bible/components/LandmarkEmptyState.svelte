@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { GhostButton, PrimaryButton } from '$lib/components/ui/index.js';
 	import NarrativeLocationEmptyState from './NarrativeLocationEmptyState.svelte';
 
 	let {
@@ -15,13 +16,15 @@
 <NarrativeLocationEmptyState
 	title="No landmarks yet."
 	description="Add specific high-impact sites where scenes actually happen. Realms define what can happen; landmarks define what does happen."
-	note={hasRealms ? '' : 'Create at least one realm first so every landmark belongs to a functioning narrative environment.'}
+	note={hasRealms
+		? ''
+		: 'Create at least one realm first so every landmark belongs to a functioning narrative environment.'}
 >
 	{#snippet actions()}
 		{#if hasRealms}
-			<button class="bible-btn-sm" onclick={onCreate}>+ Add your first landmark</button>
+			<PrimaryButton size="sm" onclick={onCreate}>+ Add your first landmark</PrimaryButton>
 		{:else}
-			<a class="bible-btn-sm" href={openRealmsHref}>Open realms</a>
+			<GhostButton size="sm" href={openRealmsHref}>Open realms</GhostButton>
 		{/if}
 	{/snippet}
 </NarrativeLocationEmptyState>

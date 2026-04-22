@@ -33,6 +33,42 @@ async function waitForStableRender(page: import('@playwright/test').Page) {
 	await page.waitForTimeout(500);
 }
 
+async function dismissOnboardingIfVisible(page: import('@playwright/test').Page) {
+	const getStartedButton = page.getByRole('button', { name: 'Get Started' });
+	const visible = await getStartedButton.isVisible().catch(() => false);
+	if (!visible) return;
+	await getStartedButton.click();
+	await page.waitForTimeout(150);
+}
+
+async function createVisualProject(
+	request: import('@playwright/test').APIRequestContext,
+	title: string,
+) {
+	const response = await request.post('/api/db/projects', { data: { title } });
+	expect(response.ok()).toBe(true);
+	const payload = (await response.json()) as { id: string };
+	expect(payload.id).toBeTruthy();
+	return payload.id;
+}
+
+async function createMajorArc(
+	request: import('@playwright/test').APIRequestContext,
+	projectId: string,
+) {
+	const response = await request.post('/api/db/plot_threads', {
+		data: {
+			projectId,
+			title: 'Visual Arc',
+			description: '',
+			status: 'open',
+			relatedSceneIds: [],
+			relatedCharacterIds: [],
+		},
+	});
+	expect(response.ok()).toBe(true);
+}
+
 test.describe('Visual Regression — Route Family Baselines', () => {
 	test.beforeAll(async ({ browser }) => {
 		// Verify dev server is accessible
@@ -44,7 +80,7 @@ test.describe('Visual Regression — Route Family Baselines', () => {
 		} catch {
 			throw new Error(
 				'Dev server not reachable at http://localhost:5173. ' +
-					'Start it with `pnpm run dev` before running visual regression tests.'
+					'Start it with `pnpm run dev` before running visual regression tests.',
 			);
 		} finally {
 			await context.close();
@@ -90,6 +126,66 @@ test.describe('Visual Regression — Route Family Baselines', () => {
 		await page.goto('/nova');
 		await waitForStableRender(page);
 		await expect(page).toHaveScreenshot('nova.png');
+	});
+
+	test('Nova context menu open — full page', async ({ page }) => {
+		await page.goto('/nova');
+		await waitForStableRender(page);
+		await dismissOnboardingIfVisible(page);
+		await page.getByRole('button', { name: 'Add project or file context' }).click();
+		await page.waitForTimeout(150);
+		await expect(page).toHaveScreenshot('nova-context-menu-open.png');
+	});
+
+	test('Nova with attached project chip — full page', async ({ page, request }) => {
+		const projectId = await createVisualProject(request, `Visual Nova Context ${Date.now()}`);
+		try {
+			await page.goto('/nova');
+			await waitForStableRender(page);
+			await dismissOnboardingIfVisible(page);
+			await page.getByRole('button', { name: 'Add project or file context' }).click();
+			await page.getByRole('menuitem', { name: 'Add Project' }).click();
+			await page.getByRole('button', { name: 'Attach', exact: false }).first().click();
+			await page.getByRole('button', { name: 'Done' }).click();
+			await page.waitForTimeout(200);
+			await expect(page).toHaveScreenshot('nova-context-chip-project.png');
+		} finally {
+			await request.delete(`/api/db/projects/${projectId}`);
+		}
+	});
+
+	test('Worldbuilding top-section landing — full page', async ({ page, request }) => {
+		const projectId = await createVisualProject(request, `Visual WB Landing ${Date.now()}`);
+		try {
+			await page.goto(`/projects/${projectId}/world-building/characters`);
+			await waitForStableRender(page);
+			await expect(page).toHaveScreenshot('worldbuilding-characters-landing.png');
+		} finally {
+			await request.delete(`/api/db/projects/${projectId}`);
+		}
+	});
+
+	test('Worldbuilding entity workspace with selection — full page', async ({ page, request }) => {
+		const projectId = await createVisualProject(request, `Visual WB Workspace ${Date.now()}`);
+		try {
+			await createMajorArc(request, projectId);
+			await page.goto(`/projects/${projectId}/world-building/plot-threads/major-arcs`);
+			await waitForStableRender(page);
+			await expect(page).toHaveScreenshot('worldbuilding-major-arcs-selected.png');
+		} finally {
+			await request.delete(`/api/db/projects/${projectId}`);
+		}
+	});
+
+	test('Worldbuilding placeholder subsection — full page', async ({ page, request }) => {
+		const projectId = await createVisualProject(request, `Visual WB Placeholder ${Date.now()}`);
+		try {
+			await page.goto(`/projects/${projectId}/world-building/timeline/key-events`);
+			await waitForStableRender(page);
+			await expect(page).toHaveScreenshot('worldbuilding-timeline-key-events-placeholder.png');
+		} finally {
+			await request.delete(`/api/db/projects/${projectId}`);
+		}
 	});
 
 	/*

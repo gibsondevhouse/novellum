@@ -1,13 +1,11 @@
 <script lang="ts">
 	import type { PlotThread } from '$lib/db/types.js';
+	import { translator } from '$lib/i18n';
+	import { DestructiveButton, GhostButton } from '$lib/components/ui/index.js';
 	import ThreadSystemForm from '$modules/bible/components/ThreadSystemForm.svelte';
-	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
-	import IndividualsWorkspaceShell from '$modules/bible/components/IndividualsWorkspaceShell.svelte';
-	import {
-		isThreadKind,
-		optionMeta,
-		optionSubtitle,
-	} from '$modules/bible/thread-systems.js';
+	import WorldBuildingWorkspaceEmptyState from '$modules/bible/components/WorldBuildingWorkspaceEmptyState.svelte';
+	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
+	import { isThreadKind, optionMeta, optionSubtitle } from '$modules/bible/thread-systems.js';
 	import {
 		getPlotThreads,
 		getPlotThreadSaving,
@@ -17,8 +15,7 @@
 		submitDeletePlotThread,
 	} from '$modules/bible/stores/bible-crud.svelte.js';
 
-	let { data }: { data: { projectId: string; plotThreads: PlotThread[] } } =
-		$props();
+	let { data }: { data: { projectId: string; plotThreads: PlotThread[] } } = $props();
 
 	$effect(() => {
 		initPlotThreads(data.plotThreads);
@@ -28,7 +25,9 @@
 	let selectedId: string | null = $state(null);
 	let confirmDeleteId: string | null = $state(null);
 
-	const majorArcs = $derived(getPlotThreads().filter((thread) => isThreadKind(thread, 'major-arc')));
+	const majorArcs = $derived(
+		getPlotThreads().filter((thread) => isThreadKind(thread, 'major-arc')),
+	);
 
 	$effect(() => {
 		if (selectedId && majorArcs.some((thread) => thread.id === selectedId)) return;
@@ -75,79 +74,86 @@
 </script>
 
 <svelte:head>
-	<title>Major Arcs — Novellum</title>
+	<title>{$translator('worldbuilding.page.major-arcs.title')}</title>
 </svelte:head>
 
-<div class="worldbuilding-section-view">
-	<WorldBuildingSubheaderNav
-		projectId={data.projectId}
-		topSection="plot-threads"
-		activeId="major-arcs"
-		ariaLabel="Threads sections"
-	/>
-
-	<IndividualsWorkspaceShell
-		characterOptions={options}
-		selectedCharacterId={selectedId}
-		onSelectCharacter={selectThread}
-		onCreateCharacter={() => {
-			creating = true;
-			selectedId = null;
-		}}
-		hasSelection={creating || selectedId !== null}
-		listAriaLabel="Major Arcs"
-		createLabel="new +"
-	>
-		{#snippet dossier()}
-			{#if creating}
-				<section class="character-dossier">
-					<div class="dossier-header">
-						<h2 class="dossier-title">New Major Arc</h2>
-						<p class="dossier-copy">Primary causal chain that drives the story from setup to resolution.</p>
-					</div>
-					<div class="dossier-flow" aria-label="Major arc system form">
-						<ThreadSystemForm
-							kind="major-arc"
-							saving={getPlotThreadSaving()}
-							onSave={handleCreate}
-							onCancel={() => (creating = false)}
-						/>
-					</div>
-				</section>
-			{:else if selectedThread}
-				<section class="character-dossier">
-					<div class="dossier-header">
-						<h2 class="dossier-title">{selectedThread.title}</h2>
-						<p class="dossier-copy">Causality spine: pressure compounds until continuation becomes impossible.</p>
-					</div>
-					<div class="dossier-flow" aria-label="Major arc system form">
-						<ThreadSystemForm
-							thread={selectedThread}
-							kind="major-arc"
-							saving={getPlotThreadSaving()}
-							onSave={handleUpdate}
-							onCancel={() => (selectedId = null)}
-						/>
-					</div>
-					<div class="dossier-footer-actions">
-						{#if confirmDeleteId === selectedThread.id}
-							<button class="bible-btn-sm bible-btn-danger" onclick={() => handleDelete(selectedThread.id)}>Confirm</button>
-							<button class="bible-btn-sm" onclick={() => (confirmDeleteId = null)}>Cancel</button>
-						{:else}
-							<button class="bible-btn-sm bible-btn-danger" onclick={() => (confirmDeleteId = selectedThread.id)}>Delete</button>
-						{/if}
-					</div>
-				</section>
-			{/if}
-		{/snippet}
-		{#snippet empty()}
-			<div class="entity-empty">
-				<p>No major arcs yet. Start with 1-3 primary causal chains.</p>
-				<button class="bible-btn-sm" onclick={() => (creating = true)}>+ Add your first arc</button>
-			</div>
-		{/snippet}
-	</IndividualsWorkspaceShell>
-</div>
+<WorldBuildingWorkspacePage
+	projectId={data.projectId}
+	topSection="plot-threads"
+	activeId="major-arcs"
+	ariaLabel={$translator('worldbuilding.aria.threadsSections')}
+	{options}
+	{selectedId}
+	onSelect={selectThread}
+	onCreate={() => {
+		creating = true;
+		selectedId = null;
+	}}
+	hasSelection={creating || selectedId !== null}
+	listAriaLabel={$translator('worldbuilding.list.majorArcs')}
+	createLabel={$translator('worldbuilding.workspace.common.createLabel')}
+>
+	{#snippet dossier()}
+		{#if creating}
+			<section class="character-dossier">
+				<div class="dossier-header">
+					<h2 class="dossier-title">New Major Arc</h2>
+					<p class="dossier-copy">
+						Primary causal chain that drives the story from setup to resolution.
+					</p>
+				</div>
+				<div class="dossier-flow" aria-label="Major arc system form">
+					<ThreadSystemForm
+						kind="major-arc"
+						saving={getPlotThreadSaving()}
+						onSave={handleCreate}
+						onCancel={() => (creating = false)}
+					/>
+				</div>
+			</section>
+		{:else if selectedThread}
+			<section class="character-dossier">
+				<div class="dossier-header">
+					<h2 class="dossier-title">{selectedThread.title}</h2>
+					<p class="dossier-copy">
+						Causality spine: pressure compounds until continuation becomes impossible.
+					</p>
+				</div>
+				<div class="dossier-flow" aria-label="Major arc system form">
+					<ThreadSystemForm
+						thread={selectedThread}
+						kind="major-arc"
+						saving={getPlotThreadSaving()}
+						onSave={handleUpdate}
+						onCancel={() => (selectedId = null)}
+					/>
+				</div>
+				<div class="dossier-footer-actions">
+					{#if confirmDeleteId === selectedThread.id}
+						<DestructiveButton size="sm" onclick={() => handleDelete(selectedThread.id)}
+							>Confirm</DestructiveButton
+						>
+						<GhostButton size="sm" onclick={() => (confirmDeleteId = null)}>Cancel</GhostButton>
+					{:else}
+						<DestructiveButton size="sm" onclick={() => (confirmDeleteId = selectedThread.id)}
+							>Delete</DestructiveButton
+						>
+					{/if}
+				</div>
+			</section>
+		{/if}
+	{/snippet}
+	{#snippet empty()}
+		<WorldBuildingWorkspaceEmptyState
+			title={$translator('worldbuilding.workspace.majorArcs.emptyTitle')}
+			description={$translator('worldbuilding.workspace.majorArcs.emptyDescription')}
+			actionLabel={$translator('worldbuilding.workspace.common.firstArc')}
+			onAction={() => {
+				creating = true;
+			}}
+		/>
+	{/snippet}
+</WorldBuildingWorkspacePage>
 
 <style>
 	.dossier-header {
@@ -165,14 +171,5 @@
 		margin: 0;
 		color: var(--color-text-secondary);
 		max-width: 72ch;
-	}
-
-	.entity-empty {
-		padding: var(--space-8);
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: var(--space-4);
-		color: var(--color-text-muted);
 	}
 </style>

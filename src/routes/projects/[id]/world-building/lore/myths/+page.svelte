@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { LoreEntry } from '$lib/db/types.js';
+	import { translator } from '$lib/i18n';
 	import MythDossierPane from '$modules/bible/components/MythDossierPane.svelte';
-	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
-	import IndividualsWorkspaceShell from '$modules/bible/components/IndividualsWorkspaceShell.svelte';
+	import WorldBuildingWorkspaceEmptyState from '$modules/bible/components/WorldBuildingWorkspaceEmptyState.svelte';
+	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
 	import {
 		getLoreEntries,
 		getLoreSaving,
@@ -100,80 +101,50 @@
 </script>
 
 <svelte:head>
-	<title>Myths — Novellum</title>
+	<title>{$translator('worldbuilding.page.myths.title')}</title>
 </svelte:head>
 
-<div class="worldbuilding-section-view">
-	<WorldBuildingSubheaderNav
-		projectId={data.projectId}
-		topSection="lore"
-		activeId="myths"
-		ariaLabel="Archive sections"
-	/>
-
-	<IndividualsWorkspaceShell
-		characterOptions={options}
-		selectedCharacterId={selectedId}
-		onSelectCharacter={selectEntry}
-		onCreateCharacter={createNewMyth}
-		hasSelection={creating || selectedId !== null}
-		listAriaLabel="Myths"
-		createLabel="new +"
-	>
-		{#snippet dossier()}
-			{#if creating}
-				<MythDossierPane
-					entry={null}
-					isCreating={true}
-					saving={getLoreSaving()}
-					showDeleteConfirm={false}
-					onSave={handleCreate}
-					onCancel={() => (creating = false)}
-					onDelete={() => {}}
-				/>
-			{:else if selectedEntry}
-				<MythDossierPane
-					entry={selectedEntry}
-					saving={getLoreSaving()}
-					showDeleteConfirm={confirmDeleteId === selectedEntry.id}
-					onSave={handleUpdate}
-					onCancel={cancelDelete}
-					onDelete={() => handleDeleteAction(selectedEntry.id)}
-				/>
-			{/if}
-		{/snippet}
-		{#snippet empty()}
-			<div class="myth-empty-state">
-				<p>No myths yet. Add belief systems that influence decisions and fear.</p>
-				<button class="bible-btn-sm" onclick={createNewMyth}>+ Add first myth</button>
-			</div>
-		{/snippet}
-	</IndividualsWorkspaceShell>
-</div>
-
-<style>
-	.worldbuilding-section-view {
-		display: grid;
-		grid-template-rows: auto minmax(0, 1fr);
-		height: 100%;
-		min-height: 0;
-		overflow: hidden;
-		overscroll-behavior: none;
-	}
-
-	.myth-empty-state {
-		padding: var(--space-8);
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: var(--space-4);
-		color: var(--color-text-muted);
-	}
-
-	@media (max-width: 768px) {
-		.worldbuilding-section-view {
-			height: auto;
-			overflow: visible;
-		}
-	}
-</style>
+<WorldBuildingWorkspacePage
+	projectId={data.projectId}
+	topSection="lore"
+	activeId="myths"
+	ariaLabel={$translator('worldbuilding.aria.archiveSections')}
+	{options}
+	{selectedId}
+	onSelect={selectEntry}
+	onCreate={createNewMyth}
+	hasSelection={creating || selectedId !== null}
+	listAriaLabel={$translator('worldbuilding.list.myths')}
+	createLabel={$translator('worldbuilding.workspace.common.createLabel')}
+>
+	{#snippet dossier()}
+		{#if creating}
+			<MythDossierPane
+				entry={null}
+				isCreating={true}
+				saving={getLoreSaving()}
+				showDeleteConfirm={false}
+				onSave={handleCreate}
+				onCancel={() => (creating = false)}
+				onDelete={() => {}}
+			/>
+		{:else if selectedEntry}
+			<MythDossierPane
+				entry={selectedEntry}
+				saving={getLoreSaving()}
+				showDeleteConfirm={confirmDeleteId === selectedEntry.id}
+				onSave={handleUpdate}
+				onCancel={cancelDelete}
+				onDelete={() => handleDeleteAction(selectedEntry.id)}
+			/>
+		{/if}
+	{/snippet}
+	{#snippet empty()}
+		<WorldBuildingWorkspaceEmptyState
+			title={$translator('worldbuilding.workspace.myths.emptyTitle')}
+			description={$translator('worldbuilding.workspace.myths.emptyDescription')}
+			actionLabel={$translator('worldbuilding.workspace.common.firstMyth')}
+			onAction={createNewMyth}
+		/>
+	{/snippet}
+</WorldBuildingWorkspacePage>

@@ -8,7 +8,7 @@
 </script>
 
 <svelte:head>
-	<title>The Archive — Novellum</title>
+	<title>{landing.title} — Novellum</title>
 </svelte:head>
 
 <WorldBuildingTopSectionLanding

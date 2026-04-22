@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { PrimaryButton } from '$lib/components/ui/index.js';
 	import NarrativeLocationEmptyState from './NarrativeLocationEmptyState.svelte';
 
 	let { onCreate }: { onCreate: () => void } = $props();
@@ -9,6 +10,6 @@
 	description="Realms define the rules of existence: what is possible, what is dangerous, who holds power, and which tension never fully disappears."
 >
 	{#snippet actions()}
-		<button class="bible-btn-sm" onclick={onCreate}>+ Add your first realm</button>
+		<PrimaryButton size="sm" onclick={onCreate}>+ Add your first realm</PrimaryButton>
 	{/snippet}
 </NarrativeLocationEmptyState>

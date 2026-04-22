@@ -410,12 +410,12 @@
 		background: var(--color-surface-base);
 		border: 1px solid var(--color-border-default);
 		border-radius: var(--radius-md);
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+		box-shadow: var(--shadow-lg);
 		opacity: 0;
 		pointer-events: none;
 		transform: translateX(-50%);
 		z-index: 100;
-		transition: opacity 0.15s ease-out;
+		transition: opacity var(--duration-base) var(--ease-decelerate);
 		backdrop-filter: blur(8px);
 	}
 
@@ -436,7 +436,10 @@
 		line-height: 1;
 		border-radius: 4px;
 		cursor: pointer;
-		transition: all 0.1s ease;
+		transition:
+			background-color var(--duration-fast) var(--ease-standard),
+			color var(--duration-fast) var(--ease-standard),
+			transform var(--duration-fast) var(--ease-standard);
 		display: flex;
 		align-items: center;
 		justify-content: center;

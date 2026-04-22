@@ -1,3 +1,6 @@
+import { get } from 'svelte/store';
+import { locale, translateWithFallback, type Locale } from '$lib/i18n';
+
 export type WorldBuildingTopSectionId =
 	| 'characters'
 	| 'locations'
@@ -17,6 +20,7 @@ export type WorldBuildingSubItem = {
 };
 
 export type WorldBuildingLandingSectionId =
+	| 'characters'
 	| 'locations'
 	| 'lore'
 	| 'plot-threads'
@@ -47,6 +51,21 @@ export const WORLD_BUILDING_TOP_ITEMS: WorldBuildingTopItem[] = [
 	{ id: 'timeline', label: 'Chronicles' },
 ];
 
+function localized(
+	currentLocale: Locale,
+	key: string,
+	fallback: string,
+): string {
+	return translateWithFallback(currentLocale, key, fallback);
+}
+
+export function buildWorldBuildingTopItems(currentLocale: Locale = get(locale)): WorldBuildingTopItem[] {
+	return WORLD_BUILDING_TOP_ITEMS.map((item) => ({
+		...item,
+		label: localized(currentLocale, `worldbuilding.section.${item.id}`, item.label),
+	}));
+}
+
 export const WORLD_BUILDING_SECTION_LABELS: Record<WorldBuildingTopSectionId, string> = {
 	characters: 'Personae',
 	locations: 'Atlas',
@@ -55,7 +74,53 @@ export const WORLD_BUILDING_SECTION_LABELS: Record<WorldBuildingTopSectionId, st
 	timeline: 'Chronicles',
 };
 
-export const WORLD_BUILDING_LANDING_CONFIG: Record<WorldBuildingLandingSectionId, WorldBuildingLandingConfig> = {
+export const WORLD_BUILDING_LANDING_CONFIG: Record<
+	WorldBuildingLandingSectionId,
+	WorldBuildingLandingConfig
+> = {
+	characters: {
+		ariaLabel: 'Personae sections',
+		title: 'Personae',
+		description:
+			'Use this landing to orient your social world before diving into records. Personae tracks agency: who can act, who is constrained, and what identity costs to maintain.',
+		orientationTitle: 'Personae Orientation',
+		orientation:
+			'Start by defining individual motives, then map collective pressures and inherited identity layers. Keep each record tied to story consequence, not just lore completeness.',
+		links: [
+			{
+				id: 'individuals',
+				label: 'Individuals',
+				tagline: 'Specific voices with leverage and flaws',
+				description:
+					'Define protagonist and supporting actors with motive, contradiction, and pressure-sensitive traits.',
+				path: 'characters/individuals',
+			},
+			{
+				id: 'factions',
+				label: 'Factions',
+				tagline: 'Collective actors that institutionalize conflict',
+				description:
+					'Map group identity, social incentives, and power structures that shape decisions beyond individuals.',
+				path: 'factions',
+			},
+			{
+				id: 'lineages',
+				label: 'Lineages',
+				tagline: 'Inherited identity and social consequence',
+				description:
+					'Track bloodlines, legacy, and inherited expectation that alter status, obligation, and risk.',
+				path: 'lineages',
+			},
+			{
+				id: 'notes',
+				label: 'Notes',
+				tagline: 'Unsorted personae fragments',
+				description:
+					'Capture incomplete ideas and unresolved relationships before promoting them into canon records.',
+				path: 'characters/notes',
+			},
+		],
+	},
 	locations: {
 		ariaLabel: 'Atlas sections',
 		title: 'Atlas',
@@ -214,8 +279,7 @@ export const WORLD_BUILDING_LANDING_CONFIG: Record<WorldBuildingLandingSectionId
 				id: 'personal-histories',
 				label: 'Personal Histories',
 				tagline: 'Character timelines intersecting canon',
-				description:
-					'Track private chronology where lived memory diverges from public record.',
+				description: 'Track private chronology where lived memory diverges from public record.',
 				path: 'timeline/personal-histories',
 			},
 			{
@@ -233,15 +297,40 @@ export const WORLD_BUILDING_LANDING_CONFIG: Record<WorldBuildingLandingSectionId
 export function buildWorldBuildingLandingProps(
 	sectionId: WorldBuildingLandingSectionId,
 	projectId: string,
+	currentLocale: Locale = get(locale),
 ) {
 	const config = WORLD_BUILDING_LANDING_CONFIG[sectionId];
+	const prefix = `worldbuilding.landing.${sectionId}`;
+	const ariaKeyBySection: Record<WorldBuildingLandingSectionId, string> = {
+		characters: 'worldbuilding.aria.personaeSections',
+		locations: 'worldbuilding.aria.atlasSections',
+		lore: 'worldbuilding.aria.archiveSections',
+		'plot-threads': 'worldbuilding.aria.threadsSections',
+		timeline: 'worldbuilding.aria.chroniclesSections',
+	};
 	return {
-		...config,
+		ariaLabel: localized(
+			currentLocale,
+			ariaKeyBySection[sectionId],
+			config.ariaLabel,
+		),
+		title: localized(currentLocale, `${prefix}.title`, config.title),
+		description: localized(currentLocale, `${prefix}.description`, config.description),
+		orientationTitle: localized(
+			currentLocale,
+			`${prefix}.orientationTitle`,
+			config.orientationTitle,
+		),
+		orientation: localized(currentLocale, `${prefix}.orientation`, config.orientation),
 		links: config.links.map((link) => ({
 			id: link.id,
-			label: link.label,
-			tagline: link.tagline,
-			description: link.description,
+			label: localized(currentLocale, `${prefix}.links.${link.id}.label`, link.label),
+			tagline: localized(currentLocale, `${prefix}.links.${link.id}.tagline`, link.tagline),
+			description: localized(
+				currentLocale,
+				`${prefix}.links.${link.id}.description`,
+				link.description,
+			),
 			href: `/projects/${projectId}/world-building/${link.path}`,
 		})),
 	};
@@ -252,7 +341,7 @@ export const WORLD_BUILDING_SUB_ITEMS: Record<WorldBuildingTopSectionId, WorldBu
 		{ id: 'overview', label: 'Overview', path: 'characters' },
 		{ id: 'individuals', label: 'Individuals', path: 'characters/individuals' },
 		{ id: 'factions', label: 'Factions', path: 'factions' },
-		{ id: 'lineages', label: 'Lineages', path: 'species' },
+		{ id: 'lineages', label: 'Lineages', path: 'lineages' },
 		{ id: 'notes', label: 'Notes', path: 'characters/notes' },
 	],
 	locations: [
@@ -285,6 +374,16 @@ export const WORLD_BUILDING_SUB_ITEMS: Record<WorldBuildingTopSectionId, WorldBu
 	],
 };
 
+export function buildWorldBuildingSubItems(
+	topSection: WorldBuildingTopSectionId,
+	currentLocale: Locale = get(locale),
+): WorldBuildingSubItem[] {
+	return WORLD_BUILDING_SUB_ITEMS[topSection].map((item) => ({
+		...item,
+		label: localized(currentLocale, `worldbuilding.sub.${item.id}`, item.label),
+	}));
+}
+
 const TOP_SECTION_IDS = new Set<WorldBuildingTopSectionId>([
 	'characters',
 	'locations',
@@ -299,7 +398,7 @@ export function getWorldBuildingTopSection(pathname: string): WorldBuildingTopSe
 	if (wbIndex < 0 || wbIndex === segments.length - 1) return null;
 
 	const section = segments[wbIndex + 1];
-	if (section === 'factions' || section === 'species') return 'characters';
+	if (section === 'factions' || section === 'lineages') return 'characters';
 	if (TOP_SECTION_IDS.has(section as WorldBuildingTopSectionId)) {
 		return section as WorldBuildingTopSectionId;
 	}
@@ -321,7 +420,7 @@ export function getWorldBuildingSubSectionId(pathname: string): string | null {
 		return null;
 	}
 	if (section === 'factions') return 'factions';
-	if (section === 'species') return 'lineages';
+	if (section === 'lineages') return 'lineages';
 
 	if (section === 'locations') {
 		if (next === null) return 'overview';

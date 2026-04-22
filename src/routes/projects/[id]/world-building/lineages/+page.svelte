@@ -1,7 +1,7 @@
 <script lang="ts">
+	import { translator } from '$lib/i18n';
 	import { createAssetsStore } from '$modules/assets/stores/assets.svelte';
 	import EmptyLineageState from '$modules/bible/components/EmptyLineageState.svelte';
-	import IndividualsWorkspaceShell from '$modules/bible/components/IndividualsWorkspaceShell.svelte';
 	import LineageContinuityPanel from '$modules/bible/components/LineageContinuityPanel.svelte';
 	import LineageCoreIdentityPanel from '$modules/bible/components/LineageCoreIdentityPanel.svelte';
 	import LineageCurrentStatePanel from '$modules/bible/components/LineageCurrentStatePanel.svelte';
@@ -10,7 +10,7 @@
 	import LineageMembersPanel from '$modules/bible/components/LineageMembersPanel.svelte';
 	import LineageRelationshipPanel from '$modules/bible/components/LineageRelationshipPanel.svelte';
 	import LineageStoryFunctionPanel from '$modules/bible/components/LineageStoryFunctionPanel.svelte';
-	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
+	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
 
 	type LineageRelationship = {
 		id: string;
@@ -248,59 +248,58 @@
 </script>
 
 <svelte:head>
-	<title>Lineages — Novellum</title>
+	<title>{$translator('worldbuilding.page.lineages.title')}</title>
 </svelte:head>
 
-<div class="worldbuilding-section-view">
-	<WorldBuildingSubheaderNav projectId={data.projectId} topSection="characters" activeId="lineages" ariaLabel="Personae sections" />
-	<IndividualsWorkspaceShell
-		characterOptions={lineageOptions}
-		selectedCharacterId={selectedLineageId}
-		onSelectCharacter={selectLineage}
-		onCreateCharacter={createNewLineage}
-		hasSelection={!!selectedLineage}
-		listAriaLabel="Lineage names"
-		createLabel="new +"
-	>
-		{#snippet dossier()}
-			<div class="lineage-dossier">
-				<LineageDetailHeader lineage={selectedLineage} onFieldChange={updateLineageField} onPhotoUpload={handleLineagePhotoUpload} />
+<WorldBuildingWorkspacePage
+	projectId={data.projectId}
+	topSection="characters"
+	activeId="lineages"
+	ariaLabel={$translator('worldbuilding.aria.personaeSections')}
+	options={lineageOptions}
+	selectedId={selectedLineageId}
+	onSelect={selectLineage}
+	onCreate={createNewLineage}
+	hasSelection={!!selectedLineage}
+	listAriaLabel={$translator('worldbuilding.list.lineageNames')}
+	createLabel={$translator('worldbuilding.workspace.common.createLabel')}
+>
+	{#snippet dossier()}
+		<div class="lineage-dossier">
+			<LineageDetailHeader
+				lineage={selectedLineage}
+				onFieldChange={updateLineageField}
+				onPhotoUpload={handleLineagePhotoUpload}
+			/>
 
-				<div class="dossier-flow" aria-label="Lineage dossier sections">
-					<LineageCoreIdentityPanel lineage={selectedLineage} onFieldChange={updateLineageField} />
-					<LineageStoryFunctionPanel lineage={selectedLineage} onFieldChange={updateLineageField} />
-					<LineageCurrentStatePanel lineage={selectedLineage} onFieldChange={updateLineageField} />
-					<LineageInheritanceCulturePanel lineage={selectedLineage} onFieldChange={updateLineageField} />
-					<LineageContinuityPanel lineage={selectedLineage} onFieldChange={updateLineageField} />
-					<LineageRelationshipPanel
-						lineage={selectedLineage}
-						lineages={lineageOptions}
-						currentLineageId={selectedLineage?.id || ''}
-						onRelationshipFieldChange={updateRelationshipField}
-						onAddRelationship={addRelationship}
-						onRemoveRelationship={removeRelationship}
-					/>
-					<LineageMembersPanel lineage={selectedLineage} onFieldChange={updateLineageField} />
-				</div>
+			<div class="dossier-flow" aria-label="Lineage dossier sections">
+				<LineageCoreIdentityPanel lineage={selectedLineage} onFieldChange={updateLineageField} />
+				<LineageStoryFunctionPanel lineage={selectedLineage} onFieldChange={updateLineageField} />
+				<LineageCurrentStatePanel lineage={selectedLineage} onFieldChange={updateLineageField} />
+				<LineageInheritanceCulturePanel
+					lineage={selectedLineage}
+					onFieldChange={updateLineageField}
+				/>
+				<LineageContinuityPanel lineage={selectedLineage} onFieldChange={updateLineageField} />
+				<LineageRelationshipPanel
+					lineage={selectedLineage}
+					lineages={lineageOptions}
+					currentLineageId={selectedLineage?.id || ''}
+					onRelationshipFieldChange={updateRelationshipField}
+					onAddRelationship={addRelationship}
+					onRemoveRelationship={removeRelationship}
+				/>
+				<LineageMembersPanel lineage={selectedLineage} onFieldChange={updateLineageField} />
 			</div>
-		{/snippet}
+		</div>
+	{/snippet}
 
-		{#snippet empty()}
-			<EmptyLineageState />
-		{/snippet}
-	</IndividualsWorkspaceShell>
-</div>
+	{#snippet empty()}
+		<EmptyLineageState />
+	{/snippet}
+</WorldBuildingWorkspacePage>
 
 <style>
-	.worldbuilding-section-view {
-		display: grid;
-		grid-template-rows: auto minmax(0, 1fr);
-		height: 100%;
-		min-height: 0;
-		overflow: hidden;
-		overscroll-behavior: none;
-	}
-
 	.lineage-dossier {
 		display: flex;
 		flex-direction: column;
@@ -317,11 +316,6 @@
 	}
 
 	@media (max-width: 768px) {
-		.worldbuilding-section-view {
-			height: auto;
-			overflow: visible;
-		}
-
 		.lineage-dossier {
 			padding-right: 0;
 		}

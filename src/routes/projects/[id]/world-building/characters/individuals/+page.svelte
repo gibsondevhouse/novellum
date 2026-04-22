@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { Character, CharacterRelationship } from '$lib/db/types';
+	import { translator } from '$lib/i18n';
+	import { DestructiveButton } from '$lib/components/ui/index.js';
 	import { createAssetsStore } from '$modules/assets/stores/assets.svelte';
 	import {
 		createCharacter,
@@ -11,12 +13,11 @@
 	import CharacterDetailHeader from '$modules/bible/components/CharacterDetailHeader.svelte';
 	import ContinuityPanel from '$modules/bible/components/ContinuityPanel.svelte';
 	import EmptyCharacterState from '$modules/bible/components/EmptyCharacterState.svelte';
-	import IndividualsWorkspaceShell from '$modules/bible/components/IndividualsWorkspaceShell.svelte';
 	import NarrativeStatePanel from '$modules/bible/components/NarrativeStatePanel.svelte';
 	import RelationshipPanel from '$modules/bible/components/RelationshipPanel.svelte';
 	import StoryFunctionPanel from '$modules/bible/components/StoryFunctionPanel.svelte';
 	import VoicePanel from '$modules/bible/components/VoicePanel.svelte';
-	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
+	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
 
 	type LoadedData = {
 		projectId: string;
@@ -132,9 +133,7 @@
 	let characterRecords = $state<Record<string, CharacterRecord>>(
 		untrack(() => buildCharacterMap(data.characters, data.relationships)),
 	);
-	let selectedCharacterId = $state<string | null>(
-		untrack(() => data.characters[0]?.id ?? null),
-	);
+	let selectedCharacterId = $state<string | null>(untrack(() => data.characters[0]?.id ?? null));
 	let deletingCharacterId = $state<string | null>(null);
 
 	$effect(() => {
@@ -271,8 +270,7 @@
 				}
 				resolve(result);
 			};
-			reader.onerror = () =>
-				reject(reader.error ?? new Error('Failed to read selected image.'));
+			reader.onerror = () => reject(reader.error ?? new Error('Failed to read selected image.'));
 			reader.readAsDataURL(file);
 		});
 	}
@@ -368,9 +366,7 @@
 		const characterName = characterRecords[characterId]?.name || 'this character';
 
 		if (typeof window !== 'undefined') {
-			const shouldDelete = window.confirm(
-				`Delete ${characterName}? This cannot be undone.`,
-			);
+			const shouldDelete = window.confirm(`Delete ${characterName}? This cannot be undone.`);
 			if (!shouldDelete) return;
 		}
 
@@ -398,96 +394,57 @@
 </script>
 
 <svelte:head>
-	<title>Individuals — Novellum</title>
+	<title>{$translator('worldbuilding.page.individuals.title')}</title>
 </svelte:head>
 
-<div class="worldbuilding-section-view">
-	<WorldBuildingSubheaderNav projectId={data.projectId} topSection="characters" activeId="individuals" ariaLabel="Personae sections" />
-	<IndividualsWorkspaceShell
-		{characterOptions}
-		{selectedCharacterId}
-		onSelectCharacter={selectCharacter}
-		onCreateCharacter={createNewCharacter}
-		hasSelection={!!selectedCharacter}
-	>
-		{#snippet dossier()}
-			<div class="character-dossier">
-				<CharacterDetailHeader
+<WorldBuildingWorkspacePage
+	projectId={data.projectId}
+	topSection="characters"
+	activeId="individuals"
+	ariaLabel={$translator('worldbuilding.aria.personaeSections')}
+	options={characterOptions}
+	selectedId={selectedCharacterId}
+	onSelect={selectCharacter}
+	onCreate={createNewCharacter}
+	hasSelection={!!selectedCharacter}
+>
+	{#snippet dossier()}
+		<div class="character-dossier">
+			<CharacterDetailHeader
+				character={selectedCharacter}
+				onFieldChange={updateCharacterField}
+				onPhotoUpload={handleCharacterPhotoUpload}
+			/>
+
+			<div class="dossier-flow" aria-label="Character dossier sections">
+				<CharacterCorePanel character={selectedCharacter} onFieldChange={updateCharacterField} />
+				<StoryFunctionPanel character={selectedCharacter} onFieldChange={updateCharacterField} />
+				<NarrativeStatePanel character={selectedCharacter} onFieldChange={updateCharacterField} />
+				<VoicePanel character={selectedCharacter} onFieldChange={updateCharacterField} />
+				<ContinuityPanel character={selectedCharacter} onFieldChange={updateCharacterField} />
+				<RelationshipPanel
 					character={selectedCharacter}
-					onFieldChange={updateCharacterField}
-					onPhotoUpload={handleCharacterPhotoUpload}
+					characters={characterOptions}
+					currentCharacterId={selectedCharacter?.id || ''}
+					onRelationshipFieldChange={updateRelationshipField}
+					onAddRelationship={addRelationship}
+					onRemoveRelationship={removeRelationship}
 				/>
-
-				<div class="dossier-flow" aria-label="Character dossier sections">
-					<CharacterCorePanel character={selectedCharacter} onFieldChange={updateCharacterField} />
-					<StoryFunctionPanel character={selectedCharacter} onFieldChange={updateCharacterField} />
-					<NarrativeStatePanel character={selectedCharacter} onFieldChange={updateCharacterField} />
-					<VoicePanel character={selectedCharacter} onFieldChange={updateCharacterField} />
-					<ContinuityPanel character={selectedCharacter} onFieldChange={updateCharacterField} />
-					<RelationshipPanel
-						character={selectedCharacter}
-						characters={characterOptions}
-						currentCharacterId={selectedCharacter?.id || ''}
-						onRelationshipFieldChange={updateRelationshipField}
-						onAddRelationship={addRelationship}
-						onRemoveRelationship={removeRelationship}
-					/>
-				</div>
-
-				<div class="dossier-footer-actions">
-					<button
-						type="button"
-						class="delete-character-btn"
-						onclick={deleteSelectedCharacter}
-						disabled={deletingCharacterId === selectedCharacter?.id}
-					>
-						{deletingCharacterId === selectedCharacter?.id ? 'Deleting…' : 'Delete Character'}
-					</button>
-				</div>
 			</div>
-		{/snippet}
 
-		{#snippet empty()}
-			<EmptyCharacterState />
-		{/snippet}
-	</IndividualsWorkspaceShell>
-</div>
+			<div class="dossier-footer-actions">
+				<DestructiveButton
+					size="sm"
+					onclick={deleteSelectedCharacter}
+					disabled={deletingCharacterId === selectedCharacter?.id}
+				>
+					{deletingCharacterId === selectedCharacter?.id ? 'Deleting…' : 'Delete Character'}
+				</DestructiveButton>
+			</div>
+		</div>
+	{/snippet}
 
-<style>
-	.worldbuilding-section-view {
-		display: grid;
-		grid-template-rows: auto minmax(0, 1fr);
-		height: 100%;
-		min-height: 0;
-		overflow: hidden;
-		overscroll-behavior: none;
-	}
-
-	.delete-character-btn {
-		border: 1px solid color-mix(in srgb, var(--color-semantic-error-fg) 50%, var(--color-border-default));
-		background: color-mix(in srgb, var(--color-semantic-error-bg) 35%, transparent);
-		color: var(--color-semantic-error-fg);
-		padding: 0.45rem 0.75rem;
-		border-radius: var(--radius-md);
-		font-size: var(--text-sm);
-		font-weight: var(--font-weight-semibold);
-		cursor: pointer;
-	}
-
-	.delete-character-btn:hover:enabled {
-		background: color-mix(in srgb, var(--color-semantic-error-bg) 55%, transparent);
-	}
-
-	.delete-character-btn:disabled {
-		opacity: 0.65;
-		cursor: not-allowed;
-	}
-
-	@media (max-width: 768px) {
-		.worldbuilding-section-view {
-			height: auto;
-			overflow: visible;
-		}
-	}
-
-</style>
+	{#snippet empty()}
+		<EmptyCharacterState />
+	{/snippet}
+</WorldBuildingWorkspacePage>

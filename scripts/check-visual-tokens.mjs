@@ -15,7 +15,7 @@
  *            without var(--duration-*) or var(--ease-*).
  *
  * Exceptions:
- *   - Files in src/styles/ (token definitions themselves)
+ *   - Token files in src/styles/ (`tokens.css`, `shadcn.css`)
  *   - Files in src/routes/styles/ (design system showcase)
  *
  * Exit codes:
@@ -34,9 +34,15 @@ const SCAN_DIRS = [
 	join(ROOT, 'src/modules'),
 ];
 
+const CSS_SCAN_DIR = join(ROOT, 'src/styles');
+
 const EXCEPTION_PREFIXES = [
-	join(ROOT, 'src/styles'),
 	join(ROOT, 'src/routes/styles'),
+];
+
+const EXCEPTION_FILES = [
+	join(ROOT, 'src/styles/tokens.css'),
+	join(ROOT, 'src/styles/shadcn.css'),
 ];
 
 // ── Helpers ──────────────────────────────────────────────────────────────
@@ -62,7 +68,29 @@ function collectSvelteFiles(dir) {
 	return results;
 }
 
+function collectCssFiles(dir) {
+	const results = [];
+	let entries;
+	try {
+		entries = readdirSync(dir);
+	} catch {
+		return results;
+	}
+	for (const entry of entries) {
+		const full = join(dir, entry);
+		const stat = statSync(full, { throwIfNoEntry: false });
+		if (!stat) continue;
+		if (stat.isDirectory()) {
+			results.push(...collectCssFiles(full));
+		} else if (entry.endsWith('.css')) {
+			results.push(full);
+		}
+	}
+	return results;
+}
+
 function isExcepted(filePath) {
+	if (EXCEPTION_FILES.includes(filePath)) return true;
 	return EXCEPTION_PREFIXES.some((prefix) => filePath.startsWith(prefix + '/') || filePath === prefix);
 }
 
@@ -237,6 +265,7 @@ function checkMotionTokens(css, startLine) {
 function main() {
 	const allFiles = SCAN_DIRS.flatMap(collectSvelteFiles);
 	const files = allFiles.filter((f) => !isExcepted(f));
+	const cssFiles = collectCssFiles(CSS_SCAN_DIR).filter((f) => !isExcepted(f));
 
 	let totalViolations = 0;
 	const fileReports = [];
@@ -261,9 +290,26 @@ function main() {
 		}
 	}
 
+	for (const filePath of cssFiles) {
+		const source = readFileSync(filePath, 'utf-8');
+		const violations = [
+			...checkHardcodedColors(source, 1),
+			...checkShadowTokens(source, 1),
+			...checkMotionTokens(source, 1),
+		];
+
+		if (violations.length > 0) {
+			const rel = relative(ROOT, filePath);
+			fileReports.push({ file: rel, violations });
+			totalViolations += violations.length;
+		}
+	}
+
 	// ── Output ───────────────────────────────────────────────────────────
 	if (totalViolations === 0) {
-		console.log(`✓ Token enforcement: ${files.length} files scanned, 0 violations.`);
+		console.log(
+			`✓ Token enforcement: ${files.length + cssFiles.length} files scanned, 0 violations.`,
+		);
 		process.exit(0);
 	}
 

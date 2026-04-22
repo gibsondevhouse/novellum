@@ -1,4 +1,8 @@
-/* Shared Form & Button Components */
+/* Shared Form & Button Components
+ * Transitional utilities:
+ * - .field / .label / .input / .actions remain while forms migrate to primitives
+ * - .btn-* remain as compatibility helpers
+ */
 
 .form-panel {
 	background-color: var(--color-surface-raised);
@@ -196,7 +200,9 @@
 }
 
 .motion-lift {
-	transition: transform var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard);
+	transition:
+		transform var(--duration-fast) var(--ease-standard),
+		box-shadow var(--duration-fast) var(--ease-standard);
 }
 
 .motion-lift:hover {
@@ -213,8 +219,8 @@
 	/* Placeholder for actual noise texture, fallback to subtle gradient */
 	background-image: repeating-linear-gradient(
 		45deg,
-		rgba(255, 255, 255, 0.01) 0px,
-		rgba(255, 255, 255, 0.01) 1px,
+		color-mix(in srgb, var(--color-text-on-dark) 1%, transparent) 0px,
+		color-mix(in srgb, var(--color-text-on-dark) 1%, transparent) 1px,
 		transparent 1px,
 		transparent 4px
 	);
@@ -238,8 +244,16 @@
 	position: absolute;
 	inset: 0;
 	background:
-		radial-gradient(circle at 22% 18%, rgba(255, 255, 255, 0.26) 0%, transparent 45%),
-		linear-gradient(125deg, rgba(255, 255, 255, 0.12), transparent 55%);
+		radial-gradient(
+			circle at 22% 18%,
+			color-mix(in srgb, var(--color-text-on-dark) 26%, transparent) 0%,
+			transparent 45%
+		),
+		linear-gradient(
+			125deg,
+			color-mix(in srgb, var(--color-text-on-dark) 12%, transparent),
+			transparent 55%
+		);
 	mix-blend-mode: screen;
 	pointer-events: none;
 	border-radius: inherit;
@@ -247,43 +261,50 @@
 
 /* ─── Skeleton Loading ───────────────────────────────────────────── */
 .skeleton {
-        background: var(--color-surface-elevated, var(--color-surface-raised));
-        border-radius: var(--radius-sm);
-        animation: skeleton-pulse 1.5s ease-in-out infinite;
+	background: var(--color-surface-elevated, var(--color-surface-raised));
+	border-radius: var(--radius-sm);
+	animation: skeleton-pulse 1.5s ease-in-out infinite;
 }
 
 @keyframes skeleton-pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.4; }
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.4;
+	}
 }
 
 /* ─── Spinner ───────────────────────────────────────────────────── */
 .spinner {
-        display: inline-block;
-        width: 1.25em;
-        height: 1.25em;
-        border: 2px solid var(--color-border-subtle);
-        border-top-color: var(--color-nova-blue);
-        border-radius: 50%;
-        animation: spinner-rotate 0.7s linear infinite;
-        flex-shrink: 0;
+	display: inline-block;
+	width: 1.25em;
+	height: 1.25em;
+	border: 2px solid var(--color-border-subtle);
+	border-top-color: var(--color-nova-blue);
+	border-radius: 50%;
+	animation: spinner-rotate 0.7s linear infinite;
+	flex-shrink: 0;
 }
 
 .btn-spinner {
-        width: 0.875em;
-        height: 0.875em;
-        vertical-align: middle;
+	width: 0.875em;
+	height: 0.875em;
+	vertical-align: middle;
 }
 
 @keyframes spinner-rotate {
-        to { transform: rotate(360deg); }
+	to {
+		transform: rotate(360deg);
+	}
 }
 
 .restoring-indicator {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: var(--space-3);
-        padding: var(--space-4);
-        text-align: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--space-3);
+	padding: var(--space-4);
+	text-align: center;
 }

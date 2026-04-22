@@ -9,10 +9,12 @@
 	import AppHeader from '$lib/components/AppHeader.svelte';
 	import OnboardingModal from '$lib/components/OnboardingModal.svelte';
 	import ToastContainer from '$lib/components/ToastContainer.svelte';
+	import { initLocale } from '$lib/i18n';
 
 	let { children } = $props();
 
 	onMount(() => {
+		initLocale();
 		db.open().catch(() => {}); // already opened; no-op if open
 
 		// Register service worker for stale-chunk protection

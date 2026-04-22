@@ -1,13 +1,11 @@
 <script lang="ts">
 	import type { PlotThread } from '$lib/db/types.js';
-	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
-	import IndividualsWorkspaceShell from '$modules/bible/components/IndividualsWorkspaceShell.svelte';
+	import { translator } from '$lib/i18n';
+	import { DestructiveButton, GhostButton } from '$lib/components/ui/index.js';
 	import ThreadSystemForm from '$modules/bible/components/ThreadSystemForm.svelte';
-	import {
-		isThreadKind,
-		optionMeta,
-		optionSubtitle,
-	} from '$modules/bible/thread-systems.js';
+	import WorldBuildingWorkspaceEmptyState from '$modules/bible/components/WorldBuildingWorkspaceEmptyState.svelte';
+	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
+	import { isThreadKind, optionMeta, optionSubtitle } from '$modules/bible/thread-systems.js';
 	import {
 		getPlotThreads,
 		getPlotThreadSaving,
@@ -31,7 +29,9 @@
 		getPlotThreads().filter((thread) => isThreadKind(thread, 'motivation')),
 	);
 
-	const majorArcs = $derived(getPlotThreads().filter((thread) => isThreadKind(thread, 'major-arc')));
+	const majorArcs = $derived(
+		getPlotThreads().filter((thread) => isThreadKind(thread, 'major-arc')),
+	);
 
 	$effect(() => {
 		if (selectedId && motivations.some((thread) => thread.id === selectedId)) return;
@@ -86,80 +86,88 @@
 </script>
 
 <svelte:head>
-	<title>Motivations — Novellum</title>
+	<title>{$translator('worldbuilding.page.motivations.title')}</title>
 </svelte:head>
 
-<div class="worldbuilding-section-view">
-	<WorldBuildingSubheaderNav
-		projectId={data.projectId}
-		topSection="plot-threads"
-		activeId="motivations"
-		ariaLabel="Threads sections"
-	/>
-	<IndividualsWorkspaceShell
-		characterOptions={options}
-		selectedCharacterId={selectedId}
-		onSelectCharacter={selectThread}
-		onCreateCharacter={() => {
-			creating = true;
-			selectedId = null;
-		}}
-		hasSelection={creating || selectedId !== null}
-		listAriaLabel="Motivations"
-		createLabel="new +"
-	>
-		{#snippet dossier()}
-			{#if creating}
-				<section class="character-dossier">
-					<div class="dossier-header">
-						<h2 class="dossier-title">New Motivation</h2>
-						<p class="dossier-copy">Decision logic beneath action: desire, fear, belief, trigger, and escalation.</p>
-					</div>
-					<div class="dossier-flow" aria-label="Motivation system form">
-						<ThreadSystemForm
-							kind="motivation"
-							arcOptions={arcOptions}
-							saving={getPlotThreadSaving()}
-							onSave={handleCreate}
-							onCancel={() => (creating = false)}
-						/>
-					</div>
-				</section>
-			{:else if selectedThread}
-				<section class="character-dossier">
-					<div class="dossier-header">
-						<h2 class="dossier-title">{selectedThread.title}</h2>
-						<p class="dossier-copy">Motivation should produce decisions that move arcs and increase conflict pressure.</p>
-					</div>
-					<div class="dossier-flow" aria-label="Motivation system form">
-						<ThreadSystemForm
-							thread={selectedThread}
-							kind="motivation"
-							arcOptions={arcOptions}
-							saving={getPlotThreadSaving()}
-							onSave={handleUpdate}
-							onCancel={() => (selectedId = null)}
-						/>
-					</div>
-					<div class="dossier-footer-actions">
-						{#if confirmDeleteId === selectedThread.id}
-							<button class="bible-btn-sm bible-btn-danger" onclick={() => handleDelete(selectedThread.id)}>Confirm</button>
-							<button class="bible-btn-sm" onclick={() => (confirmDeleteId = null)}>Cancel</button>
-						{:else}
-							<button class="bible-btn-sm bible-btn-danger" onclick={() => (confirmDeleteId = selectedThread.id)}>Delete</button>
-						{/if}
-					</div>
-				</section>
-			{/if}
-		{/snippet}
-		{#snippet empty()}
-			<div class="entity-empty">
-				<p>No motivations yet. Define the decision engines behind major choices and events.</p>
-				<button class="bible-btn-sm" onclick={() => (creating = true)}>+ Add first motivation</button>
-			</div>
-		{/snippet}
-	</IndividualsWorkspaceShell>
-</div>
+<WorldBuildingWorkspacePage
+	projectId={data.projectId}
+	topSection="plot-threads"
+	activeId="motivations"
+	ariaLabel={$translator('worldbuilding.aria.threadsSections')}
+	{options}
+	{selectedId}
+	onSelect={selectThread}
+	onCreate={() => {
+		creating = true;
+		selectedId = null;
+	}}
+	hasSelection={creating || selectedId !== null}
+	listAriaLabel={$translator('worldbuilding.list.motivations')}
+	createLabel={$translator('worldbuilding.workspace.common.createLabel')}
+>
+	{#snippet dossier()}
+		{#if creating}
+			<section class="character-dossier">
+				<div class="dossier-header">
+					<h2 class="dossier-title">New Motivation</h2>
+					<p class="dossier-copy">
+						Decision logic beneath action: desire, fear, belief, trigger, and escalation.
+					</p>
+				</div>
+				<div class="dossier-flow" aria-label="Motivation system form">
+					<ThreadSystemForm
+						kind="motivation"
+						{arcOptions}
+						saving={getPlotThreadSaving()}
+						onSave={handleCreate}
+						onCancel={() => (creating = false)}
+					/>
+				</div>
+			</section>
+		{:else if selectedThread}
+			<section class="character-dossier">
+				<div class="dossier-header">
+					<h2 class="dossier-title">{selectedThread.title}</h2>
+					<p class="dossier-copy">
+						Motivation should produce decisions that move arcs and increase conflict pressure.
+					</p>
+				</div>
+				<div class="dossier-flow" aria-label="Motivation system form">
+					<ThreadSystemForm
+						thread={selectedThread}
+						kind="motivation"
+						{arcOptions}
+						saving={getPlotThreadSaving()}
+						onSave={handleUpdate}
+						onCancel={() => (selectedId = null)}
+					/>
+				</div>
+				<div class="dossier-footer-actions">
+					{#if confirmDeleteId === selectedThread.id}
+						<DestructiveButton size="sm" onclick={() => handleDelete(selectedThread.id)}
+							>Confirm</DestructiveButton
+						>
+						<GhostButton size="sm" onclick={() => (confirmDeleteId = null)}>Cancel</GhostButton>
+					{:else}
+						<DestructiveButton size="sm" onclick={() => (confirmDeleteId = selectedThread.id)}
+							>Delete</DestructiveButton
+						>
+					{/if}
+				</div>
+			</section>
+		{/if}
+	{/snippet}
+	{#snippet empty()}
+		<WorldBuildingWorkspaceEmptyState
+			title={$translator('worldbuilding.workspace.motivations.emptyTitle')}
+			description={$translator('worldbuilding.workspace.motivations.emptyDescription')}
+			actionLabel={$translator('worldbuilding.workspace.common.firstMotivation')}
+			onAction={() => {
+				creating = true;
+			}}
+		/>
+	{/snippet}
+</WorldBuildingWorkspacePage>
 
 <style>
 	.dossier-header {
@@ -177,15 +185,5 @@
 		margin: 0;
 		color: var(--color-text-secondary);
 		max-width: 72ch;
-	}
-
-	.entity-empty {
-		padding: var(--space-8);
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: var(--space-4);
-		color: var(--color-text-muted);
-		text-align: center;
 	}
 </style>

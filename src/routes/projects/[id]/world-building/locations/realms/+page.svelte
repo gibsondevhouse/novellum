@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { Location } from '$lib/db/types.js';
+	import { translator } from '$lib/i18n';
 	import RealmDossierPane from '$modules/bible/components/RealmDossierPane.svelte';
 	import RealmEmptyState from '$modules/bible/components/RealmEmptyState.svelte';
-	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
-	import IndividualsWorkspaceShell from '$modules/bible/components/IndividualsWorkspaceShell.svelte';
+	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
 	import {
 		formatLocationSubtitle,
 		formatRealmMeta,
@@ -37,7 +37,7 @@
 	const realms = $derived.by(() => getLocations().filter((location) => isRealmLocation(location)));
 
 	const selectedLocation = $derived.by(() =>
-		selectedId ? realms.find((location) => location.id === selectedId) ?? null : null,
+		selectedId ? (realms.find((location) => location.id === selectedId) ?? null) : null,
 	);
 
 	const options = $derived.by(() =>
@@ -104,8 +104,7 @@
 				}
 				resolve(result);
 			};
-			reader.onerror = () =>
-				reject(reader.error ?? new Error('Failed to read selected image.'));
+			reader.onerror = () => reject(reader.error ?? new Error('Failed to read selected image.'));
 			reader.readAsDataURL(file);
 		});
 	}
@@ -147,72 +146,49 @@
 </script>
 
 <svelte:head>
-	<title>Realms — Novellum</title>
+	<title>{$translator('worldbuilding.page.realms.title')}</title>
 </svelte:head>
 
-<div class="worldbuilding-section-view">
-	<WorldBuildingSubheaderNav
-		projectId={data.projectId}
-		topSection="locations"
-		activeId="realms"
-		ariaLabel="Atlas sections"
-	/>
-
-	<IndividualsWorkspaceShell
-		characterOptions={options}
-		selectedCharacterId={selectedId}
-		onSelectCharacter={selectLocation}
-		onCreateCharacter={createNewRealm}
-		hasSelection={creating || selectedId !== null}
-		listAriaLabel="Realms"
-		createLabel="new +"
-	>
-		{#snippet dossier()}
-			{#if creating}
-				<RealmDossierPane
-					realm={null}
-					isCreating={true}
-					saving={getLocationSaving()}
-					showDeleteConfirm={false}
-					onSave={handleCreate}
-					onCancel={() => (creating = false)}
-					onDelete={() => {}}
-					formatMeta={formatRealmMeta}
-				/>
-			{:else if selectedLocation}
-				<RealmDossierPane
-					realm={selectedLocation}
-					saving={getLocationSaving()}
-					showDeleteConfirm={confirmDeleteId === selectedLocation.id}
-					onSave={handleUpdate}
-					onCancel={cancelDelete}
-					onDelete={() => handleDeleteAction(selectedLocation.id)}
-					onPhotoUpload={handleRealmPhotoUpload}
-					photoUrl={realmPhotoUrls[selectedLocation.id] ?? ''}
-					formatMeta={formatRealmMeta}
-				/>
-			{/if}
-		{/snippet}
-		{#snippet empty()}
-			<RealmEmptyState onCreate={createNewRealm} />
-		{/snippet}
-	</IndividualsWorkspaceShell>
-</div>
-
-<style>
-	.worldbuilding-section-view {
-		display: grid;
-		grid-template-rows: auto minmax(0, 1fr);
-		height: 100%;
-		min-height: 0;
-		overflow: hidden;
-		overscroll-behavior: none;
-	}
-
-	@media (max-width: 768px) {
-		.worldbuilding-section-view {
-			height: auto;
-			overflow: visible;
-		}
-	}
-</style>
+<WorldBuildingWorkspacePage
+	projectId={data.projectId}
+	topSection="locations"
+	activeId="realms"
+	ariaLabel={$translator('worldbuilding.aria.atlasSections')}
+	{options}
+	{selectedId}
+	onSelect={selectLocation}
+	onCreate={createNewRealm}
+	hasSelection={creating || selectedId !== null}
+	listAriaLabel={$translator('worldbuilding.list.realms')}
+	createLabel={$translator('worldbuilding.workspace.common.createLabel')}
+>
+	{#snippet dossier()}
+		{#if creating}
+			<RealmDossierPane
+				realm={null}
+				isCreating={true}
+				saving={getLocationSaving()}
+				showDeleteConfirm={false}
+				onSave={handleCreate}
+				onCancel={() => (creating = false)}
+				onDelete={() => {}}
+				formatMeta={formatRealmMeta}
+			/>
+		{:else if selectedLocation}
+			<RealmDossierPane
+				realm={selectedLocation}
+				saving={getLocationSaving()}
+				showDeleteConfirm={confirmDeleteId === selectedLocation.id}
+				onSave={handleUpdate}
+				onCancel={cancelDelete}
+				onDelete={() => handleDeleteAction(selectedLocation.id)}
+				onPhotoUpload={handleRealmPhotoUpload}
+				photoUrl={realmPhotoUrls[selectedLocation.id] ?? ''}
+				formatMeta={formatRealmMeta}
+			/>
+		{/if}
+	{/snippet}
+	{#snippet empty()}
+		<RealmEmptyState onCreate={createNewRealm} />
+	{/snippet}
+</WorldBuildingWorkspacePage>

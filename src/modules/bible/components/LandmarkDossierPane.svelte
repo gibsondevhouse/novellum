@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Location } from '$lib/db/types.js';
+	import { DestructiveButton, GhostButton } from '$lib/components/ui/index.js';
 	import LandmarkDetailHeader from './LandmarkDetailHeader.svelte';
 	import LandmarkForm from './LandmarkForm.svelte';
 
@@ -27,7 +28,9 @@
 		saving?: boolean;
 		isCreating?: boolean;
 		showDeleteConfirm?: boolean;
-		onSave: (formData: Omit<Location, 'id' | 'projectId' | 'createdAt' | 'updatedAt'>) => void | Promise<void>;
+		onSave: (
+			formData: Omit<Location, 'id' | 'projectId' | 'createdAt' | 'updatedAt'>,
+		) => void | Promise<void>;
 		onCancel: () => void;
 		onDelete: () => void | Promise<void>;
 		onPhotoUpload?: (file: File) => void | Promise<void>;
@@ -58,7 +61,7 @@
 	<LandmarkDetailHeader
 		{landmark}
 		{photoUrl}
-		onPhotoUpload={onPhotoUpload}
+		{onPhotoUpload}
 		uploadDisabled={isCreating || !landmark}
 	/>
 
@@ -69,16 +72,20 @@
 	</div>
 
 	<div class="dossier-flow" aria-label="Landmark dossier sections">
-		<LandmarkForm landmark={landmark} {realms} {saving} {onSave} {onCancel} />
+		<LandmarkForm {landmark} {realms} {saving} {onSave} {onCancel} />
 	</div>
 
 	{#if !isCreating && landmark}
 		<div class="dossier-footer-actions">
 			{#if showDeleteConfirm}
-				<button class="bible-btn-sm bible-btn-danger" onclick={() => void onDelete()}>Confirm Delete</button>
-				<button class="bible-btn-sm" onclick={onCancel}>Cancel</button>
+				<DestructiveButton size="sm" onclick={() => void onDelete()}
+					>Confirm Delete</DestructiveButton
+				>
+				<GhostButton size="sm" onclick={onCancel}>Cancel</GhostButton>
 			{:else}
-				<button class="bible-btn-sm bible-btn-danger" onclick={() => void onDelete()}>Delete Landmark</button>
+				<DestructiveButton size="sm" onclick={() => void onDelete()}
+					>Delete Landmark</DestructiveButton
+				>
 			{/if}
 		</div>
 	{/if}

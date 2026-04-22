@@ -30,10 +30,13 @@ Open <http://localhost:5173> in your browser.
 - `pnpm run build`: Build production bundle.
 - `pnpm run preview`: Preview production build.
 - `pnpm run lint`: Run ESLint (includes boundaries rules).
+- `pnpm run lint:css`: Run Stylelint across `.css` and `.svelte` style blocks.
 - `pnpm run check`: Run Svelte/TypeScript checks.
 - `pnpm run test`: Run Vitest suite.
 - `pnpm run test:coverage`: Run Vitest with coverage.
 - `pnpm run test:visual`: Run Playwright visual tests.
+- `pnpm run storybook`: Start Storybook component playground.
+- `pnpm run build-storybook`: Build static Storybook for CI verification.
 - `pnpm run format`: Run Prettier.
 
 ## Project Structure

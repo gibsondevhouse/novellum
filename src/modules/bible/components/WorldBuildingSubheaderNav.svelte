@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { locale, translator } from '$lib/i18n';
 	import PillNav from '$lib/components/ui/PillNav.svelte';
 	import type { PillNavItem } from '$lib/components/ui/PillNav.svelte';
 	import {
-		WORLD_BUILDING_SUB_ITEMS,
+		buildWorldBuildingSubItems,
 		type WorldBuildingTopSectionId,
 	} from '$modules/bible/worldbuilding-navigation.js';
 
-	let { projectId, topSection, activeId, ariaLabel = 'World building subsection' } = $props<{
+	let { projectId, topSection, activeId, ariaLabel } = $props<{
 		projectId: string;
 		topSection: WorldBuildingTopSectionId;
 		activeId: string;
@@ -15,7 +16,26 @@
 	}>();
 
 	const currentTopSection = $derived(topSection as WorldBuildingTopSectionId);
-	const currentItems = $derived(WORLD_BUILDING_SUB_ITEMS[currentTopSection]);
+	const currentItems = $derived(buildWorldBuildingSubItems(currentTopSection, $locale));
+	const fallbackAriaLabel = $derived.by(() => {
+		switch (currentTopSection) {
+			case 'characters':
+				return $translator('worldbuilding.aria.personaeSections');
+			case 'locations':
+				return $translator('worldbuilding.aria.atlasSections');
+			case 'lore':
+				return $translator('worldbuilding.aria.archiveSections');
+			case 'plot-threads':
+				return $translator('worldbuilding.aria.threadsSections');
+			case 'timeline':
+				return $translator('worldbuilding.aria.chroniclesSections');
+			default:
+				return $translator('worldbuilding.aria.personaeSections');
+		}
+	});
+	const navAriaLabel = $derived(
+		ariaLabel ?? fallbackAriaLabel,
+	);
 
 	const items = $derived<PillNavItem[]>(
 		currentItems.map((item) => ({ id: item.id, label: item.label })),
@@ -28,8 +48,8 @@
 	}
 </script>
 
-<div class="worldbuilding-subheader-nav" aria-label={ariaLabel}>
-	<PillNav items={items} activeId={activeId} onSelect={handleSelect} ariaLabel={ariaLabel} />
+<div class="worldbuilding-subheader-nav" aria-label={navAriaLabel}>
+	<PillNav items={items} activeId={activeId} onSelect={handleSelect} ariaLabel={navAriaLabel} />
 </div>
 
 <style>

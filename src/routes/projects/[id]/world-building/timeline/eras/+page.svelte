@@ -1,8 +1,10 @@
 <script lang="ts">
 	import type { TimelineEvent, Character } from '$lib/db/types.js';
+	import { translator } from '$lib/i18n';
+	import { DestructiveButton, GhostButton } from '$lib/components/ui/index.js';
 	import TimelineEventForm from '$modules/bible/components/TimelineEventForm.svelte';
-	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
-	import IndividualsWorkspaceShell from '$modules/bible/components/IndividualsWorkspaceShell.svelte';
+	import WorldBuildingWorkspaceEmptyState from '$modules/bible/components/WorldBuildingWorkspaceEmptyState.svelte';
+	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
 	import {
 		getTimelineEvents,
 		getTimelineSaving,
@@ -12,7 +14,9 @@
 		submitDeleteTimelineEvent,
 	} from '$modules/bible/stores/bible-crud.svelte.js';
 
-	let { data }: { data: { projectId: string; timelineEvents: TimelineEvent[]; characters: Character[] } } =
+	let {
+		data,
+	}: { data: { projectId: string; timelineEvents: TimelineEvent[]; characters: Character[] } } =
 		$props();
 
 	$effect(() => {
@@ -63,69 +67,72 @@
 </script>
 
 <svelte:head>
-	<title>Eras — Novellum</title>
+	<title>{$translator('worldbuilding.page.eras.title')}</title>
 </svelte:head>
 
-<div class="worldbuilding-section-view">
-	<WorldBuildingSubheaderNav
-		projectId={data.projectId}
-		topSection="timeline"
-		activeId="eras"
-		ariaLabel="Chronicles sections"
-	/>
-
-	<IndividualsWorkspaceShell
-		characterOptions={options}
-		selectedCharacterId={selectedId}
-		onSelectCharacter={selectEvent}
-		onCreateCharacter={() => {
-			creating = true;
-			selectedId = null;
-		}}
-		hasSelection={creating || selectedId !== null}
-		listAriaLabel="Eras"
-		createLabel="new +"
-	>
-		{#snippet dossier()}
-			{#if creating}
-				<div class="entity-dossier">
-					<h2 class="dossier-title">New Era Event</h2>
-					<TimelineEventForm
-						characters={data.characters}
-						saving={getTimelineSaving()}
-						onSave={handleCreate}
-						onCancel={() => (creating = false)}
-					/>
-				</div>
-			{:else if selectedEvent}
-				<div class="entity-dossier">
-					<div class="dossier-header">
-						<h2 class="dossier-title">{selectedEvent.title}</h2>
-						{#if confirmDeleteId === selectedEvent.id}
-							<button class="bible-btn-sm bible-btn-danger" onclick={() => handleDelete(selectedEvent.id)}>Confirm</button>
-							<button class="bible-btn-sm" onclick={() => (confirmDeleteId = null)}>Cancel</button>
-						{:else}
-							<button class="bible-btn-sm bible-btn-danger" onclick={() => (confirmDeleteId = selectedEvent.id)}>Delete</button>
-						{/if}
-					</div>
-					<TimelineEventForm
-						event={selectedEvent}
-						characters={data.characters}
-						saving={getTimelineSaving()}
-						onSave={handleUpdate}
-						onCancel={() => (selectedId = null)}
-					/>
-				</div>
-			{/if}
-		{/snippet}
-		{#snippet empty()}
-			<div class="entity-empty">
-				<p>No era events yet.</p>
-				<button class="bible-btn-sm" onclick={() => (creating = true)}>+ Add your first era event</button>
+<WorldBuildingWorkspacePage
+	projectId={data.projectId}
+	topSection="timeline"
+	activeId="eras"
+	ariaLabel={$translator('worldbuilding.aria.chroniclesSections')}
+	{options}
+	{selectedId}
+	onSelect={selectEvent}
+	onCreate={() => {
+		creating = true;
+		selectedId = null;
+	}}
+	hasSelection={creating || selectedId !== null}
+	listAriaLabel={$translator('worldbuilding.list.eras')}
+	createLabel={$translator('worldbuilding.workspace.common.createLabel')}
+>
+	{#snippet dossier()}
+		{#if creating}
+			<div class="entity-dossier">
+				<h2 class="dossier-title">New Era Event</h2>
+				<TimelineEventForm
+					characters={data.characters}
+					saving={getTimelineSaving()}
+					onSave={handleCreate}
+					onCancel={() => (creating = false)}
+				/>
 			</div>
-		{/snippet}
-	</IndividualsWorkspaceShell>
-</div>
+		{:else if selectedEvent}
+			<div class="entity-dossier">
+				<div class="dossier-header">
+					<h2 class="dossier-title">{selectedEvent.title}</h2>
+					{#if confirmDeleteId === selectedEvent.id}
+						<DestructiveButton size="sm" onclick={() => handleDelete(selectedEvent.id)}
+							>Confirm</DestructiveButton
+						>
+						<GhostButton size="sm" onclick={() => (confirmDeleteId = null)}>Cancel</GhostButton>
+					{:else}
+						<DestructiveButton size="sm" onclick={() => (confirmDeleteId = selectedEvent.id)}
+							>Delete</DestructiveButton
+						>
+					{/if}
+				</div>
+				<TimelineEventForm
+					event={selectedEvent}
+					characters={data.characters}
+					saving={getTimelineSaving()}
+					onSave={handleUpdate}
+					onCancel={() => (selectedId = null)}
+				/>
+			</div>
+		{/if}
+	{/snippet}
+	{#snippet empty()}
+		<WorldBuildingWorkspaceEmptyState
+			title={$translator('worldbuilding.workspace.eras.emptyTitle')}
+			description={$translator('worldbuilding.workspace.eras.emptyDescription')}
+			actionLabel={$translator('worldbuilding.workspace.common.firstEraEvent')}
+			onAction={() => {
+				creating = true;
+			}}
+		/>
+	{/snippet}
+</WorldBuildingWorkspacePage>
 
 <style>
 	.entity-dossier {
@@ -145,14 +152,5 @@
 		margin: 0;
 		font-size: var(--text-xl);
 		font-weight: var(--font-weight-semibold);
-	}
-
-	.entity-empty {
-		padding: var(--space-8);
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: var(--space-4);
-		color: var(--color-text-muted);
 	}
 </style>
