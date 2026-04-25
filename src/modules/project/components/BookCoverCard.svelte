@@ -1,6 +1,5 @@
 <script lang="ts">
         import type { Project } from '$lib/db/types.js';
-        import GhostButton from '$lib/components/ui/GhostButton.svelte';
         import { openReader } from '../stores/project-hub.svelte.js';
 
         let { project } = $props<{ project: Project }>();
@@ -26,7 +25,7 @@
 </script>
 
 <article class="book-cover-card">
-        <GhostButton
+        <button
                 class="cover-button"
                 type="button"
                 onclick={() => openReader(project)}
@@ -61,7 +60,7 @@
                                 <p class="book-meta">Never opened</p>
                         {/if}
                 </div>
-        </GhostButton>
+        </button>
 </article>
 
 <style>

@@ -153,7 +153,7 @@
 					<h3 class="album-title">{album.title}</h3>
 					<div class="grid">
 						{#if album.coverUrl}
-							<GhostButton
+							<button
 								type="button"
 								class="asset-card cover-card"
 								aria-label={`Open ${album.title} cover artwork`}
@@ -177,10 +177,10 @@
 								<div class="asset-meta">
 									<span class="asset-name">Cover Artwork</span>
 								</div>
-							</GhostButton>
+							</button>
 						{/if}
 						{#each album.assets as asset (asset.id)}
-							<GhostButton
+							<button
 								type="button"
 								class={`asset-card ${selectedAsset?.id === asset.id ? 'selected' : ''}`}
 								aria-label={`Open asset ${asset.name}`}
@@ -196,7 +196,7 @@
 									<span class="asset-name">{asset.name}</span>
 									<span class="asset-type">{bytesToSize(asset.sizeBytes)}</span>
 								</div>
-							</GhostButton>
+							</button>
 						{/each}
 					</div>
 				</section>
