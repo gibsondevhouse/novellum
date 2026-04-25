@@ -6,7 +6,7 @@
 		loadProjects,
 		submitCreate
 	} from '$modules/project/stores/project-hub.svelte.js';
-	import { SurfacePanel, SectionHeader, PrimaryButton, GhostButton, Input, PageHeader } from '$lib/components/ui/index.js';
+	import { SurfacePanel, SectionHeader, PrimaryButton, GhostButton, Input, PageHeader, EmptyStatePanel } from '$lib/components/ui/index.js';
 	import LibraryHeroCard from '$modules/project/components/LibraryHeroCard.svelte';
 	import LibraryHeroCardSkeleton from '$modules/project/components/LibraryHeroCardSkeleton.svelte';
 	import type { Project } from '$lib/db/types.js';
@@ -76,13 +76,14 @@
 			<LibraryHeroCardSkeleton />
 		</ul>
 	{:else if stories.length === 0}
-		<div class="empty-state">
-			<div class="empty-text-block">
-				<h2 class="empty-title">No stories yet.</h2>
-				<p class="empty-subtitle">Your short-form narratives will appear here.</p>
-			</div>
-			<PrimaryButton onclick={() => showCreate = true}>Create your first story</PrimaryButton>
-		</div>
+		<EmptyStatePanel
+			title="No stories yet."
+			description="Your short-form narratives will appear here."
+		>
+			{#snippet actions()}
+				<PrimaryButton onclick={() => showCreate = true}>Create your first story</PrimaryButton>
+			{/snippet}
+		</EmptyStatePanel>
 	{:else}
 		<ul class="stories-list" role="list" aria-label="Stories collection">
 			{#each stories as project, i (project.id)}
@@ -132,34 +133,5 @@
 		list-style: none;
 		padding: 0;
 		margin: 0;
-	}
-
-	.empty-state {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		min-height: 40vh;
-		text-align: center;
-		padding: var(--space-8);
-		background: var(--color-surface-ground);
-		border: 1px dashed var(--color-border-default);
-		border-radius: var(--radius-lg);
-	}
-
-	.empty-text-block {
-		margin-bottom: var(--space-6);
-	}
-
-	.empty-title {
-		font-family: var(--font-display);
-		font-size: var(--text-3xl);
-		font-weight: var(--font-weight-normal);
-		color: var(--color-text-primary);
-		margin: 0 0 var(--space-2);
-	}
-
-	.empty-subtitle {
-		color: var(--color-text-muted);
 	}
 </style>

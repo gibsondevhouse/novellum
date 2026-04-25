@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Chapter, Character, Project, Scene } from '$lib/db/types.js';
 	import AiPanel from '$lib/components/AiPanel.svelte';
-	import EmptyState from '$lib/components/EmptyState.svelte';
+	import EmptyStatePanel from '$lib/components/ui/EmptyStatePanel.svelte';
 	import { pushState } from '$app/navigation';
 	import { page } from '$app/state';
 	import { aiPanel } from '$lib/stores/ai-panel.svelte';
@@ -537,7 +537,7 @@
 			<div class="doc-list-meta">{data.scenes.length} scenes · {data.chapters.length} chapters</div>
 		</div>
 		{#if data.scenes.length === 0}
-			<EmptyState title="No scenes yet" />
+			<EmptyStatePanel title="No scenes yet." />
 		{:else}
 			<ul class="scene-list">
 				{#each data.scenes as scene (scene.id)}
@@ -608,7 +608,7 @@
 			</PageHeader>
 		</header>
 		{#if data.scenes.length === 0}
-			<EmptyState title="No scenes yet" description="Add one from the Outline." />
+			<EmptyStatePanel title="No scenes yet." description="Add one from the Outline." />
 		{:else}
 			<div class="editor-scroll">
 				<ManuscriptSurface

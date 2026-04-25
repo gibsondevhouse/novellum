@@ -2,7 +2,6 @@ export { default as AiPanel } from './AiPanel.svelte';
 export { default as AppHeader } from './AppHeader.svelte';
 export { default as AppSidebar } from './AppSidebar.svelte';
 export { default as Breadcrumb } from './Breadcrumb.svelte';
-export { default as EmptyState } from './EmptyState.svelte';
 export { default as ModelSelector } from './ModelSelector.svelte';
 export { default as OnboardingModal } from './OnboardingModal.svelte';
 export { default as SidebarSection } from './SidebarSection.svelte';
