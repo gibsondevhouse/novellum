@@ -9,7 +9,7 @@
 	import CollectionRow from '../modules/project/components/CollectionRow.svelte';
 	import BookCoverCard from '../modules/project/components/BookCoverCard.svelte';
 	import LibraryHeroCardSkeleton from '../modules/project/components/LibraryHeroCardSkeleton.svelte';
-	import { EmptyStatePanel, Button } from '$lib/components/ui/index.js';
+	import { EmptyStatePanel, Button, PageHeader } from '$lib/components/ui/index.js';
 
 	onMount(async () => {
 		await loadProjects();
@@ -37,17 +37,14 @@
 </svelte:head>
 
 <div class="library-hub">
-	<header class="library-spotlight" aria-labelledby="library-title">
+	<div class="library-spotlight">
 		<div class="library-spotlight__glow" aria-hidden="true"></div>
-		<div class="library-spotlight__content">
-			<p class="library-spotlight__eyebrow">Editorial Library</p>
-			<h1 id="library-title" class="library-spotlight__title">Home Library</h1>
-			<p class="library-spotlight__description">
-				A cinematic shelf of active drafts and completed manuscripts. Continue where you left
-				off or browse your full catalog.
-			</p>
-		</div>
-	</header>
+		<PageHeader
+			eyebrow="Editorial Library"
+			title="Home Library"
+			description="A cinematic shelf of active drafts and completed manuscripts. Continue where you left off or browse your full catalog."
+		/>
+	</div>
 
 	{#if getLoading()}
 		<ul class="collection-list" role="list" aria-label="Loading library">
@@ -100,7 +97,7 @@
 	.library-hub {
 		max-width: 1100px;
 		margin: 0 auto;
-		padding: var(--space-10) var(--panel-padding) var(--space-10);
+		padding: var(--space-10) 0;
 	}
 
 	.library-spotlight {
@@ -115,6 +112,25 @@
 		margin-bottom: var(--space-8);
 	}
 
+	.library-spotlight :global(.page-header) {
+		position: relative;
+		border-bottom: none;
+		padding-bottom: 0;
+	}
+
+	.library-spotlight :global(.page-header__heading) {
+		max-width: 56ch;
+	}
+
+	.library-spotlight :global(.page-header__eyebrow) {
+		color: var(--color-teal);
+		letter-spacing: var(--tracking-widest);
+	}
+
+	.library-spotlight :global(.page-header__description) {
+		color: var(--color-text-secondary);
+	}
+
 	.library-spotlight__glow {
 		position: absolute;
 		inset: -35% -20% auto;
@@ -123,35 +139,6 @@
 			radial-gradient(circle at 20% 30%, color-mix(in srgb, var(--color-nova-blue) 22%, transparent), transparent 44%),
 			radial-gradient(circle at 80% 0%, color-mix(in srgb, var(--color-teal) 14%, transparent), transparent 36%);
 		pointer-events: none;
-	}
-
-	.library-spotlight__content {
-		position: relative;
-		max-width: 56ch;
-		display: grid;
-		gap: var(--space-3);
-	}
-
-	.library-spotlight__eyebrow {
-		margin: 0;
-		font-size: var(--text-xs);
-		letter-spacing: var(--tracking-widest);
-		text-transform: uppercase;
-		color: var(--color-teal);
-	}
-
-	.library-spotlight__title {
-		margin: 0;
-		font-family: var(--font-display);
-		font-size: clamp(var(--text-3xl), 4.2vw, var(--text-5xl));
-		line-height: 1.05;
-		color: var(--color-text-primary);
-	}
-
-	.library-spotlight__description {
-		margin: 0;
-		color: var(--color-text-secondary);
-		line-height: var(--leading-relaxed);
 	}
 
 	.library-collections {

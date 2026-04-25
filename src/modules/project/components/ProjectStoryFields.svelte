@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { ProjectDraft } from '../types/project-draft.js';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 
 	let {
 		draft,
@@ -46,7 +47,7 @@
 
 	<!-- Synopsis toggle -->
 	{#if !showSynopsis}
-		<button
+		<GhostButton
 			type="button"
 			class="disclosure-toggle"
 			onclick={toggleSynopsis}
@@ -55,14 +56,18 @@
 		>
 			<span class="toggle-icon" aria-hidden="true">+</span>
 			Add synopsis
-		</button>
+		</GhostButton>
 	{:else}
 		<div id="synopsis-region" class="field synopsis-field" role="region" aria-label="Synopsis">
 			<div class="label-row">
 				<label class="label" for="create-synopsis">Synopsis</label>
-				<button type="button" class="disclosure-toggle collapse-btn" onclick={toggleSynopsis}>
+				<GhostButton
+					type="button"
+					class="disclosure-toggle collapse-btn"
+					onclick={toggleSynopsis}
+				>
 					<span aria-hidden="true">−</span> Collapse
-				</button>
+				</GhostButton>
 			</div>
 			<textarea
 				id="create-synopsis"
@@ -133,7 +138,7 @@
 		line-height: var(--leading-normal);
 	}
 
-	.disclosure-toggle {
+	:global(.disclosure-toggle) {
 		display: inline-flex;
 		align-items: center;
 		gap: var(--space-1);
@@ -148,11 +153,11 @@
 		align-self: flex-start;
 	}
 
-	.disclosure-toggle:hover {
+	:global(.disclosure-toggle:hover) {
 		color: var(--color-text-primary);
 	}
 
-	.disclosure-toggle:focus-visible {
+	:global(.disclosure-toggle:focus-visible) {
 		outline: 2px solid var(--color-border-focus);
 		outline-offset: 2px;
 		border-radius: var(--radius-xs);
@@ -167,7 +172,7 @@
 		animation: slide-down var(--duration-enter) var(--ease-editorial) both;
 	}
 
-	.collapse-btn {
+	:global(.collapse-btn) {
 		font-size: var(--text-xs);
 		color: var(--color-text-muted);
 	}

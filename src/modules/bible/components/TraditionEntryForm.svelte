@@ -175,191 +175,95 @@
 	}
 </script>
 
-<div class="archive-form">
-	<section class="archive-section">
+<div class="dossier-form">
+	<section class="dossier-form-section">
 		<h3>Core Identity</h3>
-		<div class="archive-grid archive-grid--double">
-			<div class="archive-field">
-				<label class="archive-label" for="tradition-name">Name <span aria-hidden="true">*</span></label>
-				<input id="tradition-name" class="archive-input" class:archive-input-error={!!nameError} type="text" bind:value={name} />
-				{#if nameError}<p class="archive-error-text">{nameError}</p>{/if}
+		<div class="dossier-form-grid dossier-form-grid--double">
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="tradition-name">Name <span aria-hidden="true">*</span></label>
+				<input id="tradition-name" class="dossier-form-input" class:dossier-form-input-error={!!nameError} type="text" bind:value={name} />
+				{#if nameError}<p class="dossier-form-error-text">{nameError}</p>{/if}
 			</div>
-			<div class="archive-field">
-				<label class="archive-label" for="tradition-type">Type <span aria-hidden="true">*</span></label>
-				<select id="tradition-type" class="archive-input" class:archive-input-error={!!typeError} bind:value={traditionType}>
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="tradition-type">Type <span aria-hidden="true">*</span></label>
+				<select id="tradition-type" class="dossier-form-input" class:dossier-form-input-error={!!typeError} bind:value={traditionType}>
 					<option value="">Select tradition type</option>
 					{#each TRADITION_TYPES as option (option.value)}
 						<option value={option.value}>{option.label}</option>
 					{/each}
 				</select>
-				{#if typeError}<p class="archive-error-text">{typeError}</p>{/if}
+				{#if typeError}<p class="dossier-form-error-text">{typeError}</p>{/if}
 			</div>
 		</div>
 	</section>
 
-	<section class="archive-section">
+	<section class="dossier-form-section">
 		<h3>Practice</h3>
-		<div class="archive-field">
-			<label class="archive-label" for="tradition-description">Description</label>
-			<textarea id="tradition-description" class="archive-input archive-textarea" rows={3} bind:value={description}></textarea>
+		<div class="dossier-form-field">
+			<label class="dossier-form-label" for="tradition-description">Description</label>
+			<textarea id="tradition-description" class="dossier-form-input dossier-form-textarea" rows={3} bind:value={description}></textarea>
 		</div>
-		<div class="archive-grid archive-grid--double">
-			<div class="archive-field">
-				<label class="archive-label" for="tradition-when">When It Occurs</label>
-				<input id="tradition-when" class="archive-input" type="text" bind:value={whenItOccurs} />
+		<div class="dossier-form-grid dossier-form-grid--double">
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="tradition-when">When It Occurs</label>
+				<input id="tradition-when" class="dossier-form-input" type="text" bind:value={whenItOccurs} />
 			</div>
-			<div class="archive-field">
-				<label class="archive-label" for="tradition-participants">Participants</label>
-				<input id="tradition-participants" class="archive-input" type="text" bind:value={participants} />
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="tradition-participants">Participants</label>
+				<input id="tradition-participants" class="dossier-form-input" type="text" bind:value={participants} />
 			</div>
 		</div>
 	</section>
 
-	<section class="archive-section">
+	<section class="dossier-form-section">
 		<h3>Meaning</h3>
-		<div class="archive-field">
-			<label class="archive-label" for="tradition-intended">Intended Meaning</label>
-			<textarea id="tradition-intended" class="archive-input archive-textarea" rows={3} bind:value={intendedMeaning}></textarea>
+		<div class="dossier-form-field">
+			<label class="dossier-form-label" for="tradition-intended">Intended Meaning</label>
+			<textarea id="tradition-intended" class="dossier-form-input dossier-form-textarea" rows={3} bind:value={intendedMeaning}></textarea>
 		</div>
-		<div class="archive-field">
-			<label class="archive-label" for="tradition-actual">Actual Function <span class="archive-hint">(optional)</span></label>
-			<textarea id="tradition-actual" class="archive-input archive-textarea" rows={3} bind:value={actualFunction}></textarea>
+		<div class="dossier-form-field">
+			<label class="dossier-form-label" for="tradition-actual">Actual Function <span class="dossier-form-hint">(optional)</span></label>
+			<textarea id="tradition-actual" class="dossier-form-input dossier-form-textarea" rows={3} bind:value={actualFunction}></textarea>
 		</div>
 	</section>
 
-	<section class="archive-section">
+	<section class="dossier-form-section">
 		<h3>Narrative Function</h3>
-		<div class="archive-field">
-			<label class="archive-label" for="tradition-use">Use in Story</label>
-			<textarea id="tradition-use" class="archive-input archive-textarea" class:archive-input-error={!!useError} rows={3} bind:value={useInStory}></textarea>
-			{#if useError}<p class="archive-error-text">{useError}</p>{/if}
+		<div class="dossier-form-field">
+			<label class="dossier-form-label" for="tradition-use">Use in Story</label>
+			<textarea id="tradition-use" class="dossier-form-input dossier-form-textarea" class:dossier-form-input-error={!!useError} rows={3} bind:value={useInStory}></textarea>
+			{#if useError}<p class="dossier-form-error-text">{useError}</p>{/if}
 		</div>
-		<div class="archive-field">
-			<label class="archive-label" for="tradition-tone">Emotional Tone</label>
-			<input id="tradition-tone" class="archive-input" type="text" bind:value={emotionalTone} />
+		<div class="dossier-form-field">
+			<label class="dossier-form-label" for="tradition-tone">Emotional Tone</label>
+			<input id="tradition-tone" class="dossier-form-input" type="text" bind:value={emotionalTone} />
 		</div>
 	</section>
 
-	<section class="archive-section">
+	<section class="dossier-form-section">
 		<h3>Relationships</h3>
-		<div class="archive-grid archive-grid--double">
-			<div class="archive-field">
-				<label class="archive-label" for="tradition-realm-ids">Realm IDs</label>
-				<input id="tradition-realm-ids" class="archive-input" type="text" bind:value={realmIdsRaw} />
+		<div class="dossier-form-grid dossier-form-grid--double">
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="tradition-realm-ids">Realm IDs</label>
+				<input id="tradition-realm-ids" class="dossier-form-input" type="text" bind:value={realmIdsRaw} />
 			</div>
-			<div class="archive-field">
-				<label class="archive-label" for="tradition-character-ids">Character IDs</label>
-				<input id="tradition-character-ids" class="archive-input" type="text" bind:value={characterIdsRaw} />
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="tradition-character-ids">Character IDs</label>
+				<input id="tradition-character-ids" class="dossier-form-input" type="text" bind:value={characterIdsRaw} />
 			</div>
-			<div class="archive-field">
-				<label class="archive-label" for="tradition-faction-ids">Faction IDs</label>
-				<input id="tradition-faction-ids" class="archive-input" type="text" bind:value={factionIdsRaw} />
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="tradition-faction-ids">Faction IDs</label>
+				<input id="tradition-faction-ids" class="dossier-form-input" type="text" bind:value={factionIdsRaw} />
 			</div>
-			<div class="archive-field">
-				<label class="archive-label" for="tradition-thread-ids">Thread IDs</label>
-				<input id="tradition-thread-ids" class="archive-input" type="text" bind:value={threadIdsRaw} />
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="tradition-thread-ids">Thread IDs</label>
+				<input id="tradition-thread-ids" class="dossier-form-input" type="text" bind:value={threadIdsRaw} />
 			</div>
 		</div>
 	</section>
 
-	<div class="archive-actions">
+	<div class="dossier-form-actions">
 		<GhostButton onclick={onCancel} disabled={saving}>Cancel</GhostButton>
 		<PrimaryButton onclick={handleSubmit} disabled={saving}>{saving ? 'Saving…' : entry ? 'Save Tradition' : 'Create Tradition'}</PrimaryButton>
 	</div>
 </div>
-
-<style>
-	.archive-form {
-		display: grid;
-		gap: var(--space-6);
-	}
-
-	.archive-section {
-		display: grid;
-		gap: var(--space-4);
-		padding-top: var(--space-4);
-		border-top: 1px solid color-mix(in srgb, var(--color-border-subtle) 65%, transparent);
-	}
-
-	h3 {
-		margin: 0;
-		font-size: var(--text-xs);
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
-		color: var(--color-text-muted);
-		font-weight: var(--font-weight-semibold);
-	}
-
-	.archive-grid {
-		display: grid;
-		gap: var(--space-4);
-	}
-
-	.archive-grid--double {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-
-	.archive-field {
-		display: grid;
-		gap: var(--space-2);
-	}
-
-	.archive-label {
-		font-size: var(--text-xs);
-		letter-spacing: 0.03em;
-		color: var(--color-text-muted);
-		font-weight: var(--font-weight-medium);
-	}
-
-	.archive-hint {
-		font-weight: var(--font-weight-normal);
-		color: var(--color-text-muted);
-	}
-
-	.archive-input {
-		width: 100%;
-		padding: 0.2rem 0.25rem;
-		border: 1px solid transparent;
-		border-radius: var(--radius-sm);
-		background: transparent;
-		color: var(--color-text-primary);
-		font: inherit;
-	}
-
-	.archive-input:hover {
-		border-color: color-mix(in srgb, var(--color-border-subtle) 75%, transparent);
-	}
-
-	.archive-input:focus {
-		outline: none;
-		border-color: color-mix(in srgb, var(--color-nova-blue) 45%, var(--color-border-default));
-		background: color-mix(in srgb, var(--color-surface-overlay) 35%, transparent);
-	}
-
-	.archive-textarea {
-		min-height: 6rem;
-		resize: vertical;
-	}
-
-	.archive-input-error {
-		border-color: var(--color-error);
-	}
-
-	.archive-error-text {
-		margin: 0;
-		font-size: var(--text-xs);
-		color: var(--color-error-on-dark);
-	}
-
-	.archive-actions {
-		display: flex;
-		justify-content: flex-end;
-		gap: var(--space-3);
-	}
-
-	@media (max-width: 860px) {
-		.archive-grid--double {
-			grid-template-columns: 1fr;
-		}
-	}
-</style>

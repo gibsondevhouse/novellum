@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { ProjectDraft } from '../types/project-draft.js';
 	import { GENRE_SUGGESTIONS } from '../constants.js';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 
 	let {
 		draft,
@@ -87,11 +88,11 @@
 				{#each draft.genre as tag (tag)}
 					<span class="tag" role="listitem">
 						{tag}
-						<button
+						<GhostButton
 							type="button"
 							class="tag-remove"
 							onclick={() => removeGenre(tag)}
-							aria-label="Remove {tag}">✕</button
+							aria-label="Remove {tag}">✕</GhostButton
 						>
 					</span>
 				{/each}
@@ -200,7 +201,7 @@
 		border-radius: var(--radius-full);
 	}
 
-	.tag-remove {
+	:global(.tag-remove) {
 		background: none;
 		border: none;
 		cursor: pointer;
@@ -213,7 +214,7 @@
 		align-items: center;
 	}
 
-	.tag-remove:hover {
+	:global(.tag-remove:hover) {
 		opacity: 1;
 	}
 

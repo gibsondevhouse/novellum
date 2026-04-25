@@ -11,6 +11,7 @@
 	} from '../stores/consistency-store.svelte.js';
 	import IssueGroup from './IssueGroup.svelte';
 	import { ISSUE_TYPES } from '../constants.js';
+	import { SurfacePanel } from '$lib/components/ui/index.js';
 
 	let { projectId }: { projectId: string } = $props();
 
@@ -37,7 +38,7 @@
 	});
 </script>
 
-<div class="consistency-panel">
+<SurfacePanel class="consistency-panel">
 	<div class="panel-hero" aria-labelledby="consistency-title">
 		<div class="panel-toolbar">
 			<div>
@@ -89,16 +90,13 @@
 			{/each}
 		</div>
 	{/if}
-</div>
+</SurfacePanel>
 
 <style>
-	.consistency-panel {
-		padding: var(--space-5);
+	:global(.consistency-panel) {
 		max-width: 960px;
 		display: grid;
 		gap: var(--space-5);
-		border: 1px solid var(--color-border-subtle);
-		border-radius: var(--radius-xl);
 		background: linear-gradient(165deg, var(--color-surface-overlay), var(--color-surface-ground));
 	}
 

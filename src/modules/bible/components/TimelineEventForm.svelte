@@ -4,6 +4,7 @@
 	import type { EntityFormCallbacks } from '../types.js';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
+	import { SurfacePanel } from '$lib/components/ui/index.js';
 
 	let {
 		event = null,
@@ -46,7 +47,7 @@
 	}
 </script>
 
-<div class="form-panel">
+<SurfacePanel class="form-panel">
 	<div class="field">
 		<label class="label" for="te-title">Title <span aria-hidden="true">*</span></label>
 		<input
@@ -96,7 +97,7 @@
 			{saving ? 'Saving…' : event ? 'Save Changes' : 'Create Event'}
 		</PrimaryButton>
 	</div>
-</div>
+</SurfacePanel>
 
 <style>
 	.check-list {

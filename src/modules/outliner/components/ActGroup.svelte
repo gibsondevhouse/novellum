@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Act, Chapter, Scene } from '$lib/db/types.js';
 	import type { ChapterWithScenes } from '$modules/outliner/types.js';
+	import { GhostButton } from '$lib/components/ui/index.js';
 	import ChapterGroup from './ChapterGroup.svelte';
 	import AddChapterForm from './AddChapterForm.svelte';
 
@@ -43,16 +44,18 @@
 
 <div class="act-group" role="group" aria-label={act.title}>
 	<div class="act-header">
-		<button
+		<GhostButton
 			class="act-expand-btn"
+			type="button"
 			onclick={() => (expanded = !expanded)}
 			onkeydown={handleHeaderKeydown}
 			aria-label="{expanded ? 'Collapse' : 'Expand'} act"
 		>
 			<span class="act-chevron" aria-hidden="true">{expanded ? '▾' : '▸'}</span>
-		</button>
-		<button
+		</GhostButton>
+		<GhostButton
 			class="act-select-btn"
+			type="button"
 			onclick={() => onSelectAct(act)}
 			aria-label="Select act: {act.title}"
 		>
@@ -60,7 +63,7 @@
 			{#if chapters.length > 0}
 				<span class="act-badge">{chapters.length}</span>
 			{/if}
-		</button>
+		</GhostButton>
 	</div>
 
 	{#if expanded}
@@ -101,7 +104,7 @@
 		padding: var(--space-1) var(--space-2);
 	}
 
-	.act-expand-btn {
+	:global(.act-expand-btn) {
 		background: none;
 		border: none;
 		cursor: pointer;
@@ -111,11 +114,11 @@
 		transition: color var(--duration-fast) var(--ease-standard);
 	}
 
-	.act-expand-btn:hover {
+	:global(.act-expand-btn:hover) {
 		color: var(--color-text-secondary);
 	}
 
-	.act-expand-btn:focus-visible {
+	:global(.act-expand-btn:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}
@@ -124,7 +127,7 @@
 		font-size: var(--text-xs);
 	}
 
-	.act-select-btn {
+	:global(.act-select-btn) {
 		flex: 1;
 		background: none;
 		border: none;
@@ -138,11 +141,11 @@
 		transition: background var(--duration-fast) var(--ease-standard);
 	}
 
-	.act-select-btn:hover {
+	:global(.act-select-btn:hover) {
 		background: color-mix(in srgb, var(--color-text-primary) 5%, transparent);
 	}
 
-	.act-select-btn:focus-visible {
+	:global(.act-select-btn:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}

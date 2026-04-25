@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { GhostButton } from '$lib/components/ui/index.js';
 
 	let { beat, onSave, onClose } = $props<{
 		beat: { id: string; title: string; notes?: string };
@@ -47,15 +48,16 @@
 		rows="4"
 	></textarea>
 	<div class="overlay-actions">
-		<button
+		<GhostButton
 			class="btn-save"
+			type="button"
 			onclick={() => {
 				onSave(draft.trim() || beat.title);
 				onClose();
 			}}
 		>
 			Save
-		</button>
+		</GhostButton>
 	</div>
 </div>
 
@@ -99,7 +101,7 @@
 		justify-content: flex-end;
 	}
 
-	.btn-save {
+	:global(.btn-save) {
 		background: var(--color-nova-blue);
 		color: white;
 		border: none;
@@ -111,11 +113,11 @@
 		transition: opacity var(--duration-fast) var(--ease-standard);
 	}
 
-	.btn-save:hover {
+	:global(.btn-save:hover) {
 		opacity: 0.85;
 	}
 
-	.btn-save:focus-visible {
+	:global(.btn-save:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}

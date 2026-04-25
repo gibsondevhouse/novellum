@@ -1,5 +1,6 @@
 <script lang="ts">
 	import CharacterSelect from '$modules/bible/components/CharacterSelect.svelte';
+	import { GhostButton, SectionHeader } from '$lib/components/ui/index.js';
 
 	type CharacterOption = {
 		id: string;
@@ -103,13 +104,14 @@
 	}
 </script>
 
-<section class="dossier-section" aria-labelledby="relationships-title">
-	<div class="section-header">
-		<h3 id="relationships-title" class="section-title">Relationships</h3>
-		<button type="button" class="collapse-toggle" aria-expanded={!isCollapsed} aria-controls="relationships-content" onclick={() => (isCollapsed = !isCollapsed)}>
-			{isCollapsed ? 'Expand' : 'Collapse'}
-		</button>
-	</div>
+<section class="dossier-section" aria-label="Relationships">
+	<SectionHeader title="Relationships" class="dossier-section-header">
+		{#snippet actions()}
+			<GhostButton type="button" class="collapse-toggle" aria-expanded={!isCollapsed} aria-controls="relationships-content" onclick={() => (isCollapsed = !isCollapsed)}>
+				{isCollapsed ? 'Expand' : 'Collapse'}
+			</GhostButton>
+		{/snippet}
+	</SectionHeader>
 	{#if !isCollapsed}
 		<div id="relationships-content">
 			{#if availableTargets.length === 0}
@@ -117,7 +119,9 @@
 			{:else}
 				<div class="create-row">
 					{#if !isCreating}
-						<button type="button" class="create-button" onclick={beginCreate}>Add Relationship</button>
+						<GhostButton type="button" class="create-button" onclick={beginCreate}
+							>Add Relationship</GhostButton
+						>
 					{:else}
 						<div class="create-form">
 							<CharacterSelect
@@ -147,8 +151,12 @@
 								<p class="form-error">{formError}</p>
 							{/if}
 							<div class="create-actions">
-								<button type="button" class="create-button" onclick={saveNewRelationship}>Save</button>
-								<button type="button" class="secondary-button" onclick={cancelCreate}>Cancel</button>
+								<GhostButton type="button" class="create-button" onclick={saveNewRelationship}
+									>Save</GhostButton
+								>
+								<GhostButton type="button" class="secondary-button" onclick={cancelCreate}
+									>Cancel</GhostButton
+								>
 							</div>
 						</div>
 					{/if}
@@ -182,7 +190,9 @@
 								/>
 								<input class="rel-type input-inline" type="text" list="relationship-type-options" value={rel.relationshipType || ''} oninput={(event) => onRelationshipFieldChange(index, 'relationshipType', (event.currentTarget as HTMLInputElement).value)} placeholder="Relationship type" />
 								<input class="rel-status input-inline" type="text" list="relationship-status-options" value={rel.status || ''} oninput={(event) => onRelationshipFieldChange(index, 'status', (event.currentTarget as HTMLInputElement).value)} placeholder="Status" />
-								<button type="button" class="secondary-button" aria-label={`Remove relationship with ${resolveCharacterName(rel.targetCharacterId)}`} onclick={() => onRemoveRelationship(index)}>Remove</button>
+								<GhostButton type="button" class="secondary-button" aria-label={`Remove relationship with ${resolveCharacterName(rel.targetCharacterId)}`} onclick={() => onRemoveRelationship(index)}
+									>Remove</GhostButton
+								>
 							</div>
 							<textarea class="rel-note input-inline" rows="2" value={rel.notes || ''} oninput={(event) => onRelationshipFieldChange(index, 'notes', (event.currentTarget as HTMLTextAreaElement).value)} placeholder="Relationship note"></textarea>
 						</div>
@@ -204,8 +214,7 @@
 		border-top: 1px solid color-mix(in srgb, var(--color-border-subtle) 65%, transparent);
 	}
 
-	.section-title {
-		margin: 0;
+	:global(.dossier-section-header .title) {
 		font-size: var(--text-xs);
 		font-weight: var(--font-weight-semibold);
 		color: var(--color-text-muted);
@@ -213,14 +222,7 @@
 		letter-spacing: 0.08em;
 	}
 
-	.section-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		gap: var(--space-3);
-	}
-
-	.collapse-toggle {
+	:global(.collapse-toggle) {
 		border: 1px solid color-mix(in srgb, var(--color-border-subtle) 70%, transparent);
 		background: transparent;
 		color: var(--color-text-muted);
@@ -256,8 +258,8 @@
 		gap: var(--space-2);
 	}
 
-	.create-button,
-	.secondary-button {
+	:global(.create-button),
+	:global(.secondary-button) {
 		border: 1px solid color-mix(in srgb, var(--color-border-default) 75%, transparent);
 		background: transparent;
 		padding: 0.25rem 0.6rem;
@@ -267,7 +269,7 @@
 		color: var(--color-text-primary);
 	}
 
-	.secondary-button {
+	:global(.secondary-button) {
 		color: var(--color-text-muted);
 	}
 

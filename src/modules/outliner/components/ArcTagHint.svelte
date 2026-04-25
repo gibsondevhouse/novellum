@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { GhostButton } from '$lib/components/ui/index.js';
 	import type { ArcRef } from '$lib/db/types.js';
 
 	let { arcRefs, onAddRef } = $props<{
@@ -17,9 +18,9 @@
 			{/each}
 		</div>
 	{:else}
-		<button class="hint-btn" onclick={onAddRef} aria-label="Add arc tag" type="button">
+		<GhostButton class="hint-btn" onclick={onAddRef} aria-label="Add arc tag" type="button">
 			+ Add arc tag
-		</button>
+		</GhostButton>
 	{/if}
 </div>
 
@@ -45,26 +46,23 @@
 		padding: 1px var(--space-2);
 	}
 
-	.hint-btn {
-		background: none;
+	:global(.hint-btn) {
 		border: 1px dashed var(--color-border-subtle);
-		border-radius: var(--radius-sm);
 		color: var(--color-text-muted);
 		font-size: var(--text-xs);
 		font-family: inherit;
-		cursor: pointer;
 		padding: var(--space-1) var(--space-2);
 		transition:
 			border-color 0.1s,
 			color 0.1s;
 	}
 
-	.hint-btn:hover {
+	:global(.hint-btn:hover) {
 		border-color: var(--color-border-default);
 		color: var(--color-text-secondary);
 	}
 
-	.hint-btn:focus-visible {
+	:global(.hint-btn:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}

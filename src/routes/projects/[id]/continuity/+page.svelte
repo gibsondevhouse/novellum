@@ -3,6 +3,7 @@
 	import PromptEditor from '$modules/continuity/components/PromptEditor.svelte';
 	import EmptyStatePanel from '$lib/components/ui/EmptyStatePanel.svelte';
 	import SurfacePanel from '$lib/components/ui/SurfacePanel.svelte';
+	import PageHeader from '$lib/components/ui/PageHeader.svelte';
 	import { getOpenCount } from '$modules/consistency/stores/consistency-store.svelte.js';
 	import type { Project } from '$lib/db/types';
 
@@ -27,27 +28,26 @@
 </svelte:head>
 
 <div class="continuity">
-	<section class="continuity-hero" aria-labelledby="continuity-title">
-		<div>
-			<p class="continuity-hero__eyebrow">Continuity Command</p>
-			<h1 id="continuity-title">Narrative Triage Center</h1>
-			<p>
-				Review structural issues, tune project-level constraints, and keep interventions grounded in verified context.
-			</p>
-		</div>
-		<SurfacePanel>
-			<div class="continuity-hero__metrics" aria-label="Continuity snapshot">
-				<div>
-					<span class="metric-label">Open Issues</span>
-					<strong>{getOpenCount()}</strong>
+	<PageHeader
+		eyebrow="Continuity Command"
+		title="Narrative Triage Center"
+		description="Review structural issues, tune project-level constraints, and keep interventions grounded in verified context."
+	>
+		{#snippet meta()}
+			<SurfacePanel>
+				<div class="continuity-hero__metrics" aria-label="Continuity snapshot">
+					<div>
+						<span class="metric-label">Open Issues</span>
+						<strong>{getOpenCount()}</strong>
+					</div>
+					<div>
+						<span class="metric-label">Active View</span>
+						<strong>{activeTabLabel}</strong>
+					</div>
 				</div>
-				<div>
-					<span class="metric-label">Active View</span>
-					<strong>{activeTabLabel}</strong>
-				</div>
-			</div>
-		</SurfacePanel>
-	</section>
+			</SurfacePanel>
+		{/snippet}
+	</PageHeader>
 
 	<div class="tab-bar" aria-label="Continuity sections">
 		<button
@@ -113,39 +113,6 @@
 		gap: var(--space-5);
 	}
 
-	.continuity-hero {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
-		gap: var(--space-4);
-		align-items: stretch;
-	}
-
-	.continuity-hero__eyebrow,
-	.continuity-hero h1,
-	.continuity-hero p,
-	.styles-panel h2,
-	.styles-panel p {
-		margin: 0;
-	}
-
-	.continuity-hero__eyebrow {
-		font-size: var(--text-xs);
-		letter-spacing: var(--tracking-wide);
-		text-transform: uppercase;
-		color: var(--color-text-muted);
-	}
-
-	.continuity-hero h1 {
-		font-size: var(--text-2xl);
-		margin-top: var(--space-1);
-	}
-
-	.continuity-hero p {
-		margin-top: var(--space-2);
-		color: var(--color-text-secondary);
-		max-width: 64ch;
-	}
-
 	.continuity-hero__metrics {
 		display: grid;
 		gap: var(--space-3);
@@ -169,14 +136,21 @@
 		gap: var(--space-4);
 	}
 
+	.styles-panel h2,
+	.styles-panel p {
+		margin: 0;
+	}
+
 	.styles-panel p {
 		color: var(--color-text-secondary);
 	}
+
 	.tab-bar {
 		display: flex;
 		gap: var(--space-1);
 		border-bottom: 1px solid var(--color-border-default);
 	}
+
 	.tab {
 		padding: var(--space-2) var(--space-4);
 		font-size: var(--text-sm);
@@ -200,11 +174,5 @@
 	.tab.active {
 		color: var(--color-text-primary);
 		border-bottom-color: var(--color-teal);
-	}
-
-	@media (max-width: 900px) {
-		.continuity-hero {
-			grid-template-columns: 1fr;
-		}
 	}
 </style>

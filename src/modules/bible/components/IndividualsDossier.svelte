@@ -191,9 +191,8 @@
 						<ul class="persona-list" aria-label="Individuals roster">
 							{#each personaList as character (character.id)}
 								<li>
-									<button
-										class:persona-list__item--active={selectedCharacter?.id === character.id}
-										class="persona-list__item"
+									<GhostButton
+										class={`persona-list__item ${selectedCharacter?.id === character.id ? 'persona-list__item--active' : ''}`}
 										type="button"
 										onclick={() => selectCharacter(character.id)}
 										aria-current={selectedCharacter?.id === character.id ? 'true' : undefined}
@@ -209,7 +208,7 @@
 											<strong>{character.name}</strong>
 											<span>{getLineageTag(character)}</span>
 										</div>
-									</button>
+									</GhostButton>
 								</li>
 							{/each}
 						</ul>
@@ -559,7 +558,7 @@
 		gap: 0.35rem;
 	}
 
-	.persona-list__item {
+	:global(.persona-list__item) {
 		width: 100%;
 		padding: 0.8rem 0.9rem;
 		border: 1px solid transparent;
@@ -578,14 +577,14 @@
 			transform var(--duration-fast) var(--ease-standard);
 	}
 
-	.persona-list__item:hover,
-	.persona-list__item:focus-visible {
+	:global(.persona-list__item:hover),
+	:global(.persona-list__item:focus-visible) {
 		background: var(--color-surface-overlay);
 		border-color: color-mix(in srgb, var(--color-nova-blue) 22%, transparent);
 		transform: none;
 	}
 
-	.persona-list__item--active {
+	:global(.persona-list__item--active) {
 		background: color-mix(in srgb, var(--color-nova-blue) 10%, var(--color-surface-overlay));
 		border-color: color-mix(in srgb, var(--color-nova-blue) 35%, var(--color-border-default));
 		box-shadow: var(--shadow-xs);

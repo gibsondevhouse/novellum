@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { WorkspaceShell, WorkspaceHero } from '$lib/components/ui/index.js';
 
 	const arcLabel = $derived((page.params.arcId || 'arc').replace(/[-_]+/g, ' '));
 </script>
@@ -8,61 +9,30 @@
 	<title>Arc Workspace — Novellum</title>
 </svelte:head>
 
-<div class="future-shell">
-	<section class="future-hero" aria-labelledby="arc-detail-title">
-		<p class="future-eyebrow">Arc Workspace</p>
-		<h1 id="arc-detail-title">{arcLabel}</h1>
-		<p>
-			This arc workspace is being prepared. Continue refining thread records and continuity signals while planner controls are finalized.
-		</p>
-		<div class="future-actions">
-			<a class="future-primary" href="/projects/{page.params.id}/world-building/plot-threads">Back to Threads</a>
-			<a class="future-secondary" href="/projects/{page.params.id}/continuity">Open Continuity</a>
+<WorkspaceShell mainLabel="Arc workspace placeholder">
+	{#snippet hero()}
+		<WorkspaceHero
+			eyebrow="Arc Workspace"
+			title={arcLabel}
+			description="This arc workspace is being prepared. Continue refining thread records and continuity signals while planner controls are finalized."
+		>
+			{#snippet actions()}
+				<div class="future-actions">
+					<a class="future-primary" href="/projects/{page.params.id}/world-building/plot-threads">Back to Threads</a>
+					<a class="future-secondary" href="/projects/{page.params.id}/continuity">Open Continuity</a>
+				</div>
+			{/snippet}
+		</WorkspaceHero>
+	{/snippet}
+
+	{#snippet main()}
+		<div class="future-placeholder" aria-live="polite">
+			<p>Arc-level planner controls will land here.</p>
 		</div>
-	</section>
-</div>
+	{/snippet}
+</WorkspaceShell>
 
 <style>
-	.future-shell {
-		padding: var(--space-6) 0 var(--space-10);
-	}
-
-	.future-hero {
-		display: grid;
-		gap: var(--space-3);
-		padding: var(--space-6);
-		border: 1px solid var(--color-border-subtle);
-		border-radius: var(--radius-xl);
-		background:
-			radial-gradient(circle at 80% 24%, color-mix(in srgb, var(--color-teal) 14%, transparent), transparent 42%),
-			linear-gradient(165deg, var(--color-surface-overlay), var(--color-surface-ground));
-	}
-
-	.future-eyebrow,
-	.future-hero h1,
-	.future-hero p {
-		margin: 0;
-	}
-
-	.future-eyebrow {
-		font-size: var(--text-xs);
-		text-transform: uppercase;
-		letter-spacing: var(--tracking-widest);
-		color: var(--color-text-muted);
-	}
-
-	.future-hero h1 {
-		font-size: clamp(1.4rem, 1.6vw + 1rem, 2rem);
-		text-transform: capitalize;
-	}
-
-	.future-hero p {
-		max-width: 60ch;
-		font-size: var(--text-sm);
-		line-height: var(--leading-relaxed);
-		color: var(--color-text-secondary);
-	}
-
 	.future-actions {
 		display: flex;
 		gap: var(--space-3);
@@ -86,7 +56,7 @@
 		color: var(--color-text-primary);
 		border: 1px solid color-mix(in srgb, var(--color-nova-blue) 45%, var(--color-border-default));
 		background: color-mix(in srgb, var(--color-nova-blue) 18%, transparent);
- 	}
+	}
 
 	.future-secondary {
 		color: var(--color-text-secondary);
@@ -104,5 +74,19 @@
 	.future-secondary:focus-visible {
 		outline: none;
 		box-shadow: var(--focus-ring);
+	}
+
+	.future-placeholder {
+		width: 100%;
+		padding: var(--space-6);
+		border-radius: var(--radius-lg);
+		border: 1px dashed var(--color-border-default);
+		background: color-mix(in srgb, var(--color-surface-overlay) 70%, transparent);
+		color: var(--color-text-secondary);
+		font-size: var(--text-sm);
+	}
+
+	.future-placeholder p {
+		margin: 0;
 	}
 </style>

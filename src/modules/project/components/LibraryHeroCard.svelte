@@ -60,7 +60,7 @@
 </script>
 
 <li class="library-card" style="--card-index: {cardIndex}">
-	<a class="library-card__button" href={cardHref} aria-label="{cardActionLabel} {title}">
+	<a class="library-card__button" href={cardHref} aria-label="{cardActionLabel} {title}" style="text-decoration: none;">
 		<div
 			class="library-card__cover"
 			style="--cover-a: {palette.a}; --cover-b: {palette.b};"
@@ -112,21 +112,16 @@
 		align-items: stretch;
 		gap: var(--space-5);
 		padding: var(--space-5);
-		border: 1px solid var(--color-border-subtle);
-		border-radius: var(--radius-lg);
+		cursor: pointer;
+		text-align: left;
+		color: inherit;
+		transition:
+			transform var(--duration-base) var(--ease-standard);
 		background: linear-gradient(
 			145deg,
 			var(--color-surface-raised) 0%,
 			var(--color-surface-overlay) 100%
 		);
-		box-shadow: var(--shadow-sm);
-		cursor: pointer;
-		text-align: left;
-		color: inherit;
-		transition:
-			border-color var(--duration-base) var(--ease-standard),
-			transform var(--duration-base) var(--ease-standard),
-			box-shadow var(--duration-base) var(--ease-standard);
 	}
 
 	.library-card__button:hover {

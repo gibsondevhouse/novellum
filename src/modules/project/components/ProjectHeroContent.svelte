@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import type { Project } from '$lib/db/types.js';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	import { submitUpdate } from '../stores/project-hub.svelte.ts';
 
 	let { project }: { project: Project } = $props();
@@ -64,18 +65,19 @@
 		<!-- Controls: ✓/✕ when editing, pencil hint when not -->
 		{#if editingField}
 			<div class="hero-controls">
-				<button
+				<GhostButton
 					class="hero-ctrl hero-ctrl--confirm"
+					type="button"
 					onclick={confirmEdit}
 					aria-label="Save changes"
-					title="Save">✓</button
+					title="Save">✓</GhostButton
 				>
-				<button
+				<GhostButton
 					class="hero-ctrl hero-ctrl--cancel"
+					type="button"
 					onclick={cancelEdit}
 					aria-label="Cancel editing"
-					title="Cancel">✕</button
-				>
+					title="Cancel">✕</GhostButton>
 			</div>
 		{/if}
 	</div>
@@ -96,7 +98,9 @@
 			{project.genre}
 		</span>
 	{:else if !editingField}
-		<button class="hero-field-empty" onclick={() => startEdit('genre')}>Add a genre</button>
+		<GhostButton class="hero-field-empty" type="button" onclick={() => startEdit('genre')}
+			>Add a genre</GhostButton
+		>
 	{/if}
 
 	{#if editingField === 'logline'}
@@ -115,9 +119,9 @@
 			{project.logline}
 		</blockquote>
 	{:else if !editingField}
-		<button class="hero-field-empty" onclick={() => startEdit('logline')}>
+		<GhostButton class="hero-field-empty" type="button" onclick={() => startEdit('logline')}>
 			Add a logline to define this story
-		</button>
+		</GhostButton>
 	{/if}
 
 	{#if editingField === 'synopsis'}
@@ -136,7 +140,9 @@
 			{project.synopsis}
 		</p>
 	{:else if !editingField}
-		<button class="hero-field-empty" onclick={() => startEdit('synopsis')}> Add a synopsis </button>
+		<GhostButton class="hero-field-empty" type="button" onclick={() => startEdit('synopsis')}>
+			Add a synopsis
+		</GhostButton>
 	{/if}
 </div>
 
@@ -231,7 +237,7 @@
 	}
 
 	/* ── Empty-field prompts ── */
-	.hero-field-empty {
+	:global(.hero-field-empty) {
 		display: block;
 		background: none;
 		border: 1px dashed var(--color-border-default);
@@ -248,12 +254,12 @@
 			border-color var(--duration-base) var(--ease-standard),
 			background-color var(--duration-base) var(--ease-standard);
 	}
-	.hero-field-empty:hover {
+	:global(.hero-field-empty:hover) {
 		color: var(--color-text-secondary);
 		border-color: var(--color-border-strong);
 		background: var(--color-surface-overlay);
 	}
-	.hero-field-empty:focus-visible {
+	:global(.hero-field-empty:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}
@@ -308,7 +314,7 @@
 		gap: var(--space-1);
 		flex-shrink: 0;
 	}
-	.hero-ctrl {
+	:global(.hero-ctrl) {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -325,16 +331,16 @@
 			background-color var(--duration-base) var(--ease-standard),
 			border-color var(--duration-base) var(--ease-standard);
 	}
-	.hero-ctrl:focus-visible {
+	:global(.hero-ctrl:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}
-	.hero-ctrl--confirm:hover {
+	:global(.hero-ctrl--confirm:hover) {
 		color: var(--color-teal);
 		border-color: var(--color-teal);
 		background: color-mix(in srgb, var(--color-teal) 10%, transparent);
 	}
-	.hero-ctrl--cancel:hover {
+	:global(.hero-ctrl--cancel:hover) {
 		color: var(--color-error);
 		border-color: var(--color-error);
 		background: color-mix(in srgb, var(--color-error) 10%, transparent);

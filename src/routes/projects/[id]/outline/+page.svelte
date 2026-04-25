@@ -2,6 +2,7 @@
 	import { untrack } from 'svelte';
 	import type { Chapter, Scene, StoryFrame, Act, Arc, Character } from '$lib/db/types.js';
 	import type { ChapterWithScenes } from '$modules/outliner/types.js';
+	import { WorkspaceShell, WorkspaceHero } from '$lib/components/ui/index.js';
 	import HierarchyNavigator from '$modules/outliner/components/HierarchyNavigator.svelte';
 	import ActClarityPanel from '$modules/outliner/components/ActClarityPanel.svelte';
 	import ChapterClarityPanel from '$modules/outliner/components/ChapterClarityPanel.svelte';
@@ -246,43 +247,41 @@
 	<title>Outline — Novellum</title>
 </svelte:head>
 
-<div class="outline-shell" role="main">
-	<section class="storyboard-hero" aria-labelledby="storyboard-title">
-		<div>
-			<p class="storyboard-eyebrow">Storyboard Room</p>
-			<h1 id="storyboard-title">Narrative Structure</h1>
-			<p class="storyboard-copy">
-				Map acts, chapters, and scenes as production beats. Keep structure explicit before entering manuscript drafting.
-			</p>
-		</div>
-		<div class="storyboard-metrics" aria-label="Outline metrics">
-			<div class="metric-card">
-				<span>Acts</span>
-				<strong>{acts.length}</strong>
-			</div>
-			<div class="metric-card">
-				<span>Chapters</span>
-				<strong>{chapters.length}</strong>
-			</div>
-			<div class="metric-card">
-				<span>Scenes</span>
-				<strong>{totalSceneCount}</strong>
-			</div>
-			<div class="metric-card metric-card--wide">
-				<span>Selection</span>
-				<strong>{selectionSummary}</strong>
-			</div>
-		</div>
-	</section>
+<WorkspaceShell sidebarLabel="Outline selector" mainLabel="Outline detail workspace">
+	{#snippet hero()}
+		<WorkspaceHero
+			eyebrow="Storyboard Room"
+			title="Narrative Structure"
+			description="Map acts, chapters, and scenes as production beats. Keep structure explicit before entering manuscript drafting."
+		>
+			{#snippet metrics()}
+				<div class="storyboard-metrics" aria-label="Outline metrics">
+					<div class="metric-card">
+						<span>Acts</span>
+						<strong>{acts.length}</strong>
+					</div>
+					<div class="metric-card">
+						<span>Chapters</span>
+						<strong>{chapters.length}</strong>
+					</div>
+					<div class="metric-card">
+						<span>Scenes</span>
+						<strong>{totalSceneCount}</strong>
+					</div>
+					<div class="metric-card metric-card--wide">
+						<span>Selection</span>
+						<strong>{selectionSummary}</strong>
+					</div>
+				</div>
+			{/snippet}
+		</WorkspaceHero>
+	{/snippet}
 
-	<div class="outline-workspace">
-	<aside class="outline-sidebar" aria-label="Outline selector">
-		<div class="outline-sidebar-scroll">
-			<HierarchyNavigator {...navigatorProps} />
-		</div>
-	</aside>
+	{#snippet sidebar()}
+		<HierarchyNavigator {...navigatorProps} />
+	{/snippet}
 
-	<section class="outline-main" aria-label="Outline detail workspace">
+	{#snippet main()}
 		{#if selectedScene}
 			<SceneClarityPanel
 				{projectId}
@@ -320,55 +319,10 @@
 				<p>Choose an item on the left to define story structure and execution details.</p>
 			</div>
 		{/if}
-	</section>
-	</div>
-</div>
+	{/snippet}
+</WorkspaceShell>
 
 <style>
-	.outline-shell {
-		display: grid;
-		gap: var(--space-5);
-		padding: var(--space-5) 0 var(--space-8);
-	}
-
-	.storyboard-hero {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
-		gap: var(--space-4);
-		padding: var(--space-5);
-		border: 1px solid var(--color-border-subtle);
-		border-radius: var(--radius-xl);
-		background:
-			radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--color-teal) 12%, transparent), transparent 40%),
-			linear-gradient(165deg, var(--color-surface-overlay), var(--color-surface-ground));
-	}
-
-	.storyboard-eyebrow,
-	.storyboard-hero h1,
-	.storyboard-copy {
-		margin: 0;
-	}
-
-	.storyboard-eyebrow {
-		font-size: var(--text-xs);
-		letter-spacing: var(--tracking-wide);
-		text-transform: uppercase;
-		color: var(--color-text-muted);
-	}
-
-	.storyboard-hero h1 {
-		margin-top: var(--space-1);
-		font-size: var(--text-2xl);
-	}
-
-	.storyboard-copy {
-		margin-top: var(--space-2);
-		max-width: 60ch;
-		font-size: var(--text-sm);
-		line-height: var(--leading-relaxed);
-		color: var(--color-text-secondary);
-	}
-
 	.storyboard-metrics {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -400,45 +354,6 @@
 		grid-column: 1 / -1;
 	}
 
-	.outline-workspace {
-		display: grid;
-		grid-template-columns: minmax(280px, 340px) 1fr;
-		gap: var(--space-4);
-		padding: 0 var(--space-2) var(--space-1);
-		height: calc(100vh - var(--header-height, 64px));
-		overflow: hidden;
-		box-sizing: border-box;
-		min-height: 0;
-	}
-
-	.outline-sidebar {
-		display: flex;
-		flex-direction: column;
-		border-right: 1px solid var(--color-border-default);
-		padding-right: var(--space-4);
-		height: 100%;
-		overflow: hidden;
-		min-height: 0;
-	}
-
-	.outline-sidebar-scroll {
-		height: 100%;
-		overflow-y: auto;
-		overflow-x: hidden;
-		overscroll-behavior: contain;
-		min-height: 0;
-		padding-right: var(--space-1);
-	}
-
-	.outline-main {
-		display: flex;
-		justify-content: center;
-		align-items: flex-start;
-		height: 100%;
-		overflow: hidden;
-		min-height: 0;
-	}
-
 	.outline-main-empty {
 		width: min(620px, 100%);
 		margin-top: var(--space-10);
@@ -461,26 +376,5 @@
 		font-size: var(--text-sm);
 		color: var(--color-text-secondary);
 		line-height: var(--leading-relaxed);
-	}
-
-	@media (max-width: 960px) {
-		.storyboard-hero {
-			grid-template-columns: 1fr;
-		}
-
-		.outline-workspace {
-			grid-template-columns: 1fr;
-			height: auto;
-			overflow: auto;
-		}
-
-		.outline-sidebar {
-			border-right: none;
-			padding-right: 0;
-		}
-
-		.outline-main {
-			display: none;
-		}
 	}
 </style>

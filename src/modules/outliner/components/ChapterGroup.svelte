@@ -11,6 +11,7 @@
 	import PacingSignal from './PacingSignal.svelte';
 	import SceneRow from './SceneRow.svelte';
 	import AddSceneForm from './AddSceneForm.svelte';
+	import { GhostButton } from '$lib/components/ui/index.js';
 
 	let {
 		chapter,
@@ -166,8 +167,9 @@
 >
 	<div class="chapter-header">
 		<!-- Expand/collapse chevron — separate from selection -->
-		<button
+		<GhostButton
 			class="expand-btn"
+			type="button"
 			onclick={(e) => {
 				e.stopPropagation();
 				toggleChapter(chapter.id);
@@ -176,7 +178,7 @@
 			aria-label="{expanded ? 'Collapse' : 'Expand'} chapter"
 		>
 			<span class="expand-icon" aria-hidden="true">{expanded ? '▾' : '▸'}</span>
-		</button>
+		</GhostButton>
 
 		{#if editing}
 			<input
@@ -189,8 +191,9 @@
 			/>
 		{:else}
 			<!-- Primary select target: title + count -->
-			<button
+			<GhostButton
 				class="chapter-select"
+				type="button"
 				onclick={() => onSelectChapter(chapter)}
 				aria-label="Select chapter: {chapter.title}"
 			>
@@ -202,19 +205,20 @@
 						label={scenes.length === 0 ? 'No scenes yet' : 'Could use more scenes'}
 					/>
 				{/if}
-			</button>
+			</GhostButton>
 		{/if}
 
 		<!-- Quiet utility cluster — only visible on hover -->
 		<div class="chapter-utils" role="toolbar" aria-label="Chapter actions">
-			<button class="util-btn" onclick={startEditing} aria-label="Rename chapter" title="Rename"
-				>✎</button
+			<GhostButton class="util-btn" type="button" onclick={startEditing} aria-label="Rename chapter" title="Rename"
+				>✎</GhostButton
 			>
-			<button
+			<GhostButton
 				class="util-btn util-btn--danger"
+				type="button"
 				onclick={handleDelete}
 				aria-label="Delete chapter"
-				title="Delete">✕</button
+				title="Delete">✕</GhostButton
 			>
 		</div>
 	</div>
@@ -303,7 +307,7 @@
 	}
 
 	/* ── Expand-only button ── */
-	.expand-btn {
+	:global(.expand-btn) {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -321,18 +325,18 @@
 			background 0.1s;
 	}
 
-	.expand-btn:hover {
+	:global(.expand-btn:hover) {
 		color: var(--color-text-secondary);
 		background: color-mix(in srgb, var(--color-text-primary) 6%, transparent);
 	}
 
-	.expand-btn:focus-visible {
+	:global(.expand-btn:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}
 
 	/* ── Chapter select button (primary action) ── */
-	.chapter-select {
+	:global(.chapter-select) {
 		display: flex;
 		align-items: baseline;
 		gap: var(--space-3);
@@ -348,16 +352,16 @@
 		transition: background var(--duration-fast) var(--ease-standard);
 	}
 
-	.chapter-select:hover {
+	:global(.chapter-select:hover) {
 		background: color-mix(in srgb, var(--color-text-primary) 5%, transparent);
 	}
 
-	.chapter-select:focus-visible {
+	:global(.chapter-select:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}
 
-	.is-selected .chapter-select {
+	.is-selected :global(.chapter-select) {
 		background: transparent;
 	}
 
@@ -433,7 +437,7 @@
 		opacity: 1;
 	}
 
-	.util-btn {
+	:global(.util-btn) {
 		background: none;
 		border: none;
 		color: var(--color-text-muted);
@@ -447,17 +451,17 @@
 			background 0.1s;
 	}
 
-	.util-btn:hover {
+	:global(.util-btn:hover) {
 		color: var(--color-text-secondary);
 		background: var(--color-surface-elevated);
 	}
 
-	.util-btn:focus-visible {
+	:global(.util-btn:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}
 
-	.util-btn--danger:hover {
+	:global(.util-btn--danger:hover) {
 		color: var(--color-error);
 		background: color-mix(in srgb, var(--color-error) 10%, transparent);
 	}

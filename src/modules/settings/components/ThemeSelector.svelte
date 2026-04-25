@@ -1,5 +1,6 @@
 <script lang="ts">
 	import SurfaceCard from '$lib/components/ui/SurfaceCard.svelte';
+	import { GhostButton } from '$lib/components/ui/index.js';
 	import { onMount } from 'svelte';
 	import { getStoredTheme, storeTheme, applyTheme, type Theme } from '../services/themeService';
 
@@ -37,7 +38,7 @@
 		</div>
 
 		<div class="theme-selector__options">
-			<button
+			<GhostButton
 				type="button"
 				class="theme-option {theme === 'light' ? 'active' : ''}"
 				onclick={() => setTheme('light')}
@@ -45,9 +46,9 @@
 			>
 				<span class="theme-option__icon" aria-hidden="true">☀️</span>
 				<span class="theme-option__label">Light</span>
-			</button>
+			</GhostButton>
 
-			<button
+			<GhostButton
 				type="button"
 				class="theme-option {theme === 'dark' ? 'active' : ''}"
 				onclick={() => setTheme('dark')}
@@ -55,9 +56,9 @@
 			>
 				<span class="theme-option__icon" aria-hidden="true">🌙</span>
 				<span class="theme-option__label">Dark</span>
-			</button>
+			</GhostButton>
 
-			<button
+			<GhostButton
 				type="button"
 				class="theme-option {theme === 'system' ? 'active' : ''}"
 				onclick={() => setTheme('system')}
@@ -65,7 +66,7 @@
 			>
 				<span class="theme-option__icon" aria-hidden="true">💻</span>
 				<span class="theme-option__label">System</span>
-			</button>
+			</GhostButton>
 		</div>
 	</div>
 </SurfaceCard>
@@ -102,7 +103,7 @@
 		flex-wrap: wrap;
 	}
 
-	.theme-option {
+	:global(.theme-option) {
 		display: flex;
 		align-items: center;
 		gap: var(--space-2);
@@ -117,18 +118,18 @@
 		transition: var(--transition-color), box-shadow var(--duration-fast) var(--ease-standard);
 	}
 
-	.theme-option:hover {
+	:global(.theme-option:hover) {
 		background: var(--color-surface-hover);
 		border-color: var(--color-border-strong);
 	}
 
-	.theme-option:focus-visible {
+	:global(.theme-option:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 		border-color: var(--color-border-focus);
 	}
 
-	.theme-option.active {
+	:global(.theme-option.active) {
 		background: var(--color-ai-tint);
 		border-color: var(--color-nova-blue);
 		color: var(--color-nova-blue);

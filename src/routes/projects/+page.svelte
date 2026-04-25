@@ -9,7 +9,7 @@
         import LibraryHeroCard from '$modules/project/components/LibraryHeroCard.svelte';
         import LibraryHeroCardSkeleton from '$modules/project/components/LibraryHeroCardSkeleton.svelte';
         import ProjectCreateCard from '$modules/project/components/ProjectCreateCard.svelte';
-        import { SectionHeader, PrimaryButton, GhostButton, Input, EmptyStatePanel } from '$lib/components/ui/index.js';
+        import { SectionHeader, PrimaryButton, GhostButton, Input, EmptyStatePanel, PageHeader } from '$lib/components/ui/index.js';
         import type { Project } from '$lib/db/types.js';
 
         let showCreateBook = $state(false);
@@ -48,22 +48,23 @@
 </svelte:head>
 
 <div class="projects-hub">
-        <header class="projects-header" aria-labelledby="projects-title">
+        <div class="projects-header-shell">
                 <div class="projects-header__glow" aria-hidden="true"></div>
-                <div class="projects-heading">
-                        <p class="projects-eyebrow">Creative Catalog</p>
-                        <h1 id="projects-title" class="projects-title">Projects</h1>
-                        <p class="projects-subtitle">
-                                A unified gallery for novels and stories. Open an existing project or start a new one.
-                        </p>
-                        <div class="projects-header__actions">
-                                <PrimaryButton onclick={openCreateBook}>New Book</PrimaryButton>
-                                <GhostButton onclick={() => showCreateStory = !showCreateStory}>
-                                        {showCreateStory ? 'Close Story Form' : 'New Story'}
-                                </GhostButton>
-                        </div>
-                </div>
-        </header>
+                <PageHeader
+                        eyebrow="Creative Catalog"
+                        title="Projects"
+                        description="A unified gallery for novels and stories. Open an existing project or start a new one."
+                >
+                        {#snippet actions()}
+                                <div class="projects-header__actions">
+                                        <PrimaryButton onclick={openCreateBook}>New Book</PrimaryButton>
+                                        <GhostButton onclick={() => (showCreateStory = !showCreateStory)}>
+                                                {showCreateStory ? 'Close Story Form' : 'New Story'}
+                                        </GhostButton>
+                                </div>
+                        {/snippet}
+                </PageHeader>
+        </div>
 
         <div class="projects-grid">
                 <!-- Stories Column -->
@@ -179,10 +180,10 @@
         .projects-hub {
                 max-width: 1400px;
                 margin: 0 auto;
-                padding: var(--space-10) var(--panel-padding);
+                padding: var(--space-10) 0;
         }
 
-        .projects-header {
+        .projects-header-shell {
                 margin-bottom: var(--space-8);
                 position: relative;
                 overflow: hidden;
@@ -192,6 +193,21 @@
                         linear-gradient(155deg, var(--color-surface-raised) 0%, var(--color-surface-overlay) 100%),
                         var(--gradient-spotlight);
                 padding: var(--space-8);
+        }
+
+        .projects-header-shell :global(.page-header) {
+                position: relative;
+                border-bottom: none;
+                padding-bottom: 0;
+        }
+
+        .projects-header-shell :global(.page-header__heading) {
+                max-width: 560px;
+        }
+
+        .projects-header-shell :global(.page-header__eyebrow) {
+                color: var(--color-teal);
+                letter-spacing: var(--tracking-widest);
         }
 
         .projects-header__glow {
@@ -204,45 +220,11 @@
                 pointer-events: none;
         }
 
-        .projects-heading {
-                display: flex;
-                flex-direction: column;
-                gap: var(--space-2);
-                max-width: 560px;
-                position: relative;
-        }
-
-        .projects-eyebrow {
-                margin: 0;
-                font-size: var(--text-xs);
-                letter-spacing: var(--tracking-widest);
-                text-transform: uppercase;
-                color: var(--color-teal);
-        }
-
-        .projects-title {
-                font-family: var(--font-display);
-                font-size: var(--text-5xl);
-                font-weight: var(--font-weight-normal);
-                letter-spacing: var(--tracking-tight);
-                color: var(--color-text-primary);
-                line-height: 1.1;
-                margin: 0;
-        }
-
         .projects-header__actions {
                 margin-top: var(--space-3);
                 display: flex;
                 gap: var(--space-3);
                 flex-wrap: wrap;
-        }
-
-        .projects-subtitle {
-                font-family: var(--font-sans);
-                font-size: var(--text-base);
-                color: var(--color-text-muted);
-                line-height: var(--leading-relaxed);
-                margin: 0;
         }
 
         .projects-grid {
@@ -311,7 +293,7 @@
         }
 
         @media (max-width: 640px) {
-                .projects-header {
+                .projects-header-shell {
                         padding: var(--space-6);
                 }
 

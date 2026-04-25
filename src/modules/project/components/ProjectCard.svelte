@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { Project } from '$lib/db/types.js';
 	import { selectProject } from '../stores/project-hub.svelte.ts';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
+	import { SurfaceCard } from '$lib/components/ui/index.js';
 
 	let { project, cardIndex = 0 } = $props<{ project: Project; cardIndex?: number }>();
 
@@ -13,9 +15,9 @@
 	}
 </script>
 
-<li class="project-card" style="--card-index: {cardIndex}">
+<SurfaceCard class="project-card" style="--card-index: {cardIndex}">
 	<div class="card-cover" aria-hidden="true"></div>
-	<button class="card-btn" onclick={() => selectProject(project)}>
+	<GhostButton class="card-btn" type="button" onclick={() => selectProject(project)}>
 		{#if project.genre}
 			<p class="card-genre">{project.genre}</p>
 		{/if}
@@ -24,33 +26,21 @@
 			<p class="card-logline">{project.logline}</p>
 		{/if}
 		<p class="card-meta">Updated {formatDate(project.updatedAt)}</p>
-	</button>
-</li>
+	</GhostButton>
+</SurfaceCard>
 
 <style>
-	.project-card {
-		background-color: var(--color-surface-overlay);
-		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-md);
-		box-shadow: var(--shadow-xs);
-		list-style: none;
-		display: flex;
-		flex-direction: column;
-		overflow: hidden;
-		transition:
-			border-color var(--duration-fast) var(--ease-standard),
-			box-shadow var(--duration-fast) var(--ease-standard);
+	:global(.project-card) {
 		animation: novellum-enter var(--duration-enter) var(--ease-editorial) both;
 		animation-delay: min(calc(var(--card-index, 0) * 40ms), 280ms);
 	}
 
-	.project-card:hover {
-		border-color: var(--color-border-strong);
-		box-shadow: var(--shadow-md);
+	:global(.project-card:hover) {
+		--_shadow-override: var(--shadow-md);
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.project-card {
+		:global(.project-card) {
 			animation: none;
 			opacity: 1;
 			transform: none;
@@ -67,7 +57,7 @@
 		flex-shrink: 0;
 	}
 
-	.card-btn {
+	:global(.card-btn) {
 		display: block;
 		width: 100%;
 		padding: var(--space-4);

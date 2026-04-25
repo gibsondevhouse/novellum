@@ -3,6 +3,7 @@
 	import { safeHtml } from '$lib/ai/markdown.js';
 	import type { AIRequestPayload } from '$lib/ai/types.js';
 	import SurfaceCard from '$lib/components/ui/SurfaceCard.svelte';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	import type { Project } from '$lib/db/types.js';
 	import { apiGet } from '$lib/api-client.js';
 	import { getSelectedModel } from '$lib/stores/model-selection.svelte.js';
@@ -313,7 +314,14 @@
 					<h3>Add Projects</h3>
 					<p>Attach one or more projects for this chat session. Nova will include their current data on each send.</p>
 				</div>
-				<button type="button" class="project-picker__close" onclick={closeProjectPicker} aria-label="Close project picker">×</button>
+				<GhostButton
+					type="button"
+					class="project-picker__close"
+					onclick={closeProjectPicker}
+					aria-label="Close project picker"
+				>
+					×
+				</GhostButton>
 			</header>
 
 			<div class="project-picker__body">
@@ -325,15 +333,14 @@
 					<ul class="project-picker__list" aria-label="Projects">
 						{#each projects as project (project.id)}
 							<li>
-								<button
+								<GhostButton
 									type="button"
-									class="project-picker__option"
-									class:project-picker__option--attached={attachedProjectIds.has(project.id)}
+									class={`project-picker__option ${attachedProjectIds.has(project.id) ? 'project-picker__option--attached' : ''}`}
 									onclick={() => toggleProjectAttachment(project)}
 								>
 									<span class="project-picker__option-title">{project.title}</span>
 									<span class="project-picker__option-tag">{attachedProjectIds.has(project.id) ? 'Attached' : 'Attach'}</span>
-								</button>
+								</GhostButton>
 							</li>
 						{/each}
 					</ul>
@@ -342,7 +349,9 @@
 
 			<footer class="project-picker__footer">
 				<p>{attachedProjectIds.size} project{attachedProjectIds.size === 1 ? '' : 's'} attached</p>
-				<button type="button" class="project-picker__done" onclick={closeProjectPicker}>Done</button>
+				<GhostButton type="button" class="project-picker__done" onclick={closeProjectPicker}
+					>Done</GhostButton
+				>
 			</footer>
 		</div>
 	</div>
@@ -603,7 +612,7 @@
 		color: var(--color-text-secondary);
 	}
 
-	.project-picker__close {
+	:global(.project-picker__close) {
 		width: 30px;
 		height: 30px;
 		padding: 0;
@@ -619,12 +628,12 @@
 		cursor: pointer;
 	}
 
-	.project-picker__close:hover {
+	:global(.project-picker__close:hover) {
 		background: var(--color-surface-hover);
 		color: var(--color-text-primary);
 	}
 
-	.project-picker__close:focus-visible {
+	:global(.project-picker__close:focus-visible) {
 		outline: 2px solid var(--color-border-focus);
 		outline-offset: 2px;
 	}
@@ -649,7 +658,7 @@
 		gap: var(--space-2);
 	}
 
-	.project-picker__option {
+	:global(.project-picker__option) {
 		width: 100%;
 		display: flex;
 		align-items: center;
@@ -663,16 +672,16 @@
 		cursor: pointer;
 	}
 
-	.project-picker__option:hover {
+	:global(.project-picker__option:hover) {
 		background: var(--color-surface-hover);
 	}
 
-	.project-picker__option:focus-visible {
+	:global(.project-picker__option:focus-visible) {
 		outline: 2px solid var(--color-border-focus);
 		outline-offset: 2px;
 	}
 
-	.project-picker__option--attached {
+	:global(.project-picker__option--attached) {
 		border-color: color-mix(in srgb, var(--color-nova-blue) 48%, var(--color-border-default));
 		background: color-mix(in srgb, var(--color-nova-blue) 10%, var(--color-surface-overlay));
 	}
@@ -705,7 +714,7 @@
 		color: var(--color-text-secondary);
 	}
 
-	.project-picker__done {
+	:global(.project-picker__done) {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
@@ -718,11 +727,11 @@
 		cursor: pointer;
 	}
 
-	.project-picker__done:hover {
+	:global(.project-picker__done:hover) {
 		background: var(--color-surface-hover);
 	}
 
-	.project-picker__done:focus-visible {
+	:global(.project-picker__done:focus-visible) {
 		outline: 2px solid var(--color-border-focus);
 		outline-offset: 2px;
 	}

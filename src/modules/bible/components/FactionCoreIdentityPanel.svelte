@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { GhostButton, SectionHeader } from '$lib/components/ui/index.js';
+
 	type CoreField =
 		| 'foundingPurpose'
 		| 'ideology'
@@ -20,11 +22,12 @@
 	let isCollapsed = $state(false);
 </script>
 
-<section class="dossier-section" aria-labelledby="faction-core-title">
-	<div class="section-header">
-		<h3 id="faction-core-title" class="section-title">Core Identity</h3>
-		<button type="button" class="collapse-toggle" aria-expanded={!isCollapsed} aria-controls="faction-core-content" onclick={() => (isCollapsed = !isCollapsed)}>{isCollapsed ? 'Expand' : 'Collapse'}</button>
-	</div>
+<section class="dossier-section" aria-label="Core Identity">
+	<SectionHeader title="Core Identity" class="dossier-section-header">
+		{#snippet actions()}
+			<GhostButton type="button" class="collapse-toggle" aria-expanded={!isCollapsed} aria-controls="faction-core-content" onclick={() => (isCollapsed = !isCollapsed)}>{isCollapsed ? 'Expand' : 'Collapse'}</GhostButton>
+		{/snippet}
+	</SectionHeader>
 	{#if !isCollapsed}
 		<div id="faction-core-content" class="section-content">
 			<div class="field-grid">
@@ -43,9 +46,8 @@
 
 <style>
 	.dossier-section { display: flex; flex-direction: column; gap: var(--space-4); padding-top: var(--space-4); border-top: 1px solid color-mix(in srgb, var(--color-border-subtle) 65%, transparent); }
-	.section-header { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); }
-	.section-title { margin: 0; font-size: var(--text-xs); font-weight: var(--font-weight-semibold); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
-	.collapse-toggle { border: 1px solid color-mix(in srgb, var(--color-border-subtle) 70%, transparent); background: transparent; color: var(--color-text-muted); padding: 0.15rem 0.45rem; border-radius: var(--radius-sm); font-size: var(--text-xs); cursor: pointer; }
+	:global(.dossier-section-header .title) { font-size: var(--text-xs); font-weight: var(--font-weight-semibold); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+	:global(.collapse-toggle) { border: 1px solid color-mix(in srgb, var(--color-border-subtle) 70%, transparent); background: transparent; color: var(--color-text-muted); padding: 0.15rem 0.45rem; border-radius: var(--radius-sm); font-size: var(--text-xs); cursor: pointer; }
 	.field-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4) var(--space-5); }
 	label { display: flex; flex-direction: column; gap: 0.35rem; }
 	label span { font-size: var(--text-xs); letter-spacing: 0.03em; color: var(--color-text-muted); }

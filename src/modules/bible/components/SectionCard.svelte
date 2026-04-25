@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { SurfacePanel } from '$lib/components/ui/index.js';
 
 	interface Props {
 		title?: string;
@@ -9,7 +10,7 @@
 	let { title = '', children }: Props = $props();
 </script>
 
-<div class="section-card">
+<SurfacePanel class="section-card">
 	{#if title}
 		<h3 class="section-title">{title}</h3>
 	{/if}
@@ -18,10 +19,10 @@
 			{@render children()}
 		{/if}
 	</div>
-</div>
+</SurfacePanel>
 
 <style>
-	.section-card {
+	:global(.section-card) {
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-3);

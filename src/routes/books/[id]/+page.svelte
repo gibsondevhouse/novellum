@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { PageHeader } from '$lib/components/ui/index.js';
+
 	let {
 		data,
 	}: {
@@ -63,29 +65,32 @@
 </svelte:head>
 
 <div class="reader-shell">
-	<header class="reader-header">
-		<a class="reader-back" href="/">Back to Library</a>
-		<div class="reader-hero">
-			{#if hasCover}
-				<div class="reader-cover">
-					<img class="reader-cover-image" src={coverUrl} alt="Cover for {data.project.title}" />
+	<div class="reader-header-shell">
+		<PageHeader
+			title={data.project.title}
+			description={data.project.logline?.trim() ? data.project.logline : 'Immersive reading view for your manuscript.'}
+		>
+			{#snippet actions()}
+				<a class="reader-back" href="/">Back to Library</a>
+			{/snippet}
+			{#snippet meta()}
+				<div class="reader-hero">
+					{#if hasCover}
+						<div class="reader-cover">
+							<img class="reader-cover-image" src={coverUrl} alt="Cover for {data.project.title}" />
+						</div>
+					{/if}
+					{#if genres.length > 0}
+						<div class="reader-genres" aria-label="Genres">
+							{#each genres as genre (genre)}
+								<span class="reader-genre-pill">{genre}</span>
+							{/each}
+						</div>
+					{/if}
 				</div>
-			{/if}
-			<div class="reader-heading-block">
-				<h1 class="reader-title">{data.project.title}</h1>
-				{#if genres.length > 0}
-					<div class="reader-genres" aria-label="Genres">
-						{#each genres as genre (genre)}
-							<span class="reader-genre-pill">{genre}</span>
-						{/each}
-					</div>
-				{/if}
-				{#if data.project.logline?.trim()}
-					<p class="reader-logline">{data.project.logline}</p>
-				{/if}
-			</div>
-		</div>
-	</header>
+			{/snippet}
+		</PageHeader>
+	</div>
 
 	{#if readableChapters.length === 0}
 		<div class="reader-empty">
@@ -126,25 +131,44 @@
 	.reader-shell {
 		max-width: 880px;
 		margin: 0 auto;
-		padding: var(--space-10) var(--space-6) var(--space-12);
+		padding: var(--space-10) 0 var(--space-12);
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-8);
 	}
 
-	.reader-header {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-3);
+	.reader-header-shell {
 		padding-bottom: var(--space-6);
 		border-bottom: 1px solid var(--color-border-subtle);
 	}
 
+	.reader-header-shell :global(.page-header) {
+		border-bottom: none;
+		padding-bottom: 0;
+	}
+
+	.reader-header-shell :global(.page-header__right) {
+		justify-items: stretch;
+		width: 100%;
+	}
+
+	.reader-header-shell :global(.page-header__actions) {
+		align-self: start;
+	}
+
+	.reader-header-shell :global(.page-header__description) {
+		font-family: var(--font-display);
+		font-size: var(--text-lg);
+		font-style: italic;
+		color: var(--color-text-secondary);
+	}
+
 	.reader-hero {
 		display: grid;
-		grid-template-columns: 176px 1fr;
+		grid-template-columns: auto 1fr;
 		align-items: start;
 		gap: var(--space-6);
+		margin-top: var(--space-2);
 	}
 
 	.reader-cover {
@@ -160,12 +184,6 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-	}
-
-	.reader-heading-block {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-3);
 	}
 
 	.reader-back {
@@ -193,20 +211,11 @@
 		border-radius: var(--radius-xs);
 	}
 
-	.reader-title {
-		font-family: var(--font-display);
-		font-size: clamp(2.25rem, 5vw, 3.4rem);
-		font-weight: var(--font-weight-normal);
-		letter-spacing: var(--tracking-tight);
-		line-height: 1.05;
-		margin: 0;
-		color: var(--color-text-primary);
-	}
-
 	.reader-genres {
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--space-2);
+		align-self: center;
 	}
 
 	.reader-genre-pill {
@@ -221,15 +230,6 @@
 		background: color-mix(in srgb, var(--color-teal) 12%, transparent);
 		border: 1px solid color-mix(in srgb, var(--color-teal) 28%, transparent);
 		color: color-mix(in srgb, var(--color-teal) 78%, white 22%);
-	}
-
-	.reader-logline {
-		font-family: var(--font-display);
-		font-size: var(--text-lg);
-		font-style: italic;
-		line-height: var(--leading-relaxed);
-		color: var(--color-text-secondary);
-		margin: 0;
 	}
 
 	.reader-manuscript {
@@ -309,10 +309,6 @@
 
 		.reader-cover {
 			max-width: 180px;
-		}
-
-		.reader-title {
-			font-size: var(--text-4xl);
 		}
 
 		.reader-chapter-title {

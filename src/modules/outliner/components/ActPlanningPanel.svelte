@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { Act } from '$lib/db/types.js';
+	import { SurfacePanel, GhostButton } from '$lib/components/ui/index.js';
 
 	let { act, onUpdate, onDelete } = $props<{
 		act: Act;
@@ -37,7 +38,7 @@
 	}
 </script>
 
-<div class="act-panel">
+<SurfacePanel class="act-panel">
 	<div class="act-header">
 		{#if editingTitle}
 			<input
@@ -49,11 +50,11 @@
 				aria-label="Act title"
 			/>
 		{:else}
-			<button class="title-btn" onclick={() => (editingTitle = true)} aria-label="Edit act title">
+			<GhostButton class="title-btn" type="button" onclick={() => (editingTitle = true)} aria-label="Edit act title">
 				{act.title}
-			</button>
+			</GhostButton>
 		{/if}
-		<button class="delete-btn" onclick={handleDelete} aria-label="Delete act">✕</button>
+		<GhostButton class="delete-btn" type="button" onclick={handleDelete} aria-label="Delete act">✕</GhostButton>
 	</div>
 
 	<div class="field">
@@ -67,13 +68,13 @@
 			onblur={() => onUpdate({ planningNotes })}
 		></textarea>
 	</div>
-</div>
+</SurfacePanel>
 
 <style>
-	.act-panel {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-4);
+	:global(.act-panel) {
+		display: flex !important;
+		flex-direction: column !important;
+		gap: var(--space-4) !important;
 	}
 
 	.act-header {
@@ -82,7 +83,7 @@
 		gap: var(--space-2);
 	}
 
-	.title-btn {
+	:global(.title-btn) {
 		flex: 1;
 		background: none;
 		border: none;
@@ -96,7 +97,7 @@
 		transition: background var(--duration-fast) var(--ease-standard);
 	}
 
-	.title-btn:hover {
+	:global(.title-btn:hover) {
 		background: color-mix(in srgb, var(--color-text-primary) 6%, transparent);
 	}
 
@@ -117,7 +118,7 @@
 		box-shadow: var(--focus-ring);
 	}
 
-	.delete-btn {
+	:global(.delete-btn) {
 		background: none;
 		border: none;
 		color: var(--color-text-muted);
@@ -130,7 +131,7 @@
 			background 0.1s;
 	}
 
-	.delete-btn:hover {
+	:global(.delete-btn:hover) {
 		color: var(--color-error);
 		background: color-mix(in srgb, var(--color-error) 10%, transparent);
 	}

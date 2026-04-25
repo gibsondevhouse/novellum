@@ -1,5 +1,6 @@
 <script lang="ts">
 	import CharacterSelect from '$modules/bible/components/CharacterSelect.svelte';
+	import { GhostButton, SectionHeader } from '$lib/components/ui/index.js';
 	type FactionOption = { id: string; name: string; role?: string; summary?: string };
 	type Relationship = { id: string; targetFactionId: string; relationshipType?: string; status?: string; notes?: string };
 	type RelationshipField = 'targetFactionId' | 'relationshipType' | 'status' | 'notes';
@@ -43,8 +44,12 @@
 	}
 </script>
 
-<section class="dossier-section" aria-labelledby="faction-relationships-title">
-	<div class="section-header"><h3 id="faction-relationships-title" class="section-title">Relationships</h3><button type="button" class="collapse-toggle" aria-expanded={!isCollapsed} aria-controls="faction-relationships-content" onclick={() => (isCollapsed = !isCollapsed)}>{isCollapsed ? 'Expand' : 'Collapse'}</button></div>
+<section class="dossier-section" aria-label="Relationships">
+	<SectionHeader title="Relationships" class="dossier-section-header">
+		{#snippet actions()}
+			<GhostButton type="button" class="collapse-toggle" aria-expanded={!isCollapsed} aria-controls="faction-relationships-content" onclick={() => (isCollapsed = !isCollapsed)}>{isCollapsed ? 'Expand' : 'Collapse'}</GhostButton>
+		{/snippet}
+	</SectionHeader>
 	{#if !isCollapsed}
 		<div id="faction-relationships-content">
 			{#if availableTargets.length === 0}
@@ -52,7 +57,7 @@
 			{:else}
 				<div class="create-row">
 					{#if !isCreating}
-						<button type="button" class="create-button" onclick={beginCreate}>Add Relationship</button>
+						<GhostButton type="button" class="create-button" onclick={beginCreate}>Add Relationship</GhostButton>
 					{:else}
 						<div class="create-form">
 							<CharacterSelect id="new-faction-target" label="Target faction" value={newTargetFactionId} options={factions} excludeId={currentFactionId} onChange={(id) => (newTargetFactionId = id)} />
@@ -60,7 +65,7 @@
 							<input class="input-inline" type="text" list="faction-relationship-status" value={newStatus} oninput={(e) => (newStatus = (e.currentTarget as HTMLInputElement).value)} placeholder="Status" />
 							<textarea class="input-inline" rows="2" value={newNotes} oninput={(e) => (newNotes = (e.currentTarget as HTMLTextAreaElement).value)} placeholder="Notes"></textarea>
 							{#if formError}<p class="form-error">{formError}</p>{/if}
-							<div class="create-actions"><button type="button" class="create-button" onclick={saveNewRelationship}>Save</button><button type="button" class="secondary-button" onclick={cancelCreate}>Cancel</button></div>
+							<div class="create-actions"><GhostButton type="button" class="create-button" onclick={saveNewRelationship}>Save</GhostButton><GhostButton type="button" class="secondary-button" onclick={cancelCreate}>Cancel</GhostButton></div>
 						</div>
 					{/if}
 				</div>
@@ -77,7 +82,7 @@
 								<CharacterSelect id={`faction-target-${rel.id}`} label="Target faction" value={rel.targetFactionId || ''} options={factions} excludeId={currentFactionId} onChange={(id) => onRelationshipFieldChange(index, 'targetFactionId', id)} />
 								<input class="input-inline" type="text" list="faction-relationship-types" value={rel.relationshipType || ''} oninput={(e) => onRelationshipFieldChange(index, 'relationshipType', (e.currentTarget as HTMLInputElement).value)} placeholder="Relationship type" />
 								<input class="input-inline" type="text" list="faction-relationship-status" value={rel.status || ''} oninput={(e) => onRelationshipFieldChange(index, 'status', (e.currentTarget as HTMLInputElement).value)} placeholder="Status" />
-								<button type="button" class="secondary-button" aria-label={`Remove relationship with ${resolveFactionName(rel.targetFactionId)}`} onclick={() => onRemoveRelationship(index)}>Remove</button>
+								<GhostButton type="button" class="secondary-button" aria-label={`Remove relationship with ${resolveFactionName(rel.targetFactionId)}`} onclick={() => onRemoveRelationship(index)}>Remove</GhostButton>
 							</div>
 							<textarea class="input-inline" rows="2" value={rel.notes || ''} oninput={(e) => onRelationshipFieldChange(index, 'notes', (e.currentTarget as HTMLTextAreaElement).value)} placeholder="Relationship note"></textarea>
 						</div>
@@ -92,14 +97,13 @@
 
 <style>
 	.dossier-section { display: flex; flex-direction: column; gap: var(--space-4); padding-top: var(--space-4); border-top: 1px solid color-mix(in srgb, var(--color-border-subtle) 65%, transparent); }
-	.section-header { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); }
-	.section-title { margin: 0; font-size: var(--text-xs); font-weight: var(--font-weight-semibold); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
-	.collapse-toggle { border: 1px solid color-mix(in srgb, var(--color-border-subtle) 70%, transparent); background: transparent; color: var(--color-text-muted); padding: 0.15rem 0.45rem; border-radius: var(--radius-sm); font-size: var(--text-xs); cursor: pointer; }
+	:global(.dossier-section-header .title) { font-size: var(--text-xs); font-weight: var(--font-weight-semibold); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+	:global(.collapse-toggle) { border: 1px solid color-mix(in srgb, var(--color-border-subtle) 70%, transparent); background: transparent; color: var(--color-text-muted); padding: 0.15rem 0.45rem; border-radius: var(--radius-sm); font-size: var(--text-xs); cursor: pointer; }
 	.create-row { margin-bottom: var(--space-4); }
 	.create-form { display: flex; flex-direction: column; gap: var(--space-3); }
 	.create-actions { display: flex; gap: var(--space-2); }
-	.create-button,.secondary-button { border: 1px solid color-mix(in srgb, var(--color-border-default) 75%, transparent); background: transparent; padding: 0.25rem 0.6rem; font-size: var(--text-xs); border-radius: var(--radius-sm); cursor: pointer; color: var(--color-text-primary); }
-	.secondary-button { color: var(--color-text-muted); }
+	:global(.create-button),:global(.secondary-button) { border: 1px solid color-mix(in srgb, var(--color-border-default) 75%, transparent); background: transparent; padding: 0.25rem 0.6rem; font-size: var(--text-xs); border-radius: var(--radius-sm); cursor: pointer; color: var(--color-text-primary); }
+	:global(.secondary-button) { color: var(--color-text-muted); }
 	.relationships-list { display: flex; flex-direction: column; gap: var(--space-2); }
 	.relationship-item { padding: var(--space-2) 0; border-bottom: 1px solid color-mix(in srgb, var(--color-border-subtle) 65%, transparent); }
 	.rel-header { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-3); align-items: flex-end; }

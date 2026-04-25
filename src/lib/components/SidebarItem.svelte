@@ -79,12 +79,16 @@
 		text-decoration: none;
 		border-left: 2px solid transparent;
 		gap: var(--space-3);
-		transition: var(--transition-color);
+		transition:
+			color var(--duration-fast) var(--ease-standard),
+			background-color var(--duration-fast) var(--ease-standard),
+			border-color var(--duration-fast) var(--ease-standard);
 	}
 
 	.sidebar-item:focus-visible {
 		outline: 2px solid var(--color-border-focus);
 		outline-offset: -2px;
+		background: var(--color-surface-glass);
 	}
 
 	.sidebar-item:hover:not(.sidebar-item--locked) {

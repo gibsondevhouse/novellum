@@ -3,6 +3,7 @@
 	import { diffLines } from 'diff';
 	import { listByScene } from '$modules/editor/services/snapshot-repository.js';
 	import type { SceneSnapshot } from '$lib/db/types.js';
+	import { SurfacePanel, GhostButton } from '$lib/components/ui/index.js';
 
 	interface Props {
 		sceneId: string;
@@ -38,20 +39,20 @@
 	const diffChunks = $derived(selected ? diffLines(selected.text, currentText) : []);
 </script>
 
-<div class="panel">
+<SurfacePanel class="version-history-panel">
 	<header class="panel-header">
 		<h2>Version History</h2>
-		<button class="btn-close" onclick={onClose}>✕</button>
+		<GhostButton class="btn-close" type="button" onclick={onClose}>✕</GhostButton>
 	</header>
 
 	<div class="panel-body">
 		<ul class="snapshot-list">
 			{#each snapshots as snap (snap.id)}
 				<li class="snapshot-row" class:active={selected?.id === snap.id}>
-					<button class="snap-btn" onclick={() => (selected = snap)}>
+					<GhostButton class="snap-btn" type="button" onclick={() => (selected = snap)}>
 						<span class="snap-time">{relativeTime(snap.createdAt)}</span>
 						<span class="snap-words">{wordCount(snap.text)} words</span>
-					</button>
+					</GhostButton>
 				</li>
 			{:else}
 				<li class="empty">No snapshots yet.</li>
@@ -61,15 +62,16 @@
 		{#if selected}
 			<div class="diff-view">
 				<div class="diff-actions">
-					<button
+					<GhostButton
 						class="btn-restore"
+						type="button"
 						onclick={() => {
 							onRestore(selected!.text);
 							onClose();
 						}}
 					>
 						Restore this version
-					</button>
+					</GhostButton>
 				</div>
 				<pre class="diff-content">{#each diffChunks as chunk, i (i)}{#if chunk.added}<span
 								class="added">{chunk.value}</span
@@ -79,10 +81,10 @@
 			</div>
 		{/if}
 	</div>
-</div>
+</SurfacePanel>
 
 <style>
-	.panel {
+	:global(.version-history-panel) {
 		display: flex;
 		flex-direction: column;
 		width: 380px;
@@ -90,6 +92,11 @@
 		background: var(--color-surface-ground);
 		border-left: 1px solid var(--color-border-default);
 		overflow: hidden;
+		padding: 0;
+		border-radius: 0;
+		border-top: 0;
+		border-right: 0;
+		border-bottom: 0;
 	}
 	.panel-header {
 		display: flex;
@@ -103,7 +110,7 @@
 		margin: 0;
 		font-size: var(--text-base);
 	}
-	.btn-close {
+	:global(.btn-close) {
 		background: none;
 		border: none;
 		cursor: pointer;
@@ -133,6 +140,17 @@
 	.snapshot-row.active {
 		background: var(--color-surface-raised);
 	}
+	:global(.snap-btn) {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-2);
+		width: 100%;
+		padding: 0;
+		background: transparent;
+		border: none;
+		text-align: left;
+	}
 	.snap-time {
 		font-size: var(--text-sm);
 		color: var(--color-text-primary);
@@ -157,7 +175,7 @@
 	.diff-actions {
 		flex-shrink: 0;
 	}
-	.btn-restore {
+	:global(.btn-restore) {
 		padding: var(--space-1) var(--space-3);
 		font-size: var(--text-sm);
 		cursor: pointer;

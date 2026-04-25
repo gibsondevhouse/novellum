@@ -9,7 +9,7 @@
 		submitCreateRelationship,
 		submitDeleteRelationship,
 	} from '../stores/bible-crud.svelte.ts';
-	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
+	import { GhostButton, PrimaryButton } from '$lib/components/ui/index.js';
 
 	let { characterId, projectId, allCharacters, initialRelationships, onSelectCharacter } = $props<{
 		characterId: string;
@@ -77,26 +77,26 @@
 		<ul class="rel-list">
 			{#each myRelationships as rel (rel.id)}
 				<li class="rel-item">
-					<button
+					<GhostButton
 						class="rel-other"
 						type="button"
 						onclick={() => onSelectCharacter?.(getOtherId(rel))}
 					>
 						<Link2 class="rel-icon" aria-hidden="true" />
 						<span>{getOtherName(rel)}</span>
-					</button>
+					</GhostButton>
 					<span class="rel-type">{rel.type}</span>
 					{#if rel.description}
 						<span class="rel-desc">{rel.description}</span>
 					{/if}
-					<button
+					<GhostButton
 						class="btn-xs"
 						onclick={() => submitDeleteRelationship(rel.id)}
 						aria-label="Remove relationship"
 						type="button"
 					>
 						<X class="rel-icon" aria-hidden="true" />
-					</button
+					</GhostButton
 					>
 				</li>
 			{/each}
@@ -167,7 +167,7 @@
 		border-radius: var(--radius-sm);
 	}
 
-	.rel-other {
+	:global(.rel-other) {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
@@ -234,7 +234,7 @@
 		stroke-width: 1.5;
 	}
 
-	.btn-xs {
+	:global(.btn-xs) {
 		display: inline-grid;
 		place-items: center;
 		width: 2rem;
@@ -247,7 +247,7 @@
 		transition: var(--transition-color);
 	}
 
-	.btn-xs:hover {
+	:global(.btn-xs:hover) {
 		border-color: color-mix(in srgb, var(--color-error) 55%, transparent);
 	}
 

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { Location } from '$lib/db/types.js';
+	import { GhostButton, SectionHeader, SurfacePanel } from '$lib/components/ui/index.js';
 	import type { EntityFormCallbacks } from '../types.js';
 	import {
 		LANDMARK_ACTIVITY_OPTIONS,
@@ -97,17 +98,18 @@
 	}
 </script>
 
-<div class="form-panel" oninput={queueAutosave} onchange={queueAutosave}>
+<SurfacePanel class="form-panel" oninput={queueAutosave} onchange={queueAutosave}>
 	<section class="form-section">
-		<div class="section-header">
-			<div class="section-heading">
+		<SectionHeader title="Landmark is where scenes actually happen" class="dossier-section-header">
+			{#snippet meta()}
 				<p class="section-eyebrow">Core Identity</p>
-				<h3>Landmark is where scenes actually happen</h3>
-			</div>
-			<button type="button" class="collapse-toggle" aria-expanded={!isCoreCollapsed} onclick={() => (isCoreCollapsed = !isCoreCollapsed)}>
-				{isCoreCollapsed ? 'Expand' : 'Collapse'}
-			</button>
-		</div>
+			{/snippet}
+			{#snippet actions()}
+				<GhostButton type="button" class="collapse-toggle" aria-expanded={!isCoreCollapsed} onclick={() => (isCoreCollapsed = !isCoreCollapsed)}>
+					{isCoreCollapsed ? 'Expand' : 'Collapse'}
+				</GhostButton>
+			{/snippet}
+		</SectionHeader>
 		{#if !isCoreCollapsed}
 			<div class="field-grid field-grid--double">
 				<div class="field">
@@ -149,15 +151,16 @@
 	</section>
 
 	<section class="form-section">
-		<div class="section-header">
-			<div class="section-heading">
+		<SectionHeader title="Make the place usable on the page" class="dossier-section-header">
+			{#snippet meta()}
 				<p class="section-eyebrow">Physical / Spatial Description</p>
-				<h3>Make the place usable on the page</h3>
-			</div>
-			<button type="button" class="collapse-toggle" aria-expanded={!isSpatialCollapsed} onclick={() => (isSpatialCollapsed = !isSpatialCollapsed)}>
-				{isSpatialCollapsed ? 'Expand' : 'Collapse'}
-			</button>
-		</div>
+			{/snippet}
+			{#snippet actions()}
+				<GhostButton type="button" class="collapse-toggle" aria-expanded={!isSpatialCollapsed} onclick={() => (isSpatialCollapsed = !isSpatialCollapsed)}>
+					{isSpatialCollapsed ? 'Expand' : 'Collapse'}
+				</GhostButton>
+			{/snippet}
+		</SectionHeader>
 		{#if !isSpatialCollapsed}
 			<div class="field">
 				<label class="label" for="landmark-environment">Environment</label>
@@ -172,15 +175,16 @@
 	</section>
 
 	<section class="form-section">
-		<div class="section-header">
-			<div class="section-heading">
+		<SectionHeader title="Define what the place does in story" class="dossier-section-header">
+			{#snippet meta()}
 				<p class="section-eyebrow">Functional Role</p>
-				<h3>Define what the place does in story</h3>
-			</div>
-			<button type="button" class="collapse-toggle" aria-expanded={!isRoleCollapsed} onclick={() => (isRoleCollapsed = !isRoleCollapsed)}>
-				{isRoleCollapsed ? 'Expand' : 'Collapse'}
-			</button>
-		</div>
+			{/snippet}
+			{#snippet actions()}
+				<GhostButton type="button" class="collapse-toggle" aria-expanded={!isRoleCollapsed} onclick={() => (isRoleCollapsed = !isRoleCollapsed)}>
+					{isRoleCollapsed ? 'Expand' : 'Collapse'}
+				</GhostButton>
+			{/snippet}
+		</SectionHeader>
 		{#if !isRoleCollapsed}
 			<div class="field-grid field-grid--double">
 				<div class="field">
@@ -201,15 +205,16 @@
 	</section>
 
 	<section class="form-section">
-		<div class="section-header">
-			<div class="section-heading">
+		<SectionHeader title="Track how the place evolves" class="dossier-section-header">
+			{#snippet meta()}
 				<p class="section-eyebrow">Narrative Weight</p>
-				<h3>Track how the place evolves</h3>
-			</div>
-			<button type="button" class="collapse-toggle" aria-expanded={!isWeightCollapsed} onclick={() => (isWeightCollapsed = !isWeightCollapsed)}>
-				{isWeightCollapsed ? 'Expand' : 'Collapse'}
-			</button>
-		</div>
+			{/snippet}
+			{#snippet actions()}
+				<GhostButton type="button" class="collapse-toggle" aria-expanded={!isWeightCollapsed} onclick={() => (isWeightCollapsed = !isWeightCollapsed)}>
+					{isWeightCollapsed ? 'Expand' : 'Collapse'}
+				</GhostButton>
+			{/snippet}
+		</SectionHeader>
 		{#if !isWeightCollapsed}
 			<div class="field-grid field-grid--double">
 				<div class="field">
@@ -225,15 +230,16 @@
 	</section>
 
 	<section class="form-section">
-		<div class="section-header">
-			<div class="section-heading">
+		<SectionHeader title="Keep the landmark tied to active systems" class="dossier-section-header">
+			{#snippet meta()}
 				<p class="section-eyebrow">Relationships</p>
-				<h3>Keep the landmark tied to active systems</h3>
-			</div>
-			<button type="button" class="collapse-toggle" aria-expanded={!isRelationshipsCollapsed} onclick={() => (isRelationshipsCollapsed = !isRelationshipsCollapsed)}>
-				{isRelationshipsCollapsed ? 'Expand' : 'Collapse'}
-			</button>
-		</div>
+			{/snippet}
+			{#snippet actions()}
+				<GhostButton type="button" class="collapse-toggle" aria-expanded={!isRelationshipsCollapsed} onclick={() => (isRelationshipsCollapsed = !isRelationshipsCollapsed)}>
+					{isRelationshipsCollapsed ? 'Expand' : 'Collapse'}
+				</GhostButton>
+			{/snippet}
+		</SectionHeader>
 		{#if !isRelationshipsCollapsed}
 			<div class="field-grid field-grid--double">
 				<div class="field">
@@ -253,10 +259,10 @@
 		{/if}
 	</section>
 
-</div>
+</SurfacePanel>
 
 <style>
-	.form-panel {
+	:global(.form-panel) {
 		display: grid;
 		gap: var(--space-6);
 		background: transparent;
@@ -272,25 +278,7 @@
 		border-top: 1px solid color-mix(in srgb, var(--color-border-subtle) 65%, transparent);
 	}
 
-	.section-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		gap: var(--space-3);
-	}
-
-	.section-heading {
-		display: grid;
-		gap: var(--space-1);
-	}
-
-	.section-heading h3,
-	.section-eyebrow,
-	.support-copy {
-		margin: 0;
-	}
-
-	.section-heading h3 {
+	:global(.dossier-section-header .title) {
 		font-size: var(--text-xs);
 		font-weight: var(--font-weight-semibold);
 		color: var(--color-text-muted);
@@ -298,14 +286,29 @@
 		letter-spacing: 0.08em;
 	}
 
+	:global(.dossier-section-header .header-content) {
+		display: flex;
+		flex-direction: column;
+	}
+
+	:global(.dossier-section-header .meta) {
+		order: -1;
+		margin-top: 0;
+	}
+
 	.section-eyebrow {
+		margin: 0;
 		font-size: var(--text-xs);
 		letter-spacing: 0.04em;
 		text-transform: uppercase;
 		color: var(--color-text-muted);
 	}
 
-	.collapse-toggle {
+	.support-copy {
+		margin: 0;
+	}
+
+	:global(.collapse-toggle) {
 		border: 1px solid color-mix(in srgb, var(--color-border-subtle) 70%, transparent);
 		background: transparent;
 		color: var(--color-text-muted);

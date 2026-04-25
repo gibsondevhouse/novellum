@@ -2,6 +2,7 @@
 	import type { Project } from '$lib/db/types';
 	import { apiPut } from '$lib/api-client';
 	import SurfaceCard from '$lib/components/ui/SurfaceCard.svelte';
+	import { PrimaryButton } from '$lib/components/ui/index.js';
 	import { toast } from '$lib/stores/toast.svelte.js';
 
 	let { project }: { project: Project } = $props();
@@ -89,9 +90,9 @@
 
 	{#if hasChanges}
 		<div class="actions">
-			<button class="save-button" onclick={handleSave} disabled={saving}>
+			<PrimaryButton class="save-button" type="button" onclick={handleSave} disabled={saving}>
 				{saving ? 'Saving...' : 'Save Prompt Settings'}
-			</button>
+			</PrimaryButton>
 		</div>
 	{/if}
 </div>
@@ -210,7 +211,7 @@
 		border-top: 1px solid var(--color-border-subtle);
 	}
 
-	.save-button {
+	:global(.save-button) {
 		padding: var(--space-2) var(--space-4);
 		background-color: var(--color-teal);
 		color: var(--color-black);
@@ -222,11 +223,11 @@
 		transition: background-color var(--transition-color);
 	}
 
-	.save-button:hover:not(:disabled) {
+	:global(.save-button:hover:not(:disabled)) {
 		background-color: var(--color-teal-dark);
 	}
 
-	.save-button:disabled {
+	:global(.save-button:disabled) {
 		opacity: 0.7;
 		cursor: not-allowed;
 	}

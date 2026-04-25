@@ -2,6 +2,7 @@
 	import { untrack } from 'svelte';
 	import type { Project } from '$lib/db/types.js';
 	import { getSaving, getSaveSuccess, submitUpdate } from '../stores/project-hub.svelte.ts';
+	import { SurfacePanel } from '$lib/components/ui/index.js';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 
@@ -31,7 +32,7 @@
 	}
 </script>
 
-<div class="form-panel">
+<SurfacePanel class="edit-project-form">
 	<div class="field">
 		<label class="label" for="edit-title">Title <span aria-hidden="true">*</span></label>
 		<input
@@ -86,4 +87,12 @@
 			{getSaving() ? 'Saving…' : 'Save Changes'}
 		</PrimaryButton>
 	</div>
-</div>
+</SurfacePanel>
+
+<style>
+	:global(.edit-project-form) {
+		display: flex !important;
+		flex-direction: column !important;
+		gap: var(--space-4) !important;
+	}
+</style>

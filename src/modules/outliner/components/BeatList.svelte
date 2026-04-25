@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { GhostButton } from '$lib/components/ui/index.js';
 	import type { Beat } from '$lib/db/types.js';
 	import type { BeatFocus } from '../types.js';
 	import {
@@ -121,7 +122,7 @@
 			bind:value={newText}
 			onkeydown={(e) => e.key === 'Enter' && addBeat()}
 		/>
-		<button class="planning-beat-add-btn" onclick={addBeat}>+</button>
+		<GhostButton class="planning-beat-add-btn" type="button" onclick={addBeat}>+</GhostButton>
 	</div>
 </div>
 

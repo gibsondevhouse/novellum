@@ -3,7 +3,7 @@
 	import Link2 from '@lucide/svelte/icons/link-2';
 	import ScanSearch from '@lucide/svelte/icons/scan-search';
 	import { untrack } from 'svelte';
-	import { Input, PrimaryButton, SurfacePanel } from '$lib/components/ui/index.js';
+	import { GhostButton, Input, PrimaryButton, SurfacePanel } from '$lib/components/ui/index.js';
 
 	let {
 		value = '',
@@ -98,9 +98,8 @@
 			</div>
 		</div>
 
-		<button
-			class:asset-linker__dropzone--active={activeDrop}
-			class="asset-linker__dropzone"
+		<GhostButton
+			class={`asset-linker__dropzone ${activeDrop ? 'asset-linker__dropzone--active' : ''}`}
 			type="button"
 			ondragenter={() => (activeDrop = true)}
 			ondragleave={() => (activeDrop = false)}
@@ -118,7 +117,7 @@
 					<span>Example: static/portraits/solenne.png</span>
 				</div>
 			{/if}
-		</button>
+		</GhostButton>
 
 		<div class="asset-linker__controls">
 			<Input
@@ -194,7 +193,7 @@
 		stroke-width: 1.5;
 	}
 
-	.asset-linker__dropzone {
+	:global(.asset-linker__dropzone) {
 		border: 1px dashed var(--color-border-default);
 		border-radius: var(--radius-lg);
 		padding: 0;
@@ -208,9 +207,9 @@
 			transform var(--duration-fast) var(--ease-standard);
 	}
 
-	.asset-linker__dropzone:hover,
-	.asset-linker__dropzone:focus-visible,
-	.asset-linker__dropzone--active {
+	:global(.asset-linker__dropzone:hover),
+	:global(.asset-linker__dropzone:focus-visible),
+	:global(.asset-linker__dropzone--active) {
 		border-color: color-mix(in srgb, var(--color-nova-blue) 60%, var(--color-border-default));
 		box-shadow: var(--shadow-xs);
 		transform: translateY(-1px);

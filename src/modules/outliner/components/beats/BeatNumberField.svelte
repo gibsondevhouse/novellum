@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { GhostButton } from '$lib/components/ui/index.js';
 
 	let { beatNumber, content, onChange, onDelete } = $props<{
 		beatNumber: number;
@@ -41,8 +42,12 @@
 		aria-label="Beat {beatNumber} content"
 		placeholder="What happens here?"
 	/>
-	<button class="beat-delete" onclick={onDelete} aria-label="Delete beat {beatNumber}" tabindex="-1"
-		>×</button
+	<GhostButton
+		class="beat-delete"
+		type="button"
+		onclick={onDelete}
+		aria-label="Delete beat {beatNumber}"
+		tabindex={-1}>×</GhostButton
 	>
 </div>
 
@@ -88,7 +93,7 @@
 		color: var(--color-text-primary);
 	}
 
-	.beat-delete {
+	:global(.beat-delete) {
 		background: none;
 		border: none;
 		color: var(--color-text-muted);
@@ -103,16 +108,16 @@
 			color 0.1s;
 	}
 
-	.beat-number-field:hover .beat-delete,
-	.beat-number-field:focus-within .beat-delete {
+	.beat-number-field:hover :global(.beat-delete),
+	.beat-number-field:focus-within :global(.beat-delete) {
 		opacity: 1;
 	}
 
-	.beat-delete:hover {
+	:global(.beat-delete:hover) {
 		color: var(--color-error);
 	}
 
-	.beat-delete:focus-visible {
+	:global(.beat-delete:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 		opacity: 1;

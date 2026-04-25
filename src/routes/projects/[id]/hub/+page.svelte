@@ -47,7 +47,7 @@
 		max-width: 1120px;
 		margin: 0 auto;
 		width: 100%;
-		padding: var(--space-8) var(--space-6) var(--space-10);
+		padding: var(--space-8) 0 var(--space-10);
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-6);
@@ -64,7 +64,7 @@
 	/* ── Responsive ── */
 	@media (max-width: 767px) {
 		.hub {
-			padding: var(--space-6) var(--space-4) var(--space-8);
+			padding: var(--space-6) 0 var(--space-8);
 		}
 
 		.hub-grid {
@@ -73,7 +73,7 @@
 	}
 	@media (max-width: 640px) {
 		.hub {
-			padding: var(--space-6) var(--space-4);
+			padding: var(--space-6) 0;
 		}
 		.hub-grid {
 			grid-template-columns: 1fr;

@@ -7,6 +7,7 @@
 	import PlanningSurfaceBody from '$lib/components/planning/PlanningSurfaceBody.svelte';
 	import PlanningSurfaceFooter from '$lib/components/planning/PlanningSurfaceFooter.svelte';
 	import FocusOverlay from '$lib/components/planning/FocusOverlay.svelte';
+	import { GhostButton } from '$lib/components/ui/index.js';
 	import ChapterOutlineForm from './ChapterOutlineForm.svelte';
 	import SceneOutlineForm from './SceneOutlineForm.svelte';
 	import ChapterOutlinePanel from './ChapterOutlinePanel.svelte';
@@ -114,9 +115,9 @@
 		/>
 
 		{#snippet actions()}
-			<button class="close-btn" onclick={onClose} aria-label="Close planning panel">
+			<GhostButton class="close-btn" type="button" onclick={onClose} aria-label="Close planning panel">
 				<span aria-hidden="true">✕</span>
-			</button>
+			</GhostButton>
 		{/snippet}
 	</PlanningSurfaceHeader>
 
@@ -158,7 +159,9 @@
 				<span class="beat-focus-label">
 					Beat {selectedBeat ? selectedBeat.index + 1 : ''}
 				</span>
-				<button class="beat-focus-close" onclick={closeBeat} aria-label="Close beat">✕</button>
+				<GhostButton class="beat-focus-close" type="button" onclick={closeBeat} aria-label="Close beat"
+					>✕</GhostButton
+				>
 			</div>
 		{/snippet}
 		<div class="beat-focus-body">
@@ -197,7 +200,7 @@
 		color: var(--color-nova-blue);
 	}
 
-	.close-btn {
+	:global(.close-btn) {
 		background: none;
 		border: none;
 		color: var(--color-text-muted);
@@ -211,12 +214,12 @@
 			background var(--duration-base) var(--ease-standard);
 	}
 
-	.close-btn:hover {
+	:global(.close-btn:hover) {
 		color: var(--color-text-secondary);
 		background: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
 	}
 
-	.close-btn:focus-visible {
+	:global(.close-btn:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}
@@ -275,7 +278,7 @@
 		opacity: 0.7;
 	}
 
-	.beat-focus-close {
+	:global(.beat-focus-close) {
 		background: none;
 		border: none;
 		color: var(--color-text-muted);
@@ -290,12 +293,12 @@
 			background var(--duration-fast) var(--ease-standard);
 	}
 
-	.beat-focus-close:hover {
+	:global(.beat-focus-close:hover) {
 		color: var(--color-text-secondary);
 		background: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
 	}
 
-	.beat-focus-close:focus-visible {
+	:global(.beat-focus-close:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}

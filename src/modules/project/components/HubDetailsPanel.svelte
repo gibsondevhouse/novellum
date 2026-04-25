@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import type { Project, WritingStyle } from '$lib/db/types.js';
-	import { SurfacePanel, SectionHeader, PrimaryButton, Input } from '$lib/components/ui/index.js';
+	import {
+		SurfacePanel,
+		SectionHeader,
+		PrimaryButton,
+		GhostButton,
+		Input,
+	} from '$lib/components/ui/index.js';
 	import { submitUpdate } from '$modules/project/stores/project-hub.svelte.js';
 	import { STYLE_PRESETS } from '$lib/ai/style-presets.js';
 
@@ -104,9 +110,9 @@
 						<PrimaryButton onclick={confirmTarget} class="hub-target-btn">Save</PrimaryButton>
 					</div>
 				{:else}
-					<button class="details-val-btn" onclick={startEditTarget}>
+					<GhostButton class="details-val-btn" type="button" onclick={startEditTarget}>
 						{hasTarget ? `${formatWords(project.targetWordCount)} words` : 'Set target'}
-					</button>
+					</GhostButton>
 				{/if}
 			</dd>
 		</div>
@@ -171,19 +177,15 @@
 		background: var(--color-surface-hover);
 	}
 
-	.details-val-btn {
-		background: none;
-		border: none;
+	:global(.details-val-btn) {
 		color: var(--color-text-secondary);
 		font-size: var(--text-xs);
 		font-family: inherit;
-		cursor: pointer;
 		padding: var(--space-1) var(--space-2);
-		border-radius: var(--radius-sm);
 		transition: background-color var(--duration-base) var(--ease-standard);
 	}
 
-	.details-val-btn:hover {
+	:global(.details-val-btn:hover) {
 		background: var(--color-surface-hover);
 	}
 

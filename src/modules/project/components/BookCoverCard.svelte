@@ -1,5 +1,6 @@
 <script lang="ts">
         import type { Project } from '$lib/db/types.js';
+        import GhostButton from '$lib/components/ui/GhostButton.svelte';
         import { openReader } from '../stores/project-hub.svelte.js';
 
         let { project } = $props<{ project: Project }>();
@@ -25,8 +26,9 @@
 </script>
 
 <article class="book-cover-card">
-        <button
+        <GhostButton
                 class="cover-button"
+                type="button"
                 onclick={() => openReader(project)}
                 aria-label="Open project {project.title || 'Untitled'}"
         >
@@ -59,7 +61,7 @@
                                 <p class="book-meta">Never opened</p>
                         {/if}
                 </div>
-        </button>
+        </GhostButton>
 </article>
 
 <style>
@@ -68,7 +70,7 @@
                 flex-shrink: 0;
         }
 
-        .cover-button {
+        :global(.cover-button) {
                 display: flex;
                 flex-direction: column;
                 background: transparent;
@@ -83,16 +85,16 @@
                 position: relative;
         }
 
-        .cover-button:focus-visible {
+        :global(.cover-button:focus-visible) {
                 outline: none;
         }
 
-        .cover-button:focus-visible .cover-image {
+        :global(.cover-button:focus-visible) .cover-image {
                 box-shadow: var(--focus-ring-offset);
                 border-color: var(--color-border-focus);
         }
 
-        .cover-button:hover {
+        :global(.cover-button:hover) {
                 transform: translateY(-4px);
         }
 
@@ -111,12 +113,12 @@
                         transform var(--duration-fast) var(--ease-standard);
         }
 
-        .cover-button:hover .cover-image {
+        :global(.cover-button:hover) .cover-image {
                 box-shadow: var(--shadow-md);
                 border-color: var(--color-border-strong);
         }
 
-        .cover-button:active .cover-image {
+        :global(.cover-button:active) .cover-image {
                 transform: scale(0.98);
                 box-shadow: var(--shadow-xs);
         }

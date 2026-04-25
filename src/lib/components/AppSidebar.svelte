@@ -74,7 +74,7 @@
 		</div>
 	{/if}
 
-	<div id="sidebar-nav-content" class="sidebar-scroll">
+	<nav id="sidebar-nav-content" class="sidebar-scroll" aria-label="Primary navigation links">
 		<SidebarSection>
 			<SidebarItem href="/" label="Home" active={isHomeActive}>
 			{#snippet icon()}
@@ -216,7 +216,7 @@
 			{/snippet}
 			</SidebarItem>
 		</SidebarSection>
-	</div>
+	</nav>
 
 	{#if !collapsed}
 		<div class="sidebar-bottom">

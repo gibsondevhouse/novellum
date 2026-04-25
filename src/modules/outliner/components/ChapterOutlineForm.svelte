@@ -4,6 +4,7 @@
 	import { updateChapter } from '$modules/project/services/chapter-repository.js';
 	import StructuredSection from '$lib/components/planning/StructuredSection.svelte';
 	import ArcTagHint from './ArcTagHint.svelte';
+	import { SurfacePanel } from '$lib/components/ui/index.js';
 
 	let { chapter, onUpdate } = $props<{
 		chapter: Chapter;
@@ -74,7 +75,7 @@
 	}
 </script>
 
-<div class="planning-panel">
+<SurfacePanel class="planning-panel">
 	<!-- Panel context bar -->
 	<div class="planning-context">
 		<span class="planning-context-label">Intent</span>
@@ -161,4 +162,4 @@
 
 	<!-- Arc tags -->
 	<ArcTagHint arcRefs={chapter.arcRefs} />
-</div>
+</SurfacePanel>

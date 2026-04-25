@@ -4,6 +4,7 @@
 	import SectionHeader from '$lib/components/ui/SectionHeader.svelte';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
+	import { PageHeader } from '$lib/components/ui/index.js';
 	import type { WritingStyle, SystemPrompt, ChatInstruction } from '$lib/db/types';
 	import { STYLE_PRESETS } from '$lib/ai/style-presets.js';
 
@@ -118,19 +119,18 @@
 </svelte:head>
 
 <div class="styles-page">
-	<div class="styles-header">
-		<div>
-			<p class="styles-header__eyebrow">Configuration Library</p>
-			<h1 class="styles-header__title">Writing Styles</h1>
-			<p class="styles-header__description">
-				Customize formatting, tone, and behavior rules for Nova.
-			</p>
-		</div>
-		<div class="styles-header__summary" aria-label="Styles summary">
-			<span>{tabs.find((tab) => tab.id === activeTab)?.label}</span>
-			<strong>{activeTab === 'styles' ? styles.length : activeTab === 'prompts' ? systemPrompts.length : instructions.length} items</strong>
-		</div>
-	</div>
+	<PageHeader
+		eyebrow="Configuration Library"
+		title="Writing Styles"
+		description="Customize formatting, tone, and behavior rules for Nova."
+	>
+		{#snippet meta()}
+			<div class="styles-header__summary" aria-label="Styles summary">
+				<span>{tabs.find((tab) => tab.id === activeTab)?.label}</span>
+				<strong>{activeTab === 'styles' ? styles.length : activeTab === 'prompts' ? systemPrompts.length : instructions.length} items</strong>
+			</div>
+		{/snippet}
+	</PageHeader>
 
 	<div class="tab-navigation" aria-label="Styles sections">
 		{#each tabs as tab (tab.id)}
@@ -307,44 +307,14 @@
 	.styles-page {
 		max-width: 800px;
 		margin: 0 auto;
-		padding: var(--space-8) var(--space-6);
+		padding: var(--space-8) 0;
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-8);
 	}
 
-	.styles-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-		gap: var(--space-4);
-	}
-
-	.styles-header__eyebrow,
-	.styles-header__title,
-	.styles-header__description {
-		margin: 0;
-	}
-
-	.styles-header__eyebrow {
-		font-size: var(--text-xs);
-		text-transform: uppercase;
-		letter-spacing: var(--tracking-wide);
-		color: var(--color-text-muted);
-	}
-
-	.styles-header__title {
-		font-family: var(--font-display);
-		font-size: var(--text-3xl);
-		margin: 0;
-		color: var(--color-text-primary);
-	}
-
-	.styles-header__description {
-		font-size: var(--text-base);
-		color: var(--color-text-secondary);
-		max-width: 500px;
-		margin-top: var(--space-2);
+	.styles-page :global(.page-header) {
+		padding-bottom: var(--space-6);
 	}
 
 	.styles-header__summary {
@@ -419,7 +389,6 @@
 	}
 
 	@media (max-width: 760px) {
-		.styles-header,
 		.panel-header-actions {
 			flex-direction: column;
 			align-items: stretch;

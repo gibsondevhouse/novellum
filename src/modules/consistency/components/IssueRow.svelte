@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { ConsistencyIssue } from '$lib/db/types.js';
+	import { GhostButton } from '$lib/components/ui/index.js';
 
 	let {
 		issue,
@@ -54,13 +55,19 @@
 	{#if onResolve || onDismiss || onReopen}
 		<div class="issue-actions">
 			{#if onResolve && issue.status === 'open'}
-				<button onclick={() => onResolve?.(issue.id)} class="btn-resolve">Mark Resolved</button>
+				<GhostButton type="button" onclick={() => onResolve?.(issue.id)} class="btn-resolve"
+					>Mark Resolved</GhostButton
+				>
 			{/if}
 			{#if onDismiss && issue.status === 'open'}
-				<button onclick={() => onDismiss?.(issue.id)} class="btn-dismiss">Dismiss</button>
+				<GhostButton type="button" onclick={() => onDismiss?.(issue.id)} class="btn-dismiss"
+					>Dismiss</GhostButton
+				>
 			{/if}
 			{#if onReopen && (issue.status === 'resolved' || issue.status === 'dismissed')}
-				<button onclick={() => onReopen?.(issue.id)} class="btn-reopen">Reopen</button>
+				<GhostButton type="button" onclick={() => onReopen?.(issue.id)} class="btn-reopen"
+					>Reopen</GhostButton
+				>
 			{/if}
 		</div>
 	{/if}
@@ -153,9 +160,9 @@
 		padding-top: var(--space-1);
 	}
 
-	.btn-resolve,
-	.btn-dismiss,
-	.btn-reopen {
+	:global(.btn-resolve),
+	:global(.btn-dismiss),
+	:global(.btn-reopen) {
 		padding: var(--space-1) var(--space-3);
 		border-radius: var(--radius-sm);
 		background: transparent;
@@ -165,37 +172,37 @@
 		transition: background-color var(--duration-fast) var(--ease-standard);
 	}
 
-	.btn-resolve:focus-visible,
-	.btn-dismiss:focus-visible,
-	.btn-reopen:focus-visible {
+	:global(.btn-resolve:focus-visible),
+	:global(.btn-dismiss:focus-visible),
+	:global(.btn-reopen:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}
 
-	.btn-resolve {
+	:global(.btn-resolve) {
 		color: var(--color-success);
 		border: 1px solid var(--color-success);
 	}
 
-	.btn-resolve:hover {
+	:global(.btn-resolve:hover) {
 		background-color: color-mix(in srgb, var(--color-success) 15%, transparent);
 	}
 
-	.btn-dismiss {
+	:global(.btn-dismiss) {
 		color: var(--color-text-muted);
 		border: 1px solid var(--color-border);
 	}
 
-	.btn-dismiss:hover {
+	:global(.btn-dismiss:hover) {
 		background-color: var(--color-surface-elevated);
 	}
 
-	.btn-reopen {
+	:global(.btn-reopen) {
 		color: var(--color-text-secondary);
 		border: 1px solid var(--color-border);
 	}
 
-	.btn-reopen:hover {
+	:global(.btn-reopen:hover) {
 		background-color: var(--color-surface-elevated);
 	}
 </style>

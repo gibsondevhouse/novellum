@@ -1,11 +1,12 @@
 <script lang="ts">
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	let { synopsis, onEdit }: { synopsis: string; onEdit: () => void } = $props();
 </script>
 
 {#if synopsis}
 	<p class="hero-synopsis">{synopsis}</p>
 {:else}
-	<button class="hero-synopsis-empty" onclick={onEdit}>Add a synopsis</button>
+	<GhostButton class="hero-synopsis-empty" type="button" onclick={onEdit}>Add a synopsis</GhostButton>
 {/if}
 
 <style>
@@ -16,7 +17,7 @@
 		color: var(--color-text-secondary);
 		margin: 0;
 	}
-	.hero-synopsis-empty {
+	:global(.hero-synopsis-empty) {
 		display: block;
 		background: none;
 		border: 1px dashed var(--color-border-default);
@@ -33,12 +34,12 @@
 			border-color var(--duration-base) var(--ease-standard),
 			background-color var(--duration-base) var(--ease-standard);
 	}
-	.hero-synopsis-empty:hover {
+	:global(.hero-synopsis-empty:hover) {
 		color: var(--color-text-secondary);
 		border-color: var(--color-border-strong);
 		background: var(--color-surface-overlay);
 	}
-	.hero-synopsis-empty:focus-visible {
+	:global(.hero-synopsis-empty:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}

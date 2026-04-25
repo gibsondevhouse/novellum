@@ -253,19 +253,19 @@
 	}
 </script>
 
-<div class="archive-form">
-	<section class="archive-section">
+<div class="dossier-form">
+	<section class="dossier-form-section">
 		<h3>Core Identity</h3>
-		<div class="archive-grid archive-grid--double">
-			<div class="archive-field">
-				<label class="archive-label" for="thread-system-name">Name <span aria-hidden="true">*</span></label>
-				<input id="thread-system-name" class="archive-input" class:archive-input-error={!!nameError} type="text" bind:value={name} />
-				{#if nameError}<p class="archive-error-text">{nameError}</p>{/if}
+		<div class="dossier-form-grid dossier-form-grid--double">
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="thread-system-name">Name <span aria-hidden="true">*</span></label>
+				<input id="thread-system-name" class="dossier-form-input" class:dossier-form-input-error={!!nameError} type="text" bind:value={name} />
+				{#if nameError}<p class="dossier-form-error-text">{nameError}</p>{/if}
 			</div>
 			{#if kind === 'major-arc'}
-				<div class="archive-field">
-					<label class="archive-label" for="major-arc-scope">Scope</label>
-					<select id="major-arc-scope" class="archive-input" bind:value={scope}>
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="major-arc-scope">Scope</label>
+					<select id="major-arc-scope" class="dossier-form-input" bind:value={scope}>
 						<option value="">Select scope</option>
 						<option value="global">Global</option>
 						<option value="faction">Faction</option>
@@ -274,315 +274,224 @@
 				</div>
 			{/if}
 			{#if kind === 'sub-plot'}
-				<div class="archive-field">
-					<label class="archive-label" for="sub-plot-parent">Parent Arc <span aria-hidden="true">*</span></label>
-					<select id="sub-plot-parent" class="archive-input" class:archive-input-error={!!parentArcError} bind:value={parentArcId}>
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="sub-plot-parent">Parent Arc <span aria-hidden="true">*</span></label>
+					<select id="sub-plot-parent" class="dossier-form-input" class:dossier-form-input-error={!!parentArcError} bind:value={parentArcId}>
 						<option value="">Select parent arc</option>
 						{#each arcOptions as arc (arc.id)}
 							<option value={arc.id}>{arc.name}</option>
 						{/each}
 					</select>
-					{#if parentArcError}<p class="archive-error-text">{parentArcError}</p>{/if}
+					{#if parentArcError}<p class="dossier-form-error-text">{parentArcError}</p>{/if}
 				</div>
 			{/if}
 			{#if kind === 'motivation'}
-				<div class="archive-field">
-					<label class="archive-label" for="motivation-type">Type <span aria-hidden="true">*</span></label>
-					<select id="motivation-type" class="archive-input" class:archive-input-error={!!typeError} bind:value={motivationType}>
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="motivation-type">Type <span aria-hidden="true">*</span></label>
+					<select id="motivation-type" class="dossier-form-input" class:dossier-form-input-error={!!typeError} bind:value={motivationType}>
 						<option value="">Select type</option>
 						<option value="character">Character</option>
 						<option value="faction">Faction</option>
 						<option value="systemic">Systemic</option>
 					</select>
-					{#if typeError}<p class="archive-error-text">{typeError}</p>{/if}
+					{#if typeError}<p class="dossier-form-error-text">{typeError}</p>{/if}
 				</div>
 			{/if}
 		</div>
 	</section>
 
 	{#if kind === 'major-arc'}
-		<section class="archive-section">
+		<section class="dossier-form-section">
 			<h3>Causal Spine</h3>
-			<div class="archive-field">
-				<label class="archive-label" for="major-initial">Initial Condition</label>
-				<textarea id="major-initial" class="archive-input archive-textarea" rows={3} bind:value={initialCondition}></textarea>
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="major-initial">Initial Condition</label>
+				<textarea id="major-initial" class="dossier-form-input dossier-form-textarea" rows={3} bind:value={initialCondition}></textarea>
 			</div>
-			<div class="archive-field">
-				<label class="archive-label" for="major-inciting">Inciting Pressure</label>
-				<textarea id="major-inciting" class="archive-input archive-textarea" rows={3} bind:value={incitingPressure}></textarea>
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="major-inciting">Inciting Pressure</label>
+				<textarea id="major-inciting" class="dossier-form-input dossier-form-textarea" rows={3} bind:value={incitingPressure}></textarea>
 			</div>
-			<div class="archive-field">
-				<label class="archive-label" for="major-escalation">Escalation Pattern</label>
-				<textarea id="major-escalation" class="archive-input archive-textarea" rows={3} bind:value={escalationPattern}></textarea>
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="major-escalation">Escalation Pattern</label>
+				<textarea id="major-escalation" class="dossier-form-input dossier-form-textarea" rows={3} bind:value={escalationPattern}></textarea>
 			</div>
-			<div class="archive-grid archive-grid--double">
-				<div class="archive-field">
-					<label class="archive-label" for="major-breaking">Breaking Point</label>
-					<textarea id="major-breaking" class="archive-input archive-textarea" rows={3} bind:value={breakingPoint}></textarea>
+			<div class="dossier-form-grid dossier-form-grid--double">
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="major-breaking">Breaking Point</label>
+					<textarea id="major-breaking" class="dossier-form-input dossier-form-textarea" rows={3} bind:value={breakingPoint}></textarea>
 				</div>
-				<div class="archive-field">
-					<label class="archive-label" for="major-resolution">Resolution Vector</label>
-					<textarea id="major-resolution" class="archive-input archive-textarea" rows={3} bind:value={resolutionVector}></textarea>
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="major-resolution">Resolution Vector</label>
+					<textarea id="major-resolution" class="dossier-form-input dossier-form-textarea" rows={3} bind:value={resolutionVector}></textarea>
 				</div>
 			</div>
 		</section>
 
-		<section class="archive-section">
+		<section class="dossier-form-section">
 			<h3>Narrative Role</h3>
-			<div class="archive-grid archive-grid--double">
-				<div class="archive-field">
-					<label class="archive-label" for="major-function">Arc Function</label>
-					<input id="major-function" class="archive-input" type="text" bind:value={arcFunction} />
+			<div class="dossier-form-grid dossier-form-grid--double">
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="major-function">Arc Function</label>
+					<input id="major-function" class="dossier-form-input" type="text" bind:value={arcFunction} />
 				</div>
-				<div class="archive-field">
-					<label class="archive-label" for="major-stakes">Stakes</label>
-					<input id="major-stakes" class="archive-input" type="text" bind:value={arcStakes} />
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="major-stakes">Stakes</label>
+					<input id="major-stakes" class="dossier-form-input" type="text" bind:value={arcStakes} />
 				</div>
 			</div>
 		</section>
 
-		<section class="archive-section">
+		<section class="dossier-form-section">
 			<h3>Relationships</h3>
-			<div class="archive-grid archive-grid--double">
-				<div class="archive-field">
-					<label class="archive-label" for="major-character-ids">Character IDs</label>
-					<input id="major-character-ids" class="archive-input" type="text" bind:value={arcCharacterIdsRaw} />
+			<div class="dossier-form-grid dossier-form-grid--double">
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="major-character-ids">Character IDs</label>
+					<input id="major-character-ids" class="dossier-form-input" type="text" bind:value={arcCharacterIdsRaw} />
 				</div>
-				<div class="archive-field">
-					<label class="archive-label" for="major-realm-ids">Realm IDs</label>
-					<input id="major-realm-ids" class="archive-input" type="text" bind:value={arcRealmIdsRaw} />
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="major-realm-ids">Realm IDs</label>
+					<input id="major-realm-ids" class="dossier-form-input" type="text" bind:value={arcRealmIdsRaw} />
 				</div>
-				<div class="archive-field">
-					<label class="archive-label" for="major-thread-ids">Thread IDs</label>
-					<input id="major-thread-ids" class="archive-input" type="text" bind:value={arcThreadIdsRaw} />
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="major-thread-ids">Thread IDs</label>
+					<input id="major-thread-ids" class="dossier-form-input" type="text" bind:value={arcThreadIdsRaw} />
 				</div>
-				<div class="archive-field">
-					<label class="archive-label" for="major-subplot-ids">Sub-plot IDs</label>
-					<input id="major-subplot-ids" class="archive-input" type="text" bind:value={subPlotIdsRaw} />
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="major-subplot-ids">Sub-plot IDs</label>
+					<input id="major-subplot-ids" class="dossier-form-input" type="text" bind:value={subPlotIdsRaw} />
 				</div>
 			</div>
 		</section>
 	{/if}
 
 	{#if kind === 'sub-plot'}
-		<section class="archive-section">
+		<section class="dossier-form-section">
 			<h3>Function</h3>
-			<div class="archive-field">
-				<label class="archive-label" for="sub-relationship">Relationship to Main Arc</label>
-				<textarea id="sub-relationship" class="archive-input archive-textarea" rows={2} bind:value={relationshipToMainArc}></textarea>
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="sub-relationship">Relationship to Main Arc</label>
+				<textarea id="sub-relationship" class="dossier-form-input dossier-form-textarea" rows={2} bind:value={relationshipToMainArc}></textarea>
 			</div>
-			<div class="archive-grid archive-grid--double">
-				<div class="archive-field">
-					<label class="archive-label" for="sub-entry">Entry Point</label>
-					<textarea id="sub-entry" class="archive-input archive-textarea" rows={2} bind:value={entryPoint}></textarea>
+			<div class="dossier-form-grid dossier-form-grid--double">
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="sub-entry">Entry Point</label>
+					<textarea id="sub-entry" class="dossier-form-input dossier-form-textarea" rows={2} bind:value={entryPoint}></textarea>
 				</div>
-				<div class="archive-field">
-					<label class="archive-label" for="sub-convergence">Convergence Point</label>
-					<textarea id="sub-convergence" class="archive-input archive-textarea" rows={2} bind:value={convergencePoint}></textarea>
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="sub-convergence">Convergence Point</label>
+					<textarea id="sub-convergence" class="dossier-form-input dossier-form-textarea" rows={2} bind:value={convergencePoint}></textarea>
 				</div>
 			</div>
-			<div class="archive-field">
-				<label class="archive-label" for="sub-escalation">Escalation</label>
-				<textarea id="sub-escalation" class="archive-input archive-textarea" rows={3} bind:value={subEscalation}></textarea>
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="sub-escalation">Escalation</label>
+				<textarea id="sub-escalation" class="dossier-form-input dossier-form-textarea" rows={3} bind:value={subEscalation}></textarea>
 			</div>
 		</section>
 
-		<section class="archive-section">
+		<section class="dossier-form-section">
 			<h3>Narrative Role</h3>
-			<div class="archive-grid archive-grid--double">
-				<div class="archive-field">
-					<label class="archive-label" for="sub-purpose">Purpose</label>
-					<input id="sub-purpose" class="archive-input" type="text" bind:value={subPurpose} />
+			<div class="dossier-form-grid dossier-form-grid--double">
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="sub-purpose">Purpose</label>
+					<input id="sub-purpose" class="dossier-form-input" type="text" bind:value={subPurpose} />
 				</div>
-				<div class="archive-field">
-					<label class="archive-label" for="sub-stakes">Stakes</label>
-					<input id="sub-stakes" class="archive-input" type="text" bind:value={subStakes} />
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="sub-stakes">Stakes</label>
+					<input id="sub-stakes" class="dossier-form-input" type="text" bind:value={subStakes} />
 				</div>
 			</div>
 		</section>
 
-		<section class="archive-section">
+		<section class="dossier-form-section">
 			<h3>Relationships</h3>
-			<div class="archive-grid archive-grid--double">
-				<div class="archive-field">
-					<label class="archive-label" for="sub-character-ids">Character IDs</label>
-					<input id="sub-character-ids" class="archive-input" type="text" bind:value={subCharacterIdsRaw} />
+			<div class="dossier-form-grid dossier-form-grid--double">
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="sub-character-ids">Character IDs</label>
+					<input id="sub-character-ids" class="dossier-form-input" type="text" bind:value={subCharacterIdsRaw} />
 				</div>
-				<div class="archive-field">
-					<label class="archive-label" for="sub-realm-ids">Realm IDs</label>
-					<input id="sub-realm-ids" class="archive-input" type="text" bind:value={subRealmIdsRaw} />
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="sub-realm-ids">Realm IDs</label>
+					<input id="sub-realm-ids" class="dossier-form-input" type="text" bind:value={subRealmIdsRaw} />
 				</div>
-				<div class="archive-field">
-					<label class="archive-label" for="sub-thread-ids">Thread IDs</label>
-					<input id="sub-thread-ids" class="archive-input" type="text" bind:value={subThreadIdsRaw} />
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="sub-thread-ids">Thread IDs</label>
+					<input id="sub-thread-ids" class="dossier-form-input" type="text" bind:value={subThreadIdsRaw} />
 				</div>
 			</div>
 		</section>
 	{/if}
 
 	{#if kind === 'motivation'}
-		<section class="archive-section">
+		<section class="dossier-form-section">
 			<h3>Decision Logic</h3>
-			<div class="archive-grid archive-grid--double">
-				<div class="archive-field">
-					<label class="archive-label" for="motivation-desire">Desire</label>
-					<textarea id="motivation-desire" class="archive-input archive-textarea" rows={2} bind:value={desire}></textarea>
+			<div class="dossier-form-grid dossier-form-grid--double">
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="motivation-desire">Desire</label>
+					<textarea id="motivation-desire" class="dossier-form-input dossier-form-textarea" rows={2} bind:value={desire}></textarea>
 				</div>
-				<div class="archive-field">
-					<label class="archive-label" for="motivation-fear">Fear / Constraint</label>
-					<textarea id="motivation-fear" class="archive-input archive-textarea" rows={2} bind:value={fearConstraint}></textarea>
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="motivation-fear">Fear / Constraint</label>
+					<textarea id="motivation-fear" class="dossier-form-input dossier-form-textarea" rows={2} bind:value={fearConstraint}></textarea>
 				</div>
 			</div>
-			<div class="archive-field">
-				<label class="archive-label" for="motivation-belief">Belief</label>
-				<textarea id="motivation-belief" class="archive-input archive-textarea" rows={2} bind:value={belief}></textarea>
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="motivation-belief">Belief</label>
+				<textarea id="motivation-belief" class="dossier-form-input dossier-form-textarea" rows={2} bind:value={belief}></textarea>
 			</div>
-			<div class="archive-field">
-				<label class="archive-label" for="motivation-trigger">Trigger</label>
-				<textarea id="motivation-trigger" class="archive-input archive-textarea" rows={2} bind:value={trigger}></textarea>
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="motivation-trigger">Trigger</label>
+				<textarea id="motivation-trigger" class="dossier-form-input dossier-form-textarea" rows={2} bind:value={trigger}></textarea>
 			</div>
 		</section>
 
-		<section class="archive-section">
+		<section class="dossier-form-section">
 			<h3>Behavior Pattern</h3>
-			<div class="archive-grid archive-grid--double">
-				<div class="archive-field">
-					<label class="archive-label" for="motivation-action">Typical Action</label>
-					<textarea id="motivation-action" class="archive-input archive-textarea" rows={2} bind:value={typicalAction}></textarea>
+			<div class="dossier-form-grid dossier-form-grid--double">
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="motivation-action">Typical Action</label>
+					<textarea id="motivation-action" class="dossier-form-input dossier-form-textarea" rows={2} bind:value={typicalAction}></textarea>
 				</div>
-				<div class="archive-field">
-					<label class="archive-label" for="motivation-shift">Escalation Shift</label>
-					<textarea id="motivation-shift" class="archive-input archive-textarea" rows={2} bind:value={escalationShift}></textarea>
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="motivation-shift">Escalation Shift</label>
+					<textarea id="motivation-shift" class="dossier-form-input dossier-form-textarea" rows={2} bind:value={escalationShift}></textarea>
 				</div>
 			</div>
 		</section>
 
-		<section class="archive-section">
+		<section class="dossier-form-section">
 			<h3>Narrative Role</h3>
-			<div class="archive-field">
-				<label class="archive-label" for="motivation-function">Function</label>
-				<input id="motivation-function" class="archive-input" type="text" bind:value={motivationFunction} />
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="motivation-function">Function</label>
+				<input id="motivation-function" class="dossier-form-input" type="text" bind:value={motivationFunction} />
 			</div>
 		</section>
 
-		<section class="archive-section">
+		<section class="dossier-form-section">
 			<h3>Relationships</h3>
-			<div class="archive-grid archive-grid--double">
-				<div class="archive-field">
-					<label class="archive-label" for="motivation-character-ids">Character IDs</label>
-					<input id="motivation-character-ids" class="archive-input" type="text" bind:value={motivationCharacterIdsRaw} />
+			<div class="dossier-form-grid dossier-form-grid--double">
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="motivation-character-ids">Character IDs</label>
+					<input id="motivation-character-ids" class="dossier-form-input" type="text" bind:value={motivationCharacterIdsRaw} />
 				</div>
-				<div class="archive-field">
-					<label class="archive-label" for="motivation-faction-ids">Faction IDs</label>
-					<input id="motivation-faction-ids" class="archive-input" type="text" bind:value={motivationFactionIdsRaw} />
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="motivation-faction-ids">Faction IDs</label>
+					<input id="motivation-faction-ids" class="dossier-form-input" type="text" bind:value={motivationFactionIdsRaw} />
 				</div>
-				<div class="archive-field">
-					<label class="archive-label" for="motivation-arc-ids">Arc IDs</label>
-					<input id="motivation-arc-ids" class="archive-input" type="text" bind:value={motivationArcIdsRaw} />
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="motivation-arc-ids">Arc IDs</label>
+					<input id="motivation-arc-ids" class="dossier-form-input" type="text" bind:value={motivationArcIdsRaw} />
 				</div>
-				<div class="archive-field">
-					<label class="archive-label" for="motivation-subplot-ids">Sub-plot IDs</label>
-					<input id="motivation-subplot-ids" class="archive-input" type="text" bind:value={motivationSubPlotIdsRaw} />
+				<div class="dossier-form-field">
+					<label class="dossier-form-label" for="motivation-subplot-ids">Sub-plot IDs</label>
+					<input id="motivation-subplot-ids" class="dossier-form-input" type="text" bind:value={motivationSubPlotIdsRaw} />
 				</div>
 			</div>
 		</section>
 	{/if}
 
-	<div class="archive-actions">
+	<div class="dossier-form-actions">
 		<GhostButton onclick={onCancel} disabled={saving}>Cancel</GhostButton>
 		<PrimaryButton onclick={handleSubmit} disabled={saving}>
 			{saving ? 'Saving…' : thread ? 'Save Changes' : 'Create Entry'}
 		</PrimaryButton>
 	</div>
 </div>
-
-<style>
-	.archive-form {
-		display: grid;
-		gap: var(--space-6);
-	}
-
-	.archive-section {
-		display: grid;
-		gap: var(--space-4);
-		padding-top: var(--space-4);
-		border-top: 1px solid color-mix(in srgb, var(--color-border-subtle) 65%, transparent);
-	}
-
-	h3 {
-		margin: 0;
-		font-size: var(--text-xs);
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
-		color: var(--color-text-muted);
-		font-weight: var(--font-weight-semibold);
-	}
-
-	.archive-grid {
-		display: grid;
-		gap: var(--space-4);
-	}
-
-	.archive-grid--double {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-
-	.archive-field {
-		display: grid;
-		gap: var(--space-2);
-	}
-
-	.archive-label {
-		font-size: var(--text-xs);
-		letter-spacing: 0.03em;
-		color: var(--color-text-muted);
-		font-weight: var(--font-weight-medium);
-	}
-
-	.archive-input {
-		width: 100%;
-		padding: 0.2rem 0.25rem;
-		border: 1px solid transparent;
-		border-radius: var(--radius-sm);
-		background: transparent;
-		color: var(--color-text-primary);
-		font: inherit;
-	}
-
-	.archive-input:hover {
-		border-color: color-mix(in srgb, var(--color-border-subtle) 75%, transparent);
-	}
-
-	.archive-input:focus {
-		outline: none;
-		border-color: color-mix(in srgb, var(--color-nova-blue) 45%, var(--color-border-default));
-		background: color-mix(in srgb, var(--color-surface-overlay) 35%, transparent);
-	}
-
-	.archive-textarea {
-		min-height: 5.5rem;
-		resize: vertical;
-	}
-
-	.archive-input-error {
-		border-color: var(--color-error);
-	}
-
-	.archive-error-text {
-		margin: 0;
-		font-size: var(--text-xs);
-		color: var(--color-error-on-dark);
-	}
-
-	.archive-actions {
-		display: flex;
-		justify-content: flex-end;
-		gap: var(--space-3);
-	}
-
-	@media (max-width: 860px) {
-		.archive-grid--double {
-			grid-template-columns: 1fr;
-		}
-	}
-</style>

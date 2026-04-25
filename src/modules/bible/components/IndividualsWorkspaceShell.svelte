@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { GhostButton } from '$lib/components/ui/index.js';
 
 	type CharacterOption = {
 		id: string;
@@ -43,9 +44,9 @@
 			<span class="index-count" aria-label={`${itemCount} records`}>{itemCount}</span>
 		</div>
 
-		<button type="button" class="name-item name-item--new" onclick={() => void onCreateCharacter()}>
+		<GhostButton type="button" class="name-item name-item--new" onclick={() => void onCreateCharacter()}>
 			{createLabel}
-		</button>
+		</GhostButton>
 
 		<div class="names-scroll">
 			<ul class="names-list">
@@ -54,10 +55,9 @@
 				{/if}
 				{#each characterOptions as option (option.id)}
 					<li>
-						<button
+						<GhostButton
 							type="button"
-							class="name-item"
-							class:name-item--selected={selectedCharacterId === option.id}
+							class={`name-item ${selectedCharacterId === option.id ? 'name-item--selected' : ''}`}
 							onclick={() => onSelectCharacter(option.id)}
 							aria-current={selectedCharacterId === option.id ? 'true' : undefined}
 						>
@@ -68,7 +68,7 @@
 							{#if option.meta}
 								<span class="name-item__meta">{option.meta}</span>
 							{/if}
-						</button>
+						</GhostButton>
 					</li>
 				{/each}
 			</ul>
@@ -171,7 +171,7 @@
 		text-align: center;
 	}
 
-	.name-item {
+	:global(.name-item) {
 		width: 100%;
 		display: grid;
 		gap: 0.2rem;
@@ -186,49 +186,49 @@
 		transition: background-color var(--duration-fast) var(--ease-standard);
 	}
 
-	.name-item__title {
+	:global(.name-item__title) {
 		font-weight: var(--font-weight-semibold);
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
 
-	.name-item__subtitle,
-	.name-item__meta {
+	:global(.name-item__subtitle),
+	:global(.name-item__meta) {
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
 
-	.name-item__subtitle {
+	:global(.name-item__subtitle) {
 		font-size: var(--text-xs);
 		color: var(--color-text-secondary);
 	}
 
-	.name-item__meta {
+	:global(.name-item__meta) {
 		font-size: var(--text-xs);
 		color: var(--color-text-muted);
 		letter-spacing: 0.03em;
 	}
 
-	.name-item:hover {
+	:global(.name-item:hover) {
 		background: var(--color-surface-overlay);
 		border-color: var(--color-border-default);
 	}
 
-	.name-item--new {
+	:global(.name-item--new) {
 		font-weight: var(--font-weight-semibold);
 		color: var(--color-nova-blue);
 		border-color: color-mix(in srgb, var(--color-nova-blue) 22%, transparent);
 		text-align: center;
 	}
 
-	.name-item--new:hover {
+	:global(.name-item--new:hover) {
 		background: color-mix(in srgb, var(--color-nova-blue) 8%, var(--color-surface-overlay));
 		border-color: color-mix(in srgb, var(--color-nova-blue) 35%, transparent);
 	}
 
-	.name-item--selected {
+	:global(.name-item--selected) {
 		background: color-mix(in srgb, var(--color-nova-blue) 10%, var(--color-surface-overlay));
 		border-color: color-mix(in srgb, var(--color-nova-blue) 35%, var(--color-border-default));
 		box-shadow: var(--shadow-xs);

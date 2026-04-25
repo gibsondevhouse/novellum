@@ -2,6 +2,7 @@
 	import { untrack } from 'svelte';
 	import type { StoryFrame } from '$lib/db/types.js';
 	import { updateStoryFrame } from '$modules/outliner/services/story-structure-service.js';
+	import { SurfacePanel } from '$lib/components/ui/index.js';
 
 	let { storyFrame, onUpdate } = $props<{
 		storyFrame: StoryFrame;
@@ -28,7 +29,7 @@
 	}
 </script>
 
-<div class="story-frame-panel">
+<SurfacePanel class="story-frame-panel">
 	<div class="field">
 		<label class="field-label" for="sf-premise">Premise</label>
 		<p class="field-hint">The core "what if" or central situation driving your story.</p>
@@ -65,10 +66,10 @@
 			oninput={() => scheduleSave({ toneNotes })}
 		></textarea>
 	</div>
-</div>
+</SurfacePanel>
 
 <style>
-	.story-frame-panel {
+	:global(.story-frame-panel) {
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-5);

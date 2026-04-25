@@ -66,9 +66,10 @@
 	function handleAddKeydown(e: KeyboardEvent) {
 		if (e.key === 'Enter') addBeat();
 	}
+	import { SurfacePanel, GhostButton } from '$lib/components/ui/index.js';
 </script>
 
-<div class="planning-panel">
+<SurfacePanel class="planning-panel">
 	<!-- Sequence context bar -->
 	<div class="planning-context">
 		<span class="planning-context-label">Sequence</span>
@@ -83,13 +84,17 @@
 			{#each beats as beat, i (beat.id)}
 				<div class="beat-item" role="listitem">
 					<span class="beat-num" aria-hidden="true">{i + 1}</span>
-					<button
+					<GhostButton
 						class="beat-text"
+						type="button"
 						onclick={() => openBeat(beat, i)}
-						aria-label="Open beat: {beat.text}">{beat.text}</button
+						aria-label="Open beat: {beat.text}">{beat.text}</GhostButton
 					>
-					<button class="beat-del" onclick={() => deleteBeat(beat.id)} aria-label="Remove beat"
-						>✕</button
+					<GhostButton
+						class="beat-del"
+						type="button"
+						onclick={() => deleteBeat(beat.id)}
+						aria-label="Remove beat">✕</GhostButton
 					>
 				</div>
 			{/each}
@@ -105,10 +110,15 @@
 				bind:value={newText}
 				onkeydown={handleAddKeydown}
 			/>
-			<button class="planning-beat-add-btn" onclick={addBeat} aria-label="Add beat">+</button>
+			<GhostButton
+				class="planning-beat-add-btn"
+				type="button"
+				onclick={addBeat}
+				aria-label="Add beat">+</GhostButton
+			>
 		</div>
 	</div>
-</div>
+</SurfacePanel>
 
 <style>
 	/* Beat row items — layout and styling of individual beat entries */
@@ -129,7 +139,7 @@
 		border-color: var(--color-border-default);
 	}
 
-	.beat-item:hover .beat-del {
+	.beat-item:hover :global(.beat-del) {
 		opacity: 1;
 	}
 
@@ -143,7 +153,7 @@
 		opacity: 0.55;
 	}
 
-	.beat-text {
+	:global(.beat-text) {
 		flex: 1;
 		background: none;
 		border: none;
@@ -160,17 +170,17 @@
 		transition: color var(--duration-fast) var(--ease-standard);
 	}
 
-	.beat-text:hover {
+	:global(.beat-text:hover) {
 		color: var(--color-text-primary);
 	}
 
-	.beat-text:focus-visible {
+	:global(.beat-text:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 		border-radius: var(--radius-sm);
 	}
 
-	.beat-del {
+	:global(.beat-del) {
 		background: none;
 		border: none;
 		color: var(--color-text-muted);
@@ -187,12 +197,12 @@
 			background 0.1s;
 	}
 
-	.beat-del:hover {
+	:global(.beat-del:hover) {
 		color: var(--color-error);
 		background: color-mix(in srgb, var(--color-error) 10%, transparent);
 	}
 
-	.beat-del:focus-visible {
+	:global(.beat-del:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 		opacity: 1;

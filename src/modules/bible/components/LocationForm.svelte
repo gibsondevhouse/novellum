@@ -4,6 +4,7 @@
 	import type { EntityFormCallbacks } from '../types.js';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
+	import { SurfacePanel } from '$lib/components/ui/index.js';
 
 	let {
 		location = null,
@@ -37,7 +38,7 @@
 	}
 </script>
 
-<div class="form-panel">
+<SurfacePanel class="form-panel">
 	<div class="field">
 		<label class="label" for="loc-name">Name <span aria-hidden="true">*</span></label>
 		<input
@@ -68,4 +69,4 @@
 			{saving ? 'Saving…' : location ? 'Save Changes' : 'Create Location'}
 		</PrimaryButton>
 	</div>
-</div>
+</SurfacePanel>

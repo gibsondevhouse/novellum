@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { EditMode } from '$lib/ai/types.js';
 	import { EDIT_MODES } from '../constants.js';
+	import { GhostButton } from '$lib/components/ui/index.js';
 
 	let {
 		activeMode,
@@ -15,15 +16,15 @@
 
 <div class="toolbar" role="toolbar" aria-label="Edit mode">
 	{#each EDIT_MODES as mode (mode.value)}
-		<button
-			class="toolbar-btn"
-			class:active={activeMode === mode.value}
+		<GhostButton
+			class={`toolbar-btn ${activeMode === mode.value ? 'active' : ''}`}
+			type="button"
 			disabled={isRunning}
 			aria-pressed={activeMode === mode.value}
 			onclick={() => onSelectMode(mode.value)}
 		>
 			{mode.label}
-		</button>
+		</GhostButton>
 	{/each}
 </div>
 
@@ -33,7 +34,7 @@
 		gap: var(--space-2);
 	}
 
-	.toolbar-btn {
+	:global(.toolbar-btn) {
 		padding: var(--space-2) var(--space-3);
 		border-radius: var(--radius-sm);
 		font-size: var(--text-sm);
@@ -45,18 +46,18 @@
 		transition: var(--transition-color);
 	}
 
-	.toolbar-btn:hover:not(:disabled) {
+	:global(.toolbar-btn:hover:not(:disabled)) {
 		background-color: var(--color-surface-elevated);
 		color: var(--color-text-primary);
 	}
 
-	.toolbar-btn.active {
+	:global(.toolbar-btn.active) {
 		background-color: color-mix(in srgb, var(--color-nova-blue) 15%, transparent);
 		color: var(--color-nova-blue);
 		border-color: var(--color-nova-blue);
 	}
 
-	.toolbar-btn:disabled {
+	:global(.toolbar-btn:disabled) {
 		opacity: 0.5;
 		cursor: not-allowed;
 	}

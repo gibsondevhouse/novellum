@@ -1,4 +1,6 @@
 <script lang="ts">
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
+
 	interface Suggestion {
 		label: string;
 		prompt: string;
@@ -24,9 +26,9 @@
 	</span>
 	<div class="suggestion-row__chips">
 		{#each suggestions as s (s.label)}
-			<button class="suggestion-chip" onclick={() => onselect?.(s.prompt)}>
+			<GhostButton class="suggestion-chip" type="button" onclick={() => onselect?.(s.prompt)}>
 				{s.label}
-			</button>
+			</GhostButton>
 		{/each}
 	</div>
 </div>
@@ -58,7 +60,7 @@
 		flex-wrap: wrap;
 	}
 
-	.suggestion-chip {
+	:global(.suggestion-chip) {
 		padding: var(--space-1) var(--space-3);
 		border-radius: var(--radius-full);
 		border: 1px solid var(--color-border-subtle);
@@ -73,13 +75,13 @@
 			border-color var(--duration-fast) var(--ease-standard);
 	}
 
-	.suggestion-chip:hover {
+	:global(.suggestion-chip:hover) {
 		background-color: color-mix(in srgb, var(--color-teal) 10%, transparent);
 		border-color: var(--color-teal);
 		color: var(--color-text-primary);
 	}
 
-	.suggestion-chip:focus-visible {
+	:global(.suggestion-chip:focus-visible) {
 		outline: 2px solid var(--color-border-focus);
 		outline-offset: 2px;
 	}

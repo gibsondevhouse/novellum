@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { GhostButton, SectionHeader } from '$lib/components/ui/index.js';
+
 	type NarrativeStateField = 'emotionalState' | 'currentObjective' | 'currentPressure' | 'lastSeen' | 'nextMove';
 
 	type NarrativeStateModel = {
@@ -21,13 +23,14 @@
 	let isCollapsed = $state(false);
 </script>
 
-<section class="dossier-section" aria-labelledby="narrative-state-title">
-	<div class="section-header">
-		<h3 id="narrative-state-title" class="section-title">Current Narrative State</h3>
-		<button type="button" class="collapse-toggle" aria-expanded={!isCollapsed} aria-controls="narrative-state-content" onclick={() => (isCollapsed = !isCollapsed)}>
-			{isCollapsed ? 'Expand' : 'Collapse'}
-		</button>
-	</div>
+<section class="dossier-section" aria-label="Current Narrative State">
+	<SectionHeader title="Current Narrative State" class="dossier-section-header">
+		{#snippet actions()}
+			<GhostButton type="button" class="collapse-toggle" aria-expanded={!isCollapsed} aria-controls="narrative-state-content" onclick={() => (isCollapsed = !isCollapsed)}>
+				{isCollapsed ? 'Expand' : 'Collapse'}
+			</GhostButton>
+		{/snippet}
+	</SectionHeader>
 	{#if !isCollapsed}
 		<div id="narrative-state-content" class="field-group">
 			<div class="field-pair wide">
@@ -63,8 +66,7 @@
 		border-top: 1px solid color-mix(in srgb, var(--color-border-subtle) 65%, transparent);
 	}
 
-	.section-title {
-		margin: 0;
+	:global(.dossier-section-header .title) {
 		font-size: var(--text-xs);
 		font-weight: var(--font-weight-semibold);
 		color: var(--color-text-muted);
@@ -72,14 +74,7 @@
 		letter-spacing: 0.08em;
 	}
 
-	.section-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		gap: var(--space-3);
-	}
-
-	.collapse-toggle {
+	:global(.collapse-toggle) {
 		border: 1px solid color-mix(in srgb, var(--color-border-subtle) 70%, transparent);
 		background: transparent;
 		color: var(--color-text-muted);

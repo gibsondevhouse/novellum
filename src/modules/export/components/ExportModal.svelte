@@ -137,17 +137,17 @@
 						<span class="field-label">Format</span>
 						<div class="format-tabs" role="radiogroup" aria-label="Export format">
 							{#each EXPORT_FORMAT_OPTIONS as opt (opt.value)}
-								<button
+								<GhostButton
 									role="radio"
 									aria-checked={format === opt.value}
-									class="format-tab"
-									class:active={format === opt.value}
+									class={`format-tab ${format === opt.value ? 'active' : ''}`}
+									type="button"
 									onclick={() => {
 										format = opt.value;
 									}}
 								>
 									{opt.label}
-								</button>
+								</GhostButton>
 							{/each}
 						</div>
 					</div>
@@ -329,7 +329,7 @@
 		gap: var(--space-2);
 	}
 
-	.format-tab {
+	:global(.format-tab) {
 		padding: var(--space-1) var(--space-3);
 		border: 1px solid var(--color-border-default);
 		border-radius: var(--radius-sm);
@@ -343,12 +343,12 @@
 			background-color 0.15s;
 	}
 
-	.format-tab:hover {
+	:global(.format-tab:hover) {
 		border-color: var(--color-border-strong);
 		color: var(--color-text-primary);
 	}
 
-	.format-tab.active {
+	:global(.format-tab.active) {
 		border-color: var(--color-nova-blue);
 		color: var(--color-nova-blue);
 		background-color: color-mix(in srgb, var(--color-nova-blue) 8%, transparent);

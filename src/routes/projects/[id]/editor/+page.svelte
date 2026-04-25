@@ -9,7 +9,7 @@
 	import * as autosaveService from '$modules/editor/services/autosave-service.js';
 	import ManuscriptSurface from '$modules/editor/components/ManuscriptSurface.svelte';
 	import { updateScene } from '$modules/editor/services/scene-repository.js';
-	import { GhostButton } from '$lib/components/ui/index.js';
+	import { GhostButton, PageHeader } from '$lib/components/ui/index.js';
 
 	type OutcomeType = 'win' | 'loss' | 'partial' | 'reversal' | '';
 	type SceneLengthEstimate = 'short' | 'medium' | 'long' | '';
@@ -88,6 +88,10 @@
 		if (!activeScene) return null;
 		return data.chapters.find((chapter: Chapter) => chapter.id === activeScene.chapterId) ?? null;
 	});
+
+	const editorContextLabel = $derived.by(
+		() => `${activeChapter?.title ?? 'Unassigned chapter'}${data.project ? ` · ${data.project.title}` : ''}`,
+	);
 
 	const activeWordCount = $derived.by(() => countWords(activeContent));
 	const normalizedContent = $derived.by(() => normalizeText(activeContent));
@@ -566,39 +570,42 @@
 
 	<main class="editor-area" aria-label="Writing workspace">
 		<header class="editor-toolbar">
-			<div class="scene-context">
-				<p class="scene-context__eyebrow">Drafting Studio</p>
-				<h1>{activeScene?.title ?? 'Scene'}</h1>
-				<p>{activeChapter?.title ?? 'Unassigned chapter'}{#if data.project} · {data.project.title}{/if}</p>
-			</div>
-			<div class="inline-context" aria-label="Writing context controls">
-				<label class="inline-field">
-					<span>POV</span>
-					<select
-						value={activeScene?.povCharacterId ?? ''}
-						onchange={(event) =>
-							void persistPovCharacter((event.target as HTMLSelectElement).value)}
-					>
-						<option value="">Unassigned</option>
-						{#each data.characters as character (character.id)}
-							<option value={character.id}>{character.name}</option>
-						{/each}
-					</select>
-				</label>
-			</div>
-			<div class="nav-actions">
-				<button class="nav-btn" onclick={() => goToScene(-1)} disabled={activeSceneIndex <= 0}>Previous</button>
-				<button class="nav-btn" onclick={() => goToScene(1)} disabled={activeSceneIndex < 0 || activeSceneIndex >= data.scenes.length - 1}>Next</button>
-			</div>
-			<div class="ai-actions-wrap">
-				<span class="ai-actions-label">AI Commands</span>
-				<div class="ai-actions" role="toolbar" aria-label="AI scene tools">
-				<GhostButton onclick={() => handleAskAi('continue')} title="Continue scene">Continue</GhostButton>
-				<GhostButton onclick={() => handleAskAi('dialogue')} title="Punch up dialogue">Dialogue</GhostButton>
-				<GhostButton onclick={() => handleAskAi('tension')} title="Raise tension">Tension</GhostButton>
-				<GhostButton onclick={() => handleAskAi('summary')} title="Summarize scene">Summary</GhostButton>
-				</div>
-			</div>
+			<PageHeader
+				eyebrow="Drafting Studio"
+				title={activeScene?.title ?? 'Scene'}
+				description={editorContextLabel}
+			>
+				{#snippet actions()}
+					<div class="inline-context" aria-label="Writing context controls">
+						<label class="inline-field">
+							<span>POV</span>
+							<select
+								value={activeScene?.povCharacterId ?? ''}
+								onchange={(event) =>
+									void persistPovCharacter((event.target as HTMLSelectElement).value)}
+							>
+								<option value="">Unassigned</option>
+								{#each data.characters as character (character.id)}
+									<option value={character.id}>{character.name}</option>
+								{/each}
+							</select>
+						</label>
+					</div>
+					<div class="nav-actions">
+						<button class="nav-btn" onclick={() => goToScene(-1)} disabled={activeSceneIndex <= 0}>Previous</button>
+						<button class="nav-btn" onclick={() => goToScene(1)} disabled={activeSceneIndex < 0 || activeSceneIndex >= data.scenes.length - 1}>Next</button>
+					</div>
+					<div class="ai-actions-wrap">
+						<span class="ai-actions-label">AI Commands</span>
+						<div class="ai-actions" role="toolbar" aria-label="AI scene tools">
+							<GhostButton onclick={() => handleAskAi('continue')} title="Continue scene">Continue</GhostButton>
+							<GhostButton onclick={() => handleAskAi('dialogue')} title="Punch up dialogue">Dialogue</GhostButton>
+							<GhostButton onclick={() => handleAskAi('tension')} title="Raise tension">Tension</GhostButton>
+							<GhostButton onclick={() => handleAskAi('summary')} title="Summarize scene">Summary</GhostButton>
+						</div>
+					</div>
+				{/snippet}
+			</PageHeader>
 		</header>
 		{#if data.scenes.length === 0}
 			<EmptyState title="No scenes yet" description="Add one from the Outline." />
@@ -753,23 +760,22 @@
 		border-bottom: 1px solid var(--color-border-subtle);
 	}
 
+	.doc-list-title {
+		font-size: var(--text-sm);
+		font-weight: var(--font-weight-semibold);
+		color: var(--color-text-primary);
+	}
+
 	.doc-list-meta {
 		font-size: var(--text-xs);
 		color: var(--color-text-muted);
 		margin-top: var(--space-1);
 	}
 
-	.doc-list-title {
-		font-size: var(--text-xs);
-		font-weight: var(--font-weight-semibold);
-		color: var(--color-text-muted);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
-
 	.scene-list {
 		list-style: none;
 		padding: 0;
+		margin: 0;
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-1);
@@ -838,27 +844,42 @@
 	}
 
 	.editor-toolbar {
-		display: none;
+		display: block;
+		padding: var(--space-4);
+		border-bottom: 1px solid var(--color-border-default);
+		background: var(--color-surface-ground);
 	}
 
-	.scene-context h1 {
-		margin: 0;
-		font-size: var(--text-lg);
-		font-weight: var(--font-weight-semibold);
+	.editor-toolbar :global(.page-header) {
+		border-bottom: none;
+		padding-bottom: 0;
+		align-items: flex-start;
 	}
 
-	.scene-context__eyebrow {
-		margin: 0 0 var(--space-1);
+	.editor-toolbar :global(.page-header__eyebrow) {
 		font-size: var(--text-xs);
 		text-transform: uppercase;
 		letter-spacing: var(--tracking-wide);
 		color: var(--color-text-muted);
 	}
 
-	.scene-context p {
-		margin: 0;
-		font-size: var(--text-xs);
+	.editor-toolbar :global(.page-header__title) {
+		font-size: var(--text-2xl);
+		line-height: 1.1;
+	}
+
+	.editor-toolbar :global(.page-header__description) {
+		font-size: var(--text-sm);
+		line-height: var(--leading-normal);
 		color: var(--color-text-muted);
+	}
+
+	.editor-toolbar :global(.page-header__right) {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-3);
+		justify-content: flex-end;
+		align-items: flex-end;
 	}
 
 	.inline-context {
@@ -1141,8 +1162,9 @@
 	}
 
 	@media (max-width: 1120px) {
-		.inline-context {
-			display: none;
+		.editor-toolbar :global(.page-header__right) {
+			justify-content: flex-start;
+			align-items: flex-start;
 		}
 	}
 

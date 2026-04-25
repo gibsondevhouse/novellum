@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { GhostButton, PrimaryButton } from '$lib/components/ui/index.js';
+
 	let { onAdd } = $props<{ onAdd: (title: string) => void }>();
 	let title = $state('');
 	let active = $state(false);
@@ -36,13 +38,13 @@
 			bind:value={title}
 			onkeydown={handleKeydown}
 		/>
-		<button class="btn-submit" onclick={submit}>Add</button>
-		<button class="btn-cancel" onclick={cancel} aria-label="Cancel">✕</button>
+		<PrimaryButton class="btn-submit" onclick={submit}>Add</PrimaryButton>
+		<GhostButton class="btn-cancel" onclick={cancel} aria-label="Cancel">✕</GhostButton>
 	</div>
 {:else}
-	<button class="btn-add-scene" onclick={() => (active = true)}>
+	<GhostButton class="btn-add-scene" onclick={() => (active = true)}>
 		<span aria-hidden="true">+</span> Add Scene
-	</button>
+	</GhostButton>
 {/if}
 
 <style>
@@ -67,54 +69,31 @@
 		outline: none;
 		border-color: var(--color-nova-blue);
 	}
-	.btn-submit {
-		padding: var(--space-1) var(--space-3);
-		background: var(--color-nova-blue);
-		color: var(--color-text-on-dark);
-		border: none;
-		border-radius: var(--radius-sm);
-		font-size: var(--text-sm);
-		font-weight: var(--font-weight-medium);
-		cursor: pointer;
+	:global(.btn-submit) {
 		white-space: nowrap;
 	}
-	.btn-submit:hover {
-		opacity: 0.85;
-	}
-	.btn-cancel {
-		background: none;
-		border: none;
+	:global(.btn-cancel) {
 		color: var(--color-text-muted);
-		cursor: pointer;
 		font-size: var(--text-sm);
 		padding: var(--space-1);
-		border-radius: var(--radius-sm);
 		line-height: 1;
 	}
-	.btn-cancel:hover {
+	:global(.btn-cancel:hover) {
 		color: var(--color-text-secondary);
 	}
-	.btn-add-scene {
+	:global(.btn-add-scene) {
 		display: flex;
 		align-items: center;
 		gap: var(--space-1);
-		background: none;
-		border: none;
 		color: var(--color-text-muted);
 		font-size: var(--text-xs);
 		padding: var(--space-1) var(--space-2);
-		cursor: pointer;
-		border-radius: var(--radius-sm);
 		transition:
 			color 0.1s,
 			background 0.1s;
 	}
-	.btn-add-scene:hover {
+	:global(.btn-add-scene:hover) {
 		color: var(--color-text-secondary);
 		background: color-mix(in srgb, var(--color-text-primary) 5%, transparent);
-	}
-	.btn-add-scene:focus-visible {
-		outline: none;
-		box-shadow: var(--focus-ring);
 	}
 </style>

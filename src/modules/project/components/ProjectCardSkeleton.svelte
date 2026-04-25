@@ -11,12 +11,12 @@
 <style>
 	.project-card-skeleton {
 		background-color: var(--color-surface-overlay);
-		border: 1px solid var(--color-border-subtle);
-		border-radius: var(--radius-md);
 		list-style: none;
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
+		border: 1px solid var(--color-border-subtle);
+		border-radius: var(--radius-md);
 	}
 
 	.skeleton-cover {

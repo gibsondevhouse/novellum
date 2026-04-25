@@ -3,6 +3,11 @@
 	import { onMount } from 'svelte';
 	import { createAssetsStore } from '$modules/assets/stores/assets.svelte';
 	import EmptyStatePanel from '$lib/components/ui/EmptyStatePanel.svelte';
+	import {
+		DestructiveButton,
+		GhostButton,
+		PrimaryButton,
+	} from '$lib/components/ui/index.js';
 	import { updateProject } from '$modules/project/services/project-repository';
 
 	let { projectId = null } = $props<{ projectId?: string | null }>();
@@ -13,6 +18,8 @@
 	let confirmDelete = $state(false);
 	let assignProjectId = $state('');
 	let assignUseFor = $state('cover');
+	let toolbarUploadInput = $state<HTMLInputElement | null>(null);
+	let emptyStateUploadInput = $state<HTMLInputElement | null>(null);
 
 	onMount(() => {
 		store.load();
@@ -22,6 +29,25 @@
 		// Reload when projectId changes
 		void projectId; 
 		store.load();
+	});
+
+	$effect(() => {
+		if (!selectedAsset) {
+			return;
+		}
+
+		const handleEscape = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				selectedAsset = null;
+				isAssigning = false;
+				confirmDelete = false;
+			}
+		};
+
+		window.addEventListener('keydown', handleEscape);
+		return () => {
+			window.removeEventListener('keydown', handleEscape);
+		};
 	});
 
 	async function handleUpload(e: Event) {
@@ -84,10 +110,18 @@
 
 <div class="image-grid-container">
 	<div class="toolbar">
-		<label class="upload-btn">
-			<span>Upload Image</span>
-			<input type="file" multiple accept="image/*" onchange={handleUpload} style="display: none;" />
-		</label>
+		<GhostButton type="button" class="upload-btn" onclick={() => toolbarUploadInput?.click()}>
+			Upload Image
+		</GhostButton>
+		<input
+			bind:this={toolbarUploadInput}
+			type="file"
+			multiple
+			accept="image/*"
+			onchange={handleUpload}
+			class="sr-only"
+			aria-label="Upload image files"
+		/>
 	</div>
 
 	{#if store.loading}
@@ -98,10 +132,18 @@
 			description="Upload reference visuals, character portraits, and map designs to use across your projects."
 		>
 			{#snippet actions()}
-				<label class="upload-btn">
-					<span>Upload Image</span>
-					<input type="file" multiple accept="image/*" onchange={handleUpload} style="display: none;" />
-				</label>
+				<GhostButton type="button" class="upload-btn" onclick={() => emptyStateUploadInput?.click()}>
+					Upload Image
+				</GhostButton>
+				<input
+					bind:this={emptyStateUploadInput}
+					type="file"
+					multiple
+					accept="image/*"
+					onchange={handleUpload}
+					class="sr-only"
+					aria-label="Upload image files"
+				/>
 			{/snippet}
 		</EmptyStatePanel>
 	{:else}
@@ -111,7 +153,7 @@
 					<h3 class="album-title">{album.title}</h3>
 					<div class="grid">
 						{#if album.coverUrl}
-							<button
+							<GhostButton
 								type="button"
 								class="asset-card cover-card"
 								aria-label={`Open ${album.title} cover artwork`}
@@ -130,18 +172,17 @@
 								}}
 							>
 								<div class="img-wrapper">
-									<img src={album.coverUrl} alt="{album.title} Cover" />
+									<img src={album.coverUrl} alt={`${album.title} Cover`} />
 								</div>
 								<div class="asset-meta">
 									<span class="asset-name">Cover Artwork</span>
 								</div>
-							</button>
+							</GhostButton>
 						{/if}
 						{#each album.assets as asset (asset.id)}
-							<button
+							<GhostButton
 								type="button"
-								class="asset-card"
-								class:selected={selectedAsset?.id === asset.id}
+								class={`asset-card ${selectedAsset?.id === asset.id ? 'selected' : ''}`}
 								aria-label={`Open asset ${asset.name}`}
 								onclick={() => {
 									selectedAsset = asset;
@@ -155,7 +196,7 @@
 									<span class="asset-name">{asset.name}</span>
 									<span class="asset-type">{bytesToSize(asset.sizeBytes)}</span>
 								</div>
-							</button>
+							</GhostButton>
 						{/each}
 					</div>
 				</section>
@@ -164,13 +205,31 @@
 	{/if}
 
 	{#if selectedAsset}
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<div class="dialog-backdrop" onclick={() => (selectedAsset = null)}>
-			<div class="dialog" role="dialog" tabindex="-1" aria-modal="true" aria-label={selectedAsset.name} onclick={(e) => e.stopPropagation()}>
+		<div class="dialog-backdrop">
+			<button
+				type="button"
+				class="dialog-backdrop-dismiss"
+				aria-label="Close image preview dialog"
+				onclick={() => {
+					selectedAsset = null;
+					isAssigning = false;
+					confirmDelete = false;
+				}}
+			></button>
+			<div class="dialog" role="dialog" tabindex="-1" aria-modal="true" aria-label={selectedAsset.name}>
 				<div class="dialog-header">
 					<h2>{selectedAsset.name}</h2>
-					<button class="close-btn" onclick={() => { selectedAsset = null; isAssigning = false; }}>✕</button>
+					<GhostButton
+						class="close-btn"
+						type="button"
+						aria-label="Close image preview"
+						onclick={() => {
+							selectedAsset = null;
+							isAssigning = false;
+						}}
+					>
+						✕
+					</GhostButton>
 				</div>
 				<div class="dialog-content">
 					<img src={selectedAsset.data} alt={selectedAsset.name} />
@@ -182,20 +241,24 @@
 						<div class="delete-confirm" role="alert">
 							<p>Delete this asset from the gallery?</p>
 							<div class="delete-confirm__actions">
-								<button class="btn-danger" onclick={() => selectedAsset && deleteAsset(selectedAsset.id)}>Confirm Delete</button>
-								<button class="btn-ghost" onclick={() => (confirmDelete = false)}>Cancel</button>
+								<DestructiveButton type="button" onclick={() => selectedAsset && deleteAsset(selectedAsset.id)}>
+									Confirm Delete
+								</DestructiveButton>
+								<GhostButton type="button" onclick={() => (confirmDelete = false)}>Cancel</GhostButton>
 							</div>
 						</div>
 					{/if}
 					
 					{#if isAssigning}
 						<div class="assign-form">
-							<select bind:value={assignUseFor} class="assign-select">
+							<label for="assign-use-for" class="sr-only">Assign image as</label>
+							<select id="assign-use-for" bind:value={assignUseFor} class="assign-select">
 								<option value="cover">Project Cover</option>
 								<option value="character">Character Portrait</option>
 								<option value="scene">Scene Reference</option>
 							</select>
-							<select bind:value={assignProjectId} class="assign-select">
+							<label for="assign-project-id" class="sr-only">Project to assign image to</label>
+							<select id="assign-project-id" bind:value={assignProjectId} class="assign-select">
 								<option value="">-- Select Project --</option>
 								{#each store.albums as album (album.id)}
 									{#if album.id !== 'global'}
@@ -203,19 +266,19 @@
 									{/if}
 								{/each}
 							</select>
-							<button class="btn-primary" onclick={assignAsset} disabled={!assignProjectId || assignUseFor !== 'cover'}>
+								<PrimaryButton type="button" onclick={assignAsset} disabled={!assignProjectId || assignUseFor !== 'cover'}>
 								Confirm Assignment
-							</button>
+								</PrimaryButton>
 						</div>
 					{/if}
 				</div>
 				<div class="dialog-footer">
-					<button class="btn-ghost" onclick={() => isAssigning = !isAssigning}>
+						<GhostButton type="button" onclick={() => (isAssigning = !isAssigning)}>
 						{isAssigning ? 'Cancel' : 'Assign to Project...'}
-					</button>
-					<button class="btn-danger" onclick={() => (confirmDelete = true)} disabled={confirmDelete}>
+						</GhostButton>
+						<DestructiveButton type="button" onclick={() => (confirmDelete = true)} disabled={confirmDelete}>
 						{confirmDelete ? 'Awaiting confirmation' : 'Delete Image'}
-					</button>
+						</DestructiveButton>
 				</div>
 			</div>
 		</div>
@@ -233,9 +296,10 @@
 		display: flex;
 		justify-content: flex-end;
 	}
-	.upload-btn {
+	:global(.upload-btn) {
 		display: inline-flex;
 		align-items: center;
+		justify-content: center;
 		padding: var(--space-2) var(--space-4);
 		background-color: var(--color-surface-hover);
 		color: var(--color-text-primary);
@@ -246,8 +310,19 @@
 		font-size: var(--text-sm);
 		transition: background var(--duration-enter) var(--ease-standard);
 	}
-	.upload-btn:hover {
+	:global(.upload-btn:hover) {
 		background-color: var(--color-surface-overlay);
+	}
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
 	}
 	.loading {
 		text-align: center;
@@ -277,7 +352,7 @@
 		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 		gap: var(--space-4);
 	}
-	.asset-card {
+	:global(.asset-card) {
 		appearance: none;
 		background: var(--color-surface-overlay);
 		border: 1px solid var(--color-border);
@@ -288,11 +363,11 @@
 		display: flex;
 		flex-direction: column;
 	}
-	.asset-card:hover {
+	:global(.asset-card:hover) {
 		transform: translateY(-2px);
 		border-color: var(--color-border-strong);
 	}
-	.asset-card.selected {
+	:global(.asset-card.selected) {
 		border-color: var(--color-text-primary);
 	}
 	.img-wrapper {
@@ -343,7 +418,16 @@
 		z-index: 100;
 		padding: var(--space-4);
 	}
+	:global(.dialog-backdrop-dismiss) {
+		position: absolute;
+		inset: 0;
+		border: 0;
+		background: transparent;
+		cursor: pointer;
+	}
 	.dialog {
+		position: relative;
+		z-index: 1;
 		background: var(--color-surface-overlay);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-lg);
@@ -367,15 +451,12 @@
 		font-size: var(--text-base);
 		font-weight: 500;
 	}
-	.close-btn {
-		background: transparent;
-		border: none;
+	:global(.close-btn) {
 		color: var(--color-text-muted);
 		font-size: var(--text-lg);
-		cursor: pointer;
 		padding: var(--space-1);
 	}
-	.close-btn:hover {
+	:global(.close-btn:hover) {
 		color: var(--color-text-primary);
 	}
 	.dialog-content {

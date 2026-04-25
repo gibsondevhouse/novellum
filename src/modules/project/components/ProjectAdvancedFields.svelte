@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { ProjectDraft } from '../types/project-draft.js';
 	import { WORD_COUNT_PRESETS as PRESETS } from '../constants.js';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 
 	let {
 		draft,
@@ -41,16 +42,15 @@
 
 		<div class="presets" role="group" aria-labelledby="wordcount-label">
 			{#each PRESETS as preset (preset.value)}
-				<button
+				<GhostButton
 					type="button"
-					class="preset-btn"
-					class:active={activePreset === preset.value}
+					class={`preset-btn ${activePreset === preset.value ? 'active' : ''}`}
 					onclick={() => selectPreset(preset.value)}
 					aria-pressed={activePreset === preset.value}
 				>
 					<span class="preset-name">{preset.label}</span>
 					<span class="preset-value">~{preset.value.toLocaleString()}</span>
-				</button>
+				</GhostButton>
 			{/each}
 		</div>
 
@@ -97,7 +97,7 @@
 		flex-wrap: wrap;
 	}
 
-	.preset-btn {
+	:global(.preset-btn) {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -115,16 +115,16 @@
 		min-width: 80px;
 	}
 
-	.preset-btn:hover {
+	:global(.preset-btn:hover) {
 		border-color: var(--color-border-strong);
 	}
 
-	.preset-btn:focus-visible {
+	:global(.preset-btn:focus-visible) {
 		outline: 2px solid var(--color-border-focus);
 		outline-offset: 2px;
 	}
 
-	.preset-btn.active {
+	:global(.preset-btn.active) {
 		border-color: var(--color-nova-blue);
 		background-color: color-mix(in srgb, var(--color-nova-blue) 10%, transparent);
 	}

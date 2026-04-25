@@ -12,6 +12,8 @@
 	} = $props();
 
 	let collapsed = $state(false);
+	const sectionId = `sidebar-section-${Math.random().toString(36).slice(2, 10)}`;
+	const contentId = `${sectionId}-content`;
 
 	function toggle() {
 		if (collapsible) collapsed = !collapsed;
@@ -21,7 +23,12 @@
 <div class="sidebar-section">
 	{#if label}
 		{#if collapsible}
-			<button class="sidebar-section__header" onclick={toggle} aria-expanded={!collapsed}>
+			<button
+				class="sidebar-section__header"
+				onclick={toggle}
+				aria-expanded={!collapsed}
+				aria-controls={contentId}
+			>
 				<h3 class="sidebar-section__label">{label}</h3>
 				<svg
 					class="sidebar-section__chevron"
@@ -44,7 +51,7 @@
 		{/if}
 	{/if}
 	{#if !collapsed}
-		<div class="sidebar-section__content">
+		<div id={contentId} class="sidebar-section__content">
 			{@render children()}
 		</div>
 	{/if}
@@ -70,6 +77,11 @@
 
 	.sidebar-section__header:hover .sidebar-section__label {
 		color: var(--color-text-secondary);
+	}
+
+	.sidebar-section__header:focus-visible {
+		outline: 2px solid var(--color-border-focus);
+		outline-offset: -2px;
 	}
 
 	.sidebar-section__label {

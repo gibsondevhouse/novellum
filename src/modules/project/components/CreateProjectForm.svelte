@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getCreating, getCreateError, submitCreate } from '../stores/project-hub.svelte.ts';
+	import { SurfacePanel } from '$lib/components/ui/index.js';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 
@@ -33,7 +34,7 @@
 </script>
 
 <div class="form-overlay" role="dialog" aria-modal="true" aria-label="Create project">
-	<div class="form-panel">
+	<SurfacePanel class="create-project-form">
 		<h2 class="form-title">New Project</h2>
 
 		<div class="field">
@@ -104,7 +105,7 @@
 				{getCreating() ? 'Creating…' : 'Create Project'}
 			</PrimaryButton>
 		</div>
-	</div>
+	</SurfacePanel>
 </div>
 
 <style>
@@ -118,13 +119,10 @@
 		z-index: 100;
 	}
 
-	.form-panel {
-		background-color: var(--color-surface-raised);
-		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-lg);
-		padding: var(--space-8);
-		width: min(480px, 90vw);
-		box-shadow: var(--shadow-xl);
+	:global(.create-project-form) {
+		padding: var(--space-8) !important;
+		width: min(480px, 90vw) !important;
+		box-shadow: var(--shadow-xl) !important;
 	}
 
 	.form-title {

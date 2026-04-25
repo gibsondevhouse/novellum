@@ -12,6 +12,7 @@
 	import {
 		DestructiveButton,
 		GhostButton,
+		PageHeader,
 		SurfacePanel,
 	} from '$lib/components/ui/index.js';
 
@@ -54,21 +55,22 @@
 				{ label: 'Individuals', href: `/projects/${data.projectId}/world-building/characters/individuals` },
 				{ label: data.character.name },
 			]} />
-			<div class="header-row">
-				<div>
-					<h1>{data.character.name}</h1>
-					<p class="header-subtitle">Edit dossier details, then commit relationship updates below.</p>
-				</div>
-				<div class="header-actions">
-					{#if confirmDelete}
-						<span class="confirm-text">Delete this character?</span>
-						<DestructiveButton onclick={handleDelete}>Yes, delete</DestructiveButton>
-						<GhostButton onclick={() => (confirmDelete = false)}>Cancel</GhostButton>
-					{:else}
-						<GhostButton onclick={() => (confirmDelete = true)}>Delete</GhostButton>
-					{/if}
-				</div>
-			</div>
+			<PageHeader
+				title={data.character.name}
+				description="Edit dossier details, then commit relationship updates below."
+			>
+				{#snippet actions()}
+					<div class="header-actions">
+						{#if confirmDelete}
+							<span class="confirm-text">Delete this character?</span>
+							<DestructiveButton onclick={handleDelete}>Yes, delete</DestructiveButton>
+							<GhostButton onclick={() => (confirmDelete = false)}>Cancel</GhostButton>
+						{:else}
+							<GhostButton onclick={() => (confirmDelete = true)}>Delete</GhostButton>
+						{/if}
+					</div>
+				{/snippet}
+			</PageHeader>
 		</SurfacePanel>
 	</div>
 
@@ -103,26 +105,17 @@
 		gap: var(--space-3);
 	}
 
-	.header-row {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-
-	.header-row h1 {
-		margin: 0;
-	}
-
-	.header-subtitle {
-		margin: var(--space-1) 0 0;
-		color: var(--color-text-secondary);
-		font-size: var(--text-sm);
+	.page-header :global(.page-header) {
+		border-bottom: none;
+		padding-bottom: 0;
+		padding-top: var(--space-2);
 	}
 
 	.header-actions {
 		display: flex;
 		align-items: center;
 		gap: var(--space-2);
+		flex-wrap: wrap;
 	}
 
 	.confirm-text {
@@ -137,7 +130,6 @@
 	}
 
 	@media (max-width: 768px) {
-		.header-row,
 		.header-actions {
 			flex-direction: column;
 			align-items: stretch;

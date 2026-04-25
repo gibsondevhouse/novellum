@@ -3,6 +3,7 @@
 	import { Editor as TipTapEditor } from '@tiptap/core';
 	import Placeholder from '@tiptap/extension-placeholder';
 	import StarterKit from '@tiptap/starter-kit';
+	import { GhostButton } from '$lib/components/ui/index.js';
 
 	/* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -176,77 +177,70 @@
 			}
 		}}
 	>
-		<button
+		<GhostButton
 			type="button"
-			class="bubble-btn"
-			class:active={pressed(() => editor!.isActive('bold'))}
+			class={`bubble-btn ${pressed(() => editor!.isActive('bold')) ? 'active' : ''}`}
 			onclick={() => exec(() => editor!.chain().focus().toggleBold().run())}
 			title="Bold"
 			aria-label="Toggle bold"
 		>
 			<span class="bubble-icon">B</span>
-		</button>
-		<button
+		</GhostButton>
+		<GhostButton
 			type="button"
-			class="bubble-btn"
-			class:active={pressed(() => editor!.isActive('italic'))}
+			class={`bubble-btn ${pressed(() => editor!.isActive('italic')) ? 'active' : ''}`}
 			onclick={() => exec(() => editor!.chain().focus().toggleItalic().run())}
 			title="Italic"
 			aria-label="Toggle italic"
 		>
 			<span class="bubble-icon">I</span>
-		</button>
-		<button
+		</GhostButton>
+		<GhostButton
 			type="button"
-			class="bubble-btn"
-			class:active={pressed(() => editor!.isActive('strike'))}
+			class={`bubble-btn ${pressed(() => editor!.isActive('strike')) ? 'active' : ''}`}
 			onclick={() => exec(() => editor!.chain().focus().toggleStrike().run())}
 			title="Strikethrough"
 			aria-label="Toggle strikethrough"
 		>
 			<span class="bubble-icon">S</span>
-		</button>
+		</GhostButton>
 		<span class="bubble-divider"></span>
-		<button
+		<GhostButton
 			type="button"
-			class="bubble-btn"
-			class:active={pressed(() => editor!.isActive('heading', { level: 1 }))}
+			class={`bubble-btn ${pressed(() => editor!.isActive('heading', { level: 1 })) ? 'active' : ''}`}
 			onclick={() => exec(() => editor!.chain().focus().toggleHeading({ level: 1 }).run())}
 			title="Heading 1"
 			aria-label="Toggle heading 1"
 		>
 			<span class="bubble-icon">H1</span>
-		</button>
-		<button
+		</GhostButton>
+		<GhostButton
 			type="button"
-			class="bubble-btn"
-			class:active={pressed(() => editor!.isActive('heading', { level: 2 }))}
+			class={`bubble-btn ${pressed(() => editor!.isActive('heading', { level: 2 })) ? 'active' : ''}`}
 			onclick={() => exec(() => editor!.chain().focus().toggleHeading({ level: 2 }).run())}
 			title="Heading 2"
 			aria-label="Toggle heading 2"
 		>
 			<span class="bubble-icon">H2</span>
-		</button>
-		<button
+		</GhostButton>
+		<GhostButton
 			type="button"
-			class="bubble-btn"
-			class:active={pressed(() => editor!.isActive('bulletList'))}
+			class={`bubble-btn ${pressed(() => editor!.isActive('bulletList')) ? 'active' : ''}`}
 			onclick={() => exec(() => editor!.chain().focus().toggleBulletList().run())}
 			title="Bullet list"
 			aria-label="Toggle bullet list"
 		>
 			<span class="bubble-icon">•</span>
-		</button>
-		<button
+		</GhostButton>
+		<GhostButton
 			type="button"
-			class="bubble-btn"
-			class:active={pressed(() => editor!.isActive('blockquote'))}
+			class={`bubble-btn ${pressed(() => editor!.isActive('blockquote')) ? 'active' : ''}`}
 			onclick={() => exec(() => editor!.chain().focus().toggleBlockquote().run())}
 			title="Blockquote"
 			aria-label="Toggle blockquote"
 		>
 			<span class="bubble-icon">"</span>
-		</button>
+		</GhostButton>
 	</div>
 </div>
 
@@ -415,7 +409,7 @@
 		pointer-events: auto;
 	}
 
-	.bubble-btn {
+	:global(.bubble-btn) {
 		appearance: none;
 		border: none;
 		outline: none;
@@ -434,21 +428,21 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
 
-		&:hover {
-			background: color-mix(in srgb, var(--color-surface-overlay) 72%, transparent);
-			color: var(--color-text-primary);
-		}
+	:global(.bubble-btn:hover) {
+		background: color-mix(in srgb, var(--color-surface-overlay) 72%, transparent);
+		color: var(--color-text-primary);
+	}
 
-		&:active {
-			transform: scale(0.95);
-		}
+	:global(.bubble-btn:active) {
+		transform: scale(0.95);
+	}
 
-		&.active {
-			background: color-mix(in srgb, var(--color-nova-blue) 15%, transparent);
-			color: var(--color-nova-blue);
-			font-weight: 600;
-		}
+	:global(.bubble-btn.active) {
+		background: color-mix(in srgb, var(--color-nova-blue) 15%, transparent);
+		color: var(--color-nova-blue);
+		font-weight: 600;
 	}
 
 	.bubble-icon {
@@ -478,7 +472,7 @@
 			padding: 0.4rem;
 		}
 
-		.bubble-btn {
+		:global(.bubble-btn) {
 			padding: 0.35rem 0.5rem;
 			font-size: 0.8rem;
 		}

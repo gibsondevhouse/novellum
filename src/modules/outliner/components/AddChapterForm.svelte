@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { GhostButton, PrimaryButton } from '$lib/components/ui/index.js';
+
 	let { onAdd, active = $bindable(false), entityLabel = 'Chapter', placeholder } = $props<{
 		onAdd: (title: string) => void;
 		active?: boolean;
@@ -46,14 +48,14 @@
 			bind:value={title}
 			onkeydown={handleKeydown}
 		/>
-		<button class="btn-submit" onclick={submit}>Add</button>
-		<button class="btn-cancel" onclick={cancel} aria-label="Cancel">✕</button>
+		<PrimaryButton class="btn-submit" onclick={submit}>Add</PrimaryButton>
+		<GhostButton class="btn-cancel" onclick={cancel} aria-label="Cancel">✕</GhostButton>
 	</div>
 {:else}
-	<button class="btn-add-chapter" onclick={open}>
+	<GhostButton class="btn-add-chapter" onclick={open}>
 		<span class="btn-icon-plus" aria-hidden="true">+</span>
 		Add {entityLabel}
-	</button>
+	</GhostButton>
 {/if}
 
 <style>
@@ -79,59 +81,36 @@
 		outline: none;
 		border-color: var(--color-nova-blue);
 	}
-	.btn-submit {
-		padding: var(--space-2) var(--space-4);
-		background: var(--color-nova-blue);
-		color: var(--color-text-on-dark);
-		border: none;
-		border-radius: var(--radius-sm);
-		font-size: var(--text-sm);
-		font-weight: var(--font-weight-medium);
-		cursor: pointer;
+	:global(.btn-submit) {
 		white-space: nowrap;
-		transition: opacity var(--duration-fast) var(--ease-standard);
 	}
-	.btn-submit:hover {
-		opacity: 0.85;
-	}
-	.btn-cancel {
-		background: none;
-		border: none;
+	:global(.btn-cancel) {
 		color: var(--color-text-muted);
-		cursor: pointer;
 		font-size: var(--text-sm);
 		padding: var(--space-1);
-		border-radius: var(--radius-sm);
 		line-height: 1;
 	}
-	.btn-cancel:hover {
+	:global(.btn-cancel:hover) {
 		color: var(--color-text-secondary);
 	}
-	.btn-add-chapter {
+	:global(.btn-add-chapter) {
 		display: flex;
 		align-items: center;
 		gap: var(--space-2);
-		background: none;
 		border: 1px dashed var(--color-border-default);
-		border-radius: var(--radius-md);
 		color: var(--color-text-muted);
 		font-size: var(--text-sm);
 		padding: var(--space-2) var(--space-4);
-		cursor: pointer;
 		width: 100%;
 		transition:
 			border-color 0.12s ease,
 			color 0.12s ease,
 			background 0.12s ease;
 	}
-	.btn-add-chapter:hover {
+	:global(.btn-add-chapter:hover) {
 		border-color: var(--color-border-strong);
 		color: var(--color-text-secondary);
 		background: color-mix(in srgb, var(--color-text-primary) 3%, transparent);
-	}
-	.btn-add-chapter:focus-visible {
-		outline: none;
-		box-shadow: var(--focus-ring);
 	}
 	.btn-icon-plus {
 		font-size: var(--text-base);

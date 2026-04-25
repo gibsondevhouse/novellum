@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 
 	let {
 		coverUrl: initialCoverUrl,
@@ -65,8 +66,9 @@
 	{#if displayUrl}
 		<img class="hero-cover-img" src={displayUrl} alt="Book cover" />
 		<div class="hero-cover-overlay" role="group" aria-label="Cover options">
-			<button
+			<GhostButton
 				class="cover-action-btn cover-action-btn--upload"
+				type="button"
 				onclick={openFilePicker}
 				title="Change cover image"
 				aria-label="Change cover image"
@@ -86,7 +88,7 @@
 						stroke-linecap="round"
 					/>
 				</svg>
-			</button>
+			</GhostButton>
 		</div>
 	{:else}
 		<div class="hero-cover-placeholder" aria-hidden="true">
@@ -95,8 +97,9 @@
 			<span class="hero-cover-spine">{coverTitle}</span>
 			<span class="hero-cover-label">Upload Cover</span>
 			<div class="cover-actions" role="group" aria-label="Cover options">
-				<button
+				<GhostButton
 					class="cover-action-btn cover-action-btn--upload"
+					type="button"
 					onclick={openFilePicker}
 					title="Upload cover image"
 					aria-label="Upload cover image"
@@ -116,7 +119,7 @@
 							stroke-linecap="round"
 						/>
 					</svg>
-				</button>
+				</GhostButton>
 			</div>
 		</div>
 	{/if}
@@ -219,7 +222,7 @@
 		display: flex;
 		gap: var(--space-3);
 	}
-	.cover-action-btn {
+	:global(.cover-action-btn) {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -236,16 +239,16 @@
 			border-color var(--duration-base) var(--ease-standard),
 			background var(--duration-base) var(--ease-standard);
 	}
-	.cover-action-btn:hover:not(:disabled) {
+	:global(.cover-action-btn:hover:not(:disabled)) {
 		color: var(--color-text-secondary);
 		border-color: var(--color-border-default);
 		background: var(--color-surface-elevated);
 	}
-	.cover-action-btn:focus-visible {
+	:global(.cover-action-btn:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}
-	.cover-action-btn:disabled {
+	:global(.cover-action-btn:disabled) {
 		opacity: 0.35;
 		cursor: not-allowed;
 	}

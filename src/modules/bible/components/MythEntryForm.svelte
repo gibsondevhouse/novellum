@@ -159,177 +159,81 @@
 	}
 </script>
 
-<div class="archive-form">
-	<section class="archive-section">
+<div class="dossier-form">
+	<section class="dossier-form-section">
 		<h3>Core Identity</h3>
-		<div class="archive-grid archive-grid--double">
-			<div class="archive-field">
-				<label class="archive-label" for="myth-name">Name <span aria-hidden="true">*</span></label>
-				<input id="myth-name" class="archive-input" class:archive-input-error={!!nameError} type="text" bind:value={name} />
-				{#if nameError}<p class="archive-error-text">{nameError}</p>{/if}
+		<div class="dossier-form-grid dossier-form-grid--double">
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="myth-name">Name <span aria-hidden="true">*</span></label>
+				<input id="myth-name" class="dossier-form-input" class:dossier-form-input-error={!!nameError} type="text" bind:value={name} />
+				{#if nameError}<p class="dossier-form-error-text">{nameError}</p>{/if}
 			</div>
-			<div class="archive-field">
-				<label class="archive-label" for="myth-type">Type <span aria-hidden="true">*</span></label>
-				<select id="myth-type" class="archive-input" class:archive-input-error={!!typeError} bind:value={mythType}>
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="myth-type">Type <span aria-hidden="true">*</span></label>
+				<select id="myth-type" class="dossier-form-input" class:dossier-form-input-error={!!typeError} bind:value={mythType}>
 					<option value="">Select myth type</option>
 					{#each MYTH_TYPE_OPTIONS as option (option.value)}
 						<option value={option.value}>{option.label}</option>
 					{/each}
 				</select>
-				{#if typeError}<p class="archive-error-text">{typeError}</p>{/if}
+				{#if typeError}<p class="dossier-form-error-text">{typeError}</p>{/if}
 			</div>
 		</div>
 	</section>
 
-	<section class="archive-section">
+	<section class="dossier-form-section">
 		<h3>Narrative Content</h3>
-		<div class="archive-field">
-			<label class="archive-label" for="myth-summary">Summary</label>
-			<textarea id="myth-summary" class="archive-input archive-textarea" rows={3} bind:value={summary}></textarea>
+		<div class="dossier-form-field">
+			<label class="dossier-form-label" for="myth-summary">Summary</label>
+			<textarea id="myth-summary" class="dossier-form-input dossier-form-textarea" rows={3} bind:value={summary}></textarea>
 		</div>
-		<div class="archive-field">
-			<label class="archive-label" for="myth-full-account">Full Account</label>
-			<textarea id="myth-full-account" class="archive-input archive-textarea" rows={5} bind:value={fullAccount}></textarea>
+		<div class="dossier-form-field">
+			<label class="dossier-form-label" for="myth-full-account">Full Account</label>
+			<textarea id="myth-full-account" class="dossier-form-input dossier-form-textarea" rows={5} bind:value={fullAccount}></textarea>
 		</div>
-		<div class="archive-field">
-			<label class="archive-label" for="myth-perceived-truth">Perceived Truth</label>
-			<textarea id="myth-perceived-truth" class="archive-input archive-textarea" rows={3} bind:value={perceivedTruth}></textarea>
+		<div class="dossier-form-field">
+			<label class="dossier-form-label" for="myth-perceived-truth">Perceived Truth</label>
+			<textarea id="myth-perceived-truth" class="dossier-form-input dossier-form-textarea" rows={3} bind:value={perceivedTruth}></textarea>
 		</div>
-		<div class="archive-field">
-			<label class="archive-label" for="myth-actual-truth">Actual Truth <span class="archive-hint">(optional)</span></label>
-			<textarea id="myth-actual-truth" class="archive-input archive-textarea" rows={3} bind:value={actualTruth}></textarea>
+		<div class="dossier-form-field">
+			<label class="dossier-form-label" for="myth-actual-truth">Actual Truth <span class="dossier-form-hint">(optional)</span></label>
+			<textarea id="myth-actual-truth" class="dossier-form-input dossier-form-textarea" rows={3} bind:value={actualTruth}></textarea>
 		</div>
 	</section>
 
-	<section class="archive-section">
+	<section class="dossier-form-section">
 		<h3>Influence</h3>
-		<div class="archive-field">
-			<label class="archive-label" for="myth-cultural-impact">Cultural Impact</label>
-			<textarea id="myth-cultural-impact" class="archive-input archive-textarea" class:archive-input-error={!!impactError} rows={3} bind:value={culturalImpact}></textarea>
-			{#if impactError}<p class="archive-error-text">{impactError}</p>{/if}
+		<div class="dossier-form-field">
+			<label class="dossier-form-label" for="myth-cultural-impact">Cultural Impact</label>
+			<textarea id="myth-cultural-impact" class="dossier-form-input dossier-form-textarea" class:dossier-form-input-error={!!impactError} rows={3} bind:value={culturalImpact}></textarea>
+			{#if impactError}<p class="dossier-form-error-text">{impactError}</p>{/if}
 		</div>
-		<div class="archive-field">
-			<label class="archive-label" for="myth-fear-desire">Fear / Desire Triggered</label>
-			<textarea id="myth-fear-desire" class="archive-input archive-textarea" rows={2} bind:value={fearDesireTriggered}></textarea>
+		<div class="dossier-form-field">
+			<label class="dossier-form-label" for="myth-fear-desire">Fear / Desire Triggered</label>
+			<textarea id="myth-fear-desire" class="dossier-form-input dossier-form-textarea" rows={2} bind:value={fearDesireTriggered}></textarea>
 		</div>
 	</section>
 
-	<section class="archive-section">
+	<section class="dossier-form-section">
 		<h3>Relationships</h3>
-		<div class="archive-grid archive-grid--double">
-			<div class="archive-field">
-				<label class="archive-label" for="myth-realm-ids">Realm IDs</label>
-				<input id="myth-realm-ids" class="archive-input" type="text" bind:value={realmIdsRaw} />
+		<div class="dossier-form-grid dossier-form-grid--double">
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="myth-realm-ids">Realm IDs</label>
+				<input id="myth-realm-ids" class="dossier-form-input" type="text" bind:value={realmIdsRaw} />
 			</div>
-			<div class="archive-field">
-				<label class="archive-label" for="myth-character-ids">Character IDs</label>
-				<input id="myth-character-ids" class="archive-input" type="text" bind:value={characterIdsRaw} />
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="myth-character-ids">Character IDs</label>
+				<input id="myth-character-ids" class="dossier-form-input" type="text" bind:value={characterIdsRaw} />
 			</div>
-			<div class="archive-field">
-				<label class="archive-label" for="myth-thread-ids">Thread IDs</label>
-				<input id="myth-thread-ids" class="archive-input" type="text" bind:value={threadIdsRaw} />
+			<div class="dossier-form-field">
+				<label class="dossier-form-label" for="myth-thread-ids">Thread IDs</label>
+				<input id="myth-thread-ids" class="dossier-form-input" type="text" bind:value={threadIdsRaw} />
 			</div>
 		</div>
 	</section>
 
-	<div class="archive-actions">
+	<div class="dossier-form-actions">
 		<GhostButton onclick={onCancel} disabled={saving}>Cancel</GhostButton>
 		<PrimaryButton onclick={handleSubmit} disabled={saving}>{saving ? 'Saving…' : entry ? 'Save Myth' : 'Create Myth'}</PrimaryButton>
 	</div>
 </div>
-
-<style>
-	.archive-form {
-		display: grid;
-		gap: var(--space-6);
-	}
-
-	.archive-section {
-		display: grid;
-		gap: var(--space-4);
-		padding-top: var(--space-4);
-		border-top: 1px solid color-mix(in srgb, var(--color-border-subtle) 65%, transparent);
-	}
-
-	h3 {
-		margin: 0;
-		font-size: var(--text-xs);
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
-		color: var(--color-text-muted);
-		font-weight: var(--font-weight-semibold);
-	}
-
-	.archive-grid {
-		display: grid;
-		gap: var(--space-4);
-	}
-
-	.archive-grid--double {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-
-	.archive-field {
-		display: grid;
-		gap: var(--space-2);
-	}
-
-	.archive-label {
-		font-size: var(--text-xs);
-		letter-spacing: 0.03em;
-		color: var(--color-text-muted);
-		font-weight: var(--font-weight-medium);
-	}
-
-	.archive-hint {
-		font-weight: var(--font-weight-normal);
-		color: var(--color-text-muted);
-	}
-
-	.archive-input {
-		width: 100%;
-		padding: 0.2rem 0.25rem;
-		border: 1px solid transparent;
-		border-radius: var(--radius-sm);
-		background: transparent;
-		color: var(--color-text-primary);
-		font: inherit;
-	}
-
-	.archive-input:hover {
-		border-color: color-mix(in srgb, var(--color-border-subtle) 75%, transparent);
-	}
-
-	.archive-input:focus {
-		outline: none;
-		border-color: color-mix(in srgb, var(--color-nova-blue) 45%, var(--color-border-default));
-		background: color-mix(in srgb, var(--color-surface-overlay) 35%, transparent);
-	}
-
-	.archive-textarea {
-		min-height: 6rem;
-		resize: vertical;
-	}
-
-	.archive-input-error {
-		border-color: var(--color-error);
-	}
-
-	.archive-error-text {
-		margin: 0;
-		font-size: var(--text-xs);
-		color: var(--color-error-on-dark);
-	}
-
-	.archive-actions {
-		display: flex;
-		justify-content: flex-end;
-		gap: var(--space-3);
-	}
-
-	@media (max-width: 860px) {
-		.archive-grid--double {
-			grid-template-columns: 1fr;
-		}
-	}
-</style>

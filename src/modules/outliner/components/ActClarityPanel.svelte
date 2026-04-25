@@ -3,6 +3,7 @@
 	import { SvelteSet } from 'svelte/reactivity';
 	import type { Act, Arc } from '$lib/db/types.js';
 	import type { ChapterWithScenes } from '$modules/outliner/types.js';
+	import { WorkspaceInspector, GhostButton } from '$lib/components/ui/index.js';
 
 	type NarrativeRole = 'setup' | 'escalation' | 'resolution' | '';
 
@@ -151,7 +152,7 @@
 	}
 </script>
 
-<div class="act-clarity" aria-label="Act clarity panel">
+<WorkspaceInspector aria-label="Act clarity panel">
 	<header class="act-clarity__header">
 		<div>
 			{#if editingTitle}
@@ -170,9 +171,9 @@
 					aria-label="Act title"
 				/>
 			{:else}
-				<button class="act-title-btn" onclick={() => (editingTitle = true)} aria-label="Edit act title">
+				<GhostButton class="act-title-btn" type="button" onclick={() => (editingTitle = true)} aria-label="Edit act title">
 					{act.title}
-				</button>
+				</GhostButton>
 			{/if}
 			<input
 				class="act-subtitle-input"
@@ -254,12 +255,12 @@
 				<ul class="chapter-list" role="list">
 					{#each chapters as chapter (chapter.id)}
 						<li class="chapter-item">
-							<button class="chapter-row" onclick={() => toggleChapter(chapter.id)}>
+							<GhostButton class="chapter-row" type="button" onclick={() => toggleChapter(chapter.id)}>
 								<span class="chapter-title">{chapter.title}</span>
 								<span class="chapter-meta">
 									{chapterStatus(chapter.scenes.length)} · {chapter.scenes.length} scenes · {chapterPovCount(chapter)} POV
 								</span>
-							</button>
+							</GhostButton>
 							{#if expandedChapters.has(chapter.id)}
 								<ul class="scene-list" role="list">
 									{#each chapter.scenes as scene (scene.id)}
@@ -351,19 +352,9 @@
 			</label>
 		</div>
 	</details>
-</div>
+</WorkspaceInspector>
 
 <style>
-	.act-clarity {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-3);
-		width: min(920px, 100%);
-		height: 100%;
-		overflow-y: auto;
-		padding-right: var(--space-2);
-	}
-
 	.act-clarity__header {
 		display: flex;
 		flex-direction: column;
@@ -374,7 +365,7 @@
 		background: color-mix(in srgb, var(--color-surface-raised) 90%, transparent);
 	}
 
-	.act-title-btn {
+	:global(.act-title-btn) {
 		background: none;
 		border: none;
 		padding: 0;
@@ -517,7 +508,7 @@
 		overflow: visible;
 	}
 
-	.chapter-row {
+	:global(.chapter-row) {
 		width: 100%;
 		background: transparent;
 		border: none;
@@ -531,7 +522,7 @@
 		min-width: 0;
 	}
 
-	.chapter-row:hover {
+	:global(.chapter-row:hover) {
 		background: color-mix(in srgb, var(--color-text-primary) 3%, transparent);
 	}
 
@@ -568,8 +559,8 @@
 	input:focus,
 	select:focus,
 	textarea:focus,
-	.chapter-row:focus-visible,
-	.act-title-btn:focus-visible {
+	:global(.chapter-row:focus-visible),
+	:global(.act-title-btn:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}

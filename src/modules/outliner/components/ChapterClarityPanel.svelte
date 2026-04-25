@@ -194,9 +194,10 @@
 		persistMeta();
 		void persistArcRefs();
 	}
+	import { WorkspaceInspector, GhostButton } from '$lib/components/ui/index.js';
 </script>
 
-<div class="chapter-editor" aria-label="Chapter editor">
+<WorkspaceInspector aria-label="Chapter editor">
 	<header class="chapter-header">
 		<div class="chapter-header__top">
 			<input
@@ -353,7 +354,9 @@
 					{/each}
 				</ul>
 			{/if}
-			<button class="btn-add" onclick={() => void onAddScene(chapter.id)}>+ Add Scene</button>
+			<GhostButton class="btn-add" type="button" onclick={() => void onAddScene(chapter.id)}
+				>+ Add Scene</GhostButton
+			>
 		</div>
 	</details>
 
@@ -392,18 +395,9 @@
 			</div>
 		</div>
 	</details>
-</div>
+</WorkspaceInspector>
 
 <style>
-	.chapter-editor {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-3);
-		width: min(920px, 100%);
-		height: 100%;
-		overflow-y: auto;
-		padding-right: var(--space-2);
-	}
 
 	.chapter-header,
 	.chapter-card {
@@ -574,7 +568,7 @@
 		color: var(--color-text-muted);
 	}
 
-	.btn-add {
+	:global(.btn-add) {
 		align-self: flex-start;
 		padding: var(--space-2) var(--space-3);
 		background: none;
@@ -585,7 +579,7 @@
 		cursor: pointer;
 	}
 
-	.btn-add:hover {
+	:global(.btn-add:hover) {
 		border-color: var(--color-border-strong);
 		color: var(--color-text-primary);
 	}

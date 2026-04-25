@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { toast } from '$lib/stores/toast.svelte.js';
-	import { PrimaryButton, SecondaryButton, Input } from '$lib/components/ui/index.js';
+	import { PrimaryButton, SecondaryButton, Input, SurfacePanel } from '$lib/components/ui/index.js';
 
 	let apiKey = $state('');
 	let isChecking = $state(false);
@@ -48,7 +48,7 @@
 	}
 </script>
 
-<div class="api-settings-panel">
+<SurfacePanel class="api-settings-panel">
 	<header class="panel-header">
 		<p class="panel-eyebrow">Primary Integration</p>
 		<h2>AI Integration</h2>
@@ -82,14 +82,11 @@
 			Clear Key
 		</SecondaryButton>
 	</footer>
-</div>
+</SurfacePanel>
 
 <style>
-	.api-settings-panel {
+	:global(.api-settings-panel) {
 		background: linear-gradient(165deg, var(--color-surface-overlay), var(--color-surface-ground));
-		border: 1px solid var(--color-border-subtle);
-		border-radius: var(--radius-lg);
-		padding: var(--space-6);
 		max-width: 600px;
 	}
 

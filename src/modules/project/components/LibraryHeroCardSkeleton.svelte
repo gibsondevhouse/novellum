@@ -20,13 +20,13 @@
 		align-items: stretch;
 		gap: var(--space-5);
 		padding: var(--space-5);
-		border: 1px solid var(--color-border-subtle);
-		border-radius: var(--radius-lg);
 		background: linear-gradient(
 			145deg,
 			var(--color-surface-raised) 0%,
 			var(--color-surface-overlay) 100%
 		);
+		border: 1px solid var(--color-border-subtle);
+		border-radius: var(--radius-lg);
 	}
 
 	.library-card-skeleton__cover {

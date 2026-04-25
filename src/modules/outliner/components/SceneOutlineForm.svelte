@@ -4,6 +4,7 @@
 	import { updateScene } from '$modules/editor/services/scene-repository.js';
 	import StructuredSection from '$lib/components/planning/StructuredSection.svelte';
 	import ArcTagHint from './ArcTagHint.svelte';
+	import { SurfacePanel } from '$lib/components/ui/index.js';
 
 	let { scene, onUpdate } = $props<{
 		scene: Scene;
@@ -75,7 +76,7 @@
 	}
 </script>
 
-<div class="planning-panel">
+<SurfacePanel class="planning-panel">
 	<!-- Panel context bar -->
 	<div class="planning-context">
 		<span class="planning-context-label">Intent</span>
@@ -158,4 +159,4 @@
 
 	<!-- Arc tags -->
 	<ArcTagHint arcRefs={scene.arcRefs} />
-</div>
+</SurfacePanel>

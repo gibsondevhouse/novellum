@@ -247,9 +247,10 @@
 		[ids[index], ids[index + 1]] = [ids[index + 1], ids[index]];
 		void reorderBeatsLocal(ids);
 	}
+	import { WorkspaceInspector, GhostButton } from '$lib/components/ui/index.js';
 </script>
 
-<div class="scene-editor" aria-label="Scene editor">
+<WorkspaceInspector aria-label="Scene editor">
 	<header class="scene-header">
 		<div class="scene-header__top">
 			<input
@@ -424,24 +425,26 @@
 					{#each beats as beat, index (beat.id)}
 						<li class="beat-item">
 							<div class="beat-controls">
-								<button
+								<GhostButton
 									class="beat-nav"
+									type="button"
 									onclick={() => moveUp(index)}
 									disabled={index === 0}
 									aria-label="Move beat up"
 									title="Move up"
 								>
 									↑
-								</button>
-								<button
+								</GhostButton>
+								<GhostButton
 									class="beat-nav"
+									type="button"
 									onclick={() => moveDown(index)}
 									disabled={index === beats.length - 1}
 									aria-label="Move beat down"
 									title="Move down"
 								>
 									↓
-								</button>
+								</GhostButton>
 							</div>
 							<div class="beat-content">
 								<input
@@ -453,14 +456,15 @@
 								/>
 								<span class="beat-index">Beat {index + 1}</span>
 							</div>
-							<button
+							<GhostButton
 								class="beat-remove"
+								type="button"
 								onclick={() => void removeBeatLocal(beat.id)}
 								aria-label="Remove beat"
 								title="Remove"
 							>
 								✕
-							</button>
+							</GhostButton>
 						</li>
 					{/each}
 				</ul>
@@ -477,7 +481,9 @@
 						}
 					}}
 				/>
-				<button class="beat-add-btn" onclick={() => void addBeat()}>+ Add</button>
+				<GhostButton class="beat-add-btn" type="button" onclick={() => void addBeat()}
+					>+ Add</GhostButton
+				>
 			</div>
 		</div>
 	</details>
@@ -577,19 +583,9 @@
 			</div>
 		</div>
 	</details>
-</div>
+</WorkspaceInspector>
 
 <style>
-	.scene-editor {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-3);
-		width: min(920px, 100%);
-		height: 100%;
-		overflow-y: auto;
-		padding-right: var(--space-2);
-	}
-
 	.scene-header,
 	.scene-card {
 		border: 1px solid var(--color-border-subtle);
@@ -766,7 +762,7 @@
 		flex-shrink: 0;
 	}
 
-	.beat-nav {
+	:global(.beat-nav) {
 		background: none;
 		border: 1px solid var(--color-border-default);
 		border-radius: var(--radius-sm);
@@ -778,12 +774,12 @@
 		min-width: 32px;
 	}
 
-	.beat-nav:disabled {
+	:global(.beat-nav:disabled) {
 		opacity: 0.4;
 		cursor: not-allowed;
 	}
 
-	.beat-nav:hover:not(:disabled) {
+	:global(.beat-nav:hover:not(:disabled)) {
 		background: var(--color-surface-hover);
 	}
 
@@ -807,7 +803,7 @@
 		color: var(--color-text-muted);
 	}
 
-	.beat-remove {
+	:global(.beat-remove) {
 		background: none;
 		border: 1px solid var(--color-border-default);
 		border-radius: var(--radius-sm);
@@ -818,7 +814,7 @@
 		flex-shrink: 0;
 	}
 
-	.beat-remove:hover {
+	:global(.beat-remove:hover) {
 		color: var(--color-semantic-error-fg);
 		border-color: var(--color-semantic-error-fg);
 	}
@@ -834,7 +830,7 @@
 		flex: 1;
 	}
 
-	.beat-add-btn {
+	:global(.beat-add-btn) {
 		padding: var(--space-2) var(--space-3);
 		background: none;
 		border: 1px dashed var(--color-border-default);
@@ -845,7 +841,7 @@
 		white-space: nowrap;
 	}
 
-	.beat-add-btn:hover {
+	:global(.beat-add-btn:hover) {
 		border-color: var(--color-border-strong);
 		color: var(--color-text-primary);
 	}

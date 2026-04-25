@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { preCheck, migrate } from '$lib/migration/index.js';
 	import type { PreCheckResult, MigrationError } from '$lib/migration/index.js';
-	import { PrimaryButton, SecondaryButton } from '$lib/components/ui/index.js';
+	import { PrimaryButton, SecondaryButton, PageHeader } from '$lib/components/ui/index.js';
 
 	type TableStatus = 'pending' | 'migrating' | 'done' | 'error';
 
@@ -72,23 +72,24 @@
 </script>
 
 <div class="migrate-page">
-	<div class="migrate-hero">
-		<div>
-			<p class="migrate-eyebrow">Data Portability</p>
-			<h1>Migrate Data</h1>
-			<p class="subtitle">Transfer existing browser data (IndexedDB) to the shared SQLite database.</p>
-		</div>
-		<div class="migrate-summary">
-			<div class="summary-item">
-				<span>Phase</span>
-				<strong>{phase}</strong>
+	<PageHeader
+		eyebrow="Data Portability"
+		title="Migrate Data"
+		description="Transfer existing browser data (IndexedDB) to the shared SQLite database."
+	>
+		{#snippet meta()}
+			<div class="migrate-summary">
+				<div class="summary-item">
+					<span>Phase</span>
+					<strong>{phase}</strong>
+				</div>
+				<div class="summary-item">
+					<span>Tables</span>
+					<strong>{tables.length}</strong>
+				</div>
 			</div>
-			<div class="summary-item">
-				<span>Tables</span>
-				<strong>{tables.length}</strong>
-			</div>
-		</div>
-	</div>
+		{/snippet}
+	</PageHeader>
 
 	{#if phase === 'loading'}
 		<p class="status-msg">Checking databases…</p>
@@ -199,44 +200,17 @@
 	.migrate-page {
 		max-width: 56rem;
 		margin: 0 auto;
-		padding: var(--space-6) var(--space-4) var(--space-10);
+		padding: var(--space-6) 0 var(--space-10);
 		display: grid;
 		gap: var(--space-5);
 	}
 
-	.migrate-hero {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-		gap: var(--space-4);
+	.migrate-page :global(.page-header) {
 		padding: var(--space-5);
 		border: 1px solid var(--color-border-subtle);
 		border-radius: var(--radius-xl);
 		background: linear-gradient(165deg, var(--color-surface-overlay), var(--color-surface-ground));
-	}
-
-	.migrate-eyebrow,
-		.subtitle,
-		h1 {
-		margin: 0;
-	}
-
-	.migrate-eyebrow {
-		font-size: var(--text-xs);
-		text-transform: uppercase;
-		letter-spacing: var(--tracking-wide);
-		color: var(--color-text-muted);
-	}
-
-	h1 {
-		font-size: var(--text-2xl);
-		font-weight: var(--font-weight-bold);
-		margin-top: var(--space-1);
-	}
-
-	.subtitle {
-		color: var(--color-text-secondary);
-		margin-top: var(--space-2);
+		margin-bottom: var(--space-2);
 	}
 
 	.migrate-summary {

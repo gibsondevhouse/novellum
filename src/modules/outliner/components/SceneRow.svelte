@@ -4,6 +4,7 @@
 	import X from '@lucide/svelte/icons/x';
 	import { untrack } from 'svelte';
 	import type { Scene } from '$lib/db/types.js';
+	import { GhostButton } from '$lib/components/ui/index.js';
 
 	let { scene, onDelete, onRename, onSelect, isSelected, onDragStart } = $props<{
 		scene: Scene;
@@ -80,29 +81,30 @@
 				onblur={saveTitle}
 				onkeydown={handleKeydown}
 			/>
-			<button class="btn-icon btn-save" onclick={saveTitle} aria-label="Save">
+			<GhostButton class="btn-icon btn-save" type="button" onclick={saveTitle} aria-label="Save">
 				<Check class="btn-icon__glyph" aria-hidden="true" />
-			</button>
+			</GhostButton>
 		</div>
 	{:else}
 		<div class="scene-header">
-			<button
+			<GhostButton
 				class="scene-title"
+				type="button"
 				onclick={() => onSelect(scene)}
 				aria-label="Select scene: {scene.title}"
 			>
 				{scene.title}
-			</button>
+			</GhostButton>
 			{#if scene.wordCount > 0}
 				<span class="wc-badge">{scene.wordCount}w</span>
 			{/if}
 			<div class="scene-actions" role="toolbar" aria-label="Scene actions">
-				<button class="btn-icon" onclick={startEditing} aria-label="Rename scene">
+				<GhostButton class="btn-icon" type="button" onclick={startEditing} aria-label="Rename scene">
 					<Pencil class="btn-icon__glyph" aria-hidden="true" />
-				</button>
-				<button class="btn-icon btn-del" onclick={handleDelete} aria-label="Delete scene">
+				</GhostButton>
+				<GhostButton class="btn-icon btn-del" type="button" onclick={handleDelete} aria-label="Delete scene">
 					<X class="btn-icon__glyph" aria-hidden="true" />
-				</button>
+				</GhostButton>
 			</div>
 		</div>
 		{#if summary}
@@ -132,7 +134,7 @@
 	}
 
 	.scene-row:hover {
-		background: color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+		background: color-mix(in srgb, var(--color-text-primary) 5%, transparent);
 	}
 
 	.scene-row:focus-within {
@@ -151,7 +153,7 @@
 		padding: var(--space-2);
 	}
 
-	.scene-title {
+	:global(.scene-title) {
 		flex: 1;
 		background: none;
 		border: none;
@@ -169,16 +171,16 @@
 		border-radius: var(--radius-sm);
 	}
 
-	.scene-title:hover {
+	:global(.scene-title:hover) {
 		color: var(--color-text-primary);
 	}
 
-	.is-selected .scene-title {
+	.is-selected :global(.scene-title) {
 		color: var(--color-text-primary);
 		font-weight: var(--font-weight-medium);
 	}
 
-	.scene-title:focus-visible {
+	:global(.scene-title:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}
@@ -226,7 +228,7 @@
 		opacity: 1;
 	}
 
-	.btn-icon {
+	:global(.btn-icon) {
 		background: none;
 		border: none;
 		color: var(--color-text-muted);
@@ -245,26 +247,26 @@
 		stroke-width: 2;
 	}
 
-	.btn-icon:hover {
+	:global(.btn-icon:hover) {
 		color: var(--color-text-secondary);
 		background: var(--color-surface-overlay);
 	}
 
-	.btn-icon:focus-visible {
+	:global(.btn-icon:focus-visible) {
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}
 
-	.btn-del:hover {
+	:global(.btn-del:hover) {
 		color: var(--color-error);
 		background: color-mix(in srgb, var(--color-error) 10%, transparent);
 	}
 
-	.btn-save {
+	:global(.btn-save) {
 		color: var(--color-teal);
 	}
 
-	.btn-save:hover {
+	:global(.btn-save:hover) {
 		color: var(--color-teal);
 		background: color-mix(in srgb, var(--color-teal) 10%, transparent);
 	}

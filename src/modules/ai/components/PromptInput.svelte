@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { NovaSessionContextItem } from '$modules/ai/types.js';
+	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 
 	let {
 		value = $bindable(''),
@@ -85,14 +86,14 @@
 				<span class="context-chip" role="listitem">
 					<span class="context-chip__kind">{item.kind === 'project' ? 'Project' : 'File'}</span>
 					<span class="context-chip__label">{item.kind === 'project' ? item.label : item.name}</span>
-					<button
+					<GhostButton
 						type="button"
 						class="context-chip__remove"
 						onclick={() => onremovecontext?.(item.id)}
 						aria-label={`Remove ${item.kind === 'project' ? item.label : item.name}`}
 					>
 						×
-					</button>
+					</GhostButton>
 				</span>
 			{/each}
 		</div>
@@ -113,7 +114,7 @@
 
 	<div class="prompt-subcard__actions">
 		<div class="prompt-subcard__context-actions">
-			<button
+			<GhostButton
 				type="button"
 				class="prompt-subcard__context-trigger"
 				onclick={toggleContextMenu}
@@ -123,16 +124,26 @@
 				aria-expanded={contextMenuOpen}
 			>
 				+
-			</button>
+			</GhostButton>
 
 			{#if contextMenuOpen}
 				<div class="prompt-subcard__context-menu" role="menu">
-					<button type="button" class="prompt-subcard__context-option" role="menuitem" onclick={openProjectPicker}>
+					<GhostButton
+						type="button"
+						class="prompt-subcard__context-option"
+						role="menuitem"
+						onclick={openProjectPicker}
+					>
 						Add Project
-					</button>
-					<button type="button" class="prompt-subcard__context-option" role="menuitem" onclick={openFilePicker}>
+					</GhostButton>
+					<GhostButton
+						type="button"
+						class="prompt-subcard__context-option"
+						role="menuitem"
+						onclick={openFilePicker}
+					>
 						Add File / Document
-					</button>
+					</GhostButton>
 				</div>
 			{/if}
 
@@ -148,7 +159,7 @@
 			/>
 		</div>
 
-		<button
+		<GhostButton
 			type="button"
 			class="prompt-subcard__send"
 			onmousedown={submit}
@@ -159,7 +170,7 @@
 				<line x1="5" y1="12" x2="19" y2="12"></line>
 				<polyline points="12 5 19 12 12 19"></polyline>
 			</svg>
-		</button>
+		</GhostButton>
 	</div>
 
 	{#if contextWarnings.length > 0}
@@ -224,7 +235,7 @@
 		white-space: nowrap;
 	}
 
-	.context-chip__remove {
+	:global(.context-chip__remove) {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
@@ -238,12 +249,12 @@
 		padding: 0;
 	}
 
-	.context-chip__remove:hover {
+	:global(.context-chip__remove:hover) {
 		background: var(--color-surface-hover);
 		color: var(--color-text-primary);
 	}
 
-	.context-chip__remove:focus-visible {
+	:global(.context-chip__remove:focus-visible) {
 		outline: 2px solid var(--color-border-focus);
 		outline-offset: 1px;
 	}
@@ -298,7 +309,7 @@
 		align-items: center;
 	}
 
-	.prompt-subcard__context-trigger {
+	:global(.prompt-subcard__context-trigger) {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
@@ -315,16 +326,16 @@
 		padding: 0;
 	}
 
-	.prompt-subcard__context-trigger:hover:not(:disabled) {
+	:global(.prompt-subcard__context-trigger:hover:not(:disabled)) {
 		background: var(--color-surface-hover);
 	}
 
-	.prompt-subcard__context-trigger:focus-visible {
+	:global(.prompt-subcard__context-trigger:focus-visible) {
 		outline: 2px solid var(--color-border-focus);
 		outline-offset: 2px;
 	}
 
-	.prompt-subcard__context-trigger:disabled {
+	:global(.prompt-subcard__context-trigger:disabled) {
 		opacity: 0.4;
 		cursor: not-allowed;
 	}
@@ -344,7 +355,7 @@
 		z-index: 40;
 	}
 
-	.prompt-subcard__context-option {
+	:global(.prompt-subcard__context-option) {
 		display: inline-flex;
 		align-items: center;
 		justify-content: flex-start;
@@ -358,11 +369,11 @@
 		cursor: pointer;
 	}
 
-	.prompt-subcard__context-option:hover {
+	:global(.prompt-subcard__context-option:hover) {
 		background: var(--color-surface-hover);
 	}
 
-	.prompt-subcard__context-option:focus-visible {
+	:global(.prompt-subcard__context-option:focus-visible) {
 		outline: 2px solid var(--color-border-focus);
 		outline-offset: 1px;
 	}
@@ -375,7 +386,7 @@
 		pointer-events: none;
 	}
 
-	.prompt-subcard__send {
+	:global(.prompt-subcard__send) {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -393,17 +404,17 @@
 			color var(--duration-fast) var(--ease-standard);
 	}
 
-	.prompt-subcard__send:hover:not(:disabled) {
+	:global(.prompt-subcard__send:hover:not(:disabled)) {
 		background-color: color-mix(in srgb, var(--color-teal) 20%, transparent);
 		color: var(--color-text-on-dark);
 	}
 
-	.prompt-subcard__send:disabled {
+	:global(.prompt-subcard__send:disabled) {
 		opacity: 0.3;
 		cursor: default;
 	}
 
-	.prompt-subcard__send:focus-visible {
+	:global(.prompt-subcard__send:focus-visible) {
 		outline: 2px solid var(--color-border-focus);
 		outline-offset: 2px;
 	}

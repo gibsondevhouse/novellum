@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { PrimaryButton } from '$lib/components/ui/index.js';
+
 	let { onAddFirstAct } = $props<{
 		onAddFirstAct: () => void;
 	}>();
@@ -21,7 +23,7 @@
 			then add chapters and scenes inside each act.
 		</p>
 	</div>
-	<button class="btn-cta" onclick={onAddFirstAct}> Add First Act </button>
+	<PrimaryButton class="btn-cta" type="button" onclick={onAddFirstAct}>Add First Act</PrimaryButton>
 </div>
 
 <style>
@@ -95,24 +97,18 @@
 	}
 
 	/* ── CTA ── */
-	.btn-cta {
+	:global(.btn-cta) {
 		padding: var(--space-3) var(--space-6);
-		background: var(--color-nova-blue);
-		color: var(--color-text-on-dark);
-		border: none;
-		border-radius: var(--radius-sm);
 		font-size: var(--text-sm);
 		font-weight: var(--font-weight-medium);
-		cursor: pointer;
 		transition: opacity var(--duration-fast) var(--ease-standard);
 	}
 
-	.btn-cta:hover {
+	:global(.btn-cta:hover) {
 		opacity: 0.85;
 	}
 
-	.btn-cta:focus-visible {
-		outline: none;
-		box-shadow: var(--focus-ring);
+	:global(.btn-cta:focus-visible) {
+		opacity: 1;
 	}
 </style>

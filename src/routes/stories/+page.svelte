@@ -6,7 +6,7 @@
 		loadProjects,
 		submitCreate
 	} from '$modules/project/stores/project-hub.svelte.js';
-	import { SurfacePanel, SectionHeader, PrimaryButton, GhostButton, Input } from '$lib/components/ui/index.js';
+	import { SurfacePanel, SectionHeader, PrimaryButton, GhostButton, Input, PageHeader } from '$lib/components/ui/index.js';
 	import LibraryHeroCard from '$modules/project/components/LibraryHeroCard.svelte';
 	import LibraryHeroCardSkeleton from '$modules/project/components/LibraryHeroCardSkeleton.svelte';
 	import type { Project } from '$lib/db/types.js';
@@ -37,17 +37,16 @@
 </svelte:head>
 
 <div class="stories-hub">
-	<header class="stories-header">
-		<div class="stories-heading">
-			<h1 class="stories-title">Stories</h1>
-			<p class="stories-subtitle">
-				Short-form narratives and single-scene pieces. Managed as focused, independent projects.
-			</p>
-		</div>
-		<PrimaryButton onclick={() => showCreate = !showCreate}>
-			{showCreate ? 'Cancel' : 'New Story'}
-		</PrimaryButton>
-	</header>
+	<PageHeader
+		title="Stories"
+		description="Short-form narratives and single-scene pieces. Managed as focused, independent projects."
+	>
+		{#snippet actions()}
+			<PrimaryButton onclick={() => (showCreate = !showCreate)}>
+				{showCreate ? 'Cancel' : 'New Story'}
+			</PrimaryButton>
+		{/snippet}
+	</PageHeader>
 
 	{#if showCreate}
 		<div class="create-story-panel">
@@ -97,41 +96,11 @@
 	.stories-hub {
 		max-width: 1100px;
 		margin: 0 auto;
-		padding: var(--space-10) var(--panel-padding);
+		padding: var(--space-10) 0;
 	}
 
-	.stories-header {
-		display: flex;
-		align-items: flex-end;
-		justify-content: space-between;
-		flex-wrap: wrap;
-		gap: var(--space-4);
+	.stories-hub :global(.page-header) {
 		margin-bottom: var(--space-8);
-	}
-
-	.stories-heading {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-2);
-		max-width: 560px;
-	}
-
-	.stories-title {
-		font-family: var(--font-display);
-		font-size: var(--text-5xl);
-		font-weight: var(--font-weight-normal);
-		letter-spacing: var(--tracking-tight);
-		color: var(--color-text-primary);
-		line-height: 1.1;
-		margin: 0;
-	}
-
-	.stories-subtitle {
-		font-family: var(--font-sans);
-		font-size: var(--text-base);
-		color: var(--color-text-muted);
-		line-height: var(--leading-relaxed);
-		margin: 0;
 	}
 
 	.create-story-panel {
@@ -172,7 +141,7 @@
 		justify-content: center;
 		min-height: 40vh;
 		text-align: center;
-		padding: var(--space-8) var(--panel-padding);
+		padding: var(--space-8);
 		background: var(--color-surface-ground);
 		border: 1px dashed var(--color-border-default);
 		border-radius: var(--radius-lg);

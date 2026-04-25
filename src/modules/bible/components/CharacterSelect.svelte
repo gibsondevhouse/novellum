@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { GhostButton } from '$lib/components/ui/index.js';
+
 	type CharacterOption = {
 		id: string;
 		name: string;
@@ -116,10 +118,9 @@
 			{:else}
 				{#each filteredOptions as option, index (option.id)}
 					<li>
-						<button
+						<GhostButton
 							type="button"
-							class="option-item"
-							class:option-item--highlighted={index === highlightedIndex}
+							class={`option-item ${index === highlightedIndex ? 'option-item--highlighted' : ''}`}
 							role="option"
 							aria-selected={value === option.id}
 							onclick={() => chooseOption(option.id)}
@@ -128,7 +129,7 @@
 							{#if option.role}
 								<span class="option-meta">{option.role}</span>
 							{/if}
-						</button>
+						</GhostButton>
 					</li>
 				{/each}
 			{/if}
@@ -180,7 +181,7 @@
 		overflow-y: auto;
 	}
 
-	.option-item {
+	:global(.option-item) {
 		width: 100%;
 		border: none;
 		background: transparent;
@@ -193,8 +194,8 @@
 		gap: 0.1rem;
 	}
 
-	.option-item--highlighted,
-	.option-item:hover {
+	:global(.option-item--highlighted),
+	:global(.option-item:hover) {
 		background: color-mix(in srgb, var(--color-surface-overlay) 50%, transparent);
 	}
 

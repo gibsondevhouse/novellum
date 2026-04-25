@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getDeleting, submitDelete } from '../stores/project-hub.svelte.ts';
+	import { DestructiveButton } from '$lib/components/ui/index.js';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 
 	let { projectId, oncancel } = $props<{ projectId: string; oncancel: () => void }>();
@@ -17,9 +18,9 @@
 		</p>
 		<div class="actions">
 			<GhostButton onclick={oncancel} disabled={getDeleting()}>Cancel</GhostButton>
-			<button class="btn-danger" onclick={handleConfirm} disabled={getDeleting()}>
+			<DestructiveButton type="button" onclick={handleConfirm} disabled={getDeleting()}>
 				{getDeleting() ? 'Deleting…' : 'Delete Project'}
-			</button>
+			</DestructiveButton>
 		</div>
 	</div>
 </div>

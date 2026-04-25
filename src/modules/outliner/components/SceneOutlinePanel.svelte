@@ -2,6 +2,7 @@
 	import type { Scene } from '$lib/db/types.js';
 	import type { BeatFocus } from '../types.js';
 	import BeatList from './BeatList.svelte';
+	import { SurfacePanel } from '$lib/components/ui/index.js';
 
 	let {
 		scene,
@@ -14,7 +15,7 @@
 	}>();
 </script>
 
-<div class="planning-panel">
+<SurfacePanel class="planning-panel">
 	<!-- Sequence context bar -->
 	<div class="planning-context">
 		<span class="planning-context-label">Sequence</span>
@@ -23,4 +24,4 @@
 		>
 	</div>
 	<BeatList sceneId={scene.id} projectId={scene.projectId} onSelectBeat={onBeatSelect} />
-</div>
+</SurfacePanel>

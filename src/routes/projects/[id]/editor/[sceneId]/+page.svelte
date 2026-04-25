@@ -4,6 +4,7 @@
 	import { editorState } from '$modules/editor/stores/editor.svelte.js';
 	import * as autosaveService from '$modules/editor/services/autosave-service.js';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
+	import { PageHeader } from '$lib/components/ui/index.js';
 
 	let { data } = $props();
 
@@ -47,24 +48,27 @@
 </svelte:head>
 
 <div class="editor-page">
-	<header class="editor-header">
-		<div class="header-main">
-			<Breadcrumb items={[
-				{ label: 'Editor', href: `/projects/${data.scene.projectId}/editor` },
-				...(data.chapter ? [{ label: data.chapter.title, href: `/projects/${data.scene.projectId}/editor` }] : []),
-				{ label: data.scene.title },
-			]} />
-			<h1 class="scene-title">{data.scene.title}</h1>
-			<p class="scene-subtitle">Focused drafting studio for the current scene.</p>
-		</div>
-		<div class="header-actions" aria-label="Editor controls">
-			<span class="meta-chip">Words: {sceneWordCount}</span>
-			<span class="save-indicator" class:saving={saveStatus === 'saving'} class:saved={saveStatus === 'saved'}>{saveLabel}</span>
-			<button class="btn-history" type="button" onclick={() => (showHistory = !showHistory)}>
-				{showHistory ? 'Close History' : 'History'}
-			</button>
-		</div>
-	</header>
+	<div class="editor-header">
+		<Breadcrumb items={[
+			{ label: 'Editor', href: `/projects/${data.scene.projectId}/editor` },
+			...(data.chapter ? [{ label: data.chapter.title, href: `/projects/${data.scene.projectId}/editor` }] : []),
+			{ label: data.scene.title },
+		]} />
+		<PageHeader
+			title={data.scene.title}
+			description="Focused drafting studio for the current scene."
+		>
+			{#snippet actions()}
+				<div class="header-actions" aria-label="Editor controls">
+					<span class="meta-chip">Words: {sceneWordCount}</span>
+					<span class="save-indicator" class:saving={saveStatus === 'saving'} class:saved={saveStatus === 'saved'}>{saveLabel}</span>
+					<button class="btn-history" type="button" onclick={() => (showHistory = !showHistory)}>
+						{showHistory ? 'Close History' : 'History'}
+					</button>
+				</div>
+			{/snippet}
+		</PageHeader>
+	</div>
 
 	<div class="editor-body">
 		<DocumentEditorFrame
@@ -98,33 +102,28 @@
 	}
 
 	.editor-header {
-		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
-		gap: var(--space-4);
+		display: grid;
+		gap: var(--space-2);
 		padding: var(--space-4) var(--space-5);
 		border-bottom: 1px solid var(--color-border-default);
 		background-color: var(--color-surface-ground);
 		flex-shrink: 0;
 	}
 
-	.header-main {
-		display: grid;
-		gap: var(--space-1);
+	.editor-header :global(.page-header) {
+		border-bottom: none;
+		padding-bottom: 0;
 	}
 
-	.scene-title {
+	.editor-header :global(.page-header__title) {
 		font-family: var(--font-sans);
 		font-size: var(--text-lg);
 		font-weight: var(--font-weight-medium);
-		color: var(--color-text-primary);
-		margin: 0;
 	}
 
-	.scene-subtitle {
-		margin: 0;
+	.editor-header :global(.page-header__description) {
 		font-size: var(--text-sm);
-		color: var(--color-text-secondary);
+		line-height: var(--leading-normal);
 	}
 
 	.header-actions {
@@ -182,8 +181,9 @@
 	}
 
 	@media (max-width: 900px) {
-		.editor-header {
-			flex-direction: column;
+		.editor-header :global(.page-header__right) {
+			width: 100%;
+			justify-items: start;
 		}
 	}
 </style>
