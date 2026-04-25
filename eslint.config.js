@@ -52,6 +52,7 @@ export default tseslint.config(
 				{ type: 'module-workspace', pattern: ['src/modules/workspace/**'] },
 				{ type: 'module-world-building', pattern: ['src/modules/world-building/**'] },
 				{ type: 'module-continuity', pattern: ['src/modules/continuity/**'] },
+				{ type: 'module-reader', pattern: ['src/modules/reader/**'] },
 				{ type: 'routes', pattern: ['src/routes/**'] },
 			],
 		},
@@ -75,6 +76,7 @@ export default tseslint.config(
 								{ to: { type: 'module-workspace' } },
 								{ to: { type: 'module-world-building' } },
 								{ to: { type: 'module-continuity' } },
+								{ to: { type: 'module-reader' } },
 							],
 						},
 						{
@@ -110,6 +112,7 @@ export default tseslint.config(
 							from: [{ type: 'module-continuity' }],
 							allow: [{ to: { type: 'module-consistency' } }],
 						},
+						{ from: [{ type: 'module-reader' }], allow: [{ to: { type: 'lib' } }] },
 						{
 							from: [{ type: 'lib' }],
 							allow: [{ to: { type: 'lib' } }, { to: { type: 'module-consistency' } }],
