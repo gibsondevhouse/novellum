@@ -12,6 +12,7 @@
 		buildWorldBuildingTopItems,
 		getWorldBuildingTopSection,
 	} from '$modules/bible/worldbuilding-navigation.js';
+	import { getReaderMode, setReaderMode, type ReaderMode } from '$lib/stores/reader-mode.svelte.js';
 	let isWorldBuildingRoute = $derived(page.url.pathname.includes('/world-building'));
 
 	let worldBuildingActiveId = $derived(getWorldBuildingTopSection(page.url.pathname));
@@ -21,6 +22,7 @@
 	let isNovaRoute = $derived(page.url.pathname === '/nova');
 	let isProjectRoute = $derived(page.url.pathname.startsWith('/projects/'));
 	let isBooksRoute = $derived(page.url.pathname.startsWith('/books'));
+	let isReaderRoute = $derived(/^\/books\/[^/]+/.test(page.url.pathname));
 	let isImagesRoute = $derived(page.url.pathname.startsWith('/images'));
 	let isEditorRoute = $derived(/^\/projects\/[^/]+\/editor$/.test(page.url.pathname));
 
@@ -28,7 +30,12 @@
 		isProjectRoute && page.data?.project ? (page.data.project as { title: string }).title : '',
 	);
 
+	let readerBookTitle = $derived(
+		isReaderRoute && page.data?.project ? (page.data.project as { title: string }).title : '',
+	);
+
 	let displayTitle = $derived.by(() => {
+		if (readerBookTitle) return readerBookTitle;
 		if (projectTitle) return projectTitle;
 		if (isSettingsRoute) return 'Settings';
 		if (isNovaRoute) return 'Nova';
@@ -163,6 +170,17 @@
 				activeId={editorActiveChapterId}
 				onSelect={handleEditorChapterSelect}
 				ariaLabel="Chapter selection"
+			/>
+		{:else if isReaderRoute}
+			<PillNav
+				items={[
+					{ id: 'classic', label: 'Classic' },
+					{ id: 'book', label: 'Book' },
+					{ id: 'fullscreen', label: 'Full Screen' },
+				]}
+				activeId={getReaderMode()}
+				onSelect={(id) => setReaderMode(id as ReaderMode)}
+				ariaLabel="Reader mode"
 			/>
 		{/if}
 	</div>

@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { ReaderInputChapter, ReaderInputProject } from '$modules/reader/reader-pages.js';
 	import BookReaderView from './BookReaderView.svelte';
+	import PillNav from '$lib/components/ui/PillNav.svelte';
+	import { getReaderMode, setReaderMode, type ReaderMode } from '$lib/stores/reader-mode.svelte.js';
 
 	interface Props {
 		project: ReaderInputProject;
@@ -27,6 +29,16 @@
 	aria-label="Full screen book reader"
 >
 	<div class="reader-fullscreen__topbar">
+		<PillNav
+			items={[
+				{ id: 'classic', label: 'Classic' },
+				{ id: 'book', label: 'Book' },
+				{ id: 'fullscreen', label: 'Full Screen' },
+			]}
+			activeId={getReaderMode()}
+			onSelect={(id) => setReaderMode(id as ReaderMode)}
+			ariaLabel="Reader mode"
+		/>
 		<button type="button" class="reader-fullscreen__exit" onclick={onExit}>
 			Exit full screen
 		</button>
@@ -50,7 +62,8 @@
 
 	.reader-fullscreen__topbar {
 		display: flex;
-		justify-content: flex-end;
+		align-items: center;
+		justify-content: space-between;
 		padding: var(--space-3) var(--space-5);
 		border-bottom: 1px solid var(--color-border-subtle);
 		background: var(--color-surface-base);

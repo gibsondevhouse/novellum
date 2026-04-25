@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PageHeader } from '$lib/components/ui/index.js';
+
 
 	interface ClassicProject {
 		id: string;
@@ -66,30 +66,27 @@
 
 <div class="reader-shell">
 	<div class="reader-header-shell">
-		<PageHeader
-			title={project.title}
-			description={project.logline?.trim() ? project.logline : 'Immersive reading view for your manuscript.'}
-		>
-			{#snippet actions()}
-				<a class="reader-back" href="/">Back to Library</a>
-			{/snippet}
-			{#snippet meta()}
-				<div class="reader-hero">
-					{#if hasCover}
-						<div class="reader-cover">
-							<img class="reader-cover-image" src={coverUrl} alt="Cover for {project.title}" />
-						</div>
-					{/if}
-					{#if genres.length > 0}
-						<div class="reader-genres" aria-label="Genres">
-							{#each genres as genre (genre)}
-								<span class="reader-genre-pill">{genre}</span>
-							{/each}
-						</div>
-					{/if}
+		<div class="reader-hero">
+			{#if hasCover}
+				<div class="reader-cover">
+					<img class="reader-cover-image" src={coverUrl} alt="Cover for {project.title}" />
 				</div>
-			{/snippet}
-		</PageHeader>
+			{/if}
+			<div class="reader-hero__info">
+				<h1 class="reader-hero__title">{project.title}</h1>
+				{#if project.logline?.trim()}
+					<p class="reader-hero__logline">{project.logline}</p>
+				{/if}
+				{#if genres.length > 0}
+					<div class="reader-genres" aria-label="Genres">
+						{#each genres as genre (genre)}
+							<span class="reader-genre-pill">{genre}</span>
+						{/each}
+					</div>
+				{/if}
+				<a class="reader-back" href="/books">Back to Library</a>
+			</div>
+		</div>
 	</div>
 
 	{#if readableChapters.length === 0}
@@ -142,37 +139,15 @@
 		border-bottom: 1px solid var(--color-border-subtle);
 	}
 
-	.reader-header-shell :global(.page-header) {
-		border-bottom: none;
-		padding-bottom: 0;
-	}
-
-	.reader-header-shell :global(.page-header__right) {
-		justify-items: stretch;
-		width: 100%;
-	}
-
-	.reader-header-shell :global(.page-header__actions) {
-		align-self: start;
-	}
-
-	.reader-header-shell :global(.page-header__description) {
-		font-family: var(--font-display);
-		font-size: var(--text-lg);
-		font-style: italic;
-		color: var(--color-text-secondary);
-	}
-
 	.reader-hero {
-		display: grid;
-		grid-template-columns: auto 1fr;
-		align-items: start;
+		display: flex;
 		gap: var(--space-6);
-		margin-top: var(--space-2);
+		align-items: flex-start;
 	}
 
 	.reader-cover {
-		width: 100%;
+		width: 120px;
+		flex-shrink: 0;
 		aspect-ratio: 2 / 3;
 		border-radius: var(--radius-md);
 		overflow: hidden;
@@ -184,6 +159,33 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+	}
+
+	.reader-hero__info {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3);
+		min-width: 0;
+		padding-top: var(--space-1);
+	}
+
+	.reader-hero__title {
+		font-family: var(--font-display);
+		font-size: var(--text-4xl);
+		font-weight: var(--font-weight-normal);
+		letter-spacing: var(--tracking-tight);
+		line-height: var(--leading-tight);
+		color: var(--color-text-primary);
+		margin: 0;
+	}
+
+	.reader-hero__logline {
+		font-family: var(--font-display);
+		font-size: var(--text-base);
+		font-style: italic;
+		line-height: var(--leading-relaxed);
+		color: var(--color-text-secondary);
+		margin: 0;
 	}
 
 	.reader-back {

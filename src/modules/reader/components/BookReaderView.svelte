@@ -86,37 +86,42 @@
 <svelte:window onkeydown={handleKeydown} />
 
 <div class="book-reader" class:book-reader--fullscreen={fullscreen}>
-	<div class="book-reader__toolbar" aria-label="Reader controls">
-		<span class="book-reader__counter" aria-live="polite">
-			{#if totalPages === 0}
-				No pages
-			{:else}
-				Page {displayPageNumber} of {totalPages}
-			{/if}
-		</span>
-	</div>
-
 	{#if totalPages === 0}
 		<div class="book-reader__empty">
 			<p>This book has no readable pages yet.</p>
 		</div>
 	{:else}
 		<div class="book-reader__stage" aria-label="Book reader">
+			<BookSpread pages={visiblePages} single={isSingle} />
+		</div>
+	{/if}
+
+	<div class="book-reader__controls">
+		{#if !fullscreen}
+			<a class="book-reader__back" href="/books">← Library</a>
+		{:else}
+			<span></span>
+		{/if}
+		<div class="book-reader__nav-group">
 			<button
 				type="button"
-				class="book-reader__nav book-reader__nav--prev"
+				class="book-reader__nav"
 				onclick={goPrev}
 				aria-label="Previous page"
 				disabled={currentIndex === 0}
 			>
 				‹
 			</button>
-
-			<BookSpread pages={visiblePages} single={isSingle} />
-
+			<span class="book-reader__counter" aria-live="polite">
+				{#if totalPages === 0}
+					No pages
+				{:else}
+					{displayPageNumber} / {totalPages}
+				{/if}
+			</span>
 			<button
 				type="button"
-				class="book-reader__nav book-reader__nav--next"
+				class="book-reader__nav"
 				onclick={goNext}
 				aria-label="Next page"
 				disabled={currentIndex >= totalPages - 1}
@@ -124,39 +129,75 @@
 				›
 			</button>
 		</div>
-	{/if}
+		<span></span>
+	</div>
 </div>
 
 <style>
 	.book-reader {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-4);
-		align-items: center;
-		padding: var(--space-6) var(--space-4);
+		align-items: stretch;
+		padding: var(--space-4) 0 var(--space-6);
 		color: var(--color-text-primary);
 	}
 
 	.book-reader--fullscreen {
 		flex: 1;
 		justify-content: center;
-		padding: var(--space-8);
+		padding: 0;
 	}
 
-	.book-reader__toolbar {
+	.book-reader__stage {
+		width: 100%;
+		display: flex;
+		justify-content: center;
+	}
+
+	.book-reader__controls {
 		display: flex;
 		align-items: center;
-		justify-content: center;
+		justify-content: space-between;
+		padding: var(--space-3) var(--space-6);
 		width: 100%;
-		max-width: 1000px;
+	}
+
+	.book-reader__nav-group {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+	}
+
+	.book-reader__back {
+		text-decoration: none;
 		font-size: var(--text-xs);
 		letter-spacing: var(--tracking-widest);
 		text-transform: uppercase;
 		color: var(--color-text-muted);
+		white-space: nowrap;
+		border-bottom: 1px solid transparent;
+		transition:
+			color var(--duration-fast) var(--ease-standard),
+			border-color var(--duration-fast) var(--ease-standard);
+	}
+
+	.book-reader__back:hover {
+		color: var(--color-text-secondary);
+		border-color: var(--color-border-default);
+	}
+
+	.book-reader__back:focus-visible {
+		outline: none;
+		box-shadow: var(--focus-ring);
+		border-radius: var(--radius-xs);
 	}
 
 	.book-reader__counter {
+		font-size: var(--text-xs);
 		font-weight: var(--font-weight-semibold);
+		letter-spacing: var(--tracking-widest);
+		text-transform: uppercase;
+		color: var(--color-text-muted);
 	}
 
 	.book-reader__stage {
