@@ -169,6 +169,8 @@ export interface TimelineEvent {
 	date: string;
 	relatedCharacterIds: string[];
 	relatedSceneIds: string[];
+	/** Discriminator for chronicles surfaces: 'era' (default) | 'key-event'. */
+	category?: string;
 	createdAt: string;
 	updatedAt: string;
 }

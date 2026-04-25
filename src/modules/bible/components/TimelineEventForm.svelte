@@ -23,6 +23,7 @@
 	let description = $state(untrack(() => event?.description ?? ''));
 	let selectedCharIds = $state<string[]>(untrack(() => event?.relatedCharacterIds ?? []));
 	let selectedSceneIds = $state<string[]>(untrack(() => event?.relatedSceneIds ?? []));
+	const category = untrack(() => event?.category);
 	let titleError = $state('');
 
 	function toggleChar(id: string) {
@@ -37,13 +38,15 @@
 			return;
 		}
 		titleError = '';
-		onSave({
+		const payload: Omit<TimelineEvent, 'id' | 'projectId' | 'createdAt' | 'updatedAt'> = {
 			title: title.trim(),
 			date,
 			description,
 			relatedCharacterIds: selectedCharIds,
 			relatedSceneIds: selectedSceneIds,
-		});
+		};
+		if (category !== undefined) payload.category = category;
+		onSave(payload);
 	}
 </script>
 

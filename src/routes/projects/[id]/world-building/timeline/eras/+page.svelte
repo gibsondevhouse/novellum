@@ -2,9 +2,15 @@
 	import type { TimelineEvent, Character } from '$lib/db/types.js';
 	import { translator } from '$lib/i18n';
 	import { DestructiveButton, GhostButton } from '$lib/components/ui/index.js';
-	import TimelineEventForm from '$modules/bible/components/TimelineEventForm.svelte';
+	import ChronicleSystemForm from '$modules/bible/components/ChronicleSystemForm.svelte';
 	import WorldBuildingWorkspaceEmptyState from '$modules/bible/components/WorldBuildingWorkspaceEmptyState.svelte';
 	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
+	import {
+		chronicleMeta,
+		chronicleSubtitle,
+		isChronicleKind,
+		parseChroniclePayload,
+	} from '$modules/bible/chronicle-systems.js';
 	import {
 		getTimelineEvents,
 		getTimelineSaving,
@@ -27,7 +33,11 @@
 	let selectedId: string | null = $state(null);
 	let confirmDeleteId: string | null = $state(null);
 
-	const sorted = $derived([...getTimelineEvents()].sort((a, b) => a.date.localeCompare(b.date)));
+	const sorted = $derived(
+		[...getTimelineEvents()]
+			.filter((e) => isChronicleKind(e, 'era'))
+			.sort((a, b) => a.date.localeCompare(b.date)),
+	);
 	const selectedEvent = $derived(
 		selectedId ? (sorted.find((e) => e.id === selectedId) ?? null) : null,
 	);
@@ -35,10 +45,16 @@
 		sorted.map((e) => ({
 			id: e.id,
 			name: e.title,
-			subtitle: e.date?.trim() || 'Date pending',
-			meta: e.description?.trim() ? 'Context drafted' : 'No context yet',
+			subtitle: chronicleSubtitle(e),
+			meta: chronicleMeta(e),
 		})),
 	);
+	const selectedTitle = $derived.by(() => {
+		if (!selectedEvent) return '';
+		const payload = parseChroniclePayload(selectedEvent);
+		if (payload?.kind === 'era') return payload.name || selectedEvent.title;
+		return selectedEvent.title;
+	});
 
 	function selectEvent(id: string) {
 		selectedId = id;
@@ -89,8 +105,9 @@
 	{#snippet dossier()}
 		{#if creating}
 			<div class="entity-dossier">
-				<h2 class="dossier-title">New Era Event</h2>
-				<TimelineEventForm
+				<h2 class="dossier-title">New Era</h2>
+				<ChronicleSystemForm
+					kind="era"
 					characters={data.characters}
 					saving={getTimelineSaving()}
 					onSave={handleCreate}
@@ -100,7 +117,7 @@
 		{:else if selectedEvent}
 			<div class="entity-dossier">
 				<div class="dossier-header">
-					<h2 class="dossier-title">{selectedEvent.title}</h2>
+					<h2 class="dossier-title">{selectedTitle}</h2>
 					{#if confirmDeleteId === selectedEvent.id}
 						<DestructiveButton size="sm" onclick={() => handleDelete(selectedEvent.id)}
 							>Confirm</DestructiveButton
@@ -112,7 +129,8 @@
 						>
 					{/if}
 				</div>
-				<TimelineEventForm
+				<ChronicleSystemForm
+					kind="era"
 					event={selectedEvent}
 					characters={data.characters}
 					saving={getTimelineSaving()}
