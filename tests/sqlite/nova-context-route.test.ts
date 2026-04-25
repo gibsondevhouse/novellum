@@ -171,4 +171,69 @@ describe('nova context route', () => {
 		expect(body.includedItems).toEqual([]);
 		expect(body.warnings.some((warning) => warning.includes('book.pdf'))).toBe(true);
 	});
+
+	it('renders summary mode without per-row scene/character content', async () => {
+		const response = await buildNovaContextHttpResponse(
+			{
+				projectIds: ['proj-1'],
+				files: [],
+				mode: 'summary',
+			},
+			database,
+		);
+		expect(response.status).toBe(200);
+		const body = (await response.json()) as { contextText: string };
+		expect(body.contextText).toContain('# Project Summary: Route Project');
+		expect(body.contextText).toContain('## Counts');
+		expect(body.contextText).not.toContain('## Scenes (');
+		expect(body.contextText).not.toContain('## Characters (');
+	});
+
+	it('targeted mode includes only requested scope sections', async () => {
+		const response = await buildNovaContextHttpResponse(
+			{
+				projectIds: ['proj-1'],
+				files: [],
+				mode: 'targeted',
+				requestedScopes: ['characters'],
+			},
+			database,
+		);
+		expect(response.status).toBe(200);
+		const body = (await response.json()) as { contextText: string };
+		expect(body.contextText).toContain('# Project: Route Project');
+		expect(body.contextText).toContain('## Characters (');
+		expect(body.contextText).not.toContain('## Scenes (');
+		expect(body.contextText).not.toContain('## Timeline Events (');
+		expect(body.contextText).not.toContain('## System Prompts (');
+	});
+
+	it('full mode renders all sections', async () => {
+		const response = await buildNovaContextHttpResponse(
+			{
+				projectIds: ['proj-1'],
+				files: [],
+				mode: 'full',
+			},
+			database,
+		);
+		expect(response.status).toBe(200);
+		const body = (await response.json()) as { contextText: string };
+		expect(body.contextText).toContain('## Chapters (');
+		expect(body.contextText).toContain('## Scenes (');
+		expect(body.contextText).toContain('## Characters (');
+		expect(body.contextText).toContain('## System Prompts (');
+	});
+
+	it('rejects unknown mode values', async () => {
+		const response = await buildNovaContextHttpResponse(
+			{
+				projectIds: ['proj-1'],
+				files: [],
+				mode: 'wat',
+			},
+			database,
+		);
+		expect(response.status).toBe(400);
+	});
 });

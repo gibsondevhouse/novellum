@@ -7,6 +7,7 @@ import {
 import type {
 	NovaContextFileInput,
 	NovaContextIncludedItem,
+	NovaContextMode,
 	NovaContextRequestPayload,
 	NovaContextResponsePayload,
 	NovaContextTruncationEntry,
@@ -15,6 +16,13 @@ import type Database from 'better-sqlite3';
 
 const DEFAULT_MAX_CONTEXT_CHARS = 100_000;
 const FINAL_TRIM_BUFFER = 96;
+
+const MODE_BUDGETS: Record<NovaContextMode, number> = {
+	off: 0,
+	summary: 12_000,
+	targeted: 35_000,
+	full: 100_000,
+};
 
 interface ContextCaps {
 	projectLogline: number;
@@ -555,13 +563,41 @@ function acceptFiles(files: NovaContextFileInput[]): AcceptedFilesResult {
 	return { accepted, warnings };
 }
 
+interface AppendProjectBlockOptions {
+	scopes?: ReadonlySet<string>;
+	entityHints?: string[];
+}
+
+function filterByHints<T>(
+	rows: T[],
+	hints: string[],
+	extract: (row: T) => Array<string | null | undefined>,
+): T[] {
+	if (hints.length === 0) return rows;
+	const lcHints = hints.map((h) => h.toLowerCase()).filter(Boolean);
+	if (lcHints.length === 0) return rows;
+	const filtered = rows.filter((row) => {
+		const haystack = extract(row)
+			.filter((value): value is string => Boolean(value))
+			.map((value) => value.toLowerCase());
+		return lcHints.some((hint) => haystack.some((value) => value.includes(hint)));
+	});
+	return filtered.length > 0 ? filtered : rows;
+}
+
 function appendProjectBlock(
 	lines: string[],
 	graph: ProjectGraph,
 	caps: ContextCaps,
 	collector: TruncationCollector | null,
+	options: AppendProjectBlockOptions = {},
 ): void {
 	const projectId = graph.project.id;
+	const scopes = options.scopes;
+	const entityHints = options.entityHints ?? [];
+	const inScope = (...names: string[]): boolean =>
+		!scopes || names.some((name) => scopes.has(name));
+
 	lines.push(`# Project: ${graph.project.title}`);
 	lines.push(`- id: ${projectId}`);
 	maybeLine(lines, 'genre', graph.project.genre);
@@ -584,8 +620,10 @@ function appendProjectBlock(
 	maybeLine(lines, 'lastOpenedAt', graph.project.lastOpenedAt);
 	maybeLine(lines, 'updatedAt', graph.project.updatedAt);
 
-	lines.push(`## Chapters (${graph.chapters.length})`);
-	for (const chapter of graph.chapters) {
+	if (inScope('chapters', 'manuscript')) {
+	const chapterRows = filterByHints(graph.chapters, entityHints, (row) => [row.title]);
+	lines.push(`## Chapters (${chapterRows.length})`);
+	for (const chapter of chapterRows) {
 		const chapterSummary = truncateValue(
 			chapter.summary,
 			caps.chapterSummary,
@@ -599,9 +637,12 @@ function appendProjectBlock(
 		);
 		if (chapterSummary) lines.push(`  summary: ${chapterSummary}`);
 	}
+	}
 
-	lines.push(`## Scenes (${graph.scenes.length})`);
-	for (const scene of graph.scenes) {
+	if (inScope('scenes', 'manuscript')) {
+	const sceneRows = filterByHints(graph.scenes, entityHints, (row) => [row.title]);
+	lines.push(`## Scenes (${sceneRows.length})`);
+	for (const scene of sceneRows) {
 		const sceneSummary = truncateValue(
 			scene.summary,
 			caps.sceneSummary,
@@ -636,9 +677,12 @@ function appendProjectBlock(
 		if (sceneNotes) lines.push(`  notes: ${sceneNotes}`);
 		if (sceneContent) lines.push(`  content: ${sceneContent}`);
 	}
+	}
 
-	lines.push(`## Beats (${graph.beats.length})`);
-	for (const beat of graph.beats) {
+	if (inScope('beats', 'scenes', 'manuscript')) {
+	const beatRows = filterByHints(graph.beats, entityHints, (row) => [row.title]);
+	lines.push(`## Beats (${beatRows.length})`);
+	for (const beat of beatRows) {
 		const beatNotes = truncateValue(
 			beat.notes,
 			caps.beatNotes,
@@ -652,9 +696,16 @@ function appendProjectBlock(
 		);
 		if (beatNotes) lines.push(`  notes: ${beatNotes}`);
 	}
+	}
 
-	lines.push(`## Characters (${graph.characters.length})`);
-	for (const character of graph.characters) {
+	if (inScope('characters')) {
+	const characterRows = filterByHints(graph.characters, entityHints, (row) => [
+		row.name,
+		...decodeStringArray(row.aliases),
+		...decodeStringArray(row.tags),
+	]);
+	lines.push(`## Characters (${characterRows.length})`);
+	for (const character of characterRows) {
 		const bio = truncateValue(
 			character.bio,
 			caps.characterBio,
@@ -691,9 +742,15 @@ function appendProjectBlock(
 			`- [${relation.id}] ${relation.characterAId} -> ${relation.characterBId} type="${relation.type || 'n/a'}" description="${relation.description || ''}"`,
 		);
 	}
+	}
 
-	lines.push(`## Locations (${graph.locations.length})`);
-	for (const location of graph.locations) {
+	if (inScope('worldbuilding')) {
+	const locationRows = filterByHints(graph.locations, entityHints, (row) => [
+		row.name,
+		...decodeStringArray(row.tags),
+	]);
+	lines.push(`## Locations (${locationRows.length})`);
+	for (const location of locationRows) {
 		const description = truncateValue(
 			location.description,
 			caps.locationDescription,
@@ -723,9 +780,15 @@ function appendProjectBlock(
 		maybeLine(lines, '  changeOverTime', location.changeOverTime);
 		if (description) lines.push(`  description: ${description}`);
 	}
+	}
 
-	lines.push(`## Lore Entries (${graph.loreEntries.length})`);
-	for (const lore of graph.loreEntries) {
+	if (inScope('lore')) {
+	const loreRows = filterByHints(graph.loreEntries, entityHints, (row) => [
+		row.title,
+		...decodeStringArray(row.tags),
+	]);
+	lines.push(`## Lore Entries (${loreRows.length})`);
+	for (const lore of loreRows) {
 		const content = truncateValue(
 			lore.content,
 			caps.loreContent,
@@ -738,9 +801,12 @@ function appendProjectBlock(
 		lines.push(`  tags: ${formatList(decodeStringArray(lore.tags))}`);
 		if (content) lines.push(`  content: ${content}`);
 	}
+	}
 
-	lines.push(`## Plot Threads (${graph.plotThreads.length})`);
-	for (const thread of graph.plotThreads) {
+	if (inScope('arcs')) {
+	const threadRows = filterByHints(graph.plotThreads, entityHints, (row) => [row.title]);
+	lines.push(`## Plot Threads (${threadRows.length})`);
+	for (const thread of threadRows) {
 		const description = truncateValue(
 			thread.description,
 			caps.plotDescription,
@@ -754,9 +820,12 @@ function appendProjectBlock(
 		lines.push(`  relatedCharacterIds: ${formatList(decodeStringArray(thread.relatedCharacterIds))}`);
 		if (description) lines.push(`  description: ${description}`);
 	}
+	}
 
-	lines.push(`## Timeline Events (${graph.timelineEvents.length})`);
-	for (const event of graph.timelineEvents) {
+	if (inScope('timeline')) {
+	const timelineRows = filterByHints(graph.timelineEvents, entityHints, (row) => [row.title]);
+	lines.push(`## Timeline Events (${timelineRows.length})`);
+	for (const event of timelineRows) {
 		const description = truncateValue(
 			event.description,
 			caps.timelineDescription,
@@ -770,7 +839,9 @@ function appendProjectBlock(
 		lines.push(`  relatedCharacterIds: ${formatList(decodeStringArray(event.relatedCharacterIds))}`);
 		if (description) lines.push(`  description: ${description}`);
 	}
+	}
 
+	if (inScope('outline')) {
 	lines.push(`## Story Frames (${graph.storyFrames.length})`);
 	for (const frame of graph.storyFrames) {
 		const premise = truncateValue(
@@ -802,9 +873,12 @@ function appendProjectBlock(
 		if (theme) lines.push(`  theme: ${theme}`);
 		if (toneNotes) lines.push(`  toneNotes: ${toneNotes}`);
 	}
+	}
 
-	lines.push(`## Acts (${graph.acts.length})`);
-	for (const act of graph.acts) {
+	if (inScope('arcs')) {
+	const actRows = filterByHints(graph.acts, entityHints, (row) => [row.title]);
+	lines.push(`## Acts (${actRows.length})`);
+	for (const act of actRows) {
 		const planningNotes = truncateValue(
 			act.planningNotes,
 			caps.actPlanningNotes,
@@ -818,9 +892,9 @@ function appendProjectBlock(
 		);
 		if (planningNotes) lines.push(`  planningNotes: ${planningNotes}`);
 	}
-
-	lines.push(`## Arcs (${graph.arcs.length})`);
-	for (const arc of graph.arcs) {
+	const arcRows = filterByHints(graph.arcs, entityHints, (row) => [row.title]);
+	lines.push(`## Arcs (${arcRows.length})`);
+	for (const arc of arcRows) {
 		const description = truncateValue(
 			arc.description,
 			caps.arcDescription,
@@ -843,9 +917,9 @@ function appendProjectBlock(
 		if (purpose) lines.push(`  purpose: ${purpose}`);
 		if (description) lines.push(`  description: ${description}`);
 	}
-
-	lines.push(`## Milestones (${graph.milestones.length})`);
-	for (const milestone of graph.milestones) {
+	const milestoneRows = filterByHints(graph.milestones, entityHints, (row) => [row.title]);
+	lines.push(`## Milestones (${milestoneRows.length})`);
+	for (const milestone of milestoneRows) {
 		const description = truncateValue(
 			milestone.description,
 			caps.milestoneDescription,
@@ -860,9 +934,12 @@ function appendProjectBlock(
 		lines.push(`  chapterIds: ${formatList(decodeStringArray(milestone.chapterIds))}`);
 		if (description) lines.push(`  description: ${description}`);
 	}
+	}
 
-	lines.push(`## Writing Styles (${graph.writingStyles.length})`);
-	for (const style of graph.writingStyles) {
+	if (inScope('style')) {
+	const styleRows = filterByHints(graph.writingStyles, entityHints, (row) => [row.title]);
+	lines.push(`## Writing Styles (${styleRows.length})`);
+	for (const style of styleRows) {
 		const description = truncateValue(
 			style.description,
 			caps.writingStyleDescription,
@@ -883,7 +960,9 @@ function appendProjectBlock(
 		if (description) lines.push(`  description: ${description}`);
 		if (exampleText) lines.push(`  exampleText: ${exampleText}`);
 	}
+	}
 
+	if (!scopes) {
 	lines.push(`## System Prompts (${graph.systemPrompts.length})`);
 	for (const prompt of graph.systemPrompts) {
 		const content = truncateValue(
@@ -913,6 +992,63 @@ function appendProjectBlock(
 		);
 		if (content) lines.push(`  content: ${content}`);
 	}
+	}
+
+	lines.push('');
+}
+
+function appendProjectSummaryBlock(
+	lines: string[],
+	graph: ProjectGraph,
+	caps: ContextCaps,
+	collector: TruncationCollector | null,
+): void {
+	const projectId = graph.project.id;
+	lines.push(`# Project Summary: ${graph.project.title}`);
+	lines.push(`- id: ${projectId}`);
+	maybeLine(lines, 'genre', graph.project.genre);
+	maybeLine(lines, 'status', graph.project.status);
+	maybeLine(lines, 'projectType', graph.project.projectType);
+	if (graph.project.targetWordCount > 0) {
+		lines.push(`- targetWordCount: ${graph.project.targetWordCount}`);
+	}
+	maybeLine(
+		lines,
+		'logline',
+		truncateValue(graph.project.logline, caps.projectLogline, 'project', projectId, 'project.logline', collector),
+	);
+	maybeLine(
+		lines,
+		'synopsis',
+		truncateValue(graph.project.synopsis, caps.projectSynopsis, 'project', projectId, 'project.synopsis', collector),
+	);
+	maybeLine(lines, 'updatedAt', graph.project.updatedAt);
+
+	lines.push(`## Counts`);
+	lines.push(`- chapters: ${graph.chapters.length}`);
+	lines.push(`- scenes: ${graph.scenes.length}`);
+	lines.push(`- beats: ${graph.beats.length}`);
+	lines.push(`- characters: ${graph.characters.length}`);
+	lines.push(`- characterRelationships: ${graph.characterRelationships.length}`);
+	lines.push(`- locations: ${graph.locations.length}`);
+	lines.push(`- loreEntries: ${graph.loreEntries.length}`);
+	lines.push(`- plotThreads: ${graph.plotThreads.length}`);
+	lines.push(`- timelineEvents: ${graph.timelineEvents.length}`);
+	lines.push(`- acts: ${graph.acts.length}`);
+	lines.push(`- arcs: ${graph.arcs.length}`);
+	lines.push(`- milestones: ${graph.milestones.length}`);
+	lines.push(`- writingStyles: ${graph.writingStyles.length}`);
+
+	const frame = graph.storyFrames[0];
+	if (frame) {
+		lines.push(`## Story Frame`);
+		const premise = truncateValue(frame.premise, caps.storyFrame, 'project', projectId, `storyFrame:${frame.id}.premise`, collector);
+		const theme = truncateValue(frame.theme, caps.storyFrame, 'project', projectId, `storyFrame:${frame.id}.theme`, collector);
+		const toneNotes = truncateValue(frame.toneNotes, caps.storyFrame, 'project', projectId, `storyFrame:${frame.id}.toneNotes`, collector);
+		if (premise) lines.push(`- premise: ${premise}`);
+		if (theme) lines.push(`- theme: ${theme}`);
+		if (toneNotes) lines.push(`- toneNotes: ${toneNotes}`);
+	}
 
 	lines.push('');
 }
@@ -940,14 +1076,29 @@ function renderContextText(
 	graphs: ProjectGraph[],
 	files: NovaContextFileInput[],
 	caps: ContextCaps,
+	options: {
+		mode?: NovaContextMode;
+		scopes?: ReadonlySet<string>;
+		entityHints?: string[];
+	} = {},
 ): RenderResult {
 	const entries: NovaContextTruncationEntry[] = [];
 	const collector: TruncationCollector = {
 		push: (entry) => entries.push(entry),
 	};
 	const lines: string[] = [];
+	const mode = options.mode ?? 'full';
 	for (const graph of graphs) {
-		appendProjectBlock(lines, graph, caps, collector);
+		if (mode === 'summary') {
+			appendProjectSummaryBlock(lines, graph, caps, collector);
+		} else if (mode === 'targeted') {
+			appendProjectBlock(lines, graph, caps, collector, {
+				scopes: options.scopes,
+				entityHints: options.entityHints,
+			});
+		} else {
+			appendProjectBlock(lines, graph, caps, collector);
+		}
 	}
 	appendFileBlocks(lines, files, caps, collector);
 
@@ -962,8 +1113,16 @@ export function buildNovaContext(
 	payload: NovaContextRequestPayload,
 	options?: { maxContextChars?: number },
 ): NovaContextResponsePayload {
-	const maxContextChars = options?.maxContextChars ?? DEFAULT_MAX_CONTEXT_CHARS;
+	const mode: NovaContextMode = payload.mode ?? 'full';
+	const modeBudget = MODE_BUDGETS[mode] ?? DEFAULT_MAX_CONTEXT_CHARS;
+	const maxContextChars = options?.maxContextChars ?? modeBudget;
 	const warnings: string[] = [];
+
+	const scopes =
+		mode === 'targeted' && payload.requestedScopes && payload.requestedScopes.length > 0
+			? new Set(payload.requestedScopes)
+			: undefined;
+	const entityHints = mode === 'targeted' ? payload.entityHints ?? [] : [];
 
 	const normalizedProjectIds = [...new Set(payload.projectIds.map((id) => id.trim()).filter(Boolean))];
 	const { accepted: acceptedFiles, warnings: fileWarnings } = acceptFiles(payload.files);
@@ -1020,13 +1179,13 @@ export function buildNovaContext(
 		arcPurpose: Number.MAX_SAFE_INTEGER,
 		milestoneDescription: Number.MAX_SAFE_INTEGER,
 		writingStyleDescription: Number.MAX_SAFE_INTEGER,
-	});
+	}, { mode, scopes, entityHints });
 
 	let compressionPasses = 0;
-	let rendered = renderContextText(projectGraphs, acceptedFiles, BASE_CAPS);
+	let rendered = renderContextText(projectGraphs, acceptedFiles, BASE_CAPS, { mode, scopes, entityHints });
 	if (rendered.text.length > maxContextChars) {
 		compressionPasses = 1;
-		rendered = renderContextText(projectGraphs, acceptedFiles, COMPRESSED_CAPS);
+		rendered = renderContextText(projectGraphs, acceptedFiles, COMPRESSED_CAPS, { mode, scopes, entityHints });
 	}
 
 	let finalHardTrimApplied = false;

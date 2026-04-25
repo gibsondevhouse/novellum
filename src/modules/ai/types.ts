@@ -12,10 +12,24 @@ export interface NovaContextFileInput {
 	text: string;
 }
 
+export type NovaContextMode = 'off' | 'summary' | 'targeted' | 'full';
+
+export interface NovaContextPlan {
+	mode: NovaContextMode;
+	reason: string;
+	projectIds: string[];
+	includeFiles: boolean;
+	requestedScopes: string[];
+	entityHints: string[];
+}
+
 export interface NovaContextRequestPayload {
 	projectIds: string[];
 	files: NovaContextFileInput[];
 	prompt?: string;
+	mode?: NovaContextMode;
+	requestedScopes?: string[];
+	entityHints?: string[];
 }
 
 export interface NovaContextTruncationEntry {

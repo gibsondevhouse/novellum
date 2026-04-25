@@ -8,8 +8,9 @@
 	import { apiGet } from '$lib/api-client.js';
 	import { getSelectedModel } from '$lib/stores/model-selection.svelte.js';
 	import { isExplicitlyUnsupportedBinaryAttachment, isSupportedTextAttachment, NOVA_MAX_FILE_TEXT_CHARS } from '$lib/ai/context-files.js';
-	import type { NovaContextResponsePayload, NovaSessionContextItem } from '$modules/ai/types.js';
+	import type { NovaContextPlan, NovaContextResponsePayload, NovaSessionContextItem } from '$modules/ai/types.js';
 	import { requestNovaContext, toNovaContextRequestPayload } from '../services/nova-context.js';
+	import { planNovaContext } from '../services/nova-context-planner.js';
 	import PromptInput from './PromptInput.svelte';
 	import QuickLinks from './QuickLinks.svelte';
 	import SuggestionChips from './SuggestionChips.svelte';
@@ -35,6 +36,7 @@
 	let messages = $state<Message[]>([]);
 	let promptValue = $state('');
 	let isStreaming = $state(false);
+	let activeMode = $state<'writing' | 'revision' | 'structure'>('writing');
 	let sessionContextItems = $state<NovaSessionContextItem[]>([]);
 	let contextWarnings = $state<string[]>([]);
 	let projectPickerOpen = $state(false);
@@ -162,9 +164,13 @@
 		];
 	}
 
-	async function resolveAttachedContext(userPrompt: string): Promise<NovaContextResponsePayload | null> {
+	async function resolveAttachedContext(
+		userPrompt: string,
+		plan: NovaContextPlan,
+	): Promise<NovaContextResponsePayload | null> {
+		if (plan.mode === 'off') return null;
 		if (sessionContextItems.length === 0) return null;
-		const payload = toNovaContextRequestPayload(sessionContextItems, userPrompt);
+		const payload = toNovaContextRequestPayload(sessionContextItems, userPrompt, plan);
 		const response = await requestNovaContext(payload);
 		if (response.warnings.length > 0) {
 			pushWarnings(response.warnings);
@@ -175,10 +181,12 @@
 	async function handleSubmit(text: string) {
 		if (!text.trim() || isStreaming) return;
 
+		const contextPlan = planNovaContext(text.trim(), sessionContextItems, messages);
+
 		let contextResponse: NovaContextResponsePayload | null = null;
-		if (sessionContextItems.length > 0) {
+		if (contextPlan.mode !== 'off') {
 			try {
-				contextResponse = await resolveAttachedContext(text.trim());
+				contextResponse = await resolveAttachedContext(text.trim(), contextPlan);
 			} catch (error) {
 				const message = error instanceof Error ? error.message : 'Unknown error while assembling context.';
 				pushWarnings([`Attached context failed: ${message}`]);
@@ -196,7 +204,7 @@
 			.map((message) => ({ role: message.role, content: message.content }))
 			.filter((message) => message.content);
 
-		if (contextResponse?.contextText) {
+		if (contextPlan.mode !== 'off' && contextResponse?.contextText) {
 			payloadMessages.unshift({
 				role: 'system',
 				content: `SESSION CONTEXT\n${contextResponse.contextText}`,
@@ -264,38 +272,70 @@
 			/>
 		</div>
 	{:else}
-		<!-- ─── Empty / home state ─── -->
-		<div class="home">
-			<div class="home__prompt-group">
-				<div class="home__intro">
-					<p class="home__eyebrow">Prompt Stage</p>
-					<h2>What do you need from Nova?</h2>
-					<p>Start with a prompt, then keep the conversation focused on one creative problem at a time.</p>
-				</div>
-				<div class="prompt-shell">
+		<!-- ─── Empty / agent landing state ─── -->
+		<div class="nova-empty">
+			<div class="nova-empty__workspace">
+				<section class="nova-empty__composer" aria-label="Start a Nova chat">
 					<PromptInput
 						bind:value={promptValue}
-						placeholder="Help me write a scene ..."
+						placeholder="Ask Nova to draft, revise, or reason through your story ..."
 						disabled={isStreaming}
 						contextItems={sessionContextItems}
-						contextWarnings={contextWarnings}
+						{contextWarnings}
 						onremovecontext={removeContextItem}
 						onrequestprojectpicker={openProjectPicker}
 						onfilesselected={handleContextFilesSelected}
 						onsubmit={handleSubmit}
 					/>
-					<SuggestionChips {suggestions} onselect={handleSubmit} />
+
+					<div
+						class="nova-empty__mode-row"
+						role="radiogroup"
+						aria-label="Nova prompt modes"
+					>
+						<button
+							type="button"
+							role="radio"
+							aria-checked={activeMode === 'writing'}
+							class="nova-empty__mode"
+							class:nova-empty__mode--active={activeMode === 'writing'}
+							onclick={() => (activeMode = 'writing')}
+						>Writing</button>
+						<button
+							type="button"
+							role="radio"
+							aria-checked={activeMode === 'revision'}
+							class="nova-empty__mode"
+							class:nova-empty__mode--active={activeMode === 'revision'}
+							onclick={() => (activeMode = 'revision')}
+						>Revision</button>
+						<button
+							type="button"
+							role="radio"
+							aria-checked={activeMode === 'structure'}
+							class="nova-empty__mode"
+							class:nova-empty__mode--active={activeMode === 'structure'}
+							onclick={() => (activeMode = 'structure')}
+						>Structure</button>
+					</div>
+
+					<div class="nova-empty__suggestion-row">
+						<span class="nova-empty__suggestion-label">Try Nova</span>
+						<SuggestionChips {suggestions} onselect={handleSubmit} />
+					</div>
+				</section>
+
+				<div class="nova-empty__utility-row">
+					<QuickLinks label="Quick access" links={quickLinks} />
 				</div>
-
-				<QuickLinks label="Quick access" links={quickLinks} />
 			</div>
-		</div>
 
-		<footer class="home-footer">
-			<span>AI-assisted writing</span>
-			<span class="home-footer__dot">·</span>
-			<span>Use suggestions with care</span>
-		</footer>
+			<footer class="nova-empty__footer">
+				<span>AI-assisted writing</span>
+				<span>·</span>
+				<span>Use suggestions with care</span>
+			</footer>
+		</div>
 	{/if}
 </div>
 
@@ -366,73 +406,97 @@
 		width: 100%;
 	}
 
-	/* ───────── Empty / home state ─── */
-	.home {
+	/* ───────── Empty / agent landing state ─── */
+	.nova-empty {
 		flex: 1;
+		min-height: 0;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.nova-empty__workspace {
+		flex: 1;
+		min-height: 0;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		padding: min(11vh, 7rem) var(--space-6) 0;
+		justify-content: flex-start;
+		gap: var(--space-6);
+		padding: min(18vh, 9rem) var(--space-6) var(--space-6);
 	}
 
-	.home__prompt-group {
+	.nova-empty__composer {
 		width: 100%;
-		max-width: 580px;
+		max-width: 680px;
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-8);
+		gap: var(--space-4);
 	}
 
-	.home__intro {
-		display: grid;
+	.nova-empty__mode-row {
+		display: flex;
+		justify-content: center;
 		gap: var(--space-2);
-		text-align: center;
+		flex-wrap: wrap;
 	}
 
-	.home__eyebrow,
-	.home__intro h2,
-	.home__intro p {
-		margin: 0;
-	}
-
-	.home__eyebrow {
+	.nova-empty__mode {
+		padding: var(--space-1) var(--space-3);
 		font-size: var(--text-xs);
-		text-transform: uppercase;
 		letter-spacing: var(--tracking-wide);
+		text-transform: uppercase;
+		border-radius: var(--radius-pill, 999px);
+		border: 1px solid var(--color-border-subtle);
+		background: transparent;
 		color: var(--color-text-muted);
+		cursor: pointer;
+		transition: var(--transition-color);
 	}
 
-	.home__intro h2 {
-		font-size: clamp(1.4rem, 1.6vw + 1rem, 2rem);
+	.nova-empty__mode:hover {
+		color: var(--color-text-primary);
+		border-color: var(--color-border-default);
 	}
 
-	.home__intro p {
-		font-size: var(--text-sm);
-		line-height: var(--leading-relaxed);
-		color: var(--color-text-secondary);
+	.nova-empty__mode:focus-visible {
+		outline: none;
+		box-shadow: var(--focus-ring);
 	}
 
-	/* ── Outer shell: wraps subcard + chips ── */
-	.prompt-shell {
+	.nova-empty__mode--active {
+		color: var(--color-text-primary);
+		border-color: color-mix(in srgb, var(--color-nova-blue) 48%, var(--color-border-default));
+		background: color-mix(in srgb, var(--color-nova-blue) 12%, transparent);
+	}
+
+	.nova-empty__suggestion-row {
 		display: flex;
 		flex-direction: column;
-		border-radius: 26px;
-		border: 1px solid var(--color-border-subtle);
-		background: color-mix(in srgb, var(--color-surface-overlay) 76%, transparent);
-		padding: 12px;
-		box-shadow: var(--shadow-xs);
+		align-items: center;
+		gap: var(--space-2);
 	}
 
-	/* ──────────────────────────── Footer ─── */
-	.home-footer {
-		padding: var(--space-3) var(--space-6) var(--space-5);
-		text-align: center;
+	.nova-empty__suggestion-label {
 		font-size: var(--text-xs);
+		letter-spacing: var(--tracking-wide);
+		text-transform: uppercase;
 		color: var(--color-text-muted);
 	}
 
-	.home-footer__dot {
-		margin: 0 var(--space-1);
+	.nova-empty__utility-row {
+		width: 100%;
+		max-width: 680px;
+		display: flex;
+		justify-content: center;
+	}
+
+	.nova-empty__footer {
+		padding: var(--space-3) var(--space-6) var(--space-5);
+		display: flex;
+		justify-content: center;
+		gap: var(--space-1);
+		font-size: var(--text-xs);
+		color: var(--color-text-muted);
 	}
 
 	/* ──────────────────── Conversation mode ─── */
