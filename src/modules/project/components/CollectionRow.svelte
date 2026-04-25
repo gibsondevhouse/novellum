@@ -2,7 +2,15 @@
         import type { Project } from '$lib/db/types.js';
         import BookCoverCard from './BookCoverCard.svelte';
 
-        let { title, projects = [] } = $props<{ title: string; projects: Project[] }>();
+        let {
+                title,
+                projects = [],
+                cardDestination = 'reader'
+        } = $props<{
+                title: string;
+                projects: Project[];
+                cardDestination?: 'reader' | 'hub';
+        }>();
 </script>
 
 <section class="collection-row" aria-label={title}>
@@ -16,7 +24,7 @@
                 <ul class="collection-list">
                         {#each projects as project (project.id)}
                                 <li class="collection-item">
-                                        <BookCoverCard {project} />
+                                        <BookCoverCard {project} destination={cardDestination} />
                                 </li>
                         {/each}
                 </ul>

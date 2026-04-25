@@ -1,19 +1,7 @@
 <script lang="ts">
-	import {
-		getExportSettings,
-		updateExportSettings,
-	} from '../services/export-settings-repository.js';
-	import { exportProject } from '../services/export-service.js';
-	import type { ExportSettings } from '$lib/db/types.js';
-	import type { ExportFormat } from '../types.js';
-	import {
-		EXPORT_FORMAT_OPTIONS,
-		FONT_FAMILY_OPTIONS,
-		LINE_SPACING_OPTIONS,
-		CHAPTER_STYLE_OPTIONS,
-	} from '../constants.js';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
+	import { buildPortabilitySnapshot } from '../services/portability/snapshot-service.js';
 
 	let {
 		projectId,
@@ -25,78 +13,87 @@
 		onClose: () => void;
 	} = $props();
 
-	let settings = $state<ExportSettings | null>(null);
-	let format = $state<ExportFormat>('docx');
+	let loading = $state(false);
 	let exporting = $state(false);
-	let exportError = $state<string | null>(null);
-
-	const isMarkdown = $derived(format === 'markdown');
-	const isBackup = $derived(format === 'backup_zip');
+	let copying = $state(false);
+	let jsonPayload = $state<string | null>(null);
+	let jsonFilename = $state('project-export.novellum.json');
+	let actionError = $state<string | null>(null);
+	let actionSuccess = $state<string | null>(null);
 
 	$effect(() => {
 		if (open) {
-			loadSettings();
+			void prepareJsonPayload();
 		}
 	});
 
-	async function loadSettings() {
-		settings = await getExportSettings(projectId);
+	function makeSafeFilename(name: string): string {
+		const safe =
+			name
+				.replace(/[^a-z0-9\s-]/gi, '')
+				.replace(/\s+/g, '_')
+				.toLowerCase()
+				.slice(0, 50) || 'project';
+		const datePart = new Date().toISOString().slice(0, 10);
+		return `${safe}_${datePart}.novellum.json`;
 	}
 
-	async function handleTitlePageChange(e: Event) {
-		const checked = (e.target as HTMLInputElement).checked;
-		if (!settings) return;
-		settings = { ...settings, titlePage: checked };
-		await updateExportSettings(projectId, { titlePage: checked });
-	}
-
-	async function handleChapterStyleChange(e: Event) {
-		const value = (e.target as HTMLSelectElement).value as ExportSettings['chapterStyle'];
-		if (!settings) return;
-		settings = { ...settings, chapterStyle: value };
-		await updateExportSettings(projectId, { chapterStyle: value });
-	}
-
-	async function handleFontFamilyChange(e: Event) {
-		const value = (e.target as HTMLSelectElement).value;
-		if (!settings) return;
-		settings = { ...settings, fontFamily: value };
-		await updateExportSettings(projectId, { fontFamily: value });
-	}
-
-	async function handleFontSizeChange(e: Event) {
-		const value = Number((e.target as HTMLInputElement).value);
-		if (!settings) return;
-		settings = { ...settings, fontSize: value };
-		await updateExportSettings(projectId, { fontSize: value });
-	}
-
-	async function handleLineSpacingChange(e: Event) {
-		const value = Number((e.target as HTMLSelectElement).value);
-		if (!settings) return;
-		settings = { ...settings, lineSpacing: value };
-		await updateExportSettings(projectId, { lineSpacing: value });
-	}
-
-	async function handleExport() {
-		if (!settings) return;
-		exporting = true;
-		exportError = null;
+	async function prepareJsonPayload() {
+		loading = true;
+		actionError = null;
+		actionSuccess = null;
 		try {
-			const { filename, blob } = await exportProject(projectId, {
-				format,
-				titlePage: settings.titlePage,
-				chapterStyle: settings.chapterStyle,
-				fontFamily: settings.fontFamily,
-				fontSize: settings.fontSize,
-				lineSpacing: settings.lineSpacing,
-			});
-			downloadBlob(blob, filename);
-			onClose();
+			const snapshot = await buildPortabilitySnapshot(projectId);
+			const projectRow = (snapshot.dexie.projects?.[0] ?? {}) as { title?: string };
+			const title = projectRow.title ?? 'project';
+			jsonFilename = makeSafeFilename(title);
+
+			jsonPayload = JSON.stringify(
+				{
+					format: 'novellum_project_json',
+					exportedAt: new Date().toISOString(),
+					projectId,
+					tableCounts: snapshot.tableCounts,
+					data: snapshot.dexie,
+					kv: snapshot.kv,
+				},
+				null,
+				2,
+			);
 		} catch (err) {
-			exportError = err instanceof Error ? err.message : 'Export failed';
+			actionError = err instanceof Error ? err.message : 'Failed to prepare project JSON.';
+		} finally {
+			loading = false;
+		}
+	}
+
+	async function handleExportJson() {
+		if (!jsonPayload) return;
+		exporting = true;
+		actionError = null;
+		actionSuccess = null;
+		try {
+			downloadBlob(new Blob([jsonPayload], { type: 'application/json' }), jsonFilename);
+			actionSuccess = `Downloaded ${jsonFilename}`;
+		} catch (err) {
+			actionError = err instanceof Error ? err.message : 'Failed to export JSON file.';
 		} finally {
 			exporting = false;
+		}
+	}
+
+	async function handleCopyJson() {
+		if (!jsonPayload) return;
+		copying = true;
+		actionError = null;
+		actionSuccess = null;
+		try {
+			await navigator.clipboard.writeText(jsonPayload);
+			actionSuccess = 'Project JSON copied to clipboard.';
+		} catch (err) {
+			actionError = err instanceof Error ? err.message : 'Unable to copy JSON to clipboard.';
+		} finally {
+			copying = false;
 		}
 	}
 
@@ -117,134 +114,63 @@
 		<div
 			class="modal"
 			role="dialog"
-			aria-label="Export Project"
+			aria-label="Export JSON Options"
 			aria-modal="true"
 			tabindex="-1"
 			onclick={(e) => e.stopPropagation()}
 			onkeydown={(e) => e.stopPropagation()}
 		>
 			<div class="modal-header">
-				<h2 class="modal-title">Export Project</h2>
+				<h2 class="modal-title">Export Project JSON</h2>
 			</div>
 
-			{#if !settings}
+			{#if loading}
 				<div class="modal-body">
-					<p class="loading-text">Loading settings…</p>
+					<p class="loading-text">Preparing project JSON...</p>
 				</div>
 			{:else}
 				<div class="modal-body">
-					<div class="field-group">
-						<span class="field-label">Format</span>
-						<div class="format-tabs" role="radiogroup" aria-label="Export format">
-							{#each EXPORT_FORMAT_OPTIONS as opt (opt.value)}
-								<GhostButton
-									role="radio"
-									aria-checked={format === opt.value}
-									class={`format-tab ${format === opt.value ? 'active' : ''}`}
-									type="button"
-									onclick={() => {
-										format = opt.value;
-									}}
-								>
-									{opt.label}
-								</GhostButton>
-							{/each}
-						</div>
+					<p class="intro-text">
+						Choose how you want to work with your JSON export. Both options use the same full
+						project payload.
+					</p>
+
+					<div class="split-pane" role="group" aria-label="JSON export actions">
+						<section class="pane">
+							<h3 class="pane-title">Export JSON</h3>
+							<p class="pane-description">
+								Best when you need a file for backups, handoff, versioning, or import flows in other
+								tools.
+							</p>
+							<PrimaryButton onclick={handleExportJson} disabled={!jsonPayload || exporting || copying}>
+								{exporting ? 'Exporting...' : 'Export JSON'}
+							</PrimaryButton>
+						</section>
+
+						<section class="pane">
+							<h3 class="pane-title">Copy JSON</h3>
+							<p class="pane-description">
+								Best for quick sharing in chat, debugging payloads, or pasting into scripts and AI
+								prompts.
+							</p>
+							<GhostButton onclick={handleCopyJson} disabled={!jsonPayload || exporting || copying}>
+								{copying ? 'Copying...' : 'Copy JSON'}
+							</GhostButton>
+						</section>
 					</div>
 
-					{#if isBackup}
-						<div class="backup-hint">
-							<p class="backup-hint-title">Portable Backup</p>
-							<p class="backup-hint-text">
-								Export a complete snapshot of this project including all story data, characters,
-								locations, and planning notes. Use this to restore your project in another browser
-								or as a safety backup.
-							</p>
-						</div>
+					{#if actionError}
+						<p class="error-text" role="alert">{actionError}</p>
 					{/if}
 
-					{#if !isBackup}
-						<div class="field-group">
-							<label class="field-label field-label--inline">
-								<input
-									type="checkbox"
-									checked={settings.titlePage}
-									onchange={handleTitlePageChange}
-								/>
-								Title Page
-							</label>
-						</div>
-
-						<div class="field-group">
-							<label class="field-label" for="chapter-style">Chapter Style</label>
-							<select
-								id="chapter-style"
-								class="field-select"
-								value={settings.chapterStyle}
-								onchange={handleChapterStyleChange}
-							>
-								{#each CHAPTER_STYLE_OPTIONS as opt (opt.value)}
-									<option value={opt.value}>{opt.label}</option>
-								{/each}
-							</select>
-						</div>
-
-						<div class="field-group">
-							<label class="field-label" for="font-family">Font Family</label>
-							<select
-								id="font-family"
-								class="field-select"
-								value={settings.fontFamily}
-								disabled={isMarkdown}
-								onchange={handleFontFamilyChange}
-							>
-								{#each FONT_FAMILY_OPTIONS as opt (opt.value)}
-									<option value={opt.value}>{opt.label}</option>
-								{/each}
-							</select>
-						</div>
-
-						<div class="field-group">
-							<label class="field-label" for="font-size">Font Size (pt)</label>
-							<input
-								id="font-size"
-								type="number"
-								class="field-input"
-								min="10"
-								max="18"
-								value={settings.fontSize}
-								disabled={isMarkdown}
-								onchange={handleFontSizeChange}
-							/>
-						</div>
-
-						<div class="field-group">
-							<label class="field-label" for="line-spacing">Line Spacing</label>
-							<select
-								id="line-spacing"
-								class="field-select"
-								value={String(settings.lineSpacing)}
-								disabled={isMarkdown}
-								onchange={handleLineSpacingChange}
-							>
-								{#each LINE_SPACING_OPTIONS as opt (opt.value)}
-									<option value={String(opt.value)}>{opt.label}</option>
-								{/each}
-							</select>
-						</div>
-					{/if}
-
-					{#if exportError}
-						<p class="error-text" role="alert">{exportError}</p>
+					{#if actionSuccess}
+						<p class="success-text" role="status">{actionSuccess}</p>
 					{/if}
 				</div>
 			{/if}
 
 			<div class="modal-footer">
-				<GhostButton onclick={onClose} disabled={exporting}>Cancel</GhostButton>
-				<PrimaryButton onclick={handleExport} disabled={exporting || !settings}>
-					{exporting ? 'Exporting…' : isBackup ? 'Export Backup ZIP' : 'Export'}
-				</PrimaryButton>
+				<GhostButton onclick={onClose} disabled={loading || exporting || copying}>Close</GhostButton>
 			</div>
 		</div>
 	</div>
@@ -265,7 +191,7 @@
 		background-color: var(--color-surface-raised);
 		border: 1px solid var(--color-border-strong);
 		border-radius: var(--radius-md);
-		width: min(480px, 90vw);
+		width: min(820px, 92vw);
 		display: flex;
 		flex-direction: column;
 		max-height: 90vh;
@@ -305,90 +231,59 @@
 		color: var(--color-text-muted);
 	}
 
-	.field-group {
+	.intro-text {
+		margin: 0;
+		font-size: var(--text-sm);
+		line-height: var(--leading-relaxed);
+		color: var(--color-text-secondary);
+	}
+
+	.split-pane {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: var(--space-4);
+	}
+
+	.pane {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-1);
-	}
-
-	.field-label {
-		font-size: var(--text-sm);
-		font-weight: var(--font-weight-medium);
-		color: var(--color-text-secondary);
-	}
-
-	.field-label--inline {
-		display: flex;
-		align-items: center;
-		gap: var(--space-2);
-		cursor: pointer;
-	}
-
-	.format-tabs {
-		display: flex;
-		gap: var(--space-2);
-	}
-
-	:global(.format-tab) {
-		padding: var(--space-1) var(--space-3);
+		align-items: flex-start;
+		gap: var(--space-3);
+		padding: var(--space-4);
 		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-sm);
-		background: none;
-		color: var(--color-text-secondary);
-		font-size: var(--text-sm);
-		cursor: pointer;
-		transition:
-			border-color 0.15s,
-			color 0.15s,
-			background-color 0.15s;
+		border-radius: var(--radius-md);
+		background: linear-gradient(145deg, var(--color-surface-raised) 0%, var(--color-surface-overlay) 100%);
 	}
 
-	:global(.format-tab:hover) {
-		border-color: var(--color-border-strong);
-		color: var(--color-text-primary);
-	}
-
-	:global(.format-tab.active) {
-		border-color: var(--color-nova-blue);
-		color: var(--color-nova-blue);
-		background-color: color-mix(in srgb, var(--color-nova-blue) 8%, transparent);
-	}
-
-	.field-select,
-	.field-input {
-		padding: var(--space-2) var(--space-3);
-		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-sm);
-		background-color: var(--color-surface-overlay);
-		color: var(--color-text-primary);
-		font-size: var(--text-sm);
-		width: 100%;
-	}
-
-	.field-select:disabled,
-	.field-input:disabled {
-		opacity: 0.4;
-		cursor: not-allowed;
-	}
-
-	.backup-hint {
-		background-color: var(--color-surface-overlay);
-		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-sm);
-		padding: var(--space-3) var(--space-4);
-	}
-
-	.backup-hint-title {
-		font-size: var(--text-sm);
-		font-weight: var(--font-weight-medium);
-		color: var(--color-text-primary);
-		margin: 0 0 var(--space-1) 0;
-	}
-
-	.backup-hint-text {
-		font-size: var(--text-xs);
-		color: var(--color-text-muted);
-		line-height: 1.5;
+	.pane-title {
 		margin: 0;
+		font-size: var(--text-lg);
+		color: var(--color-text-primary);
+		font-family: var(--font-display);
+	}
+
+	.pane-description {
+		margin: 0;
+		font-size: var(--text-sm);
+		line-height: var(--leading-relaxed);
+		color: var(--color-text-secondary);
+	}
+
+	.error-text {
+		margin: 0;
+		font-size: var(--text-sm);
+		color: var(--color-error);
+	}
+
+	.success-text {
+		margin: 0;
+		font-size: var(--text-sm);
+		color: var(--color-success-on-dark);
+	}
+
+	@media (max-width: 760px) {
+		.split-pane {
+			grid-template-columns: 1fr;
+		}
 	}
 </style>

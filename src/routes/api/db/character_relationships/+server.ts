@@ -7,6 +7,7 @@ const config = {
 		characterAId: { required: true },
 		characterBId: { required: true },
 		type: { default: '' },
+		status: { default: '' },
 		description: { default: '' },
 	},
 	orderBy: 'createdAt ASC',

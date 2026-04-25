@@ -104,6 +104,14 @@ export function openReader(project: Project): void {
         updateProject(project.id, { lastOpenedAt: new Date().toISOString() }).catch(console.error);
         goto(`/books/${project.id}`);
 }
+
+export function openHub(project: Project): void {
+	// Update lastOpenedAt implicitly in background
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity
+	updateProject(project.id, { lastOpenedAt: new Date().toISOString() }).catch(console.error);
+	goto(`/projects/${project.id}/hub`);
+}
+
 export async function submitUpdate(
 	id: string,
 	data: Partial<Omit<Project, 'id' | 'createdAt'>>,

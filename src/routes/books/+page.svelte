@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import {
 		getProjects,
 		getLoading,
@@ -12,7 +14,9 @@
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 	import SurfacePanel from '$lib/components/ui/SurfacePanel.svelte';
 	import EmptyStatePanel from '$lib/components/ui/EmptyStatePanel.svelte';
+	import { getLastReadBookId } from '$lib/stores/reader-mode.svelte.js';
 
+	let showLibrary = $state(false);
 	let showCreateProject = $state(false);
 
 	function openCreateProject(): void {
@@ -24,6 +28,13 @@
 	}
 
 	onMount(async () => {
+		// If the user has a last-read book and didn't explicitly request the library, redirect.
+		const lastId = getLastReadBookId();
+		if (lastId && !page.url.searchParams.has('library')) {
+			await goto(`/books/${lastId}`, { replaceState: true });
+			return;
+		}
+		showLibrary = true;
 		await loadProjects();
 	});
 </script>
@@ -32,6 +43,7 @@
 	<title>Books — Novellum</title>
 </svelte:head>
 
+{#if showLibrary}
 <div class="library-hub">
 	<SectionHeader
 		title="Books"
@@ -73,6 +85,7 @@
 		<ProjectCreateCard oncancel={closeCreateProject} />
 	{/if}
 </div>
+{/if}
 
 <style>
 	.library-hub {

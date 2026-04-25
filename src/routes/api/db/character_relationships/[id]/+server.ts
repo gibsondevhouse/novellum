@@ -15,7 +15,7 @@ export const GET: RequestHandler = async ({ params }) => {
 export const PUT: RequestHandler = async ({ params, request }) => {
 	const body = await request.json();
 	const updates: Record<string, unknown> = {};
-	const allowed = ['type', 'description'];
+	const allowed = ['type', 'status', 'description'];
 
 	for (const key of allowed) {
 		if (key in body) updates[key] = body[key];

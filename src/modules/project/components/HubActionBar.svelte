@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { GhostButton } from '$lib/components/ui/index.js';
 
-	let { openExport, openDelete }: { openExport: () => void; openDelete: () => void } = $props();
+	let {
+		openExport,
+		openDelete
+	}: {
+		openExport: () => void;
+		openDelete: () => void;
+	} = $props();
 </script>
 
 <div class="hub-hero-actions" role="group" aria-label="Project actions">
@@ -33,6 +39,7 @@
 	.hub-hero-actions__primary,
 	.hub-hero-actions__danger {
 		display: flex;
+		align-items: center;
 		gap: var(--space-2);
 	}
 

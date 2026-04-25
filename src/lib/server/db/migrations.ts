@@ -77,6 +77,194 @@ function ensureCharacterPresentationColumns(db: Database.Database): void {
 	}
 }
 
+function ensureCharacterIndividualsColumns(db: Database.Database): void {
+	const columns = db.prepare('PRAGMA table_info(characters)').all() as Array<{ name: string }>;
+	const textColumns = [
+		'occupation',
+		'age',
+		'height',
+		'weight',
+		'build',
+		'hair',
+		'eyes',
+		'coreDesire',
+		'fear',
+		'contradiction',
+		'temperament',
+		'alignment',
+		'strength',
+		'flaw',
+		'storyRole',
+		'arcStage',
+		'externalGoal',
+		'internalNeed',
+		'stakes',
+		'conflict',
+		'voiceSummary',
+		'speechPattern',
+		'phrases',
+		'tells',
+		'bodyLanguage',
+		'dialogueSample',
+		'immutableTraits',
+		'injuries',
+		'habits',
+		'secrets',
+		'othersKnow',
+		'lastChange',
+		'timelineMarkers',
+		'emotionalState',
+		'currentObjective',
+		'currentPressure',
+		'lastSeen',
+		'nextMove',
+	] as const;
+
+	for (const columnName of textColumns) {
+		if (!columns.some((column) => column.name === columnName)) {
+			db.exec(`ALTER TABLE characters ADD COLUMN ${columnName} TEXT NOT NULL DEFAULT ''`);
+		}
+	}
+}
+
+function backfillIndividualsFromNotesEnvelope(db: Database.Database): void {
+	type CharacterRow = { id: string; notes: string | null };
+	type NotesEnvelope = Record<string, unknown> & {
+		kind?: string;
+		version?: number;
+		biography?: string;
+	};
+
+	const rows = db.prepare('SELECT id, notes FROM characters').all() as CharacterRow[];
+	const updatableFields = [
+		'occupation',
+		'age',
+		'height',
+		'weight',
+		'build',
+		'hair',
+		'eyes',
+		'coreDesire',
+		'fear',
+		'contradiction',
+		'temperament',
+		'alignment',
+		'strength',
+		'flaw',
+		'storyRole',
+		'arcStage',
+		'externalGoal',
+		'internalNeed',
+		'stakes',
+		'conflict',
+		'voiceSummary',
+		'speechPattern',
+		'phrases',
+		'tells',
+		'bodyLanguage',
+		'dialogueSample',
+		'immutableTraits',
+		'injuries',
+		'habits',
+		'secrets',
+		'othersKnow',
+		'lastChange',
+		'timelineMarkers',
+		'emotionalState',
+		'currentObjective',
+		'currentPressure',
+		'lastSeen',
+		'nextMove',
+	] as const;
+
+	for (const row of rows) {
+		if (!row.notes) continue;
+
+		let parsed: NotesEnvelope;
+		try {
+			parsed = JSON.parse(row.notes) as NotesEnvelope;
+		} catch {
+			continue;
+		}
+
+		if (parsed.kind !== 'individual-dossier' || parsed.version !== 1) {
+			continue;
+		}
+
+		const updates: Record<string, string> = {};
+		for (const field of updatableFields) {
+			const value = parsed[field];
+			if (typeof value === 'string' && value.trim().length > 0) {
+				updates[field] = value;
+			}
+		}
+
+		if (typeof parsed.biography === 'string') {
+			updates.notes = parsed.biography;
+		}
+
+		if (Object.keys(updates).length === 0) {
+			continue;
+		}
+
+		updates.updatedAt = new Date().toISOString();
+		const setClauses = Object.keys(updates).map((key) => `${key} = @${key}`);
+		db.prepare(`UPDATE characters SET ${setClauses.join(', ')} WHERE id = @id`).run({
+			...updates,
+			id: row.id,
+		});
+	}
+}
+
+function ensureCharacterRelationshipStatusColumn(db: Database.Database): void {
+	const columns = db
+		.prepare('PRAGMA table_info(character_relationships)')
+		.all() as Array<{ name: string }>;
+	if (!columns.some((column) => column.name === 'status')) {
+		db.exec("ALTER TABLE character_relationships ADD COLUMN status TEXT NOT NULL DEFAULT ''");
+	}
+}
+
+function backfillRelationshipStatusFromDescriptionEnvelope(db: Database.Database): void {
+	type RelationshipRow = { id: string; description: string | null; status: string | null };
+	type DescriptionEnvelope = {
+		kind?: string;
+		version?: number;
+		notes?: string;
+		status?: string;
+	};
+
+	const rows = db
+		.prepare('SELECT id, description, status FROM character_relationships')
+		.all() as RelationshipRow[];
+
+	for (const row of rows) {
+		if (!row.description) continue;
+
+		let parsed: DescriptionEnvelope;
+		try {
+			parsed = JSON.parse(row.description) as DescriptionEnvelope;
+		} catch {
+			continue;
+		}
+
+		if (parsed.kind !== 'character-relationship' || parsed.version !== 1) {
+			continue;
+		}
+
+		const nextDescription = typeof parsed.notes === 'string' ? parsed.notes : '';
+		const nextStatus = typeof parsed.status === 'string' ? parsed.status : '';
+		db.prepare(
+			'UPDATE character_relationships SET description = @description, status = @status, updatedAt = @updatedAt WHERE id = @id',
+		).run({
+			id: row.id,
+			description: nextDescription,
+			status: nextStatus,
+			updatedAt: new Date().toISOString(),
+		});
+	}
+}
+
 function ensureLocationNarrativeColumns(db: Database.Database): void {
 	const columns = db.prepare('PRAGMA table_info(locations)').all() as Array<{ name: string }>;
 
@@ -121,6 +309,10 @@ export function runMigrations(db: Database.Database): void {
 		ensureScenesNotesColumn(db);
 		ensureActsArcIdColumn(db);
 		ensureCharacterPresentationColumns(db);
+		ensureCharacterIndividualsColumns(db);
+		backfillIndividualsFromNotesEnvelope(db);
+		ensureCharacterRelationshipStatusColumn(db);
+		backfillRelationshipStatusFromDescriptionEnvelope(db);
 		ensureLocationNarrativeColumns(db);
 		db.exec(INDEX_SQL);
 	})();

@@ -1,8 +1,9 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import ClassicReaderView from '$modules/reader/components/ClassicReaderView.svelte';
 	import BookReaderView from '$modules/reader/components/BookReaderView.svelte';
 	import ReaderFullscreenShell from '$modules/reader/components/ReaderFullscreenShell.svelte';
-	import { getReaderMode, setReaderMode } from '$lib/stores/reader-mode.svelte.js';
+	import { getReaderMode, setReaderMode, setLastReadBookId } from '$lib/stores/reader-mode.svelte.js';
 
 	let {
 		data,
@@ -29,6 +30,9 @@
 		};
 	} = $props();
 
+	onMount(() => {
+		setLastReadBookId(data.project.id);
+	});
 
 </script>
 

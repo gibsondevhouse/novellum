@@ -1,22 +1,16 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
 	import type { Project, WritingStyle } from '$lib/db/types.js';
 	import {
 		ProjectHubHero,
 		StructuralMetricsCarousel,
-		HubActionBar,
 		HubProgressCard,
 		HubNextStepCard,
 		HubDetailsPanel,
 	} from '$modules/project';
 
-	let { data } = $props<{
+	let { data }: {
 		data: { project: Project; currentWordCount: number; writingStyles: WritingStyle[] };
-	}>();
-
-	const { openExport, openDelete } = getContext<{ openExport: () => void; openDelete: () => void }>(
-		'projectActions',
-	);
+	} = $props();
 
 	const project = $derived(data.project);
 </script>
@@ -24,9 +18,6 @@
 <div class="hub">
 	<!-- Layer 1: Story Hero -->
 	<ProjectHubHero {project} />
-
-	<!-- Hero utility actions -->
-	<HubActionBar {openExport} {openDelete} />
 
 	<!-- Layer 2: Structural Metrics -->
 	<StructuralMetricsCarousel projectId={project.id} />

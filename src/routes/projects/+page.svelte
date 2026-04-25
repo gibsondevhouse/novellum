@@ -4,301 +4,123 @@
                 getProjects,
                 getLoading,
                 loadProjects,
-                submitCreate
+                openReader
         } from '$modules/project/stores/project-hub.svelte.js';
-        import LibraryHeroCard from '$modules/project/components/LibraryHeroCard.svelte';
-        import LibraryHeroCardSkeleton from '$modules/project/components/LibraryHeroCardSkeleton.svelte';
-        import ProjectCreateCard from '$modules/project/components/ProjectCreateCard.svelte';
-        import { SectionHeader, PrimaryButton, GhostButton, Input, EmptyStatePanel, PageHeader } from '$lib/components/ui/index.js';
-        import type { Project } from '$lib/db/types.js';
-
-        let showCreateBook = $state(false);
-        let showCreateStory = $state(false);
-        let newStoryTitle = $state('');
+        import HomeLibraryShell from '$modules/project/components/HomeLibraryShell.svelte';
 
         onMount(async () => {
                 await loadProjects();
         });
 
-        const books = $derived(getProjects().filter((p: Project) => p.projectType === 'novel' || !p.projectType));
-        const stories = $derived(getProjects().filter((p: Project) => p.projectType === 'story'));
+        const projects = $derived(getProjects());
 
-        function openCreateBook(): void {
-                showCreateBook = true;
+        function normalizeStatus(value: string | undefined): string {
+                return (value ?? '').trim().toLowerCase();
         }
 
-        function closeCreateBook(): void {
-                showCreateBook = false;
+        function byRecent(a: { lastOpenedAt?: string }, b: { lastOpenedAt?: string }): number {
+                const dateA = a.lastOpenedAt ? new Date(a.lastOpenedAt).getTime() : 0;
+                const dateB = b.lastOpenedAt ? new Date(b.lastOpenedAt).getTime() : 0;
+                return dateB - dateA;
         }
 
-        async function handleCreateStory() {
-                if (!newStoryTitle.trim()) return;
-                await submitCreate({
-                        title: newStoryTitle.trim(),
-                        projectType: 'story',
-                        targetWordCount: 5000
-                });
-                newStoryTitle = '';
-                showCreateStory = false;
-        }
+        const storyProjects = $derived(projects.filter(p => p.projectType === 'story').toSorted(byRecent));
+        const bookProjects = $derived(projects.filter(p => p.projectType !== 'story').toSorted(byRecent));
+
+        const planningStories = $derived(storyProjects.filter(p => normalizeStatus(p.status) === 'planning'));
+        const draftingStories = $derived(
+                storyProjects.filter(p => {
+                        const status = normalizeStatus(p.status);
+                        return status === 'drafting' || status === 'revising';
+                })
+        );
+        const publishedStories = $derived(
+                storyProjects.filter(p => {
+                        const status = normalizeStatus(p.status);
+                        return status === 'completed' || status === 'published';
+                })
+        );
+        const uncategorizedStories = $derived(
+                storyProjects.filter(p => {
+                        const status = normalizeStatus(p.status);
+                        return status !== 'planning' && status !== 'drafting' && status !== 'revising' && status !== 'completed' && status !== 'published';
+                })
+        );
+
+        const planningBooks = $derived(bookProjects.filter(p => normalizeStatus(p.status) === 'planning'));
+        const draftingBooks = $derived(
+                bookProjects.filter(p => {
+                        const status = normalizeStatus(p.status);
+                        return status === 'drafting' || status === 'revising';
+                })
+        );
+        const publishedBooks = $derived(
+                bookProjects.filter(p => {
+                        const status = normalizeStatus(p.status);
+                        return status === 'completed' || status === 'published';
+                })
+        );
+        const uncategorizedBooks = $derived(
+                bookProjects.filter(p => {
+                        const status = normalizeStatus(p.status);
+                        return status !== 'planning' && status !== 'drafting' && status !== 'revising' && status !== 'completed' && status !== 'published';
+                })
+        );
+
+        const recentlyRead = $derived(
+                [...projects].sort((a, b) => {
+                        const dateA = a.lastOpenedAt ? new Date(a.lastOpenedAt).getTime() : 0;
+                        const dateB = b.lastOpenedAt ? new Date(b.lastOpenedAt).getTime() : 0;
+                        return dateB - dateA;
+                }).slice(0, 5)
+        );
+
+        const mostRecent = $derived(recentlyRead.length > 0 ? recentlyRead[0] : null);
+        const completedWorks = $derived(projects.filter(p => p.status === 'completed'));
+        const worksInProgress = $derived(projects.filter(p => p.status !== 'completed'));
+
+        const groupedCollections = $derived(
+                [
+                        {
+                                title: 'Story Projects',
+                                rows: [
+                                        { title: 'Planning', projects: planningStories },
+                                        { title: 'Drafting', projects: draftingStories },
+                                        { title: 'Published', projects: publishedStories },
+                                        { title: 'Uncategorized', projects: uncategorizedStories }
+                                ]
+                        },
+                        {
+                                title: 'Book Projects',
+                                rows: [
+                                        { title: 'Planning', projects: planningBooks },
+                                        { title: 'Drafting', projects: draftingBooks },
+                                        { title: 'Published', projects: publishedBooks },
+                                        { title: 'Uncategorized', projects: uncategorizedBooks }
+                                ]
+                        }
+                ]
+                        .map(group => ({
+                                ...group,
+                                rows: group.rows.filter(row => row.projects.length > 0)
+                        }))
+                        .filter(group => group.rows.length > 0)
+        );
 </script>
 
 <svelte:head>
         <title>Projects — Novellum</title>
 </svelte:head>
 
-<div class="projects-hub">
-        <div class="projects-header-shell">
-                <div class="projects-header__glow" aria-hidden="true"></div>
-                <PageHeader
-                        eyebrow="Creative Catalog"
-                        title="Projects"
-                        description="A unified gallery for novels and stories. Open an existing project or start a new one."
-                >
-                        {#snippet actions()}
-                                <div class="projects-header__actions">
-                                        <PrimaryButton onclick={openCreateBook}>New Book</PrimaryButton>
-                                        <GhostButton onclick={() => (showCreateStory = !showCreateStory)}>
-                                                {showCreateStory ? 'Close Story Form' : 'New Story'}
-                                        </GhostButton>
-                                </div>
-                        {/snippet}
-                </PageHeader>
-        </div>
-
-        <div class="projects-grid">
-                <!-- Stories Column -->
-                <div class="projects-column">
-                        <SectionHeader
-                                title="Stories"
-                                description="Short-form narratives and single-scene pieces."
-                        >
-                                {#snippet actions()}
-                                        <PrimaryButton onclick={() => showCreateStory = !showCreateStory}>
-                                                {showCreateStory ? 'Cancel' : 'New Story'}
-                                        </PrimaryButton>
-                                {/snippet}
-                        </SectionHeader>
-
-                        {#if showCreateStory}
-                                <div class="create-story-panel">
-                                        <div class="collection-shell collection-shell--form">
-                                                <SectionHeader title="Start a New Story" />
-                                                <div class="create-story-form">
-                                                        <Input
-                                                                id="new-story-title"
-                                                                label="Story Title"
-                                                                placeholder="Enter the title of your short story..."
-                                                                bind:value={newStoryTitle}
-                                                                onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && handleCreateStory()}
-                                                        />
-                                                        <div class="form-actions">
-                                                                <PrimaryButton onclick={handleCreateStory} disabled={!newStoryTitle.trim()}>
-                                                                        Create Story
-                                                                </PrimaryButton>
-                                                                <GhostButton onclick={() => showCreateStory = false}>Cancel</GhostButton>
-                                                        </div>
-                                                </div>
-                                        </div>
-                                </div>
-                        {/if}
-
-                        {#if getLoading()}
-                                <div class="collection-shell">
-                                        <ul class="project-list" role="list" aria-label="Loading stories">
-                                                <LibraryHeroCardSkeleton />
-                                                <LibraryHeroCardSkeleton />
-                                        </ul>
-                                </div>
-                        {:else if stories.length === 0}
-                                <EmptyStatePanel
-                                        title="No stories yet."
-                                        description="Your short-form narratives will appear here."
-                                >
-                                        {#snippet actions()}
-                                                <PrimaryButton onclick={() => showCreateStory = true}>Create your first story</PrimaryButton>
-                                        {/snippet}
-                                </EmptyStatePanel>
-                        {:else}
-                                <div class="collection-shell">
-                                        <ul class="project-list" role="list" aria-label="Stories collection">
-                                                {#each stories as project, i (project.id)}
-                                                        <LibraryHeroCard {project} cardIndex={i} destination="hub" />
-                                                {/each}
-                                        </ul>
-                                </div>
-                        {/if}
-                </div>
-
-                <!-- Books Column -->
-                <div class="projects-column">
-                        <SectionHeader
-                                title="Books"
-                                description="Long-form narratives and novels."
-                        >
-                                {#snippet actions()}
-                                        <PrimaryButton onclick={openCreateBook}>New Book</PrimaryButton>
-                                {/snippet}
-                        </SectionHeader>
-
-                        {#if showCreateBook}
-                                <div class="create-card-wrapper">
-                                        <ProjectCreateCard oncancel={closeCreateBook} />
-                                </div>
-                        {/if}
-
-                        {#if getLoading()}
-                                <div class="collection-shell">
-                                        <ul class="project-list" role="list" aria-label="Loading books">
-                                                <LibraryHeroCardSkeleton />
-                                                <LibraryHeroCardSkeleton />
-                                        </ul>
-                                </div>
-                        {:else if books.length === 0}
-                                <EmptyStatePanel
-                                        title="No active book projects yet."
-                                        description="Novels you are working on will appear here."
-                                >
-                                        {#snippet actions()}
-                                                <PrimaryButton onclick={openCreateBook}>Start New Book</PrimaryButton>
-                                        {/snippet}
-                                </EmptyStatePanel>
-                        {:else}
-                                <div class="collection-shell">
-                                        <ul class="project-list" role="list" aria-label="Book projects">
-                                                {#each books as project, i (project.id)}
-                                                        <LibraryHeroCard {project} cardIndex={i} destination="hub" />
-                                                {/each}
-                                        </ul>
-                                </div>
-                        {/if}
-                </div>
-        </div>
-</div>
-
-<style>
-        .projects-hub {
-                max-width: 1400px;
-                margin: 0 auto;
-                padding: var(--space-10) 0;
-        }
-
-        .projects-header-shell {
-                margin-bottom: var(--space-8);
-                position: relative;
-                overflow: hidden;
-                border: 1px solid var(--color-border-default);
-                border-radius: var(--radius-xl);
-                background:
-                        linear-gradient(155deg, var(--color-surface-raised) 0%, var(--color-surface-overlay) 100%),
-                        var(--gradient-spotlight);
-                padding: var(--space-8);
-        }
-
-        .projects-header-shell :global(.page-header) {
-                position: relative;
-                border-bottom: none;
-                padding-bottom: 0;
-        }
-
-        .projects-header-shell :global(.page-header__heading) {
-                max-width: 560px;
-        }
-
-        .projects-header-shell :global(.page-header__eyebrow) {
-                color: var(--color-teal);
-                letter-spacing: var(--tracking-widest);
-        }
-
-        .projects-header__glow {
-                position: absolute;
-                inset: -35% -20% auto;
-                height: 420px;
-                background:
-                        radial-gradient(circle at 20% 30%, color-mix(in srgb, var(--color-nova-blue) 22%, transparent), transparent 44%),
-                        radial-gradient(circle at 80% 0%, color-mix(in srgb, var(--color-teal) 14%, transparent), transparent 36%);
-                pointer-events: none;
-        }
-
-        .projects-header__actions {
-                margin-top: var(--space-3);
-                display: flex;
-                gap: var(--space-3);
-                flex-wrap: wrap;
-        }
-
-        .projects-grid {
-                display: grid;
-                grid-template-columns: 1fr;
-                gap: var(--space-8);
-        }
-
-        @media (min-width: 900px) {
-                .projects-grid {
-                        grid-template-columns: 1fr 1fr;
-                }
-        }
-
-        .projects-column {
-                display: flex;
-                flex-direction: column;
-                gap: var(--space-4);
-        }
-
-        .collection-shell {
-                border: 1px solid var(--color-border-default);
-                border-radius: var(--radius-lg);
-                padding: var(--space-4);
-                background: linear-gradient(145deg, var(--color-surface-raised) 0%, var(--color-surface-overlay) 100%);
-                box-shadow: var(--shadow-sm);
-        }
-
-        .collection-shell--form {
-                padding: var(--space-5);
-        }
-
-        .create-card-wrapper {
-                margin-bottom: var(--space-6);
-        }
-
-        .create-story-panel {
-                margin-bottom: var(--space-6);
-                animation: slide-down var(--duration-enter) var(--ease-decelerate);
-        }
-
-        @keyframes slide-down {
-                from { opacity: 0; transform: translateY(-10px); }
-                to { opacity: 1; transform: translateY(0); }
-        }
-
-        .create-story-form {
-                display: flex;
-                flex-direction: column;
-                gap: var(--space-4);
-                margin-top: var(--space-4);
-        }
-
-        .form-actions {
-                display: flex;
-                gap: var(--space-3);
-        }
-
-        .project-list {
-                display: flex;
-                flex-direction: column;
-                gap: var(--space-5);
-                list-style: none;
-                padding: 0;
-                margin: 0;
-        }
-
-        @media (max-width: 640px) {
-                .projects-header-shell {
-                        padding: var(--space-6);
-                }
-
-                .projects-header__actions {
-                        width: 100%;
-                }
-        }
-</style>
+<HomeLibraryShell
+        loading={getLoading()}
+        totalCount={projects.length}
+        {mostRecent}
+        {recentlyRead}
+        {worksInProgress}
+        {completedWorks}
+        {groupedCollections}
+        showHero={false}
+        cardDestination="hub"
+        onOpenMostRecent={() => mostRecent && openReader(mostRecent)}
+/>

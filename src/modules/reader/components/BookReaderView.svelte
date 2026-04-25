@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import {
 		buildReaderPages,
 		type ReaderInputChapter,
@@ -7,6 +7,7 @@
 		type ReaderPage,
 	} from '$modules/reader/reader-pages.js';
 	import BookSpread from './BookSpread.svelte';
+	import { getBookPageIndex, setBookPageIndex } from '$lib/stores/reader-mode.svelte.js';
 
 	interface Props {
 		project: ReaderInputProject;
@@ -20,6 +21,13 @@
 
 	let currentIndex = $state(0);
 	let viewportWidth = $state<number | null>(null);
+
+	// Persist page position per book
+	$effect(() => {
+		if (currentIndex > 0) {
+			untrack(() => setBookPageIndex(project.id, currentIndex));
+		}
+	});
 
 	const isSingle = $derived((viewportWidth ?? 1024) < 900);
 	const pageStep = $derived(isSingle ? 1 : 2);
@@ -72,6 +80,9 @@
 
 	onMount(() => {
 		if (typeof window === 'undefined') return;
+		// Restore saved page position
+		const saved = getBookPageIndex(project.id);
+		if (saved > 0) currentIndex = saved;
 		const updateWidth = () => {
 			viewportWidth = window.innerWidth;
 		};
@@ -98,7 +109,7 @@
 
 	<div class="book-reader__controls">
 		{#if !fullscreen}
-			<a class="book-reader__back" href="/books">← Library</a>
+			<a class="book-reader__back" href="/books?library=1">← Library</a>
 		{:else}
 			<span></span>
 		{/if}

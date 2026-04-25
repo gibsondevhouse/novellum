@@ -1,8 +1,11 @@
 <script lang="ts">
         import type { Project } from '$lib/db/types.js';
-        import { openReader } from '../stores/project-hub.svelte.js';
+        import { openHub, openReader } from '../stores/project-hub.svelte.ts';
 
-        let { project } = $props<{ project: Project }>();
+        let { project, destination = 'reader' } = $props<{
+                project: Project;
+                destination?: 'reader' | 'hub';
+        }>();
 
         function formatStatus(status: string) {
                 if (!status) return 'Planning';
@@ -28,7 +31,7 @@
         <button
                 class="cover-button"
                 type="button"
-                onclick={() => openReader(project)}
+                onclick={() => (destination === 'hub' ? openHub(project) : openReader(project))}
                 aria-label="Open project {project.title || 'Untitled'}"
         >
                 <div class="cover-image" aria-hidden="true">

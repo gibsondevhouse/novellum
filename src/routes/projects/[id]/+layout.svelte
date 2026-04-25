@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { setContext } from 'svelte';
 	import type { Project } from '$lib/db';
 	import EditProjectForm from '$modules/project/components/EditProjectForm.svelte';
@@ -28,6 +29,9 @@
 		openExport: () => {
 			showExportModal = true;
 		},
+		openImport: () => {
+			goto('/settings/migrate');
+		}
 	});
 
 </script>

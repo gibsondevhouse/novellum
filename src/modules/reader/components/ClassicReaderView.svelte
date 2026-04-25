@@ -84,7 +84,7 @@
 						{/each}
 					</div>
 				{/if}
-				<a class="reader-back" href="/books">Back to Library</a>
+				<a class="reader-back" href="/books?library=1">Back to Library</a>
 			</div>
 		</div>
 	</div>
