@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { setContext } from 'svelte';
-	import type { Project } from '$lib/db';
+	import type { Project } from '$lib/db/domain-types';
 	import EditProjectForm from '$modules/project/components/EditProjectForm.svelte';
 	import DeleteProjectDialog from '$modules/project/components/DeleteProjectDialog.svelte';
 	import ExportModal from '$modules/export/components/ExportModal.svelte';

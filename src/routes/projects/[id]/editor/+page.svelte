@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Chapter, Character, Project, Scene } from '$lib/db/types.js';
+	import type { Chapter, Character, Project, Scene } from '$lib/db/domain-types';
 	import AiPanel from '$lib/components/AiPanel.svelte';
 	import EmptyStatePanel from '$lib/components/ui/EmptyStatePanel.svelte';
 	import { pushState } from '$app/navigation';

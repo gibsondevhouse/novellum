@@ -1,4 +1,4 @@
-import type { TimelineEvent } from '$lib/db/types.js';
+import type { TimelineEvent } from '$lib/db/domain-types';
 
 export type ChronicleSystemKind = 'era' | 'key-event' | 'personal-history';
 

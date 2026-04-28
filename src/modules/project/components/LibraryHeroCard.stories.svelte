@@ -1,7 +1,7 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import LibraryHeroCard from './LibraryHeroCard.svelte';
-	import type { Project } from '$lib/db/types.js';
+	import type { Project } from '$lib/db/domain-types';
 
 	const project: Project = {
 		id: 'storybook-project-1',

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { Project } from '$lib/db/types.js';
+	import type { Project } from '$lib/db/domain-types';
 	import { getSaving, getSaveSuccess, submitUpdate } from '../stores/project-hub.svelte.ts';
 	import { SurfacePanel } from '$lib/components/ui/index.js';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';

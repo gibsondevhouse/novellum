@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Scene } from '$lib/db/types.js';
+	import type { Scene } from '$lib/db/domain-types';
 	import { untrack } from 'svelte';
 	import { updateScene } from '$modules/editor/services/scene-repository.js';
 	import StructuredSection from '$lib/components/planning/StructuredSection.svelte';

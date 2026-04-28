@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { diffLines } from 'diff';
 	import { listByScene } from '$modules/editor/services/snapshot-repository.js';
-	import type { SceneSnapshot } from '$lib/db/types.js';
+	import type { SceneSnapshot } from '$lib/db/domain-types';
 	import { SurfacePanel, GhostButton } from '$lib/components/ui/index.js';
 
 	interface Props {

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { ConsistencyIssue } from '$lib/db/types.js';
+	import type { ConsistencyIssue } from '$lib/db/domain-types';
 	import {
 		loadIssues,
 		getIssues,

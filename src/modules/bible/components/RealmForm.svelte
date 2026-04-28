@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { Location } from '$lib/db/types.js';
+	import type { Location } from '$lib/db/domain-types';
 	import { GhostButton, SectionHeader, SurfacePanel } from '$lib/components/ui/index.js';
 	import type { EntityFormCallbacks } from '../types.js';
 	import { REALM_TYPE_OPTIONS, joinCommaSeparated, splitCommaSeparated } from '../narrative-locations.js';

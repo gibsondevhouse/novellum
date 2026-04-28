@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { GhostButton } from '$lib/components/ui/index.js';
-	import type { Beat } from '$lib/db/types.js';
+	import type { Beat } from '$lib/db/domain-types';
 
 	let { beat, index, onDelete, onSelect, onDragStart } = $props<{
 		beat: Beat;

@@ -1,5 +1,5 @@
-import { db, type Asset } from '$lib/db';
-import type { Project } from '$lib/db/types';
+import { db, type Asset } from '$lib/legacy/dexie/db';
+import type { Project } from '$lib/db/domain-types';
 import { getAllProjects } from '$modules/project/services/project-repository';
 
 export interface Album {

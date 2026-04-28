@@ -1,5 +1,5 @@
 import { createRepository } from '$lib/factories/repository-factory.js';
-import type { TimelineEvent } from '$lib/db/types.js';
+import type { TimelineEvent } from '$lib/db/domain-types';
 
 const repo = createRepository<TimelineEvent>({
 	endpoint: '/api/db/timeline_events',

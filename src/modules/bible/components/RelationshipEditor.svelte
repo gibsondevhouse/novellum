@@ -2,7 +2,7 @@
 	import Link2 from '@lucide/svelte/icons/link-2';
 	import Plus from '@lucide/svelte/icons/plus';
 	import X from '@lucide/svelte/icons/x';
-	import type { Character, CharacterRelationship } from '$lib/db/types.js';
+	import type { Character, CharacterRelationship } from '$lib/db/domain-types';
 	import {
 		getRelationships,
 		initRelationships,

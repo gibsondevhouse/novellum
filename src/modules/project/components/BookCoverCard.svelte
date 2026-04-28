@@ -1,5 +1,5 @@
 <script lang="ts">
-        import type { Project } from '$lib/db/types.js';
+        import type { Project } from '$lib/db/domain-types';
         import { openHub, openReader } from '../stores/project-hub.svelte.ts';
 
         let { project, destination = 'reader' } = $props<{

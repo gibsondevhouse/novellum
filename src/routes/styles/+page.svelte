@@ -5,7 +5,7 @@
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	import { PageHeader } from '$lib/components/ui/index.js';
-	import type { WritingStyle, SystemPrompt, ChatInstruction } from '$lib/db/types';
+	import type { WritingStyle, SystemPrompt, ChatInstruction } from '$lib/db/domain-types';
 	import { STYLE_PRESETS } from '$lib/ai/style-presets.js';
 
 	let { data } = $props<{

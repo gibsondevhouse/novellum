@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Scene } from '$lib/db/types.js';
+	import type { Scene } from '$lib/db/domain-types';
 	import { goto } from '$app/navigation';
 	import { EmptyStatePanel, GhostButton, SectionHeader, SurfaceCard } from '$lib/components/ui/index.js';
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { type Asset } from '$lib/db';
+	import { type Asset } from '$lib/db/domain-types';
 	import { onMount } from 'svelte';
 	import { createAssetsStore } from '$modules/assets/stores/assets.svelte';
 	import EmptyStatePanel from '$lib/components/ui/EmptyStatePanel.svelte';

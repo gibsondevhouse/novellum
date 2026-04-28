@@ -9,7 +9,7 @@
 	import { SurfacePanel, SectionHeader, PrimaryButton, GhostButton, Input, PageHeader, EmptyStatePanel } from '$lib/components/ui/index.js';
 	import LibraryHeroCard from '$modules/project/components/LibraryHeroCard.svelte';
 	import LibraryHeroCardSkeleton from '$modules/project/components/LibraryHeroCardSkeleton.svelte';
-	import type { Project } from '$lib/db/types.js';
+	import type { Project } from '$lib/db/domain-types';
 
 	let showCreate = $state(false);
 	let newStoryTitle = $state('');

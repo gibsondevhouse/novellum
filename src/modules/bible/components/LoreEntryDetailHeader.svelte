@@ -1,6 +1,6 @@
 <script lang="ts">
 	import EntityDetailHeader from '$lib/components/ui/EntityDetailHeader.svelte';
-	import type { LoreEntry } from '$lib/db/types.js';
+	import type { LoreEntry } from '$lib/db/domain-types';
 
 	let {
 		entry,

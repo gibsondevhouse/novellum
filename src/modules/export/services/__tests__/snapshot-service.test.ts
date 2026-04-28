@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { db, resetDb } from '$lib/db/index.js';
+import { db, resetDb } from '$lib/legacy/dexie/db';
 import {
 	buildDexieSnapshot,
 	buildKeyValueSnapshot,

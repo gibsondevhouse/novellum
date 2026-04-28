@@ -1,5 +1,5 @@
 import { createRepository } from '$lib/factories/repository-factory.js';
-import type { Template } from '$lib/db/types.js';
+import type { Template } from '$lib/db/domain-types';
 
 const repo = createRepository<Template>({
 	endpoint: '/api/db/templates',

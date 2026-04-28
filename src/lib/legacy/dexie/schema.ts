@@ -1,3 +1,4 @@
+/** Legacy Dexie layer — frozen for V1. New code MUST NOT import from this module. */
 // Dexie store schema definitions
 // version 1 → auto-increment integers (deprecated)
 // version 2 → UUID string PKs, original table set from Path 1

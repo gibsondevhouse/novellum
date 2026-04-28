@@ -1,7 +1,7 @@
 <script lang="ts">
 	import EntityDetailHeader from '$lib/components/ui/EntityDetailHeader.svelte';
 	import EntityHeaderPhoto from '$lib/components/ui/EntityHeaderPhoto.svelte';
-	import type { Location } from '$lib/db/types.js';
+	import type { Location } from '$lib/db/domain-types';
 
 	let {
 		landmark,

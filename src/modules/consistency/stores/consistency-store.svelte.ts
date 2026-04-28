@@ -1,4 +1,4 @@
-import type { ConsistencyIssue } from '$lib/db/types.js';
+import type { ConsistencyIssue } from '$lib/db/domain-types';
 import { getIssuesByProjectId, updateIssueStatus } from '../services/consistency-repository.js';
 
 let issues: ConsistencyIssue[] = $state([]);

@@ -7,7 +7,7 @@
 	import Waypoints from '@lucide/svelte/icons/waypoints';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import type { Character, CharacterRelationship } from '$lib/db/types.js';
+	import type { Character, CharacterRelationship } from '$lib/db/domain-types';
 	import {
 		Button,
 		GhostButton,

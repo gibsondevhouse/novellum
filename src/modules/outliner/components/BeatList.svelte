@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { GhostButton } from '$lib/components/ui/index.js';
-	import type { Beat } from '$lib/db/types.js';
+	import type { Beat } from '$lib/db/domain-types';
 	import type { BeatFocus } from '../types.js';
 	import {
 		getBeatsBySceneId,

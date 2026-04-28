@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { GhostButton } from '$lib/components/ui/index.js';
-	import type { ArcRef } from '$lib/db/types.js';
+	import type { ArcRef } from '$lib/db/domain-types';
 
 	let { arcRefs, onAddRef } = $props<{
 		arcRefs?: ArcRef[];

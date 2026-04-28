@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { LoreEntry } from '$lib/db/types.js';
+	import type { LoreEntry } from '$lib/db/domain-types';
 	import { translator } from '$lib/i18n';
 	import TraditionDossierPane from '$modules/bible/components/TraditionDossierPane.svelte';
 	import WorldBuildingWorkspaceEmptyState from '$modules/bible/components/WorldBuildingWorkspaceEmptyState.svelte';

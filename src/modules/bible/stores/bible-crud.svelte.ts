@@ -5,7 +5,7 @@ import type {
 	LoreEntry,
 	PlotThread,
 	TimelineEvent,
-} from '$lib/db/types.js';
+} from '$lib/db/domain-types';
 import {
 	createEntityCrudStore,
 	createEntityCrudLiteStore,

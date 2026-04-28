@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { ChapterWithScenes } from '../../src/modules/outliner/types.js';
-import type { Act } from '../../src/lib/db/types.js';
+import type { Act } from '../../src/lib/db/domain-types';
 import { computeMetrics } from '../../src/modules/outliner/services/pacing-telemetry.js';
 
 type SceneFixture = { id: string };

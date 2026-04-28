@@ -1,5 +1,5 @@
 import { createRepository } from '$lib/factories/repository-factory.js';
-import type { Arc } from '$lib/db/types.js';
+import type { Arc } from '$lib/db/domain-types';
 
 const repo = createRepository<Arc>({
 	endpoint: '/api/db/arcs',

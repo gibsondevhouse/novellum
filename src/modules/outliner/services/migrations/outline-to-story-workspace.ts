@@ -1,4 +1,4 @@
-import { db } from '$lib/db/index.js';
+import { db } from '$lib/legacy/dexie/db';
 import { getOrCreateStoryFrame, createAct } from '../story-structure-service.js';
 
 /**

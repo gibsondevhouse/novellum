@@ -1,3 +1,4 @@
+/** Legacy Dexie layer — frozen for V1. New code MUST NOT import from this module. */
 import Dexie, { type Table } from 'dexie';
 import type {
 	Project,
@@ -19,7 +20,7 @@ import type {
 	ArcRef,
 	Asset,
 	Milestone,
-} from './types.js';
+} from '$lib/db/domain-types';
 import {
 	schemaV1,
 	schemaV2,

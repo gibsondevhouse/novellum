@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Chapter } from '$lib/db/types.js';
+	import type { Chapter } from '$lib/db/domain-types';
 	import { goto } from '$app/navigation';
 	import { Input, EmptyStatePanel, GhostButton, PrimaryButton, SectionHeader, SurfacePanel } from '$lib/components/ui/index.js';
 	import {
@@ -9,7 +9,7 @@
 		reorderChapters,
 		getChaptersByActId,
 	} from '../services/chapter-repository.js';
-	import type { Scene } from '$lib/db/types.js';
+	import type { Scene } from '$lib/db/domain-types';
 	import ChapterCard from './ChapterCard.svelte';
 
 	interface Props {

@@ -1,4 +1,4 @@
-import type { Location } from '$lib/db/types.js';
+import type { Location } from '$lib/db/domain-types';
 
 export const REALM_TYPE_OPTIONS = [
 	{ value: 'physical', label: 'Physical' },

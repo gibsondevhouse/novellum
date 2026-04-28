@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { db, resetDb } from '$lib/db/index.js';
+import { db, resetDb } from '$lib/legacy/dexie/db';
 import { buildBackupArchive } from '$modules/export/services/portability/zip-export.js';
 import { parseBackupArchive } from '$modules/export/services/portability/zip-import-parse.js';
 import { restoreBackupSnapshot } from '$modules/export/services/portability/restore-service.js';

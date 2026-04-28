@@ -1,4 +1,4 @@
-import { db } from '$lib/db/index.js';
+import { db } from '$lib/legacy/dexie/db';
 import { isKeyAllowed } from './kv-registry.js';
 
 /** All Dexie table names that should be included in a portability snapshot */

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { StoryFrame } from '$lib/db/types.js';
+	import type { StoryFrame } from '$lib/db/domain-types';
 	import { updateStoryFrame } from '$modules/outliner/services/story-structure-service.js';
 	import { SurfacePanel } from '$lib/components/ui/index.js';
 

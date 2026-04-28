@@ -1,4 +1,4 @@
-import type { ConsistencyIssue } from '$lib/db/types.js';
+import type { ConsistencyIssue } from '$lib/db/domain-types';
 import type { AiTask } from './types.js';
 import { buildContext } from './context-engine.js';
 import { buildPrompt } from './prompt-builder.js';

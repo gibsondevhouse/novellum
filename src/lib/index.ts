@@ -1,3 +1,3 @@
 // Shared library barrel
-export * from './db/index.js';
+export * from './db/domain-types';
 export * from './ai/index.js';

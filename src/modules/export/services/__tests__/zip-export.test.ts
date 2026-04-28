@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import JSZip from 'jszip';
-import { db, resetDb } from '$lib/db/index.js';
+import { db, resetDb } from '$lib/legacy/dexie/db';
 import { buildBackupArchive, createBackupFilename } from '../portability/zip-export.js';
 
 describe('zip-export', () => {

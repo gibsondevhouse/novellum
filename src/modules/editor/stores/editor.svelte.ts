@@ -1,4 +1,4 @@
-import type { Scene } from '$lib/db/types.js';
+import type { Scene } from '$lib/db/domain-types';
 
 class EditorStore {
 	activeProjectId: string | null = $state(null);

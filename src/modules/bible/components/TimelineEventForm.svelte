@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { TimelineEvent, Character } from '$lib/db/types.js';
+	import type { TimelineEvent, Character } from '$lib/db/domain-types';
 	import type { EntityFormCallbacks } from '../types.js';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';

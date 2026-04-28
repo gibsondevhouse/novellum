@@ -1,5 +1,5 @@
 import { createRepository } from '$lib/factories/repository-factory.js';
-import type { Beat } from '$lib/db/types.js';
+import type { Beat } from '$lib/db/domain-types';
 
 const repo = createRepository<Beat>({
 	endpoint: '/api/db/beats',

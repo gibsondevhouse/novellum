@@ -1,4 +1,4 @@
-import { db } from '$lib/db/db';
+import { db } from '$lib/legacy/dexie/db';
 
 // Legacy shape — superseded by AiContext in context-engine.ts
 interface LegacyAiContext {

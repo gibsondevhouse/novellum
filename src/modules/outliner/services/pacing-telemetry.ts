@@ -1,4 +1,4 @@
-import type { Act } from '$lib/db/types.js';
+import type { Act } from '$lib/db/domain-types';
 import type { ChapterWithScenes } from '../types.js';
 
 export interface PacingMetrics {

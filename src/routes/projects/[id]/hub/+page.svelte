@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Project, WritingStyle } from '$lib/db/types.js';
+	import type { Project, WritingStyle } from '$lib/db/domain-types';
 	import {
 		ProjectHubHero,
 		StructuralMetricsCarousel,

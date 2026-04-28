@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { Character, CharacterRelationship } from '$lib/db/types';
+	import type { Character, CharacterRelationship } from '$lib/db/domain-types';
 	import { translator } from '$lib/i18n';
 	import { DestructiveButton } from '$lib/components/ui/index.js';
 	import { getProjectMetadata, setProjectMetadata } from '$lib/project-metadata.js';

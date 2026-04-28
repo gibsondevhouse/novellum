@@ -1,5 +1,5 @@
 import { createRepository } from '$lib/factories/repository-factory.js';
-import type { Location } from '$lib/db/types.js';
+import type { Location } from '$lib/db/domain-types';
 
 const repo = createRepository<Location>({
 	endpoint: '/api/db/locations',

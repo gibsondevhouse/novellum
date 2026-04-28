@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Project } from '$lib/db/types.js';
+	import type { Project } from '$lib/db/domain-types';
 
 	type LibraryCardDestination = 'reader' | 'outline' | 'hub';
 

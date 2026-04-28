@@ -4,7 +4,7 @@
 	import type { AIRequestPayload } from '$lib/ai/types.js';
 	import SurfaceCard from '$lib/components/ui/SurfaceCard.svelte';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
-	import type { Project } from '$lib/db/types.js';
+	import type { Project } from '$lib/db/domain-types';
 	import { apiGet } from '$lib/api-client.js';
 	import { getSelectedModel } from '$lib/stores/model-selection.svelte.js';
 	import { isExplicitlyUnsupportedBinaryAttachment, isSupportedTextAttachment, NOVA_MAX_FILE_TEXT_CHARS } from '$lib/ai/context-files.js';

@@ -1,5 +1,5 @@
 import { apiGet, apiPost, apiDel } from '$lib/api-client.js';
-import type { SceneSnapshot } from '$lib/db/types.js';
+import type { SceneSnapshot } from '$lib/db/domain-types';
 
 const MAX_SNAPSHOTS = 20;
 

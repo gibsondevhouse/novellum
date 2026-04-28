@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { TimelineEvent, Character } from '$lib/db/types.js';
+	import type { TimelineEvent, Character } from '$lib/db/domain-types';
 	import { translator } from '$lib/i18n';
 	import { DestructiveButton, GhostButton } from '$lib/components/ui/index.js';
 	import ChronicleSystemForm from '$modules/bible/components/ChronicleSystemForm.svelte';

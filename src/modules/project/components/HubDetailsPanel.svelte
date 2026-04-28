@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { tick } from 'svelte';
-	import type { Project, WritingStyle } from '$lib/db/types.js';
+	import type { Project, WritingStyle } from '$lib/db/domain-types';
 	import {
 		SurfacePanel,
 		SectionHeader,

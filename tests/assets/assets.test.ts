@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { db, resetDb } from '$lib/db';
+import { db, resetDb } from '$lib/legacy/dexie/db';
 import { createAssetsStore } from '$modules/assets/stores/assets.svelte';
 
 describe('Assets Store', () => {

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 
-vi.mock('../../src/lib/db/index.js', () => ({
+vi.mock('../../src/lib/legacy/dexie/db', () => ({
 	db: {
 		story_frames: {
 			where: vi.fn(() => ({ equals: vi.fn(() => ({ first: vi.fn().mockResolvedValue(null) })) })),
@@ -33,13 +33,13 @@ describe('outline-to-story-workspace migration', async () => {
 
 	it('creates a story frame for a project with none', async () => {
 		await migrateOutlineToStoryWorkspace('p1');
-		const { db } = await import('../../src/lib/db/index.js');
+		const { db } = await import('../../src/lib/legacy/dexie/db');
 		expect(db.story_frames.add).toHaveBeenCalled();
 	});
 
 	it('creates a default Act I and assigns chapters when no acts exist', async () => {
 		await migrateOutlineToStoryWorkspace('p1');
-		const { db } = await import('../../src/lib/db/index.js');
+		const { db } = await import('../../src/lib/legacy/dexie/db');
 		expect(db.acts.add).toHaveBeenCalled();
 		expect(db.chapters.update).toHaveBeenCalledWith(
 			'ch-1',
@@ -48,7 +48,7 @@ describe('outline-to-story-workspace migration', async () => {
 	});
 
 	it('is idempotent: does not create duplicate acts', async () => {
-		const { db } = await import('../../src/lib/db/index.js');
+		const { db } = await import('../../src/lib/legacy/dexie/db');
 		// Override to return 1 existing act
 		(db.acts.where as ReturnType<typeof vi.fn>).mockReturnValue({
 			equals: vi.fn(() => ({ count: vi.fn().mockResolvedValue(1) })),

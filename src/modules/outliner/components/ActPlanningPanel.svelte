@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { Act } from '$lib/db/types.js';
+	import type { Act } from '$lib/db/domain-types';
 	import { SurfacePanel, GhostButton } from '$lib/components/ui/index.js';
 
 	let { act, onUpdate, onDelete } = $props<{

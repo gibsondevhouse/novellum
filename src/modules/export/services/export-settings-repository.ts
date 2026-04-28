@@ -1,5 +1,5 @@
 import { apiGet, apiPost, apiPut } from '$lib/api-client.js';
-import type { ExportSettings } from '$lib/db/types.js';
+import type { ExportSettings } from '$lib/db/domain-types';
 import { DEFAULT_EXPORT_SETTINGS } from '../constants.js';
 
 export async function getExportSettings(projectId: string): Promise<ExportSettings> {

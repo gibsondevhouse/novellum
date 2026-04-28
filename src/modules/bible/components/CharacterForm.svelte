@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { Character } from '$lib/db/types.js';
+	import type { Character } from '$lib/db/domain-types';
 	import type { EntityFormCallbacks } from '../types.js';
 	import {
 		GhostButton,

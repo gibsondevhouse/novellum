@@ -1,6 +1,6 @@
 import { createRepository } from '$lib/factories/repository-factory.js';
 import { apiGet } from '$lib/api-client.js';
-import type { LoreEntry } from '$lib/db/types.js';
+import type { LoreEntry } from '$lib/db/domain-types';
 
 const repo = createRepository<LoreEntry>({
 	endpoint: '/api/db/lore_entries',

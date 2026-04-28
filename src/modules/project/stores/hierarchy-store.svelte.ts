@@ -9,7 +9,7 @@
  * @see plan-013-workspace-hierarchy-flow / stage-001-hierarchy-data-services
  */
 import { SvelteMap } from 'svelte/reactivity';
-import type { Act, Arc, Chapter, Scene } from '$lib/db/types.js';
+import type { Act, Arc, Chapter, Scene } from '$lib/db/domain-types';
 
 interface ProjectSelection {
 	arcId: string | null | undefined;

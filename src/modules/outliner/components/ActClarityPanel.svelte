@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
-	import type { Act, Arc } from '$lib/db/types.js';
+	import type { Act, Arc } from '$lib/db/domain-types';
 	import type { ChapterWithScenes } from '$modules/outliner/types.js';
 	import { WorkspaceInspector, GhostButton } from '$lib/components/ui/index.js';
 

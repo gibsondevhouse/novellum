@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { ChapterWithScenes } from '$modules/outliner/types.js';
-	import type { Chapter, Scene } from '$lib/db/types.js';
+	import type { Chapter, Scene } from '$lib/db/domain-types';
 	import { updateChapter } from '$modules/project/services/chapter-repository.js';
 	import { updateScene } from '$modules/editor/services/scene-repository.js';
 	import {

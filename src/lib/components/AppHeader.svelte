@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import type { Chapter, Scene } from '$lib/db/types.js';
+	import type { Chapter, Scene } from '$lib/db/domain-types';
 	import { getChaptersByProjectId } from '$modules/project/services/chapter-repository.js';
 	import { getScenesByProjectId } from '$modules/editor/services/scene-repository.js';
 	import ModelSelector from './ModelSelector.svelte';

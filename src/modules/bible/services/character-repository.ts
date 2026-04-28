@@ -1,6 +1,6 @@
 import { createRepository } from '$lib/factories/repository-factory.js';
 import { apiGet, apiPost, apiPut, apiDel } from '$lib/api-client.js';
-import type { Character, CharacterRelationship } from '$lib/db/types.js';
+import type { Character, CharacterRelationship } from '$lib/db/domain-types';
 
 const repo = createRepository<Character>({
 	endpoint: '/api/db/characters',

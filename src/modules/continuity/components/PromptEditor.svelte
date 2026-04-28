@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Project } from '$lib/db/types';
+	import type { Project } from '$lib/db/domain-types';
 	import { apiPut } from '$lib/api-client';
 	import SurfaceCard from '$lib/components/ui/SurfaceCard.svelte';
 	import { PrimaryButton } from '$lib/components/ui/index.js';

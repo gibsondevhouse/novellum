@@ -1,5 +1,5 @@
-import { db } from '$lib/db/index.js';
-import type { StoryFrame, Act, Milestone } from '$lib/db/types.js';
+import { db } from '$lib/legacy/dexie/db';
+import type { StoryFrame, Act, Milestone } from '$lib/db/domain-types';
 
 export async function getOrCreateStoryFrame(projectId: string): Promise<StoryFrame> {
 	const existing = await db.story_frames.where('projectId').equals(projectId).first();

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { PlotThread } from '$lib/db/types.js';
+	import type { PlotThread } from '$lib/db/domain-types';
 	import { translator } from '$lib/i18n';
 	import { DestructiveButton, GhostButton } from '$lib/components/ui/index.js';
 	import ThreadSystemForm from '$modules/bible/components/ThreadSystemForm.svelte';

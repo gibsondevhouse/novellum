@@ -6,7 +6,7 @@ import {
 	updateProject,
 	removeProject,
 } from '../services/project-repository.js';
-import type { Project } from '$lib/db/types.js';
+import type { Project } from '$lib/db/domain-types';
 
 // --- List state ---
 let projects: Project[] = $state([]);

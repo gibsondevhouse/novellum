@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Act } from '$lib/db/types.js';
+	import type { Act } from '$lib/db/domain-types';
 	import { Input, PrimaryButton, GhostButton, SurfacePanel } from '$lib/components/ui/index.js';
 
 	interface Props {

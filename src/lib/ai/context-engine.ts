@@ -1,5 +1,5 @@
-import { db } from '$lib/db/index.js';
-import type { Character, Location, Scene } from '$lib/db/types.js';
+import { db } from '$lib/legacy/dexie/db';
+import type { Character, Location, Scene } from '$lib/db/domain-types';
 import type { AiContext, AiTask, ContextPolicy } from './types.js';
 import {
 	MAX_CHARACTERS,

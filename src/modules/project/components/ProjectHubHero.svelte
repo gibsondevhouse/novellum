@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import type { Project } from '$lib/db/types.js';
+	import type { Project } from '$lib/db/domain-types';
 	import { GhostButton } from '$lib/components/ui/index.js';
 	import ProjectHeroCover from './ProjectHeroCover.svelte';
 	import ProjectHeroContent from './ProjectHeroContent.svelte';

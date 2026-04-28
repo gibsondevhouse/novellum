@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import type { Act, Arc, Chapter, Scene } from '$lib/db/types.js';
+import type { Act, Arc, Chapter, Scene } from '$lib/db/domain-types';
 import {
 	selectArc,
 	selectAct,

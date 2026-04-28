@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Character, CharacterRelationship } from '$lib/db/types.js';
+	import type { Character, CharacterRelationship } from '$lib/db/domain-types';
 	import CharacterForm from '$modules/bible/components/CharacterForm.svelte';
 	import RelationshipEditor from '$modules/bible/components/RelationshipEditor.svelte';
 	import {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ConsistencyIssue } from '$lib/db/types.js';
+	import type { ConsistencyIssue } from '$lib/db/domain-types';
 	import IssueRow from './IssueRow.svelte';
 
 	let {

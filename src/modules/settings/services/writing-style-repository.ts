@@ -1,5 +1,5 @@
 import { createRepository } from '$lib/factories/repository-factory.js';
-import type { WritingStyle } from '$lib/db/types.js';
+import type { WritingStyle } from '$lib/db/domain-types';
 
 const repo = createRepository<WritingStyle>({
 	endpoint: '/api/db/writing_styles',

@@ -11,7 +11,7 @@ import type {
 	SystemPrompt,
 	ChatInstruction,
 	WritingStyle
-} from '$lib/db/types.js';
+} from '$lib/db/domain-types';
 
 export type ContextPolicy =
 	| 'scene_only'

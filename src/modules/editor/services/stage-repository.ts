@@ -1,5 +1,5 @@
 import { createRepository } from '$lib/factories/repository-factory.js';
-import type { Stage } from '$lib/db/types.js';
+import type { Stage } from '$lib/db/domain-types';
 
 const repo = createRepository<Stage>({
 	endpoint: '/api/db/stages',

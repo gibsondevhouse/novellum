@@ -1,7 +1,7 @@
 import type { PageLoad } from './$types';
 import { getScenesByProjectId } from '$modules/editor/services/scene-repository.js';
 import { apiGet } from '$lib/api-client.js';
-import type { WritingStyle } from '$lib/db/types.js';
+import type { WritingStyle } from '$lib/db/domain-types';
 
 export const load: PageLoad = async ({ parent }) => {
 	const { project } = await parent();

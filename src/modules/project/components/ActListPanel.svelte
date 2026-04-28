@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Act } from '$lib/db/types.js';
+	import type { Act } from '$lib/db/domain-types';
 	import { goto } from '$app/navigation';
 	import { EmptyStatePanel, GhostButton, SectionHeader } from '$lib/components/ui/index.js';
 	import {
@@ -10,7 +10,7 @@
 		getActsByProjectId,
 	} from '../services/act-repository.js';
 	import { selectChaptersForAct } from '../stores/hierarchy-store.svelte.js';
-	import type { Chapter } from '$lib/db/types.js';
+	import type { Chapter } from '$lib/db/domain-types';
 	import ActCard from './ActCard.svelte';
 	import ActCreateForm from './ActCreateForm.svelte';
 

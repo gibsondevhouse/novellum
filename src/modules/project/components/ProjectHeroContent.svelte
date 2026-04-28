@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { tick } from 'svelte';
-	import type { Project } from '$lib/db/types.js';
+	import type { Project } from '$lib/db/domain-types';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	import { submitUpdate } from '../stores/project-hub.svelte.ts';
 

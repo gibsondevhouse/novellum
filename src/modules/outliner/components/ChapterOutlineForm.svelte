@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Chapter } from '$lib/db/types.js';
+	import type { Chapter } from '$lib/db/domain-types';
 	import { untrack } from 'svelte';
 	import { updateChapter } from '$modules/project/services/chapter-repository.js';
 	import StructuredSection from '$lib/components/planning/StructuredSection.svelte';

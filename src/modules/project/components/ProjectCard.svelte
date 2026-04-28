@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Project } from '$lib/db/types.js';
+	import type { Project } from '$lib/db/domain-types';
 	import { selectProject } from '../stores/project-hub.svelte.ts';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	import { SurfaceCard } from '$lib/components/ui/index.js';

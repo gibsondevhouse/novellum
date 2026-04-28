@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { PlotThread, Scene } from '$lib/db/types.js';
+	import type { PlotThread, Scene } from '$lib/db/domain-types';
 	import type { EntityFormCallbacks } from '../types.js';
 	import { PLOT_THREAD_STATUS_OPTIONS } from '../constants.js';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';

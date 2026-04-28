@@ -1,4 +1,4 @@
-import { db } from '$lib/db/index.js';
+import { db } from '$lib/legacy/dexie/db';
 import type { ParsedArchive } from './zip-import-parse.js';
 
 /** All table names that participate in portability restore */

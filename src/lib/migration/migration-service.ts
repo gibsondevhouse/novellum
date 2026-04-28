@@ -1,4 +1,4 @@
-import { db } from '$lib/db/index.js';
+import { db } from '$lib/legacy/dexie/db';
 import { apiGet, apiPost } from '$lib/api-client.js';
 import type { Table } from 'dexie';
 import type {

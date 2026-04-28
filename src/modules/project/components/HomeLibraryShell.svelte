@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Project } from '$lib/db/types.js';
+	import type { Project } from '$lib/db/domain-types';
 	import CollectionRow from './CollectionRow.svelte';
 	import BookCoverCard from './BookCoverCard.svelte';
 	import LibraryHeroCardSkeleton from './LibraryHeroCardSkeleton.svelte';

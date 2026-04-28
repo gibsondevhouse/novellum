@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { Location } from '$lib/db/types.js';
+	import type { Location } from '$lib/db/domain-types';
 	import { translator } from '$lib/i18n';
 	import { getProjectMetadata, setProjectMetadata } from '$lib/project-metadata.js';
 	import RealmDossierPane from '$modules/bible/components/RealmDossierPane.svelte';

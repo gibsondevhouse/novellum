@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Act, Chapter, Scene } from '$lib/db/types.js';
+	import type { Act, Chapter, Scene } from '$lib/db/domain-types';
 	import type { ChapterWithScenes } from '$modules/outliner/types.js';
 	import { GhostButton } from '$lib/components/ui/index.js';
 	import ChapterGroup from './ChapterGroup.svelte';

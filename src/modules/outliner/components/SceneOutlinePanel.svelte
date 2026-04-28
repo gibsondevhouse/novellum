@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Scene } from '$lib/db/types.js';
+	import type { Scene } from '$lib/db/domain-types';
 	import type { BeatFocus } from '../types.js';
 	import BeatList from './BeatList.svelte';
 	import { SurfacePanel } from '$lib/components/ui/index.js';

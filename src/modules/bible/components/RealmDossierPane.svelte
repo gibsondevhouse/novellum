@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Location } from '$lib/db/types.js';
+	import type { Location } from '$lib/db/domain-types';
 	import { DestructiveButton, GhostButton } from '$lib/components/ui/index.js';
 	import RealmDetailHeader from './RealmDetailHeader.svelte';
 	import RealmForm from './RealmForm.svelte';

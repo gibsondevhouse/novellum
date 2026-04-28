@@ -1,5 +1,5 @@
 import { createRepository } from '$lib/factories/repository-factory.js';
-import type { Act } from '$lib/db/types.js';
+import type { Act } from '$lib/db/domain-types';
 
 const repo = createRepository<Act>({
 	endpoint: '/api/db/acts',

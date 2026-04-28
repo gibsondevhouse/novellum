@@ -1,5 +1,5 @@
 import { createRepository } from '$lib/factories/repository-factory.js';
-import type { ChatInstruction } from '$lib/db/types.js';
+import type { ChatInstruction } from '$lib/db/domain-types';
 
 const repo = createRepository<ChatInstruction>({
 	endpoint: '/api/db/chat_instructions',

@@ -3,7 +3,7 @@
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import X from '@lucide/svelte/icons/x';
 	import { untrack } from 'svelte';
-	import type { Scene } from '$lib/db/types.js';
+	import type { Scene } from '$lib/db/domain-types';
 	import { GhostButton } from '$lib/components/ui/index.js';
 
 	let { scene, onDelete, onRename, onSelect, isSelected, onDragStart } = $props<{

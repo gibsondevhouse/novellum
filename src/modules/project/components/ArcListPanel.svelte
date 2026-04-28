@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Arc, Act } from '$lib/db/types.js';
+	import type { Arc, Act } from '$lib/db/domain-types';
 	import { goto } from '$app/navigation';
 	import { EmptyStatePanel, GhostButton, SectionHeader } from '$lib/components/ui/index.js';
 	import {

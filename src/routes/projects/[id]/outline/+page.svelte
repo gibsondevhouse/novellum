@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { Chapter, Scene, StoryFrame, Act, Arc, Character } from '$lib/db/types.js';
+	import type { Chapter, Scene, StoryFrame, Act, Arc, Character } from '$lib/db/domain-types';
 	import type { ChapterWithScenes } from '$modules/outliner/types.js';
 	import { WorkspaceShell, WorkspaceHero } from '$lib/components/ui/index.js';
 	import HierarchyNavigator from '$modules/outliner/components/HierarchyNavigator.svelte';

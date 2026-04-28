@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { LoreEntry } from '$lib/db/types.js';
+	import type { LoreEntry } from '$lib/db/domain-types';
 	import { DestructiveButton, GhostButton } from '$lib/components/ui/index.js';
 	import LoreEntryDetailHeader from './LoreEntryDetailHeader.svelte';
 	import TraditionEntryForm from './TraditionEntryForm.svelte';

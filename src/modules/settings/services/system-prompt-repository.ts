@@ -1,5 +1,5 @@
 import { createRepository } from '$lib/factories/repository-factory.js';
-import type { SystemPrompt } from '$lib/db/types.js';
+import type { SystemPrompt } from '$lib/db/domain-types';
 
 const repo = createRepository<SystemPrompt>({
 	endpoint: '/api/db/system_prompts',

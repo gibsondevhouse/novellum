@@ -1,4 +1,4 @@
-import type { PlotThread } from '$lib/db/types.js';
+import type { PlotThread } from '$lib/db/domain-types';
 
 export type ThreadSystemKind = 'major-arc' | 'sub-plot' | 'motivation';
 

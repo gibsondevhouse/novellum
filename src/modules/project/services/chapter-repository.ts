@@ -1,5 +1,5 @@
 import { createRepository } from '$lib/factories/repository-factory.js';
-import type { Chapter } from '$lib/db/types.js';
+import type { Chapter } from '$lib/db/domain-types';
 
 const repo = createRepository<Chapter>({
 	endpoint: '/api/db/chapters',

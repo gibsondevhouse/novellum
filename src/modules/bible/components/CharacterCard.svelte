@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Character } from '$lib/db/types.js';
+	import type { Character } from '$lib/db/domain-types';
 	import { GhostButton, DestructiveButton, SurfaceCard } from '$lib/components/ui/index.js';
 
 	let { character, onEdit, onDelete } = $props<{

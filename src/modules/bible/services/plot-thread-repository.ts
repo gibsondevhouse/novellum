@@ -1,5 +1,5 @@
 import { createRepository } from '$lib/factories/repository-factory.js';
-import type { PlotThread } from '$lib/db/types.js';
+import type { PlotThread } from '$lib/db/domain-types';
 
 const repo = createRepository<PlotThread>({
 	endpoint: '/api/db/plot_threads',

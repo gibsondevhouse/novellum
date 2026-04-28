@@ -1,5 +1,5 @@
 // Outliner module public types
-import type { Chapter, Scene } from '$lib/db/types.js';
+import type { Chapter, Scene } from '$lib/db/domain-types';
 
 export type OutlineNodeId = number;
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Chapter, Scene } from '$lib/db/types.js';
+	import type { Chapter, Scene } from '$lib/db/domain-types';
 	import type { BeatFocus, OutlineSelection } from '../types.js';
 	import PlanningSurfaceCard from '$lib/components/planning/PlanningSurfaceCard.svelte';
 	import PlanningSurfaceHeader from '$lib/components/planning/PlanningSurfaceHeader.svelte';

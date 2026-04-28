@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Chapter } from '$lib/db/types.js';
+	import type { Chapter } from '$lib/db/domain-types';
 	import type { BeatFocus } from '../types.js';
 	import {
 		getProjectMetadata,

@@ -1,5 +1,5 @@
 import { createRepository } from '$lib/factories/repository-factory.js';
-import type { Scene } from '$lib/db/types.js';
+import type { Scene } from '$lib/db/domain-types';
 
 const repo = createRepository<Scene>({
 	endpoint: '/api/db/scenes',

@@ -1,6 +1,6 @@
 import { createRepository } from '$lib/factories/repository-factory.js';
 import { apiGet, apiPut } from '$lib/api-client.js';
-import type { ConsistencyIssue } from '$lib/db/types.js';
+import type { ConsistencyIssue } from '$lib/db/domain-types';
 
 const repo = createRepository<ConsistencyIssue>({
 	endpoint: '/api/db/consistency_issues',

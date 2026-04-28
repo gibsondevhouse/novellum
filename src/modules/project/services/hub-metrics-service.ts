@@ -1,4 +1,4 @@
-import { db } from '$lib/db/index.js';
+import { db } from '$lib/legacy/dexie/db';
 import type { ProjectMetrics } from '../types.js';
 
 export async function getProjectMetrics(projectId: string): Promise<ProjectMetrics> {
