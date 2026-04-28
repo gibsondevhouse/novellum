@@ -3,6 +3,7 @@
 	import type { Character, CharacterRelationship } from '$lib/db/types';
 	import { translator } from '$lib/i18n';
 	import { DestructiveButton } from '$lib/components/ui/index.js';
+	import { getProjectMetadata, setProjectMetadata } from '$lib/project-metadata.js';
 	import { createAssetsStore } from '$modules/assets/stores/assets.svelte';
 	import {
 		createCharacter,
@@ -294,7 +295,51 @@
 				photoUrl: persistedPhoto,
 			};
 		}
+
+		// Reconcile with SQLite-canonical character-photos blob.
+		const pid = data.projectId;
+		if (!pid) return;
+		void getProjectMetadata<Record<string, string> | null>(
+			pid,
+			'project',
+			pid,
+			'character-photos',
+			null,
+		).then((remote) => {
+			if (!remote || pid !== data.projectId) return;
+			for (const [characterId, photoUrl] of Object.entries(remote)) {
+				const current = characterRecords[characterId];
+				if (!current) continue;
+				if (current.photoUrl === photoUrl) continue;
+				characterRecords[characterId] = { ...current, photoUrl };
+				try {
+					window.localStorage.setItem(`${PHOTO_STORAGE_KEY_PREFIX}:${pid}:${characterId}`, photoUrl);
+				} catch {
+					/* ignore */
+				}
+			}
+		});
 	});
+
+	function collectCharacterPhotos(): Record<string, string> {
+		const out: Record<string, string> = {};
+		for (const [id, record] of Object.entries(characterRecords)) {
+			if (record?.photoUrl) out[id] = record.photoUrl;
+		}
+		return out;
+	}
+
+	function persistCharacterPhotos(): void {
+		const pid = data.projectId;
+		if (!pid) return;
+		void setProjectMetadata<Record<string, string>>(
+			pid,
+			'project',
+			pid,
+			'character-photos',
+			collectCharacterPhotos(),
+		);
+	}
 
 	function selectCharacter(id: string) {
 		selectedCharacterId = id;
@@ -386,6 +431,7 @@
 			} else {
 				window.localStorage.removeItem(key);
 			}
+			persistCharacterPhotos();
 		}
 
 		void runWithPersistenceFeedback(
@@ -595,6 +641,7 @@
 			const photoStorageKey = `${PHOTO_STORAGE_KEY_PREFIX}:${data.projectId}:${characterId}`;
 			window.localStorage.removeItem(photoStorageKey);
 		}
+		persistCharacterPhotos();
 
 		const remainingIds = Object.keys(nextRecords).sort((a, b) => {
 			const aName = nextRecords[a]?.name || '';

@@ -2,6 +2,7 @@
 	import { untrack } from 'svelte';
 	import type { Location } from '$lib/db/types.js';
 	import { translator } from '$lib/i18n';
+	import { getProjectMetadata, setProjectMetadata } from '$lib/project-metadata.js';
 	import RealmDossierPane from '$modules/bible/components/RealmDossierPane.svelte';
 	import RealmEmptyState from '$modules/bible/components/RealmEmptyState.svelte';
 	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
@@ -72,7 +73,39 @@
 		}
 
 		realmPhotoUrls = next;
+
+		const pid = data.projectId;
+		if (!pid) return;
+		void getProjectMetadata<Record<string, string> | null>(
+			pid,
+			'project',
+			pid,
+			'realm-photos',
+			null,
+		).then((remote) => {
+			if (!remote || pid !== data.projectId) return;
+			realmPhotoUrls = { ...realmPhotoUrls, ...remote };
+			for (const [id, url] of Object.entries(remote)) {
+				try {
+					window.localStorage.setItem(`${REALM_PHOTO_STORAGE_KEY_PREFIX}:${pid}:${id}`, url);
+				} catch {
+					/* ignore */
+				}
+			}
+		});
 	});
+
+	function persistRealmPhotos(): void {
+		const pid = data.projectId;
+		if (!pid) return;
+		void setProjectMetadata<Record<string, string>>(
+			pid,
+			'project',
+			pid,
+			'realm-photos',
+			realmPhotoUrls,
+		);
+	}
 
 	function selectLocation(id: string) {
 		confirmDeleteId = null;
@@ -117,6 +150,7 @@
 
 		const key = `${REALM_PHOTO_STORAGE_KEY_PREFIX}:${data.projectId}:${selectedLocation.id}`;
 		window.localStorage.setItem(key, photoData);
+		persistRealmPhotos();
 	}
 
 	async function handleUpdate(

@@ -2,6 +2,7 @@
 	import { untrack } from 'svelte';
 	import type { Location } from '$lib/db/types.js';
 	import { translator } from '$lib/i18n';
+	import { getProjectMetadata, setProjectMetadata } from '$lib/project-metadata.js';
 	import LandmarkDossierPane from '$modules/bible/components/LandmarkDossierPane.svelte';
 	import LandmarkEmptyState from '$modules/bible/components/LandmarkEmptyState.svelte';
 	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
@@ -99,7 +100,39 @@
 		}
 
 		landmarkPhotoUrls = next;
+
+		const pid = data.projectId;
+		if (!pid) return;
+		void getProjectMetadata<Record<string, string> | null>(
+			pid,
+			'project',
+			pid,
+			'landmark-photos',
+			null,
+		).then((remote) => {
+			if (!remote || pid !== data.projectId) return;
+			landmarkPhotoUrls = { ...landmarkPhotoUrls, ...remote };
+			for (const [id, url] of Object.entries(remote)) {
+				try {
+					window.localStorage.setItem(`${LANDMARK_PHOTO_STORAGE_KEY_PREFIX}:${pid}:${id}`, url);
+				} catch {
+					/* ignore */
+				}
+			}
+		});
 	});
+
+	function persistLandmarkPhotos(): void {
+		const pid = data.projectId;
+		if (!pid) return;
+		void setProjectMetadata<Record<string, string>>(
+			pid,
+			'project',
+			pid,
+			'landmark-photos',
+			landmarkPhotoUrls,
+		);
+	}
 
 	function selectLandmark(id: string) {
 		deleteConfirmLandmarkId = null;
@@ -145,6 +178,7 @@
 
 		const key = `${LANDMARK_PHOTO_STORAGE_KEY_PREFIX}:${data.projectId}:${selectedLandmark.id}`;
 		window.localStorage.setItem(key, photoData);
+		persistLandmarkPhotos();
 	}
 
 	async function updateLandmark(
@@ -164,6 +198,7 @@
 		const nextPhotos = { ...landmarkPhotoUrls };
 		delete nextPhotos[id];
 		landmarkPhotoUrls = nextPhotos;
+		persistLandmarkPhotos();
 		selectedLandmarkId = null;
 	}
 
