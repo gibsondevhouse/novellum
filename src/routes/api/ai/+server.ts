@@ -4,7 +4,7 @@ import type { RequestHandler } from './$types';
 import { resolveTask, buildContext, buildPrompt, selectModel } from '$lib/ai/index.js';
 import type { UiContext } from '$lib/ai/types.js';
 import { db } from '$lib/server/db/index.js';
-import type { ChatInstruction, SystemPrompt, WritingStyle } from '$lib/db/types.js';
+import type { ChatInstruction, SystemPrompt, WritingStyle } from '$lib/db/domain-types.js';
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 

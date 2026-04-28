@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { Act, Arc, Chapter, Character, Scene, Beat } from '$lib/db/types.js';
+	import type { Act, Arc, Chapter, Character, Scene, Beat } from '$lib/db/domain-types.js';
 	import {
 		updateBeat,
 		removeBeat,
