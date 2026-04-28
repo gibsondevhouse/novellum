@@ -1,8 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { preCheck, migrate } from '$lib/migration/index.js';
-	import type { PreCheckResult, MigrationError } from '$lib/migration/index.js';
+	import {
+		preCheck,
+		migrate,
+		isMigrationComplete,
+		MIGRATION_COMPLETE_KEY,
+	} from '$lib/migration/index.js';
+	import type { MigrationError, MigrationResult, PreCheckResult } from '$lib/migration/index.js';
+	import { getPreference } from '$lib/preferences.js';
 	import { PrimaryButton, SecondaryButton, PageHeader } from '$lib/components/ui/index.js';
+	import { buildEvidenceLog, evidenceLogFilename } from './evidence-log.js';
 
 	type TableStatus = 'pending' | 'migrating' | 'done' | 'error';
 
@@ -15,7 +22,15 @@
 		status: TableStatus;
 	}
 
-	let phase: 'loading' | 'precheck' | 'migrating' | 'complete' | 'error' = $state('loading');
+	type Phase =
+		| 'loading'
+		| 'precheck'
+		| 'migrating'
+		| 'complete'
+		| 'already-complete'
+		| 'error';
+
+	let phase = $state<Phase>('loading');
 	let tables: TableState[] = $state([]);
 	let totalMigrated = $state(0);
 	let totalErrors = $state(0);
@@ -24,9 +39,21 @@
 	let hasDexieData = $derived(tables.some((t) => t.dexieCount > 0));
 	let confirmed = $state(false);
 	let showErrors = $state(false);
+	let completedAt = $state<string | null>(null);
+	let lastResult = $state<MigrationResult | null>(null);
+	let progressMessage = $derived(
+		phase === 'migrating'
+			? `Migrating ${tables.filter((t) => t.status === 'done').length} of ${tables.length} tables`
+			: '',
+	);
 
 	onMount(async () => {
 		try {
+			if (await isMigrationComplete()) {
+				completedAt = await getPreference<string | null>(MIGRATION_COMPLETE_KEY, null);
+				phase = 'already-complete';
+				return;
+			}
 			const results: PreCheckResult[] = await preCheck();
 			tables = results.map((r) => ({
 				table: r.table,
@@ -67,7 +94,27 @@
 
 		totalMigrated = result.rowsMigrated;
 		totalErrors = result.errors.length;
+		lastResult = result;
+		completedAt = new Date().toISOString();
 		phase = 'complete';
+	}
+
+	function downloadEvidenceLog() {
+		const log = buildEvidenceLog({
+			tables,
+			errors: migrationErrors,
+			result: lastResult,
+			completedAt,
+		});
+		const blob = new Blob([JSON.stringify(log, null, 2)], { type: 'application/json' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = evidenceLogFilename(log.generatedAt);
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
 	}
 </script>
 
@@ -95,6 +142,14 @@
 		<p class="status-msg">Checking databases…</p>
 	{:else if phase === 'error'}
 		<p class="status-msg error">Failed to check databases. Make sure the server is running.</p>
+	{:else if phase === 'already-complete'}
+		<div class="already-banner" role="status">
+			<strong>Migration already complete.</strong>
+			{#if completedAt}
+				Finished on <time datetime={completedAt}>{new Date(completedAt).toLocaleString()}</time>.
+			{/if}
+		</div>
+		<PrimaryButton href="/projects">Go to Projects</PrimaryButton>
 	{:else if phase === 'precheck'}
 		{#if hasConflict}
 			<div class="warning-banner" role="alert">
@@ -139,6 +194,7 @@
 			</PrimaryButton>
 		{/if}
 	{:else if phase === 'migrating' || phase === 'complete'}
+		<div class="sr-only" aria-live="polite" aria-atomic="true">{progressMessage}</div>
 		<table class="data-table">
 			<thead>
 				<tr>
@@ -188,6 +244,7 @@
 					{/if}
 				{/if}
 
+				<SecondaryButton onclick={downloadEvidenceLog}>Download evidence log</SecondaryButton>
 				<PrimaryButton href="/projects">Go to Projects</PrimaryButton>
 			</div>
 		{:else}
@@ -257,6 +314,27 @@
 		padding: var(--space-3) var(--space-4);
 		margin-bottom: var(--space-4);
 		font-size: var(--text-sm);
+	}
+
+	.already-banner {
+		background: color-mix(in srgb, var(--color-success) 10%, transparent);
+		border: 1px solid var(--color-success);
+		border-radius: var(--radius-md);
+		padding: var(--space-3) var(--space-4);
+		font-size: var(--text-sm);
+		color: var(--color-text-primary);
+	}
+
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
 	}
 
 	.data-table {
