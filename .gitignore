@@ -60,5 +60,5 @@ coverage/
 # Local-only docs (the dev-docs/ tree is developer-private and not tracked)
 dev-docs/
 
-# Local-only GitHub overrides (workflows and customizations under .github/ are checked in)
-.github/local/
+# Local-only GitHub overrides (the .github/ tree is developer-private and not tracked)
+.github/
