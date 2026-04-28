@@ -2,49 +2,103 @@
 	import { onMount } from 'svelte';
 	import { toast } from '$lib/stores/toast.svelte.js';
 	import { PrimaryButton, SecondaryButton, Input, SurfacePanel } from '$lib/components/ui/index.js';
+	import {
+		deleteKey,
+		getStatus,
+		migrateLegacyLocalStorage,
+		saveKey,
+		testKey,
+		type ProviderStatus,
+	} from '$lib/ai/credential-service.js';
 
 	let apiKey = $state('');
-	let isChecking = $state(false);
+	let status = $state<ProviderStatus | null>(null);
+	let isSaving = $state(false);
+	let isTesting = $state(false);
+	let isDeleting = $state(false);
+	let isLoading = $state(true);
 
-	onMount(() => {
-		const storedKey = localStorage.getItem('novellum_openrouter_key');
-		if (storedKey) {
-			apiKey = storedKey;
+	const providerId = 'openrouter';
+
+	const isBusy = $derived(isSaving || isTesting || isDeleting);
+	const canSave = $derived(apiKey.trim().length >= 16 && !isBusy);
+	const canTest = $derived((status?.configured === true || apiKey.trim().length >= 16) && !isBusy);
+	const canDelete = $derived(status?.configured === true && !isBusy);
+
+	onMount(async () => {
+		try {
+			await migrateLegacyLocalStorage();
+		} catch {
+			// migration failures are non-fatal; status fetch will still proceed.
+		}
+		try {
+			status = await getStatus(providerId);
+		} catch {
+			status = null;
+		} finally {
+			isLoading = false;
 		}
 	});
 
-	async function saveKey() {
-		isChecking = true;
-
+	async function handleSave(event: SubmitEvent) {
+		event.preventDefault();
+		if (!canSave) return;
+		isSaving = true;
 		try {
-			const res = await fetch('/api/ai/validate-key', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ apiKey: apiKey.trim() }),
-			});
-
-			if (!res.ok) {
-				throw new Error('Validation request failed');
-			}
-
-			const data = await res.json();
-			if (!data.valid) {
-				throw new Error('Invalid key');
-			}
-
-			localStorage.setItem('novellum_openrouter_key', apiKey.trim());
-			toast('API key saved successfully.', 'success');
+			status = await saveKey(providerId, apiKey.trim());
+			apiKey = '';
+			toast('API key saved.', 'success');
 		} catch {
-			toast('Invalid API key. Please check again.', 'error');
+			toast('Could not save API key. Please retry.', 'error');
 		} finally {
-			isChecking = false;
+			isSaving = false;
 		}
 	}
 
-	function removeKey() {
-		localStorage.removeItem('novellum_openrouter_key');
-		apiKey = '';
-		toast('API key removed.', 'info');
+	async function handleTest() {
+		if (!canTest) return;
+		isTesting = true;
+		try {
+			const candidate = apiKey.trim();
+			const result = candidate
+				? await testKeyWithSupplied(candidate)
+				: await testKey(providerId);
+			if (result.ok) {
+				toast('API key is valid.', 'success');
+				status = await getStatus(providerId);
+			} else {
+				toast(`Key check failed: ${result.reason ?? 'unknown'}.`, 'error');
+			}
+		} catch {
+			toast('Could not test API key.', 'error');
+		} finally {
+			isTesting = false;
+		}
+	}
+
+	async function testKeyWithSupplied(value: string) {
+		const res = await fetch('/api/settings/ai-key', {
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({ providerId, apiKey: value, action: 'test' }),
+		});
+		if (!res.ok) throw new Error(`status ${res.status}`);
+		return (await res.json()) as { ok: boolean; reason?: string };
+	}
+
+	async function handleDelete() {
+		if (!canDelete) return;
+		isDeleting = true;
+		try {
+			await deleteKey(providerId);
+			status = await getStatus(providerId);
+			apiKey = '';
+			toast('API key removed.', 'info');
+		} catch {
+			toast('Could not remove API key.', 'error');
+		} finally {
+			isDeleting = false;
+		}
 	}
 </script>
 
@@ -52,36 +106,52 @@
 	<header class="panel-header">
 		<p class="panel-eyebrow">Primary Integration</p>
 		<h2>AI Integration</h2>
-		<p class="panel-desc">Configure your OpenRouter API key to enable AI assistance features.</p>
+		<p class="panel-desc">
+			Configure your OpenRouter API key. Your key is stored on this server only and never re-rendered after
+			saving.
+		</p>
 	</header>
 
-	<div class="setting-group">
+	{#if !isLoading && status?.configured}
+		<div class="status-row" data-testid="api-key-status-configured">
+			<span class="status-chip status-chip--ok">Connected</span>
+			<span class="status-hint">Key ending {status.maskedHint}</span>
+			{#if status.lastVerifiedAt}
+				<span class="status-hint">· verified {new Date(status.lastVerifiedAt).toLocaleString()}</span>
+			{/if}
+		</div>
+	{:else if !isLoading}
+		<div class="status-row" data-testid="api-key-status-unconfigured">
+			<span class="status-chip status-chip--warn">No key configured</span>
+		</div>
+	{/if}
+
+	<form class="setting-group" onsubmit={handleSave}>
 		<Input
 			id="openrouter-key"
 			type="password"
-			label="OpenRouter API Key"
+			label={status?.configured ? 'Replace OpenRouter API Key' : 'OpenRouter API Key'}
 			bind:value={apiKey}
 			placeholder="sk-or-v1-..."
+			autocomplete="off"
+			spellcheck={false}
 		/>
-		<p class="help-text">
-			Your key is stored locally in your browser and never sent to our servers.
-		</p>
-	</div>
+		<p class="help-text">Your key is sent only to this server's credential store and never echoed back.</p>
 
-	<footer class="panel-actions">
-		<PrimaryButton
-			onclick={saveKey}
-			disabled={!apiKey || isChecking}
-		>
-			{isChecking ? 'Verifying...' : 'Save Key'}
-		</PrimaryButton>
-		<SecondaryButton
-			onclick={removeKey}
-			disabled={!apiKey || isChecking}
-		>
-			Clear Key
-		</SecondaryButton>
-	</footer>
+		<footer class="panel-actions">
+			<PrimaryButton type="submit" disabled={!canSave}>
+				{isSaving ? 'Saving…' : status?.configured ? 'Replace key' : 'Save key'}
+			</PrimaryButton>
+			<SecondaryButton onclick={handleTest} disabled={!canTest}>
+				{isTesting ? 'Testing…' : 'Test connection'}
+			</SecondaryButton>
+			{#if status?.configured}
+				<SecondaryButton onclick={handleDelete} disabled={!canDelete}>
+					{isDeleting ? 'Removing…' : 'Remove key'}
+				</SecondaryButton>
+			{/if}
+		</footer>
+	</form>
 </SurfacePanel>
 
 <style>
@@ -114,6 +184,37 @@
 		margin-bottom: var(--space-6);
 		color: var(--color-text-muted);
 		font-size: var(--text-sm);
+	}
+
+	.status-row {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		flex-wrap: wrap;
+		margin-bottom: var(--space-4);
+		font-size: var(--text-sm);
+		color: var(--color-text-muted);
+	}
+
+	.status-chip {
+		display: inline-flex;
+		align-items: center;
+		padding: var(--space-1) var(--space-2);
+		border-radius: var(--radius-sm);
+		font-size: var(--text-xs);
+		font-weight: var(--font-weight-medium);
+		letter-spacing: var(--tracking-wide);
+		text-transform: uppercase;
+	}
+
+	.status-chip--ok {
+		background: var(--color-status-ok-bg, rgba(34, 197, 94, 0.15));
+		color: var(--color-status-ok-fg, rgb(74, 222, 128));
+	}
+
+	.status-chip--warn {
+		background: var(--color-status-warn-bg, rgba(250, 204, 21, 0.15));
+		color: var(--color-status-warn-fg, rgb(250, 204, 21));
 	}
 
 	.setting-group {
