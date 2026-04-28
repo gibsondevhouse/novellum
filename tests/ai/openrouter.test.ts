@@ -1,240 +1,131 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { OpenRouterClient, MissingCredentialsError } from '../../src/lib/ai/openrouter';
 
-describe('OpenRouterClient', () => {
-    let client: OpenRouterClient;
-    
-    beforeEach(() => {
-        vi.stubEnv('VITE_OPENROUTER_API_KEY', 'test-key');
-        client = new OpenRouterClient();
-        
-        // Mock fetch
-        globalThis.fetch = vi.fn();
-        
-        // Mock timers for fast exponential backoff testing
-        vi.useFakeTimers();
-    });
+/**
+ * As of plan-017 stage-005 phase-003, OpenRouterClient is a thin proxy
+ * around `/api/ai`. The browser never holds the API key and the client
+ * never sends an Authorization header.
+ */
+describe('OpenRouterClient (browser proxy)', () => {
+	let client: OpenRouterClient;
 
-    afterEach(() => {
-        vi.restoreAllMocks();
-        vi.useRealTimers();
-    });
+	beforeEach(() => {
+		client = new OpenRouterClient();
+		globalThis.fetch = vi.fn();
+	});
 
-    it('loads API key from localStorage if present', () => {
-        if (typeof window !== 'undefined' && window.localStorage && typeof window.localStorage.getItem === 'function') {
-            vi.stubEnv('VITE_OPENROUTER_API_KEY', '');
-            vi.spyOn(window.localStorage, 'getItem').mockImplementation((key: string) => {
-                if (key === 'novellum_openrouter_key') return 'test-local-key';
-                return null;
-            });
-            const localClient = new OpenRouterClient();
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            expect((localClient as any).apiKey).toBe('test-local-key');
-        }
-    });
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
 
-    it('throws MissingCredentialsError if key is missing', async () => {
-        vi.stubEnv('VITE_OPENROUTER_API_KEY', '');
-        const clientWithoutKey = new OpenRouterClient();
-        
-        await expect(clientWithoutKey.complete({ model: 'test', messages: [] }))
-            .rejects.toThrow(MissingCredentialsError);
-    });
+	function jsonResponse(body: unknown, status = 200): Response {
+		return new Response(JSON.stringify(body), {
+			status,
+			headers: { 'content-type': 'application/json' },
+		});
+	}
 
-    it('returns answer from successful fetch', async () => {
-        const mockResponse = {
-            choices: [{ message: { content: 'hello' } }],
-            model: 'test-model',
-            usage: { total_tokens: 10 }
-        };
-        
-        vi.mocked(globalThis.fetch).mockResolvedValueOnce({
-            ok: true,
-            json: async () => mockResponse,
-        } as Response);
+	function streamResponse(events: string[]): Response {
+		const encoder = new TextEncoder();
+		const stream = new ReadableStream({
+			start(controller) {
+				for (const e of events) controller.enqueue(encoder.encode(e));
+				controller.close();
+			},
+		});
+		return new Response(stream, {
+			status: 200,
+			headers: { 'content-type': 'text/event-stream' },
+		});
+	}
 
-        const result = await client.complete({ model: 'test-model', messages: [] });
-        expect(result.text).toBe('hello');
-        expect(result.model).toBe('test-model');
-        expect(result.tokensUsed).toBe(10);
-    });
+	describe('complete', () => {
+		it('POSTs to /api/ai with messages and model, no Authorization header', async () => {
+			vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+				jsonResponse({ text: 'hello', model: 'm1', tokensUsed: 7 }),
+			);
 
-    it('retries on 429 using exponential backoff', async () => {
-        const fetchMock = vi.mocked(globalThis.fetch);
-        
-        // 1st request: 429
-        fetchMock.mockResolvedValueOnce({
-            ok: false,
-            status: 429,
-            text: async () => 'Too Many Requests'
-        } as Response);
+			const result = await client.complete({ model: 'm1', messages: [] });
 
-        // 2nd request: 429
-        fetchMock.mockResolvedValueOnce({
-            ok: false,
-            status: 429,
-            text: async () => 'Too Many Requests'
-        } as Response);
+			expect(result).toEqual({ text: 'hello', model: 'm1', tokensUsed: 7 });
+			const [url, init] = vi.mocked(globalThis.fetch).mock.calls[0];
+			expect(url).toBe('/api/ai');
+			expect(init?.method).toBe('POST');
+			const headers = init?.headers as Record<string, string>;
+			expect(headers.Authorization).toBeUndefined();
+		});
 
-        // 3rd request: success
-        const mockSuccess = { choices: [{ message: { content: 'success' } }] };
-        fetchMock.mockResolvedValueOnce({
-            ok: true,
-            json: async () => mockSuccess
-        } as Response);
+		it('throws MissingCredentialsError on 401 no_credentials', async () => {
+			vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+				jsonResponse({ error: { code: 'no_credentials', message: 'no key' } }, 401),
+			);
 
-        // Start completion
-        const completePromise = client.complete({ model: 'test-model', messages: [] });
+			await expect(client.complete({ model: 'm1', messages: [] })).rejects.toBeInstanceOf(
+				MissingCredentialsError,
+			);
+		});
 
-        // Advance timers for backoff
-        // 1st delay is 1000ms
-        await vi.advanceTimersByTimeAsync(1000);
-        // 2nd delay is 2000ms
-        await vi.advanceTimersByTimeAsync(2000);
+		it('falls back to data.content when data.text is absent (task-mode response)', async () => {
+			vi.mocked(globalThis.fetch).mockResolvedValueOnce(jsonResponse({ content: 'taskish' }));
+			const result = await client.complete({ model: 'm1', messages: [] });
+			expect(result.text).toBe('taskish');
+		});
 
-        const result = await completePromise;
-        expect(result.text).toBe('success');
-        expect(fetchMock).toHaveBeenCalledTimes(3);
-    });
+		it('throws on a 502 proxy error with the upstream message', async () => {
+			vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+				jsonResponse({ error: { code: 'provider_error', message: 'rate limited' } }, 502),
+			);
 
-    it('falls back to secondary model after max retries on 5xx', async () => {
-        const fetchMock = vi.mocked(globalThis.fetch);
+			await expect(client.complete({ model: 'm1', messages: [] })).rejects.toThrow(/rate limited/);
+		});
+	});
 
-        // 3 times 500 error for 'google/gemini-3.1-flash-lite-preview'
-        for (let i = 0; i < 3; i++) {
-            fetchMock.mockResolvedValueOnce({
-                ok: false,
-                status: 500,
-                text: async () => 'Internal Server Error'
-            } as Response);
-        }
+	describe('streamComplete', () => {
+		it('yields delta chunks from the proxy SSE response', async () => {
+			vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+				streamResponse([
+					'data: {"choices":[{"delta":{"content":"Hel"}}]}\n\n',
+					'data: {"choices":[{"delta":{"content":"lo"}}]}\n\n',
+					'data: [DONE]\n\n',
+				]),
+			);
 
-        // No fallback exists, so it should throw after 3 retries
-        const completePromise = client.complete({ model: 'google/gemini-3.1-flash-lite-preview', messages: [] });
-        // Attach catch early to avoid Unhandled Rejection warning
-        completePromise.catch(() => {});
+			const chunks: string[] = [];
+			for await (const c of client.streamComplete({ model: 'm1', messages: [] })) chunks.push(c);
 
-        // Advance timers to pass the 3 retries (1000, 2000)
-        await vi.advanceTimersByTimeAsync(3000);
+			expect(chunks).toEqual(['Hel', 'lo']);
+			const init = vi.mocked(globalThis.fetch).mock.calls[0][1];
+			expect(JSON.parse(init?.body as string)).toEqual({
+				model: 'm1',
+				messages: [],
+				stream: true,
+			});
+		});
 
-        // Should throw since no fallback models are defined
-        await expect(completePromise).rejects.toThrow('[OpenRouterClient] All models/retries failed');
-    });
+		it('throws MissingCredentialsError if the proxy returns 401', async () => {
+			vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+				jsonResponse({ error: { code: 'no_credentials', message: 'no key' } }, 401),
+			);
 
-    it('throws if all models and retries fail', async () => {
-        const fetchMock = vi.mocked(globalThis.fetch);
-        
-        // Mock to always return 500
-        fetchMock.mockResolvedValue({
-            ok: false,
-            status: 500,
-            text: async () => 'Error'
-        } as Response);
+			const generator = client.streamComplete({ model: 'm1', messages: [] });
+			await expect(async () => {
+				for await (const _chunk of generator) {
+					void _chunk;
+				}
+			}).rejects.toBeInstanceOf(MissingCredentialsError);
+		});
 
-        // Attempt completion with single model (3 retries = 3 total fetches)
-        const completePromise = client.complete({ model: 'dummy-model', messages: [] });
-        // Attach catch early to avoid Unhandled Rejection warning
-        completePromise.catch(() => {});
-        
-        await vi.runAllTimersAsync();
+		it('surfaces an upstream error chunk as a thrown Error', async () => {
+			vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+				streamResponse(['data: {"error":{"message":"upstream boom"}}\n\n']),
+			);
 
-        await expect(completePromise).rejects.toThrow('All models/retries failed');
-    });
-
-    describe('streamComplete', () => {
-        it('throws MissingCredentialsError if key is missing', async () => {
-            vi.stubEnv('VITE_OPENROUTER_API_KEY', '');
-            const clientWithoutKey = new OpenRouterClient();
-            
-            const generator = clientWithoutKey.streamComplete({ model: 'test', messages: [] });
-            await expect(async () => {
-                // eslint-disable-next-line no-empty
-                for await (const _ of generator) {}
-            }).rejects.toThrow(MissingCredentialsError);
-        });
-
-        it('yields chunks from successful SSE stream', async () => {
-            const fetchMock = vi.mocked(globalThis.fetch);
-
-            // Create a mock stream reader
-            let readCallCount = 0;
-            const encoder = new TextEncoder();
-            
-            const mockReader = {
-                read: vi.fn().mockImplementation(async () => {
-                    readCallCount++;
-                    if (readCallCount === 1) {
-                        return { value: encoder.encode('data: {"choices":[{"delta":{"content":"Hello"}}]}\n\n'), done: false };
-                    }
-                    if (readCallCount === 2) {
-                        return { value: encoder.encode('data: {"choices":[{"delta":{"content":" streaming"}}]}\n\n'), done: false };
-                    }
-                    if (readCallCount === 3) {
-                        return { value: encoder.encode('data: [DONE]\n\n'), done: false };
-                    }
-                    return { done: true, value: undefined };
-                })
-            };
-
-            const mockResponse = {
-                ok: true,
-                body: { getReader: () => mockReader }
-            } as unknown as Response;
-
-            fetchMock.mockResolvedValueOnce(mockResponse);
-
-            const generator = client.streamComplete({ model: 'test-model', messages: [] });
-            const chunks: string[] = [];
-            for await (const chunk of generator) {
-                chunks.push(chunk);
-            }
-
-            expect(chunks).toEqual(['Hello', ' streaming']);
-            expect(fetchMock).toHaveBeenCalled();
-        });
-
-        it('handles malformed JSON chunks gracefully without crashing', async () => {
-            const fetchMock = vi.mocked(globalThis.fetch);
-
-            const encoder = new TextEncoder();
-            let readCallCount = 0;
-            const mockReader = {
-                read: vi.fn().mockImplementation(async () => {
-                    readCallCount++;
-                    if (readCallCount === 1) {
-                        return { value: encoder.encode('data: {"choices":[{"delta":{"content":"Valid chunk"}}]}\n\n'), done: false };
-                    }
-                    if (readCallCount === 2) {
-                        // Malformed JSON chunk
-                        return { value: encoder.encode('data: {"choices":[{malformed]}\n\n'), done: false };
-                    }
-                    if (readCallCount === 3) {
-                        return { value: encoder.encode('data: [DONE]\n\n'), done: false };
-                    }
-                    return { done: true, value: undefined };
-                })
-            };
-
-            fetchMock.mockResolvedValueOnce({
-                ok: true,
-                body: { getReader: () => mockReader }
-            } as unknown as Response);
-
-            const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-            const generator = client.streamComplete({ model: 'test-model', messages: [] });
-            const chunks: string[] = [];
-            for await (const chunk of generator) {
-                chunks.push(chunk);
-            }
-
-            expect(chunks).toEqual(['Valid chunk']);
-            expect(warnSpy).toHaveBeenCalledWith(
-                '[OpenRouterClient] Malformed stream chunk:',
-                '{"choices":[{malformed]}'
-            );
-            
-            warnSpy.mockRestore();
-        });
-    });
+			const generator = client.streamComplete({ model: 'm1', messages: [] });
+			await expect(async () => {
+				for await (const _chunk of generator) {
+					void _chunk;
+				}
+			}).rejects.toThrow(/upstream boom/);
+		});
+	});
 });

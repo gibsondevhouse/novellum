@@ -56,16 +56,21 @@ Functionality is organized by **vertical domain slices** (e.g., `bible`, `worksp
 
 ### Environment Variables
 
-| Variable           | Default         | Description                       |
-| ------------------ | --------------- | --------------------------------- |
+| Variable | Default | Description |
+| --- | --- | --- |
 | `NOVELLUM_DB_PATH` | `./novellum.db` | File path for the SQLite database |
-| `VITE_OPENROUTER_API_KEY` | (none) | Required for AI features (OpenRouter) |
+| `NOVELLUM_APP_DATA_DIR` | `~/.novellum` | Directory for the credential secure store |
+| `NOVELLUM_AI_MOCK` | `0` | When `1`, `/api/ai` returns mock responses |
+
+> AI provider credentials are no longer read from environment variables.
+> They are stored server-side via the credential service (see
+> `src/lib/server/credentials/`) and configured through the Settings UI.
 
 ## Recent Accomplishments
 
 - **Plan-012 (Codebase Extraction)**: Major refactor of duplicated repository patterns and store CRUD boilerplate (~840 lines reduced).
 - **Refactor-010 (Visual Consistency)**: Enforced visual consistency across route families through baseline rulebooks and automated token checks.
-- **AI Engine Implementation**: `OpenRouterClient` is fully implemented with streaming support and model fallback logic.
+- **AI Engine Implementation**: Browser proxies to `/api/ai`; server-side OpenRouter provider in `src/lib/ai/providers/openrouter-provider.ts` with streaming support.
 - **Frontend Hardening**: Production-grade error boundaries, accessibility improvements, and design system enforcement.
 
 ## Current Focus (Active Plans)
