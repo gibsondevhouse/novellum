@@ -347,6 +347,14 @@ CREATE TABLE IF NOT EXISTS project_metadata (
 	updatedAt TEXT NOT NULL,
 	PRIMARY KEY (projectId, scope, ownerId, key)
 );
+
+CREATE TABLE IF NOT EXISTS schema_migrations (
+	version INTEGER PRIMARY KEY,
+	name TEXT NOT NULL,
+	applied_at TEXT NOT NULL,
+	checksum TEXT NOT NULL,
+	app_version TEXT NOT NULL DEFAULT ''
+);
 `;
 
 export const INDEX_SQL = `

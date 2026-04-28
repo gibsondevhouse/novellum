@@ -140,6 +140,7 @@ describe('Dexie → SQLite migration engine', () => {
 			id: 'lore-acc',
 			projectId: 'p-acc',
 			title: 'Magic Rules',
+			category: '',
 			content: '',
 			tags: [],
 			createdAt: now,
