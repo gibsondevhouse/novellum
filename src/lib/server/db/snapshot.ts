@@ -25,11 +25,6 @@ function resolveSnapshotsRoot(): string {
 	return process.env.NOVELLUM_SNAPSHOTS_DIR ?? join(process.cwd(), '.novellum-snapshots');
 }
 
-function buildSnapshotFilename(currentVersion: number, now: Date): string {
-	const iso = now.toISOString().replace(/[:.]/g, '-');
-	return `pre-migration-${iso}-v${currentVersion}.sqlite`;
-}
-
 function backupSnapshotsTableExists(db: Database.Database): boolean {
 	const row = db
 		.prepare(
@@ -44,6 +39,17 @@ export interface WriteSnapshotOptions {
 	now?: () => Date;
 	appVersion?: string;
 	note?: string;
+	/**
+	 * Snapshot category recorded in `backup_snapshots.kind`. Used to
+	 * distinguish pre-migration backups from pre-restore backups.
+	 * Defaults to `'pre-migration'` for backwards compatibility.
+	 */
+	kind?: string;
+}
+
+function buildSnapshotFilenameFor(kind: string, currentVersion: number, now: Date): string {
+	const iso = now.toISOString().replace(/[:.]/g, '-');
+	return `${kind}-${iso}-v${currentVersion}.sqlite`;
 }
 
 export function writePreMigrationSnapshot(
@@ -54,8 +60,9 @@ export function writePreMigrationSnapshot(
 	const root = options.root ?? resolveSnapshotsRoot();
 	mkdirSync(root, { recursive: true });
 
+	const kind = options.kind ?? 'pre-migration';
 	const now = options.now ? options.now() : new Date();
-	let filename = buildSnapshotFilename(currentVersion, now);
+	let filename = buildSnapshotFilenameFor(kind, currentVersion, now);
 	let path = join(root, filename);
 
 	// Extremely rare: same-millisecond filename collision. Append a short
@@ -83,7 +90,7 @@ export function writePreMigrationSnapshot(
 			 VALUES (?, ?, ?, ?, ?, ?, ?)`,
 		).run(
 			id,
-			'pre-migration',
+			kind,
 			now.toISOString(),
 			path,
 			options.appVersion ?? '',
