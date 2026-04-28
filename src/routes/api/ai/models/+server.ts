@@ -46,7 +46,11 @@ export const GET: RequestHandler = async ({ url }) => {
 		cache.set(providerId, { models, fetchedAt: now });
 		return json({ models, cached: false });
 	} catch (err) {
-		const message = err instanceof Error ? err.message : 'unknown';
+		const raw = err instanceof Error ? err.message : 'unknown';
+		// Defensive: a misconfigured upstream may echo the key in its
+		// error message. Strip it before reflecting anything to the
+		// client.
+		const message = apiKey ? raw.split(apiKey).join('***REDACTED***') : raw;
 		return json({ error: { code: 'provider_error', message } }, { status: 502 });
 	}
 };
