@@ -1,10 +1,10 @@
 import JSZip from 'jszip';
 import type { PortabilityManifest } from './types.js';
 import { buildPortabilitySnapshot } from './snapshot-service.js';
+import { APP_VERSION } from '$lib/version.js';
 
 const CURRENT_FORMAT_VERSION = 1;
 const CURRENT_DB_SCHEMA_VERSION = 8;
-const APP_VERSION = '0.1.0';
 
 /**
  * Compute a SHA-256 hex digest of a string payload.
