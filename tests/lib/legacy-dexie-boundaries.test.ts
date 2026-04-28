@@ -71,4 +71,47 @@ describe('legacy/dexie boundary guardrail', () => {
 
 		expect(violations).toHaveLength(0);
 	});
+
+	/**
+	 * Plan-017 stage-004 phase-005 part-002 guardrail. The new
+	 * SQLite-backed `.novellum` backup/restore code paths must never
+	 * import the legacy Dexie portability modules. This locks in the
+	 * separation introduced in phase-005 so a future refactor cannot
+	 * silently re-route the new endpoints through the old layer.
+	 */
+	it('SQLite-backed backup and restore code never imports legacy portability modules', async () => {
+		const sqliteRoots = [
+			'routes/api/backup',
+			'routes/api/restore',
+			'lib/server/backup',
+			'lib/server/restore',
+		];
+		const files = await walk(ROOT);
+		const violations: { file: string; spec: string }[] = [];
+
+		for (const file of files) {
+			const rel = relative(ROOT, file).replace(/\\/g, '/');
+			if (!sqliteRoots.some((root) => rel.startsWith(root))) continue;
+
+			const source = await readFile(file, 'utf8');
+			IMPORT_RE.lastIndex = 0;
+			let match: RegExpExecArray | null;
+			while ((match = IMPORT_RE.exec(source)) !== null) {
+				const spec = match[1];
+				if (
+					spec.includes('modules/export/services/portability') ||
+					spec.includes('export/services/portability')
+				) {
+					violations.push({ file: rel, spec });
+				}
+			}
+		}
+
+		if (violations.length > 0) {
+			const msg = violations.map((v) => `${v.file} -> ${v.spec}`).join('\n');
+			throw new Error(`SQLite backup/restore code reached into legacy portability:\n${msg}`);
+		}
+
+		expect(violations).toHaveLength(0);
+	});
 });
