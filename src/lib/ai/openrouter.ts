@@ -47,10 +47,6 @@ export class OpenRouterClient {
 						stream: true,
 					};
 
-					const keyPreview = apiKey.substring(0, 15) + '...' + apiKey.substring(apiKey.length - 5);
-					console.log('[OpenRouterClient] Stream request with API key:', keyPreview);
-					console.log('[OpenRouterClient] Using model:', currentModel, 'messages count:', payload.messages.length);
-
 					const res = await fetch(OPENROUTER_API_URL, {
 						method: 'POST',
 						headers: {
@@ -62,11 +58,8 @@ export class OpenRouterClient {
 						body: JSON.stringify(requestBody),
 					});
 
-					console.log('[OpenRouterClient] Response status:', res.status);
-
 					if (!res.ok) {
 						const errorText = await res.text();
-						console.error('[OpenRouterClient] API error response:', res.status, errorText, 'Full response:', res.statusText);
 						const err = new Error(`OpenRouter API error ${res.status}: ${errorText}`);
 						Object.assign(err, { status: res.status });
 						throw err;

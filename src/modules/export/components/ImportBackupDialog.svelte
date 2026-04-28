@@ -116,6 +116,12 @@
 					<p class="hint-text">
 						Select a <code>.novellum.zip</code> backup file to restore a project into this browser.
 					</p>
+					<aside class="scope-warning" role="note" aria-label="Import scope warning">
+						<strong>Preview format.</strong> The current <code>.novellum.zip</code> archive
+						restores the legacy Dexie portability layer only. Data that lives only in SQLite
+						will not be repopulated by this import. A canonical SQLite-backed restore path is
+						in development.
+					</aside>
 					<label class="file-picker">
 						<input type="file" accept=".zip,.novellum.zip" onchange={handleFileSelect} />
 						<span class="file-picker-label">Choose backup file…</span>
@@ -256,6 +262,30 @@
 		padding: 0 var(--space-1);
 		border-radius: var(--radius-sm);
 		font-size: var(--text-xs);
+	}
+
+	.scope-warning {
+		margin: var(--space-3) 0 0 0;
+		padding: var(--space-3) var(--space-4);
+		border: 1px solid var(--color-border-default);
+		border-radius: var(--radius-md);
+		background: color-mix(in srgb, var(--color-surface-overlay) 85%, transparent);
+		font-size: var(--text-sm);
+		line-height: var(--leading-relaxed);
+		color: var(--color-text-secondary);
+	}
+
+	.scope-warning strong {
+		color: var(--color-text-primary);
+	}
+
+	.scope-warning code {
+		background-color: var(--color-surface-overlay);
+		padding: 0 var(--space-1);
+		border-radius: var(--radius-sm);
+		font-size: var(--text-xs);
+		font-family: var(--font-mono);
+		color: var(--color-text-primary);
 	}
 
 	.status-text {

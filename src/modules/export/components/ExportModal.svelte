@@ -135,6 +135,13 @@
 						project payload.
 					</p>
 
+					<aside class="scope-warning" role="note" aria-label="Export scope warning">
+						<strong>Preview format.</strong> This JSON is generated from the legacy Dexie
+						portability layer and is not yet a complete SQLite-backed backup. Some entities
+						that live only in SQLite may be omitted. A canonical
+						<code>.novellum</code> backup format is in development.
+					</aside>
+
 					<div class="split-pane" role="group" aria-label="JSON export actions">
 						<section class="pane">
 							<h3 class="pane-title">Export JSON</h3>
@@ -279,6 +286,27 @@
 		margin: 0;
 		font-size: var(--text-sm);
 		color: var(--color-success-on-dark);
+	}
+
+	.scope-warning {
+		margin: 0;
+		padding: var(--space-3) var(--space-4);
+		border: 1px solid var(--color-border-default);
+		border-radius: var(--radius-md);
+		background: color-mix(in srgb, var(--color-surface-overlay) 85%, transparent);
+		font-size: var(--text-sm);
+		line-height: var(--leading-relaxed);
+		color: var(--color-text-secondary);
+	}
+
+	.scope-warning strong {
+		color: var(--color-text-primary);
+	}
+
+	.scope-warning code {
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		color: var(--color-text-primary);
 	}
 
 	@media (max-width: 760px) {

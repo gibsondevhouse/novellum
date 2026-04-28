@@ -160,9 +160,12 @@
 	}
 
 	.book-reader__stage {
-		width: 100%;
+		position: relative;
 		display: flex;
+		align-items: center;
 		justify-content: center;
+		gap: var(--space-3);
+		width: 100%;
 	}
 
 	.book-reader__controls {
@@ -209,15 +212,6 @@
 		letter-spacing: var(--tracking-widest);
 		text-transform: uppercase;
 		color: var(--color-text-muted);
-	}
-
-	.book-reader__stage {
-		position: relative;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: var(--space-3);
-		width: 100%;
 	}
 
 	.book-reader__nav {

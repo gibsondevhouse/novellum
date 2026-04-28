@@ -10,7 +10,7 @@ interface FieldDef {
 
 export interface EntityRouteConfig {
 	table: string;
-	fields: Record<string, FieldDef>;
+	fields?: Record<string, FieldDef>;
 	orderBy?: string;
 	queryParams?: string[];
 	decodeRow?: (row: Record<string, unknown>) => unknown;
@@ -58,6 +58,9 @@ export function createGetHandler(config: EntityRouteConfig): RequestHandler {
 
 export function createPostHandler(config: EntityRouteConfig): RequestHandler {
 	const { table, fields, decodeRow: decode, customValidation } = config;
+	if (!fields) {
+		throw new Error(`createPostHandler requires 'fields' on config for table ${table}`);
+	}
 
 	const allFieldNames = ['id', ...Object.keys(fields), 'createdAt', 'updatedAt'];
 	const columns = allFieldNames.map(quoteColumn).join(', ');
