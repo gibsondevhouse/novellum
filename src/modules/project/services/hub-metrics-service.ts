@@ -1,34 +1,28 @@
-import { db } from '$lib/legacy/dexie/db';
+import { apiGet } from '$lib/api-client.js';
+import type { Chapter, Scene } from '$lib/db/domain-types';
 import type { ProjectMetrics } from '../types.js';
 
+async function safeCount(endpoint: string, projectId: string): Promise<{ count: number; ready: boolean }> {
+	try {
+		const rows = await apiGet<unknown[]>(endpoint, { projectId });
+		return { count: rows.length, ready: true };
+	} catch {
+		return { count: 0, ready: false };
+	}
+}
+
 export async function getProjectMetrics(projectId: string): Promise<ProjectMetrics> {
-	const [chapters, scenes] = await Promise.all([
-		db.chapters.where('projectId').equals(projectId).count(),
-		db.scenes.where('projectId').equals(projectId).count(),
+	const [chapters, scenes, acts, arcs] = await Promise.all([
+		apiGet<Chapter[]>('/api/db/chapters', { projectId }),
+		apiGet<Scene[]>('/api/db/scenes', { projectId }),
+		safeCount('/api/db/acts', projectId),
+		safeCount('/api/db/arcs', projectId),
 	]);
 
-	let actsCount = 0;
-	let actsReady = false;
-	try {
-		actsCount = await db.acts.where('projectId').equals(projectId).count();
-		actsReady = true;
-	} catch {
-		// table may not exist yet
-	}
-
-	let arcsCount = 0;
-	let arcsReady = false;
-	try {
-		arcsCount = await db.arcs.where('projectId').equals(projectId).count();
-		arcsReady = true;
-	} catch {
-		// table may not exist yet
-	}
-
 	return {
-		arcs: { count: arcsCount, ready: arcsReady },
-		acts: { count: actsCount, ready: actsReady },
-		chapters: { count: chapters, ready: true },
-		scenes: { count: scenes, ready: true },
+		arcs,
+		acts,
+		chapters: { count: chapters.length, ready: true },
+		scenes: { count: scenes.length, ready: true },
 	};
 }

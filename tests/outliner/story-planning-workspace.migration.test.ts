@@ -1,63 +1,60 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+const storyFrameStub = vi.fn().mockResolvedValue({ id: 'sf-1', projectId: 'p1' });
+const createActStub = vi.fn().mockResolvedValue({ id: 'act-1', projectId: 'p1', title: 'Act I' });
+
+vi.mock('../../src/modules/outliner/services/story-structure-service.js', () => ({
+	getOrCreateStoryFrame: storyFrameStub,
+	createAct: createActStub,
+}));
+
+const actsCount = vi.fn().mockResolvedValue(0);
+const chaptersToArray = vi
+	.fn()
+	.mockResolvedValue([{ id: 'ch-1', projectId: 'p1', actId: undefined, title: 'Chapter 1' }]);
+const chaptersUpdate = vi.fn().mockResolvedValue(undefined);
 
 vi.mock('../../src/lib/legacy/dexie/db', () => ({
 	db: {
-		story_frames: {
-			where: vi.fn(() => ({ equals: vi.fn(() => ({ first: vi.fn().mockResolvedValue(null) })) })),
-			add: vi.fn().mockResolvedValue(undefined),
-		},
 		acts: {
-			where: vi.fn(() => ({
-				equals: vi.fn(() => ({ count: vi.fn().mockResolvedValue(0) })),
-			})),
-			add: vi.fn().mockResolvedValue(undefined),
+			where: vi.fn(() => ({ equals: vi.fn(() => ({ count: actsCount })) })),
 		},
 		chapters: {
-			where: vi.fn(() => ({
-				equals: vi.fn(() => ({
-					toArray: vi
-						.fn()
-						.mockResolvedValue([
-							{ id: 'ch-1', projectId: 'p1', actId: undefined, title: 'Chapter 1' },
-						]),
-				})),
-			})),
-			update: vi.fn().mockResolvedValue(undefined),
+			where: vi.fn(() => ({ equals: vi.fn(() => ({ toArray: chaptersToArray })) })),
+			update: chaptersUpdate,
 		},
 	},
 }));
 
 describe('outline-to-story-workspace migration', async () => {
-	const { migrateOutlineToStoryWorkspace } =
-		await import('../../src/modules/outliner/services/migrations/outline-to-story-workspace.js');
+	const { migrateOutlineToStoryWorkspace } = await import(
+		'../../src/modules/outliner/services/migrations/outline-to-story-workspace.js'
+	);
+
+	beforeEach(() => {
+		storyFrameStub.mockClear();
+		createActStub.mockClear();
+		chaptersUpdate.mockClear();
+		actsCount.mockResolvedValue(0);
+	});
 
 	it('creates a story frame for a project with none', async () => {
 		await migrateOutlineToStoryWorkspace('p1');
-		const { db } = await import('../../src/lib/legacy/dexie/db');
-		expect(db.story_frames.add).toHaveBeenCalled();
+		expect(storyFrameStub).toHaveBeenCalledWith('p1');
 	});
 
 	it('creates a default Act I and assigns chapters when no acts exist', async () => {
 		await migrateOutlineToStoryWorkspace('p1');
-		const { db } = await import('../../src/lib/legacy/dexie/db');
-		expect(db.acts.add).toHaveBeenCalled();
-		expect(db.chapters.update).toHaveBeenCalledWith(
+		expect(createActStub).toHaveBeenCalledWith('p1', 'Act I', 0);
+		expect(chaptersUpdate).toHaveBeenCalledWith(
 			'ch-1',
 			expect.objectContaining({ actId: expect.any(String) }),
 		);
 	});
 
 	it('is idempotent: does not create duplicate acts', async () => {
-		const { db } = await import('../../src/lib/legacy/dexie/db');
-		// Override to return 1 existing act
-		(db.acts.where as ReturnType<typeof vi.fn>).mockReturnValue({
-			equals: vi.fn(() => ({ count: vi.fn().mockResolvedValue(1) })),
-		});
-		vi.clearAllMocks();
-		(db.story_frames.where as ReturnType<typeof vi.fn>).mockReturnValue({
-			equals: vi.fn(() => ({ first: vi.fn().mockResolvedValue({ id: 'sf-1', projectId: 'p1' }) })),
-		});
+		actsCount.mockResolvedValueOnce(1);
 		await migrateOutlineToStoryWorkspace('p1');
-		expect(db.acts.add).not.toHaveBeenCalled();
+		expect(createActStub).not.toHaveBeenCalled();
 	});
 });

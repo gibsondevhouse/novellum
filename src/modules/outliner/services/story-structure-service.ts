@@ -1,75 +1,74 @@
-import { db } from '$lib/legacy/dexie/db';
+import { apiGet, apiPost, apiPut } from '$lib/api-client.js';
+import { createRepository } from '$lib/factories/repository-factory.js';
 import type { StoryFrame, Act, Milestone } from '$lib/db/domain-types';
 
+/* ── Story Frame ── */
+
 export async function getOrCreateStoryFrame(projectId: string): Promise<StoryFrame> {
-	const existing = await db.story_frames.where('projectId').equals(projectId).first();
-	if (existing) return existing;
-	const frame: StoryFrame = {
-		id: crypto.randomUUID(),
-		projectId,
-		premise: '',
-		theme: '',
-		toneNotes: '',
-		updatedAt: new Date().toISOString(),
-	};
-	await db.story_frames.add(frame);
-	return frame;
+	const existing = await apiGet<StoryFrame[]>('/api/db/story_frames', { projectId });
+	if (existing.length > 0) return existing[0];
+	return apiPost<StoryFrame>('/api/db/story_frames', { projectId });
 }
 
 export async function updateStoryFrame(
 	id: string,
 	patch: Partial<Omit<StoryFrame, 'id' | 'projectId'>>,
 ): Promise<void> {
-	await db.story_frames.update(id, { ...patch, updatedAt: new Date().toISOString() });
+	await apiPut(`/api/db/story_frames/${id}`, patch);
 }
+
+/* ── Acts ── */
+
+const actsRepo = createRepository<Act>({
+	endpoint: '/api/db/acts',
+	entityName: 'Act',
+	queries: { byProjectId: 'projectId', byArcId: 'arcId' },
+});
 
 export async function getActsByProjectId(projectId: string): Promise<Act[]> {
-	return db.acts.where('projectId').equals(projectId).sortBy('order');
+	return actsRepo.queries.byProjectId(projectId);
 }
 
-export async function createAct(projectId: string, title: string, order: number, arcId?: string): Promise<Act> {
-	const now = new Date().toISOString();
-	const act: Act = {
-		id: crypto.randomUUID(),
-		projectId,
-		title,
-		order,
-		planningNotes: '',
-		createdAt: now,
-		updatedAt: now,
-		...(arcId ? { arcId } : {}),
-	};
-	await db.acts.add(act);
-	return act;
+export async function createAct(
+	projectId: string,
+	title: string,
+	order: number,
+	arcId?: string,
+): Promise<Act> {
+	const payload: Partial<Act> = { projectId, title, order, planningNotes: '' };
+	if (arcId) payload.arcId = arcId;
+	return actsRepo.create(payload as Omit<Act, 'id' | 'createdAt' | 'updatedAt'>);
 }
 
 export async function updateAct(
 	id: string,
 	patch: Partial<Omit<Act, 'id' | 'projectId' | 'createdAt'>>,
 ): Promise<void> {
-	await db.acts.update(id, { ...patch, updatedAt: new Date().toISOString() });
+	await actsRepo.update(id, patch);
 }
 
 export async function removeAct(id: string): Promise<void> {
-	await db.acts.delete(id);
+	await actsRepo.remove(id);
 }
 
-export async function reorderActs(projectId: string, orderedIds: string[]): Promise<void> {
-	await Promise.all(
-		orderedIds.map((id, idx) =>
-			db.acts.update(id, { order: idx, updatedAt: new Date().toISOString() }),
-		),
-	);
+export async function reorderActs(_projectId: string, orderedIds: string[]): Promise<void> {
+	await Promise.all(orderedIds.map((id, idx) => actsRepo.update(id, { order: idx })));
 }
 
 /* ── Milestones ── */
 
+const milestonesRepo = createRepository<Milestone>({
+	endpoint: '/api/db/milestones',
+	entityName: 'Milestone',
+	queries: { byActId: 'actId', byProjectId: 'projectId' },
+});
+
 export async function getMilestonesByActId(actId: string): Promise<Milestone[]> {
-	return db.milestones.where('actId').equals(actId).sortBy('order');
+	return milestonesRepo.queries.byActId(actId);
 }
 
 export async function getMilestonesByProjectId(projectId: string): Promise<Milestone[]> {
-	return db.milestones.where('projectId').equals(projectId).sortBy('order');
+	return milestonesRepo.queries.byProjectId(projectId);
 }
 
 export async function createMilestone(
@@ -79,29 +78,23 @@ export async function createMilestone(
 	order: number,
 	description = '',
 ): Promise<Milestone> {
-	const now = new Date().toISOString();
-	const milestone: Milestone = {
-		id: crypto.randomUUID(),
+	return milestonesRepo.create({
 		actId,
 		projectId,
 		title,
 		description,
 		order,
 		chapterIds: [],
-		createdAt: now,
-		updatedAt: now,
-	};
-	await db.milestones.add(milestone);
-	return milestone;
+	} as Omit<Milestone, 'id' | 'createdAt' | 'updatedAt'>);
 }
 
 export async function updateMilestone(
 	id: string,
 	patch: Partial<Omit<Milestone, 'id' | 'actId' | 'projectId' | 'createdAt'>>,
 ): Promise<void> {
-	await db.milestones.update(id, { ...patch, updatedAt: new Date().toISOString() });
+	await milestonesRepo.update(id, patch);
 }
 
 export async function removeMilestone(id: string): Promise<void> {
-	await db.milestones.delete(id);
+	await milestonesRepo.remove(id);
 }

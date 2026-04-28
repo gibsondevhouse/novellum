@@ -1,5 +1,13 @@
-import { db } from '$lib/legacy/dexie/db';
-import type { Character, Location, Scene } from '$lib/db/domain-types';
+import { apiGet, ApiError } from '$lib/api-client.js';
+import type {
+	Beat,
+	Chapter,
+	Character,
+	Location,
+	LoreEntry,
+	PlotThread,
+	Scene,
+} from '$lib/db/domain-types';
 import type { AiContext, AiTask, ContextPolicy } from './types.js';
 import {
 	MAX_CHARACTERS,
@@ -26,21 +34,44 @@ function emptyContext(policy: ContextPolicy): AiContext {
 	};
 }
 
+async function getOrUndefined<T>(path: string): Promise<T | undefined> {
+	try {
+		return await apiGet<T>(path);
+	} catch (err) {
+		if (err instanceof ApiError && err.status === 404) return undefined;
+		throw err;
+	}
+}
+
 async function fetchCharactersByIds(ids: string[], limit: number): Promise<Character[]> {
-	const results = await Promise.all(ids.slice(0, limit).map((id) => db.characters.get(id)));
+	const results = await Promise.all(
+		ids.slice(0, limit).map((id) => getOrUndefined<Character>(`/api/db/characters/${id}`)),
+	);
 	return results.filter((c): c is Character => c !== undefined);
 }
 
 async function fetchLocationsByIds(ids: string[], limit: number): Promise<Location[]> {
-	const results = await Promise.all(ids.slice(0, limit).map((id) => db.locations.get(id)));
+	const results = await Promise.all(
+		ids.slice(0, limit).map((id) => getOrUndefined<Location>(`/api/db/locations/${id}`)),
+	);
 	return results.filter((l): l is Location => l !== undefined);
 }
 
+async function getBeatsBySceneId(sceneId: string): Promise<Beat[]> {
+	const beats = await apiGet<Beat[]>('/api/db/beats', { sceneId });
+	return [...beats].sort((a, b) => a.order - b.order);
+}
+
+async function getScenesByChapterId(chapterId: string): Promise<Scene[]> {
+	const scenes = await apiGet<Scene[]>('/api/db/scenes', { chapterId });
+	return [...scenes].sort((a, b) => a.order - b.order);
+}
+
 async function buildSceneOnlyData(sceneId: string) {
-	const scene = await db.scenes.get(sceneId);
+	const scene = await getOrUndefined<Scene>(`/api/db/scenes/${sceneId}`);
 	if (!scene) return null;
 	const [beats, characters, locations] = await Promise.all([
-		db.beats.where('sceneId').equals(sceneId).sortBy('order'),
+		getBeatsBySceneId(sceneId),
 		fetchCharactersByIds(scene.characterIds, MAX_CHARACTERS),
 		fetchLocationsByIds(scene.locationIds, MAX_LOCATIONS),
 	]);
@@ -71,10 +102,7 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 			const data = await buildSceneOnlyData(task.targetEntityId);
 			if (!data) return emptyContext('scene_plus_adjacent');
 
-			const allScenesInChapter = await db.scenes
-				.where('chapterId')
-				.equals(data.scene.chapterId)
-				.sortBy('order');
+			const allScenesInChapter = await getScenesByChapterId(data.scene.chapterId);
 
 			const sceneIndex = allScenesInChapter.findIndex((s) => s.id === task.targetEntityId);
 			const adjacentScenes: Scene[] = [];
@@ -106,24 +134,22 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 			// targetEntityId may be a scene id or chapter id — try scene first
 			let chapterId: string | null = null;
 			if (task.targetEntityId) {
-				const scene = await db.scenes.get(task.targetEntityId);
+				const scene = await getOrUndefined<Scene>(`/api/db/scenes/${task.targetEntityId}`);
 				chapterId = scene ? scene.chapterId : task.targetEntityId;
 			}
 			if (!chapterId) return emptyContext(task.contextPolicy);
 
-			const chapter = await db.chapters.get(chapterId);
+			const chapter = await getOrUndefined<Chapter>(`/api/db/chapters/${chapterId}`);
 			if (!chapter) return emptyContext(task.contextPolicy);
 
-			const rawScenes = await db.scenes.where('chapterId').equals(chapterId).sortBy('order');
+			const rawScenes = await getScenesByChapterId(chapterId);
 			const scenes = rawScenes.map((s) => ({
 				...s,
 				content:
 					task.contextPolicy === 'outline_scope' ? '' : s.content.slice(0, MAX_CHAPTER_SCENE_CHARS),
 			}));
 
-			const allBeatsArrays = await Promise.all(
-				scenes.map((s) => db.beats.where('sceneId').equals(s.id).sortBy('order')),
-			);
+			const allBeatsArrays = await Promise.all(scenes.map((s) => getBeatsBySceneId(s.id)));
 			const beats = allBeatsArrays.flat();
 
 			const allCharacterIds = [...new Set(rawScenes.flatMap((s) => s.characterIds))];
@@ -148,17 +174,26 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 		}
 
 		case 'continuity_scope': {
-			const chapters = await db.chapters.where('projectId').equals(projectId).sortBy('order');
-			const chapterOrderMap = new Map(chapters.map((c, i) => [c.id, i]));
+			const [chapters, rawScenes, characters, locations, loreEntries, plotThreads] =
+				await Promise.all([
+					apiGet<Chapter[]>('/api/db/chapters', { projectId }),
+					apiGet<Scene[]>('/api/db/scenes', { projectId }),
+					apiGet<Character[]>('/api/db/characters', { projectId }),
+					apiGet<Location[]>('/api/db/locations', { projectId }),
+					apiGet<LoreEntry[]>('/api/db/lore_entries', { projectId }),
+					apiGet<PlotThread[]>('/api/db/plot_threads', { projectId }),
+				]);
 
-			const rawScenes = await db.scenes.where('projectId').equals(projectId).toArray();
-			rawScenes.sort((a, b) => {
+			const sortedChapters = [...chapters].sort((a, b) => a.order - b.order);
+			const chapterOrderMap = new Map(sortedChapters.map((c, i) => [c.id, i]));
+
+			const sortedScenes = [...rawScenes].sort((a, b) => {
 				const cDiff =
 					(chapterOrderMap.get(a.chapterId) ?? 0) - (chapterOrderMap.get(b.chapterId) ?? 0);
 				return cDiff !== 0 ? cDiff : a.order - b.order;
 			});
 
-			const scenes = rawScenes.map((s) => ({
+			const scenes = sortedScenes.map((s) => ({
 				...s,
 				content: s.content.slice(0, MAX_CONTINUITY_SCENE_CHARS),
 			}));
@@ -169,13 +204,6 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 				totalChars -= scenes[i].content.length;
 				scenes[i] = { ...scenes[i], content: '' };
 			}
-
-			const [characters, locations, loreEntries, plotThreads] = await Promise.all([
-				db.characters.where('projectId').equals(projectId).toArray(),
-				db.locations.where('projectId').equals(projectId).toArray(),
-				db.lore_entries.where('projectId').equals(projectId).toArray(),
-				db.plot_threads.where('projectId').equals(projectId).toArray(),
-			]);
 
 			return {
 				policy: 'continuity_scope',

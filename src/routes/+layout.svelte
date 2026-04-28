@@ -3,7 +3,6 @@
 	import { onMount } from 'svelte';
 	import { onNavigate } from '$app/navigation';
 	import favicon from '$lib/assets/favicon.svg';
-	import { db } from '$lib/legacy/dexie/db';
 
 	import AppSidebar from '$lib/components/AppSidebar.svelte';
 	import AppHeader from '$lib/components/AppHeader.svelte';
@@ -16,7 +15,6 @@
 
 	onMount(() => {
 		initLocale();
-		db.open().catch(() => {}); // already opened; no-op if open
 
 		// Register service worker for stale-chunk protection
 		if (!('serviceWorker' in navigator)) return;
