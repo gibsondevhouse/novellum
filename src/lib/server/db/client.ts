@@ -1,5 +1,4 @@
 import Database from 'better-sqlite3';
-import { runMigrations as runLegacyEnsureColumns } from './migrations.js';
 import { runMigrations } from './migration-runner.js';
 import { MIGRATION_REGISTRY } from './migration-registry.js';
 
@@ -9,6 +8,5 @@ const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 runMigrations(db, MIGRATION_REGISTRY);
-runLegacyEnsureColumns(db);
 
 export { db };

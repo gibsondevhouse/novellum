@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import Database from 'better-sqlite3';
-import { runMigrations } from '$lib/server/db/migrations.js';
+import { runMigrations } from '$lib/server/db/migration-runner.js';
+import { MIGRATION_REGISTRY } from '$lib/server/db/migration-registry.js';
 
 type SqliteRow = Record<string, string | number | null>;
 
@@ -89,7 +90,7 @@ describe('individuals migration backfill', () => {
 			updatedAt: now,
 		});
 
-		runMigrations(db);
+		runMigrations(db, MIGRATION_REGISTRY);
 
 		const cols = db
 			.prepare('PRAGMA table_info(characters)')
@@ -142,7 +143,7 @@ describe('individuals migration backfill', () => {
 			 VALUES ('rel-self', 'proj-1', 'char-z', 'char-z', 'Self', '', '2026-01-04T00:00:00.000Z', @updatedAt)`,
 		).run({ updatedAt: now });
 
-		runMigrations(db);
+		runMigrations(db, MIGRATION_REGISTRY);
 
 		const rows = db
 			.prepare(

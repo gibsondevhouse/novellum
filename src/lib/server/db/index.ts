@@ -1,5 +1,4 @@
 export { encodeJson, decodeJson } from './serialize.js';
-export { runMigrations as runLegacyEnsureColumns } from './migrations.js';
 export {
 	runMigrations,
 	getAppliedMigrations,

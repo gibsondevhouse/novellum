@@ -1,10 +1,11 @@
 import type { Migration } from './migration-runner.js';
+import { migration0001 } from './migrations/0001_baseline.js';
+import { migration0002 } from './migrations/0002_add_backup_metadata.js';
 
 /**
  * Ordered list of versioned migrations applied to the SQLite database at boot.
  *
- * Migrations are added incrementally as inline `ensureColumn` helpers in
- * `migrations.ts` are extracted into discrete files under `./migrations/`.
- * See plan-017 stage-003 phase-002 for the extraction roadmap.
+ * Add new migrations to this array in strictly increasing `version` order.
+ * Never edit a previously-shipped migration; author a new file instead.
  */
-export const MIGRATION_REGISTRY: readonly Migration[] = [];
+export const MIGRATION_REGISTRY: readonly Migration[] = [migration0001, migration0002];

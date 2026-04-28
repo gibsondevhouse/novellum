@@ -1,20 +1,39 @@
 import type Database from 'better-sqlite3';
-import { SCHEMA_SQL, INDEX_SQL } from './schema.js';
+import { SCHEMA_SQL, INDEX_SQL } from '../schema.js';
+import type { Migration } from '../migration-runner.js';
+
+/**
+ * Migration 0001: baseline canonical schema.
+ *
+ * Brings any SQLite database — fresh or legacy — to the current canonical
+ * schema. Steps execute in order:
+ *
+ *   1. SCHEMA_SQL  — `CREATE TABLE IF NOT EXISTS` for every canonical table.
+ *   2. ensure*Columns — PRAGMA-guarded `ALTER TABLE ADD COLUMN` calls that
+ *      patch legacy DBs that predate canonical column declarations.
+ *   3. Data backfills — idempotent `UPDATE/DELETE` passes that migrate row
+ *      content into the new column shape.
+ *   4. INDEX_SQL — `CREATE INDEX IF NOT EXISTS` for every canonical index.
+ *
+ * The migration runner wraps this `up()` in a `BEGIN IMMEDIATE` transaction
+ * already, so this body intentionally does **not** open its own.
+ *
+ * Helpers below were lifted verbatim from the retired
+ * `src/lib/server/db/migrations.ts` to preserve historical behavior. New
+ * schema work should land in a higher-numbered migration file rather than
+ * editing this baseline.
+ */
 
 function ensureProjectsCoverUrlColumn(db: Database.Database): void {
 	const columns = db.prepare('PRAGMA table_info(projects)').all() as Array<{ name: string }>;
-	const hasCoverUrl = columns.some((column) => column.name === 'coverUrl');
-
-	if (!hasCoverUrl) {
+	if (!columns.some((column) => column.name === 'coverUrl')) {
 		db.exec("ALTER TABLE projects ADD COLUMN coverUrl TEXT NOT NULL DEFAULT ''");
 	}
 }
 
 function ensureProjectsPromptColumns(db: Database.Database): void {
 	const columns = db.prepare('PRAGMA table_info(projects)').all() as Array<{ name: string }>;
-	const hasSystemPrompt = columns.some((column) => column.name === 'systemPrompt');
-
-	if (!hasSystemPrompt) {
+	if (!columns.some((column) => column.name === 'systemPrompt')) {
 		db.exec("ALTER TABLE projects ADD COLUMN systemPrompt TEXT NOT NULL DEFAULT ''");
 		db.exec("ALTER TABLE projects ADD COLUMN negativePrompt TEXT NOT NULL DEFAULT ''");
 	}
@@ -22,7 +41,6 @@ function ensureProjectsPromptColumns(db: Database.Database): void {
 
 function ensureProjectTypeAndLastOpened(db: Database.Database): void {
 	const columns = db.prepare('PRAGMA table_info(projects)').all() as Array<{ name: string }>;
-
 	if (!columns.some((c) => c.name === 'projectType')) {
 		db.exec("ALTER TABLE projects ADD COLUMN projectType TEXT NOT NULL DEFAULT 'novel'");
 	}
@@ -77,50 +95,50 @@ function ensureCharacterPresentationColumns(db: Database.Database): void {
 	}
 }
 
+const INDIVIDUAL_TEXT_COLUMNS = [
+	'occupation',
+	'age',
+	'height',
+	'weight',
+	'build',
+	'hair',
+	'eyes',
+	'coreDesire',
+	'fear',
+	'contradiction',
+	'temperament',
+	'alignment',
+	'strength',
+	'flaw',
+	'storyRole',
+	'arcStage',
+	'externalGoal',
+	'internalNeed',
+	'stakes',
+	'conflict',
+	'voiceSummary',
+	'speechPattern',
+	'phrases',
+	'tells',
+	'bodyLanguage',
+	'dialogueSample',
+	'immutableTraits',
+	'injuries',
+	'habits',
+	'secrets',
+	'othersKnow',
+	'lastChange',
+	'timelineMarkers',
+	'emotionalState',
+	'currentObjective',
+	'currentPressure',
+	'lastSeen',
+	'nextMove',
+] as const;
+
 function ensureCharacterIndividualsColumns(db: Database.Database): void {
 	const columns = db.prepare('PRAGMA table_info(characters)').all() as Array<{ name: string }>;
-	const textColumns = [
-		'occupation',
-		'age',
-		'height',
-		'weight',
-		'build',
-		'hair',
-		'eyes',
-		'coreDesire',
-		'fear',
-		'contradiction',
-		'temperament',
-		'alignment',
-		'strength',
-		'flaw',
-		'storyRole',
-		'arcStage',
-		'externalGoal',
-		'internalNeed',
-		'stakes',
-		'conflict',
-		'voiceSummary',
-		'speechPattern',
-		'phrases',
-		'tells',
-		'bodyLanguage',
-		'dialogueSample',
-		'immutableTraits',
-		'injuries',
-		'habits',
-		'secrets',
-		'othersKnow',
-		'lastChange',
-		'timelineMarkers',
-		'emotionalState',
-		'currentObjective',
-		'currentPressure',
-		'lastSeen',
-		'nextMove',
-	] as const;
-
-	for (const columnName of textColumns) {
+	for (const columnName of INDIVIDUAL_TEXT_COLUMNS) {
 		if (!columns.some((column) => column.name === columnName)) {
 			db.exec(`ALTER TABLE characters ADD COLUMN ${columnName} TEXT NOT NULL DEFAULT ''`);
 		}
@@ -136,46 +154,6 @@ function backfillIndividualsFromNotesEnvelope(db: Database.Database): void {
 	};
 
 	const rows = db.prepare('SELECT id, notes FROM characters').all() as CharacterRow[];
-	const updatableFields = [
-		'occupation',
-		'age',
-		'height',
-		'weight',
-		'build',
-		'hair',
-		'eyes',
-		'coreDesire',
-		'fear',
-		'contradiction',
-		'temperament',
-		'alignment',
-		'strength',
-		'flaw',
-		'storyRole',
-		'arcStage',
-		'externalGoal',
-		'internalNeed',
-		'stakes',
-		'conflict',
-		'voiceSummary',
-		'speechPattern',
-		'phrases',
-		'tells',
-		'bodyLanguage',
-		'dialogueSample',
-		'immutableTraits',
-		'injuries',
-		'habits',
-		'secrets',
-		'othersKnow',
-		'lastChange',
-		'timelineMarkers',
-		'emotionalState',
-		'currentObjective',
-		'currentPressure',
-		'lastSeen',
-		'nextMove',
-	] as const;
 
 	for (const row of rows) {
 		if (!row.notes) continue;
@@ -192,7 +170,7 @@ function backfillIndividualsFromNotesEnvelope(db: Database.Database): void {
 		}
 
 		const updates: Record<string, string> = {};
-		for (const field of updatableFields) {
+		for (const field of INDIVIDUAL_TEXT_COLUMNS) {
 			const value = parsed[field];
 			if (typeof value === 'string' && value.trim().length > 0) {
 				updates[field] = value;
@@ -329,8 +307,11 @@ function ensureLocationNarrativeColumns(db: Database.Database): void {
 	}
 }
 
-export function runMigrations(db: Database.Database): void {
-	db.transaction(() => {
+export const migration0001: Migration = {
+	version: 1,
+	name: '0001_baseline',
+	checksum: 'baseline-v1',
+	up(db) {
 		db.exec(SCHEMA_SQL);
 		ensureProjectsCoverUrlColumn(db);
 		ensureProjectsPromptColumns(db);
@@ -346,5 +327,5 @@ export function runMigrations(db: Database.Database): void {
 		normalizeAndDedupeCharacterRelationships(db);
 		ensureLocationNarrativeColumns(db);
 		db.exec(INDEX_SQL);
-	})();
-}
+	},
+};

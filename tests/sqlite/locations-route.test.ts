@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import Database from 'better-sqlite3';
 import { SCHEMA_SQL, INDEX_SQL } from '$lib/server/db/schema.js';
 import { decodeJson, encodeJson } from '$lib/server/db/serialize.js';
-import { runMigrations } from '$lib/server/db/migrations.js';
+import { runMigrations } from '$lib/server/db/migration-runner.js';
+import { MIGRATION_REGISTRY } from '$lib/server/db/migration-registry.js';
 
 type SqliteRow = Record<string, string | number | null>;
 
@@ -12,7 +13,7 @@ function createTestDb() {
 	db.pragma('foreign_keys = ON');
 	db.exec(SCHEMA_SQL);
 	db.exec(INDEX_SQL);
-	runMigrations(db);
+	runMigrations(db, MIGRATION_REGISTRY);
 	return db;
 }
 
