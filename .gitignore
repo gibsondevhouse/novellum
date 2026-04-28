@@ -57,9 +57,8 @@ coverage/
 *.sqlite
 *.sqlite3
 
-# Local-only docs scratch (the dev-docs/ tree itself is checked in)
-dev-docs/scratch/
-dev-docs/private/
+# Local-only docs (the dev-docs/ tree is developer-private and not tracked)
+dev-docs/
 
 # Local-only GitHub overrides (workflows and customizations under .github/ are checked in)
 .github/local/
