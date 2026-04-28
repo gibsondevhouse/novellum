@@ -95,12 +95,16 @@ export function getAppliedMigrations(db: Database.Database): AppliedRow[] {
 export interface RunMigrationsOptions {
 	appVersion?: string;
 	now?: () => string;
-	beforeApply?: (info: { pending: Migration[]; currentVersion: number }) => void | Promise<void>;
+	beforeApply?: (info: {
+		pending: Migration[];
+		currentVersion: number;
+	}) => { snapshotPath?: string } | void;
 }
 
 export interface RunMigrationsResult {
 	applied: Array<{ version: number; name: string }>;
 	skipped: Array<{ version: number; name: string }>;
+	snapshotPath?: string;
 }
 
 /**
@@ -135,15 +139,17 @@ export function runMigrations(
 		return { applied: [], skipped };
 	}
 
+	let snapshotPath: string | undefined;
 	if (options.beforeApply) {
-		// Sync-only execution: callers needing async work (e.g. snapshotting)
-		// should perform it before invoking runMigrations and pass nothing here.
 		const result = options.beforeApply({ pending, currentVersion: recordedMax });
-		if (result && typeof (result as Promise<void>).then === 'function') {
+		if (result && typeof (result as Promise<unknown>).then === 'function') {
 			throw new Error(
 				'runMigrations.beforeApply returned a Promise; use the synchronous form. ' +
 					'Perform async pre-flight work before calling runMigrations.',
 			);
+		}
+		if (result && typeof result === 'object' && 'snapshotPath' in result) {
+			snapshotPath = result.snapshotPath;
 		}
 	}
 
@@ -169,9 +175,11 @@ export function runMigrations(
 				// Best-effort rollback. If the inner error already aborted the txn,
 				// SQLite will report "no transaction is active" — safe to ignore.
 			}
-			throw new MigrationFailedError(migration.version, migration.name, cause);
+			const error = new MigrationFailedError(migration.version, migration.name, cause);
+			error.snapshotPath = snapshotPath;
+			throw error;
 		}
 	}
 
-	return { applied: appliedNow, skipped };
+	return { applied: appliedNow, skipped, snapshotPath };
 }
