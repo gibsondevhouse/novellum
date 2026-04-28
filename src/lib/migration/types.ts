@@ -10,6 +10,8 @@ export interface MigrationResult {
 	tablesProcessed: number;
 	rowsMigrated: number;
 	errors: MigrationError[];
+	skipped: number;
+	alreadyComplete: boolean;
 }
 
 export interface MigrationError {

@@ -1,5 +1,6 @@
 import { db } from '$lib/legacy/dexie/db';
 import { apiGet, apiPost } from '$lib/api-client.js';
+import { getPreference, setPreference } from '$lib/preferences.js';
 import type { Table } from 'dexie';
 import type {
 	MigrationResult,
@@ -7,6 +8,17 @@ import type {
 	MigrationCallbacks,
 	PreCheckResult,
 } from './types.js';
+
+export const MIGRATION_COMPLETE_KEY = 'migration.dexieToSqlite.completedAt';
+
+export async function isMigrationComplete(): Promise<boolean> {
+	const marker = await getPreference<string | null>(MIGRATION_COMPLETE_KEY, null);
+	return typeof marker === 'string' && marker.length > 0;
+}
+
+export async function markMigrationComplete(): Promise<void> {
+	await setPreference(MIGRATION_COMPLETE_KEY, new Date().toISOString());
+}
 
 /**
  * Tables in dependency order: projects first, then content/bible entities, then auxiliary.
@@ -50,36 +62,60 @@ export async function preCheck(): Promise<PreCheckResult[]> {
 }
 
 export async function migrate(callbacks?: MigrationCallbacks): Promise<MigrationResult> {
+	if (await isMigrationComplete()) {
+		return { tablesProcessed: 0, rowsMigrated: 0, errors: [], skipped: 0, alreadyComplete: true };
+	}
+
 	await db.open().catch(() => {});
 
 	let tablesProcessed = 0;
 	let rowsMigrated = 0;
+	let rowsSkipped = 0;
 	const errors: MigrationError[] = [];
 
 	for (const { table, apiPath } of MIGRATION_TABLES) {
 		const rows = await (db[table] as Table).toArray();
 		callbacks?.onTableStart?.(table as string, rows.length);
 
+		// Idempotency: load existing IDs from SQLite for this table.
+		let existingIds = new Set<string>();
+		try {
+			const existing = await apiGet<{ id: string }[]>(apiPath);
+			existingIds = new Set(existing.map((r) => r.id));
+		} catch {
+			/* if listing fails, fall back to per-row best-effort POST */
+		}
+
 		let tableMigrated = 0;
 		let tableErrors = 0;
+		let tableSkipped = 0;
 
 		for (const row of rows) {
+			const rowId = (row as { id?: string }).id ?? 'unknown';
+			if (existingIds.has(rowId)) {
+				tableSkipped++;
+				continue;
+			}
 			try {
 				await apiPost(apiPath, row);
 				tableMigrated++;
 			} catch (err) {
 				tableErrors++;
 				const message = err instanceof Error ? err.message : String(err);
-				const entityId = row.id ?? 'unknown';
-				errors.push({ table: table as string, entityId, message });
-				callbacks?.onError?.(table as string, entityId, message);
+				errors.push({ table: table as string, entityId: rowId, message });
+				callbacks?.onError?.(table as string, rowId, message);
 			}
 		}
 
 		rowsMigrated += tableMigrated;
+		rowsSkipped += tableSkipped;
 		tablesProcessed++;
 		callbacks?.onTableComplete?.(table as string, tableMigrated, tableErrors);
 	}
 
-	return { tablesProcessed, rowsMigrated, errors };
+	if (errors.length === 0) {
+		await markMigrationComplete();
+	}
+
+	return { tablesProcessed, rowsMigrated, errors, skipped: rowsSkipped, alreadyComplete: false };
 }
