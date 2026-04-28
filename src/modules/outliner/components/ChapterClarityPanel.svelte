@@ -1,6 +1,10 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { Act, Arc, Chapter, Character, Scene } from '$lib/db/types.js';
+	import {
+		getProjectMetadata,
+		setProjectMetadata,
+	} from '$lib/project-metadata.js';
 
 	type OutcomeType = 'win' | 'loss' | 'partial' | 'worse' | '';
 	type DraftStatus = 'idea' | 'draft' | 'revised' | 'locked' | '';
@@ -95,6 +99,44 @@
 			chapter.arcRefs?.map((ref: { arcId: string }) => ref.arcId) ?? [],
 		);
 		scenesExpanded = true;
+		const pid = projectId;
+		const cid = chapter.id;
+		void getProjectMetadata<Partial<ChapterMeta> | null>(
+			pid,
+			'chapter',
+			cid,
+			'clarity',
+			null,
+		).then((remote) => {
+			if (!remote || pid !== projectId || cid !== chapter.id) return;
+			meta = {
+				subtitle: remote.subtitle ?? meta.subtitle,
+				characterGoal: remote.characterGoal ?? meta.characterGoal,
+				obstacle: remote.obstacle ?? meta.obstacle,
+				centralConflict: remote.centralConflict ?? meta.centralConflict,
+				outcome: (remote.outcome as OutcomeType) ?? meta.outcome,
+				outcomeNote: remote.outcomeNote ?? meta.outcomeNote,
+				entryState: remote.entryState ?? meta.entryState,
+				exitState: remote.exitState ?? meta.exitState,
+				beats: {
+					opening: remote.beats?.opening ?? meta.beats.opening,
+					escalation: remote.beats?.escalation ?? meta.beats.escalation,
+					turningPoint: remote.beats?.turningPoint ?? meta.beats.turningPoint,
+					closingHook: remote.beats?.closingHook ?? meta.beats.closingHook,
+				},
+				povCharacterId: remote.povCharacterId ?? meta.povCharacterId,
+				linkedCharacterIds: remote.linkedCharacterIds ?? meta.linkedCharacterIds,
+				relatedArcIds: remote.relatedArcIds ?? meta.relatedArcIds,
+				continuityNotes: remote.continuityNotes ?? meta.continuityNotes,
+				draftStatus: (remote.draftStatus as DraftStatus) ?? meta.draftStatus,
+				targetLength: remote.targetLength ?? meta.targetLength,
+			};
+			try {
+				localStorage.setItem(storageKey(pid, cid), JSON.stringify(meta));
+			} catch {
+				/* storage unavailable */
+			}
+		});
 	});
 
 	function storageKey(pid: string, chapterId: string): string {
@@ -151,8 +193,10 @@
 	}
 
 	function persistMeta() {
-		if (typeof localStorage === 'undefined') return;
-		localStorage.setItem(storageKey(projectId, chapter.id), JSON.stringify(meta));
+		if (typeof localStorage !== 'undefined') {
+			localStorage.setItem(storageKey(projectId, chapter.id), JSON.stringify(meta));
+		}
+		void setProjectMetadata(projectId, 'chapter', chapter.id, 'clarity', meta);
 	}
 
 	async function persistTitle() {

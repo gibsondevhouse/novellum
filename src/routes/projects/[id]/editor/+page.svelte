@@ -10,6 +10,10 @@
 	import ManuscriptSurface from '$modules/editor/components/ManuscriptSurface.svelte';
 	import { updateScene } from '$modules/editor/services/scene-repository.js';
 	import { GhostButton, PageHeader } from '$lib/components/ui/index.js';
+	import {
+		getProjectMetadata,
+		setProjectMetadata,
+	} from '$lib/project-metadata.js';
 
 	type OutcomeType = 'win' | 'loss' | 'partial' | 'reversal' | '';
 	type SceneLengthEstimate = 'short' | 'medium' | 'long' | '';
@@ -286,6 +290,41 @@
 			quickIntent = loadQuickIntent(scene);
 			locationTag = scene.locationId ?? '';
 			autosaveService.mount(scene.id, scene.projectId);
+			// Reconcile with SQLite-canonical store (clarity is shared with the outliner).
+			const pid = scene.projectId;
+			const sid = scene.id;
+			void getProjectMetadata<Partial<SceneDefinition> | null>(pid, 'scene', sid, 'clarity', null).then(
+				(remote) => {
+					if (!remote || sid !== currentSceneId) return;
+					sceneDefinition = {
+						sceneGoal: remote.sceneGoal ?? sceneDefinition.sceneGoal,
+						immediateObstacle: remote.immediateObstacle ?? sceneDefinition.immediateObstacle,
+						tensionSource: remote.tensionSource ?? sceneDefinition.tensionSource,
+						turningPoint: remote.turningPoint ?? sceneDefinition.turningPoint,
+						outcome: (remote.outcome as OutcomeType) ?? sceneDefinition.outcome,
+						startState: remote.startState ?? sceneDefinition.startState,
+						endState: remote.endState ?? sceneDefinition.endState,
+						draftStatus: remote.draftStatus ?? sceneDefinition.draftStatus,
+						lengthEstimate:
+							(remote.lengthEstimate as SceneLengthEstimate) ?? sceneDefinition.lengthEstimate,
+					};
+				},
+			);
+			void getProjectMetadata<Partial<QuickIntent> | null>(pid, 'scene', sid, 'quickIntent', null).then(
+				(remote) => {
+					if (!remote || sid !== currentSceneId) return;
+					quickIntent = {
+						goal: remote.goal ?? quickIntent.goal,
+						obstacle: remote.obstacle ?? quickIntent.obstacle,
+						outcome: (remote.outcome as OutcomeType) ?? quickIntent.outcome,
+					};
+					try {
+						localStorage.setItem(quickIntentKey(scene), JSON.stringify(quickIntent));
+					} catch {
+						/* ignore */
+					}
+				},
+			);
 		}
 	});
 
@@ -439,8 +478,17 @@
 	}
 
 	function persistQuickIntent(): void {
-		if (!activeScene || typeof localStorage === 'undefined') return;
-		localStorage.setItem(quickIntentKey(activeScene), JSON.stringify(quickIntent));
+		if (!activeScene) return;
+		if (typeof localStorage !== 'undefined') {
+			localStorage.setItem(quickIntentKey(activeScene), JSON.stringify(quickIntent));
+		}
+		void setProjectMetadata<QuickIntent>(
+			activeScene.projectId,
+			'scene',
+			activeScene.id,
+			'quickIntent',
+			quickIntent,
+		);
 	}
 
 	function getScenePreviewMeta(scene: Scene): SceneDefinition {

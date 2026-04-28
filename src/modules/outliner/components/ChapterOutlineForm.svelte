@@ -5,6 +5,10 @@
 	import StructuredSection from '$lib/components/planning/StructuredSection.svelte';
 	import ArcTagHint from './ArcTagHint.svelte';
 	import { SurfacePanel } from '$lib/components/ui/index.js';
+	import {
+		getProjectMetadata,
+		setProjectMetadata,
+	} from '$lib/project-metadata.js';
 
 	let { chapter, onUpdate } = $props<{
 		chapter: Chapter;
@@ -18,6 +22,13 @@
 	const turnKey = $derived(`novellum_outline_chapter_turn_${chapter.id}`);
 	const revelationKey = $derived(`novellum_outline_chapter_revelation_${chapter.id}`);
 
+	type ChapterOutline = {
+		notes: string;
+		chapterFunction: string;
+		majorTurn: string;
+		revelation: string;
+	};
+
 	let notes = $state('');
 	let chapterFunction = $state('');
 	let majorTurn = $state('');
@@ -28,13 +39,49 @@
 		summary = chapter.summary;
 	});
 
-	// Load localStorage fields when chapter ID changes
+	// Load localStorage cache then reconcile with SQLite-canonical store.
 	$effect(() => {
 		notes = localStorage.getItem(notesKey) ?? '';
 		chapterFunction = localStorage.getItem(functionKey) ?? '';
 		majorTurn = localStorage.getItem(turnKey) ?? '';
 		revelation = localStorage.getItem(revelationKey) ?? '';
+		const cid = chapter.id;
+		void getProjectMetadata<ChapterOutline | null>(
+			chapter.projectId,
+			'chapter',
+			cid,
+			'outline',
+			null,
+		).then((remote) => {
+			if (!remote || cid !== chapter.id) return;
+			if (remote.notes !== undefined) {
+				notes = remote.notes;
+				try { localStorage.setItem(notesKey, remote.notes); } catch { /* ignore */ }
+			}
+			if (remote.chapterFunction !== undefined) {
+				chapterFunction = remote.chapterFunction;
+				try { localStorage.setItem(functionKey, remote.chapterFunction); } catch { /* ignore */ }
+			}
+			if (remote.majorTurn !== undefined) {
+				majorTurn = remote.majorTurn;
+				try { localStorage.setItem(turnKey, remote.majorTurn); } catch { /* ignore */ }
+			}
+			if (remote.revelation !== undefined) {
+				revelation = remote.revelation;
+				try { localStorage.setItem(revelationKey, remote.revelation); } catch { /* ignore */ }
+			}
+		});
 	});
+
+	function persistOutline(): void {
+		void setProjectMetadata<ChapterOutline>(
+			chapter.projectId,
+			'chapter',
+			chapter.id,
+			'outline',
+			{ notes, chapterFunction, majorTurn, revelation },
+		);
+	}
 
 	async function saveSummary() {
 		if (summary === chapter.summary) return;
@@ -48,6 +95,7 @@
 		} else {
 			localStorage.removeItem(notesKey);
 		}
+		persistOutline();
 	}
 
 	function saveChapterFunction() {
@@ -56,6 +104,7 @@
 		} else {
 			localStorage.removeItem(functionKey);
 		}
+		persistOutline();
 	}
 
 	function saveMajorTurn() {
@@ -64,6 +113,7 @@
 		} else {
 			localStorage.removeItem(turnKey);
 		}
+		persistOutline();
 	}
 
 	function saveRevelation() {
@@ -72,6 +122,7 @@
 		} else {
 			localStorage.removeItem(revelationKey);
 		}
+		persistOutline();
 	}
 </script>
 

@@ -5,6 +5,10 @@
 	import StructuredSection from '$lib/components/planning/StructuredSection.svelte';
 	import ArcTagHint from './ArcTagHint.svelte';
 	import { SurfacePanel } from '$lib/components/ui/index.js';
+	import {
+		getProjectMetadata,
+		setProjectMetadata,
+	} from '$lib/project-metadata.js';
 
 	let { scene, onUpdate } = $props<{
 		scene: Scene;
@@ -19,6 +23,8 @@
 	const outcomeKey = $derived(`novellum_outline_scene_outcome_${scene.id}`);
 	const notesKey = $derived(`novellum_outline_scene_notes_${scene.id}`);
 
+	type SceneOutline = { goal: string; conflict: string; outcome: string; notes: string };
+
 	let goal = $state('');
 	let conflict = $state('');
 	let outcome = $state('');
@@ -29,13 +35,48 @@
 		summary = scene.summary;
 	});
 
-	// Load structured planning fields from localStorage when scene ID changes
+	// Load structured planning fields from localStorage cache, then reconcile with SQLite.
 	$effect(() => {
 		goal = localStorage.getItem(goalKey) ?? '';
 		conflict = localStorage.getItem(conflictKey) ?? '';
 		outcome = localStorage.getItem(outcomeKey) ?? '';
 		notes = localStorage.getItem(notesKey) ?? '';
+		const sid = scene.id;
+		void getProjectMetadata<SceneOutline | null>(
+			scene.projectId,
+			'scene',
+			sid,
+			'outline',
+			null,
+		).then((remote) => {
+			if (!remote || sid !== scene.id) return;
+			if (remote.goal !== undefined) {
+				goal = remote.goal;
+				try { localStorage.setItem(goalKey, remote.goal); } catch { /* ignore */ }
+			}
+			if (remote.conflict !== undefined) {
+				conflict = remote.conflict;
+				try { localStorage.setItem(conflictKey, remote.conflict); } catch { /* ignore */ }
+			}
+			if (remote.outcome !== undefined) {
+				outcome = remote.outcome;
+				try { localStorage.setItem(outcomeKey, remote.outcome); } catch { /* ignore */ }
+			}
+			if (remote.notes !== undefined) {
+				notes = remote.notes;
+				try { localStorage.setItem(notesKey, remote.notes); } catch { /* ignore */ }
+			}
+		});
 	});
+
+	function persistOutline(): void {
+		void setProjectMetadata<SceneOutline>(scene.projectId, 'scene', scene.id, 'outline', {
+			goal,
+			conflict,
+			outcome,
+			notes,
+		});
+	}
 
 	async function saveSummary() {
 		if (summary === scene.summary) return;
@@ -49,6 +90,7 @@
 		} else {
 			localStorage.removeItem(goalKey);
 		}
+		persistOutline();
 	}
 
 	function saveConflict() {
@@ -57,6 +99,7 @@
 		} else {
 			localStorage.removeItem(conflictKey);
 		}
+		persistOutline();
 	}
 
 	function saveOutcome() {
@@ -65,6 +108,7 @@
 		} else {
 			localStorage.removeItem(outcomeKey);
 		}
+		persistOutline();
 	}
 
 	function saveNotes() {
@@ -73,6 +117,7 @@
 		} else {
 			localStorage.removeItem(notesKey);
 		}
+		persistOutline();
 	}
 </script>
 

@@ -7,6 +7,10 @@
 		reorderBeats,
 		getBeatsBySceneId,
 	} from '$modules/editor/services/beat-repository.js';
+	import {
+		getProjectMetadata,
+		setProjectMetadata,
+	} from '$lib/project-metadata.js';
 
 	type OutcomeType = 'win' | 'loss' | 'partial' | 'reversal' | '';
 	type DraftStatus = 'idea' | 'draft' | 'revised' | 'locked' | '';
@@ -95,6 +99,40 @@
 		);
 		void loadBeats();
 		beatsExpanded = false;
+		// Reconcile local cache with SQLite-canonical store.
+		const pid = projectId;
+		const sid = scene.id;
+		void getProjectMetadata<Partial<SceneMeta> | null>(pid, 'scene', sid, 'clarity', null).then(
+			(remote) => {
+				if (!remote || pid !== projectId || sid !== scene.id) return;
+				meta = {
+					sceneGoal: remote.sceneGoal ?? meta.sceneGoal,
+					immediateObstacle: remote.immediateObstacle ?? meta.immediateObstacle,
+					tensionSource: remote.tensionSource ?? meta.tensionSource,
+					turningPoint: remote.turningPoint ?? meta.turningPoint,
+					outcome: (remote.outcome as OutcomeType) ?? meta.outcome,
+					startState: remote.startState ?? meta.startState,
+					endState: remote.endState ?? meta.endState,
+					momentFlags: {
+						dialogueHeavy: remote.momentFlags?.dialogueHeavy ?? meta.momentFlags.dialogueHeavy,
+						actionHeavy: remote.momentFlags?.actionHeavy ?? meta.momentFlags.actionHeavy,
+						exposition: remote.momentFlags?.exposition ?? meta.momentFlags.exposition,
+						emotionalPivot: remote.momentFlags?.emotionalPivot ?? meta.momentFlags.emotionalPivot,
+					},
+					continuityNotes: remote.continuityNotes ?? meta.continuityNotes,
+					draftStatus: (remote.draftStatus as DraftStatus) ?? meta.draftStatus,
+					lengthEstimate:
+						(remote.lengthEstimate as SceneLengthEstimate) ?? meta.lengthEstimate,
+					linkedCharacterIds: remote.linkedCharacterIds ?? meta.linkedCharacterIds,
+					relatedArcIds: remote.relatedArcIds ?? meta.relatedArcIds,
+				};
+				try {
+					localStorage.setItem(storageKey(pid, sid), JSON.stringify(meta));
+				} catch {
+					/* storage unavailable */
+				}
+			},
+		);
 	});
 
 	function storageKey(pid: string, sceneId: string): string {
@@ -153,8 +191,10 @@
 	}
 
 	function persistMeta() {
-		if (typeof localStorage === 'undefined') return;
-		localStorage.setItem(storageKey(projectId, scene.id), JSON.stringify(meta));
+		if (typeof localStorage !== 'undefined') {
+			localStorage.setItem(storageKey(projectId, scene.id), JSON.stringify(meta));
+		}
+		void setProjectMetadata(projectId, 'scene', scene.id, 'clarity', meta);
 	}
 
 	async function persistTitle() {

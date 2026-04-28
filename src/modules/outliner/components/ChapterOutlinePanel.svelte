@@ -1,6 +1,10 @@
 <script lang="ts">
 	import type { Chapter } from '$lib/db/types.js';
 	import type { BeatFocus } from '../types.js';
+	import {
+		getProjectMetadata,
+		setProjectMetadata,
+	} from '$lib/project-metadata.js';
 
 	let {
 		chapter,
@@ -15,6 +19,7 @@
 	const storageKey = $derived(`novellum_outline_chapter_beats_${chapter.id}`);
 
 	type LocalBeat = { id: string; text: string };
+	type BeatNotes = Record<string, string>;
 
 	let beats = $state<LocalBeat[]>([]);
 	let newText = $state('');
@@ -23,10 +28,54 @@
 	$effect(() => {
 		const raw = localStorage.getItem(storageKey);
 		beats = raw ? (JSON.parse(raw) as LocalBeat[]) : [];
+		const cid = chapter.id;
+		void getProjectMetadata<LocalBeat[] | null>(
+			chapter.projectId,
+			'chapter',
+			cid,
+			'beats',
+			null,
+		).then((remote) => {
+			if (!remote || cid !== chapter.id) return;
+			beats = remote;
+			try { localStorage.setItem(storageKey, JSON.stringify(remote)); } catch { /* ignore */ }
+		});
 	});
 
 	function persist() {
 		localStorage.setItem(storageKey, JSON.stringify(beats));
+		void setProjectMetadata<LocalBeat[]>(
+			chapter.projectId,
+			'chapter',
+			chapter.id,
+			'beats',
+			beats,
+		);
+	}
+
+	function beatNoteWrite(beatId: string, value: string) {
+		const notesKey = `novellum_outline_chapter_beat_notes_${beatId}`;
+		if (value.trim()) {
+			localStorage.setItem(notesKey, value);
+		} else {
+			localStorage.removeItem(notesKey);
+		}
+		// Mirror to SQLite as a beat-notes blob keyed by chapter so it travels with backups.
+		const current = (() => {
+			const out: BeatNotes = {};
+			for (const b of beats) {
+				const raw = localStorage.getItem(`novellum_outline_chapter_beat_notes_${b.id}`);
+				if (raw) out[b.id] = raw;
+			}
+			return out;
+		})();
+		void setProjectMetadata<BeatNotes>(
+			chapter.projectId,
+			'chapter',
+			chapter.id,
+			'beat-notes',
+			current,
+		);
 	}
 
 	function addBeat() {
@@ -54,11 +103,7 @@
 				persist();
 			},
 			onUpdateNotes: (notes: string) => {
-				if (notes.trim()) {
-					localStorage.setItem(notesKey, notes);
-				} else {
-					localStorage.removeItem(notesKey);
-				}
+				beatNoteWrite(beat.id, notes);
 			},
 		});
 	}

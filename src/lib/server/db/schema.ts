@@ -337,6 +337,16 @@ CREATE TABLE IF NOT EXISTS app_preferences (
 	value TEXT NOT NULL,
 	updatedAt TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS project_metadata (
+	projectId TEXT NOT NULL,
+	scope TEXT NOT NULL,
+	ownerId TEXT NOT NULL,
+	key TEXT NOT NULL,
+	value TEXT NOT NULL,
+	updatedAt TEXT NOT NULL,
+	PRIMARY KEY (projectId, scope, ownerId, key)
+);
 `;
 
 export const INDEX_SQL = `
@@ -373,5 +383,6 @@ CREATE INDEX IF NOT EXISTS idx_stages_beatId ON stages(beatId);
 CREATE INDEX IF NOT EXISTS idx_stages_projectId ON stages(projectId);
 CREATE INDEX IF NOT EXISTS idx_milestones_actId ON milestones(actId);
 CREATE INDEX IF NOT EXISTS idx_milestones_projectId ON milestones(projectId);
+CREATE INDEX IF NOT EXISTS idx_project_metadata_owner ON project_metadata(projectId, scope, ownerId);
 `;
 
