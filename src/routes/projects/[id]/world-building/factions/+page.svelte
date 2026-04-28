@@ -11,6 +11,7 @@
 	import FactionRelationshipPanel from '$modules/bible/components/FactionRelationshipPanel.svelte';
 	import FactionStoryFunctionPanel from '$modules/bible/components/FactionStoryFunctionPanel.svelte';
 	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
+	import { getProjectMetadata, setProjectMetadata } from '$lib/project-metadata.js';
 
 	type FactionRelationship = {
 		id: string;
@@ -113,11 +114,39 @@
 			}
 		}
 		hasHydrated = true;
+		const pid = data.projectId;
+		if (!pid) return;
+		void getProjectMetadata<Record<string, FactionRecord> | null>(
+			pid,
+			'project',
+			pid,
+			'factions',
+			null,
+		).then((remote) => {
+			if (!remote || pid !== data.projectId) return;
+			factionsById = remote;
+			if (!selectedFactionId) selectedFactionId = Object.keys(remote)[0] ?? null;
+			try {
+				window.localStorage.setItem(storageKey, JSON.stringify(remote));
+			} catch {
+				/* ignore */
+			}
+		});
 	});
 
 	$effect(() => {
 		if (typeof window === 'undefined' || !hasHydrated) return;
+		const pid = data.projectId;
 		window.localStorage.setItem(storageKey, JSON.stringify(factionsById));
+		if (pid) {
+			void setProjectMetadata<Record<string, FactionRecord>>(
+				pid,
+				'project',
+				pid,
+				'factions',
+				factionsById,
+			);
+		}
 	});
 
 	function selectFaction(id: string) {

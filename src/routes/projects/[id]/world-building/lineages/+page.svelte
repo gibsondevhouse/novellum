@@ -11,6 +11,7 @@
 	import LineageRelationshipPanel from '$modules/bible/components/LineageRelationshipPanel.svelte';
 	import LineageStoryFunctionPanel from '$modules/bible/components/LineageStoryFunctionPanel.svelte';
 	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
+	import { getProjectMetadata, setProjectMetadata } from '$lib/project-metadata.js';
 
 	type LineageRelationship = {
 		id: string;
@@ -115,11 +116,40 @@
 			}
 		}
 		hasHydrated = true;
+		// Reconcile with SQLite-canonical store.
+		const pid = data.projectId;
+		if (!pid) return;
+		void getProjectMetadata<Record<string, LineageRecord> | null>(
+			pid,
+			'project',
+			pid,
+			'lineages',
+			null,
+		).then((remote) => {
+			if (!remote || pid !== data.projectId) return;
+			lineagesById = remote;
+			if (!selectedLineageId) selectedLineageId = Object.keys(remote)[0] ?? null;
+			try {
+				window.localStorage.setItem(storageKey, JSON.stringify(remote));
+			} catch {
+				/* ignore */
+			}
+		});
 	});
 
 	$effect(() => {
 		if (typeof window === 'undefined' || !hasHydrated) return;
+		const pid = data.projectId;
 		window.localStorage.setItem(storageKey, JSON.stringify(lineagesById));
+		if (pid) {
+			void setProjectMetadata<Record<string, LineageRecord>>(
+				pid,
+				'project',
+				pid,
+				'lineages',
+				lineagesById,
+			);
+		}
 	});
 
 	function selectLineage(id: string) {
