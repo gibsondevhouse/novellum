@@ -41,6 +41,18 @@ export default tseslint.config(
 		plugins: { boundaries },
 		settings: {
 			'boundaries/elements': [
+				{ type: 'legacy-dexie', pattern: ['src/lib/legacy/dexie/**'] },
+				{
+					type: 'legacy-allowed-consumer',
+					pattern: [
+						'src/lib/migration/**',
+						'src/modules/outliner/services/migrations/**',
+						'src/modules/export/services/portability/**',
+						'src/modules/export/services/__tests__/**',
+						'src/modules/assets/**',
+						'src/routes/settings/migrate/**',
+					],
+				},
 				{ type: 'lib', pattern: ['src/lib/**'] },
 				{ type: 'module-editor', pattern: ['src/modules/editor/**'] },
 				{ type: 'module-bible', pattern: ['src/modules/bible/**'] },
@@ -62,6 +74,14 @@ export default tseslint.config(
 				{
 					default: 'disallow',
 					rules: [
+						{
+							from: [{ type: 'legacy-allowed-consumer' }],
+							allow: [
+								{ to: { type: 'legacy-dexie' } },
+								{ to: { type: 'lib' } },
+								{ to: { type: 'legacy-allowed-consumer' } },
+							],
+						},
 						{
 							from: [{ type: 'routes' }],
 							allow: [
