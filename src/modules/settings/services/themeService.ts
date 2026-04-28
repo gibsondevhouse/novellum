@@ -1,4 +1,8 @@
+import { setPreference } from '$lib/preferences.js';
+
 export type Theme = 'dark' | 'light' | 'system';
+
+const PREF_KEY = 'app.theme';
 
 export function getStoredTheme(): Theme {
 	try {
@@ -18,6 +22,10 @@ export function storeTheme(theme: Theme): void {
 	} catch {
 		// Ignore
 	}
+	// Mirror to SQLite for backup/restore coverage. The localStorage write is
+	// retained as a synchronous read source for the FOUC-prevention bootstrap
+	// script in src/app.html.
+	void setPreference(PREF_KEY, theme);
 }
 
 export function applyTheme(theme: Theme): void {

@@ -1,15 +1,22 @@
 <script lang="ts">
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
+	import { getPreference, setPreference } from '$lib/preferences.js';
 
 	let open = $state(false);
 	let modalEl = $state<HTMLElement | null>(null);
 	let previouslyFocused = $state<HTMLElement | null>(null);
 
 	$effect(() => {
-		const hasSeen = localStorage.getItem('novellum:seen_onboarding');
-		if (!hasSeen) {
-			open = true;
-		}
+		const hasSeenLocal = localStorage.getItem('novellum:seen_onboarding');
+		if (hasSeenLocal) return;
+		// Local cache says "unseen" — confirm with SQLite-canonical store before opening.
+		void getPreference<boolean>('app.seenOnboarding', false).then((seen) => {
+			if (seen) {
+				localStorage.setItem('novellum:seen_onboarding', 'true');
+			} else {
+				open = true;
+			}
+		});
 	});
 
 	$effect(() => {
@@ -28,6 +35,7 @@
 
 	function dismiss() {
 		localStorage.setItem('novellum:seen_onboarding', 'true');
+		void setPreference('app.seenOnboarding', true);
 		open = false;
 	}
 

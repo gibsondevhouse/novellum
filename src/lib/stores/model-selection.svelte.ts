@@ -1,4 +1,7 @@
+import { getPreference, setPreference } from '$lib/preferences.js';
+
 const STORAGE_KEY = 'novellum_selected_model';
+const PREF_KEY = 'app.selectedModel';
 
 export interface ModelOption {
 	id: string;
@@ -19,6 +22,16 @@ function loadModel(): string {
 
 let selectedModelId = $state(loadModel());
 
+// Reconcile cached value with SQLite-canonical value on first browser run.
+if (typeof window !== 'undefined') {
+	void getPreference<string>(PREF_KEY, selectedModelId).then((remote) => {
+		if (remote && remote !== selectedModelId && AVAILABLE_MODELS.some((m) => m.id === remote)) {
+			selectedModelId = remote;
+			localStorage.setItem(STORAGE_KEY, remote);
+		}
+	});
+}
+
 export function getSelectedModel(): string {
 	return selectedModelId;
 }
@@ -33,5 +46,6 @@ export function setSelectedModel(modelId: string): void {
 	selectedModelId = modelId;
 	if (typeof window !== 'undefined') {
 		localStorage.setItem(STORAGE_KEY, modelId);
+		void setPreference(PREF_KEY, modelId);
 	}
 }

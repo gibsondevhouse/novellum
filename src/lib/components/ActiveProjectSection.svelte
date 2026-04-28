@@ -3,6 +3,9 @@
 	import { browser } from '$app/environment';
         import SidebarSection from './SidebarSection.svelte';
         import SidebarItem from './SidebarItem.svelte';
+        import { getPreference, setPreference } from '$lib/preferences.js';
+
+        const PREF_KEY = 'app.lastProjectId';
 
         let base = $state<string | null>(null);
 
@@ -14,9 +17,10 @@
 
                 const currentId = page.params.id;
                 const isProjectRoute = page.url.pathname.startsWith('/projects/');
-                
+
                 if (isProjectRoute && currentId && currentId !== 'undefined') {
                         localStorage.setItem('novellum_last_project_id', currentId);
+                        void setPreference(PREF_KEY, currentId);
                         base = `/projects/${currentId}`;
                 } else {
                         const storedId = localStorage.getItem('novellum_last_project_id');
@@ -24,6 +28,13 @@
                                 base = `/projects/${storedId}`;
                         } else {
                                 base = null;
+                                // Reconcile from SQLite-canonical store when local cache is empty.
+                                void getPreference<string | null>(PREF_KEY, null).then((remote) => {
+                                        if (remote) {
+                                                localStorage.setItem('novellum_last_project_id', remote);
+                                                base = `/projects/${remote}`;
+                                        }
+                                });
                         }
                 }
         });

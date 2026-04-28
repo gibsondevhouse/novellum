@@ -331,6 +331,12 @@ CREATE TABLE IF NOT EXISTS milestones (
 	createdAt TEXT NOT NULL,
 	updatedAt TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS app_preferences (
+	key TEXT PRIMARY KEY,
+	value TEXT NOT NULL,
+	updatedAt TEXT NOT NULL
+);
 `;
 
 export const INDEX_SQL = `
