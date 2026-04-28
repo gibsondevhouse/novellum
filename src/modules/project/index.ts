@@ -6,10 +6,29 @@ export {
 	createChapter,
 	getChapterById,
 	getChaptersByProjectId,
+	getChaptersByActId,
 	updateChapter,
 	removeChapter,
 	reorderChapters,
 } from './services/chapter-repository.js';
+export {
+	createAct,
+	getActById,
+	getActsByProjectId,
+	getActsByArcId,
+	updateAct,
+	removeAct,
+	reorderActs,
+} from './services/act-repository.js';
+export {
+	createArc,
+	getArcById,
+	getArcsByProjectId,
+	updateArc,
+	removeArc,
+	reorderArcs,
+} from './services/arc-repository.js';
+export * as hierarchyStore from './stores/hierarchy-store.svelte.js';
 export * from './services/hub-metrics-service.js';
 export * from './stores/project-hub.svelte.ts';
 export { default as ProjectCard } from './components/ProjectCard.svelte';

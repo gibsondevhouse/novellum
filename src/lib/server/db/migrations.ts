@@ -265,6 +265,36 @@ function backfillRelationshipStatusFromDescriptionEnvelope(db: Database.Database
 	}
 }
 
+function normalizeAndDedupeCharacterRelationships(db: Database.Database): void {
+	// Canonical ordering keeps (projectId, characterAId, characterBId) unique regardless of input direction.
+	db.exec(`
+		UPDATE character_relationships
+		SET characterAId = characterBId,
+			characterBId = characterAId
+		WHERE characterAId > characterBId;
+	`);
+
+	// Guard against historical self-links before uniqueness enforcement.
+	db.exec(`DELETE FROM character_relationships WHERE characterAId = characterBId;`);
+
+	// Keep earliest record per canonical pair and remove newer duplicates.
+	db.exec(`
+		DELETE FROM character_relationships
+		WHERE id IN (
+			SELECT newer.id
+			FROM character_relationships newer
+			JOIN character_relationships older
+				ON newer.projectId = older.projectId
+				AND newer.characterAId = older.characterAId
+				AND newer.characterBId = older.characterBId
+				AND (
+					newer.createdAt > older.createdAt
+					OR (newer.createdAt = older.createdAt AND newer.id > older.id)
+				)
+		);
+	`);
+}
+
 function ensureLocationNarrativeColumns(db: Database.Database): void {
 	const columns = db.prepare('PRAGMA table_info(locations)').all() as Array<{ name: string }>;
 
@@ -313,6 +343,7 @@ export function runMigrations(db: Database.Database): void {
 		backfillIndividualsFromNotesEnvelope(db);
 		ensureCharacterRelationshipStatusColumn(db);
 		backfillRelationshipStatusFromDescriptionEnvelope(db);
+		normalizeAndDedupeCharacterRelationships(db);
 		ensureLocationNarrativeColumns(db);
 		db.exec(INDEX_SQL);
 	})();

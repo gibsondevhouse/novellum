@@ -7,9 +7,10 @@ import { defineConfig, devices } from '@playwright/test';
  * Run: `pnpm run dev` in a separate terminal.
  */
 export default defineConfig({
-	testDir: './tests/visual',
+	testDir: './tests',
+	testMatch: ['visual/**/*.test.ts', 'e2e/**/*.spec.ts'],
 	outputDir: './tests/visual/test-results',
-	snapshotPathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}{ext}',
+	snapshotPathTemplate: '{testDir}/visual/__screenshots__/{testFilePath}/{arg}{ext}',
 
 	/* Fail fast — visual regression is not a large suite */
 	fullyParallel: false,

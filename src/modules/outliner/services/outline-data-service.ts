@@ -1,7 +1,7 @@
 import { getCharactersByProjectId } from '$modules/bible/services/character-repository.js';
 import type { Arc, Act, Scene, Character, Beat, Stage, Milestone } from '$lib/db/types.js';
 import type { ChapterWithScenes } from '$modules/outliner/types.js';
-import { getArcsByProjectId } from '$modules/outliner/services/arc-repository.js';
+import { getArcsByProjectId } from '$modules/project/services/arc-repository.js';
 import { getActsByProjectId, getMilestonesByProjectId } from '$modules/outliner/services/story-structure-service.js';
 import { getChaptersByProjectId } from '$modules/project/services/chapter-repository.js';
 import { getScenesByProjectId } from '$modules/editor/services/scene-repository.js';

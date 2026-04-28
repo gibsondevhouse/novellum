@@ -20,7 +20,7 @@ const config = {
 		arcRefs: { default: [], json: true },
 	},
 	orderBy: '"order" ASC',
-	queryParams: ['projectId'],
+	queryParams: ['projectId', 'actId'],
 	decodeRow,
 };
 

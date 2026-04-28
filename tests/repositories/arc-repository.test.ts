@@ -23,7 +23,7 @@ vi.mock('$lib/api-client.js', () => ({
 }));
 
 const { createArc, getArcById, getArcsByProjectId, updateArc, removeArc, reorderArcs } =
-	await import('../../src/modules/outliner/services/arc-repository.js');
+	await import('../../src/modules/project/services/arc-repository.js');
 
 const projectId = 'proj-1';
 

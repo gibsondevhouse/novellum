@@ -343,6 +343,7 @@ CREATE INDEX IF NOT EXISTS idx_characters_projectId ON characters(projectId);
 CREATE INDEX IF NOT EXISTS idx_character_relationships_projectId ON character_relationships(projectId);
 CREATE INDEX IF NOT EXISTS idx_character_relationships_characterAId ON character_relationships(characterAId);
 CREATE INDEX IF NOT EXISTS idx_character_relationships_characterBId ON character_relationships(characterBId);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_character_relationships_project_pair_unique ON character_relationships(projectId, characterAId, characterBId);
 CREATE INDEX IF NOT EXISTS idx_locations_projectId ON locations(projectId);
 CREATE INDEX IF NOT EXISTS idx_locations_kind ON locations(projectId, kind);
 CREATE INDEX IF NOT EXISTS idx_locations_realmId ON locations(projectId, realmId);

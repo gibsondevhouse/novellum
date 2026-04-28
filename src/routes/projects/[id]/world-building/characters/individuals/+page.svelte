@@ -12,6 +12,12 @@
 		removeRelationship as removePersistedRelationship,
 		updateRelationship,
 	} from '$modules/bible/services/character-repository.js';
+	import {
+		addRelationshipReciprocal,
+		removeRelationshipReciprocal,
+		updateRelationshipReciprocal,
+		type IndividualsCharacterRecord,
+	} from '$modules/bible/services/individuals-relationship-state.js';
 	import CharacterCorePanel from '$modules/bible/components/CharacterCorePanel.svelte';
 	import CharacterDetailHeader from '$modules/bible/components/CharacterDetailHeader.svelte';
 	import ContinuityPanel from '$modules/bible/components/ContinuityPanel.svelte';
@@ -203,6 +209,49 @@
 	);
 	let selectedCharacterId = $state<string | null>(untrack(() => data.characters[0]?.id ?? null));
 	let deletingCharacterId = $state<string | null>(null);
+	let pendingSaveCount = $state(0);
+	let saveErrorMessage = $state<string | null>(null);
+	let lastSavedAt = $state<number | null>(null);
+	const hasPendingSaves = $derived(pendingSaveCount > 0);
+	const showSaveIndicator = $derived(hasPendingSaves || !!saveErrorMessage || !!lastSavedAt);
+
+	async function runWithPersistenceFeedback(
+		operation: () => Promise<void>,
+		errorMessage: string,
+	): Promise<boolean> {
+		pendingSaveCount += 1;
+		saveErrorMessage = null;
+		try {
+			await operation();
+			lastSavedAt = Date.now();
+			return true;
+		} catch (error) {
+			console.error(errorMessage, error);
+			saveErrorMessage = errorMessage;
+			return false;
+		} finally {
+			pendingSaveCount = Math.max(0, pendingSaveCount - 1);
+		}
+	}
+
+	async function runWithPersistenceResult<T>(
+		operation: () => Promise<T>,
+		errorMessage: string,
+	): Promise<T | null> {
+		pendingSaveCount += 1;
+		saveErrorMessage = null;
+		try {
+			const result = await operation();
+			lastSavedAt = Date.now();
+			return result;
+		} catch (error) {
+			console.error(errorMessage, error);
+			saveErrorMessage = errorMessage;
+			return null;
+		} finally {
+			pendingSaveCount = Math.max(0, pendingSaveCount - 1);
+		}
+	}
 
 	$effect(() => {
 		const nextMap = buildCharacterMap(data.characters, data.relationships);
@@ -253,24 +302,32 @@
 
 	async function createNewCharacter() {
 		const nextCount = Object.keys(characterRecords).length + 1;
-		const created = await createCharacter({
-			projectId: data.projectId,
-			name: `New Character ${nextCount}`,
-			role: '',
-			pronunciation: '',
-			aliases: [],
-			diasporaOrigin: '',
-			photoUrl: '',
-			bio: '',
-			faction: '',
-			anomalies: [],
-			traits: [],
-			goals: [],
-			flaws: [],
-			arcs: [],
-			notes: '',
-			tags: [],
-		});
+		const created = await runWithPersistenceResult<Character>(
+			() =>
+				createCharacter({
+				projectId: data.projectId,
+				name: `New Character ${nextCount}`,
+				role: '',
+				pronunciation: '',
+				aliases: [],
+				diasporaOrigin: '',
+				photoUrl: '',
+				bio: '',
+				faction: '',
+				anomalies: [],
+				traits: [],
+				goals: [],
+				flaws: [],
+				arcs: [],
+				notes: '',
+				tags: [],
+				}),
+			'Could not create character.',
+		);
+
+		if (!created) {
+			return;
+		}
 
 		characterRecords = {
 			...characterRecords,
@@ -311,18 +368,19 @@
 	}
 
 	function updateCharacterField(field: EditableCharacterField, value: string) {
-		if (!selectedCharacterId) return;
-		const current = characterRecords[selectedCharacterId];
+		const activeCharacterId = selectedCharacterId;
+		if (!activeCharacterId) return;
+		const current = characterRecords[activeCharacterId];
 		if (!current) return;
 
 		const nextCharacter = {
 			...current,
 			[field]: value,
 		};
-		characterRecords[selectedCharacterId] = nextCharacter;
+		characterRecords[activeCharacterId] = nextCharacter;
 
 		if (field === 'photoUrl' && typeof window !== 'undefined') {
-			const key = `${PHOTO_STORAGE_KEY_PREFIX}:${data.projectId}:${selectedCharacterId}`;
+			const key = `${PHOTO_STORAGE_KEY_PREFIX}:${data.projectId}:${activeCharacterId}`;
 			if (value.trim()) {
 				window.localStorage.setItem(key, value);
 			} else {
@@ -330,9 +388,10 @@
 			}
 		}
 
-		void persistCharacterField(selectedCharacterId, field, nextCharacter).catch((error) => {
-			console.error('Failed to persist character field update', error);
-		});
+		void runWithPersistenceFeedback(
+			() => persistCharacterField(activeCharacterId, field, nextCharacter),
+			'Could not save character changes.',
+		);
 	}
 
 	function readFileAsDataUrl(file: File): Promise<string> {
@@ -364,13 +423,21 @@
 			.replace(/(^-|-$)/g, '');
 		const extension = file.type.split('/')[1] || 'png';
 
-		const createdAsset = await assetsStore.addAsset({
-			projectId: data.projectId || 'global',
-			name: `${baseName || 'character'}-portrait.${extension}`,
-			mimeType: file.type || 'image/png',
-			data: dataUrl,
-			sizeBytes: file.size,
-		});
+		const createdAsset = await runWithPersistenceResult<{ data: string }>(
+			() =>
+				assetsStore.addAsset({
+				projectId: data.projectId || 'global',
+				name: `${baseName || 'character'}-portrait.${extension}`,
+				mimeType: file.type || 'image/png',
+				data: dataUrl,
+				sizeBytes: file.size,
+				}),
+			'Could not upload character photo.',
+		);
+
+		if (!createdAsset) {
+			return;
+		}
 
 		updateCharacterField('photoUrl', createdAsset.data);
 	}
@@ -381,90 +448,21 @@
 		value: string,
 	) {
 		if (!selectedCharacterId) return;
-		const current = characterRecords[selectedCharacterId];
-		if (!current || !current.relationships[index]) return;
+		const { nextRecords, previousRelationship, updatedRelationship } = updateRelationshipReciprocal(
+			characterRecords as Record<string, IndividualsCharacterRecord>,
+			selectedCharacterId,
+			index,
+			field,
+			value,
+		);
+		if (!previousRelationship || !updatedRelationship) return;
 
-		const previousRelationship = current.relationships[index];
-		const relationships = [...current.relationships];
-		relationships[index] = {
-			...relationships[index],
-			[field]: value,
-		};
-
-		const updatedRelationship = relationships[index];
-		const nextCharacterRecords = { ...characterRecords };
-
-		if (field === 'targetCharacterId') {
-			const previousTargetId = previousRelationship.targetCharacterId;
-			const previousTarget = nextCharacterRecords[previousTargetId];
-			if (previousTarget) {
-				nextCharacterRecords[previousTargetId] = {
-					...previousTarget,
-					relationships: previousTarget.relationships.filter(
-						(relationship) => relationship.id !== previousRelationship.id,
-					),
-				};
-			}
-
-			const nextTargetId = updatedRelationship.targetCharacterId;
-			const nextTarget = nextCharacterRecords[nextTargetId];
-			if (nextTarget) {
-				const nextTargetRelationships = [...nextTarget.relationships];
-				const mirrorIndex = nextTargetRelationships.findIndex(
-					(relationship) => relationship.id === updatedRelationship.id,
-				);
-				const mirroredRelationship: LocalRelationship = {
-					id: updatedRelationship.id,
-					targetCharacterId: selectedCharacterId,
-					relationshipType: updatedRelationship.relationshipType,
-					status: updatedRelationship.status,
-					notes: updatedRelationship.notes,
-				};
-
-				if (mirrorIndex >= 0) {
-					nextTargetRelationships[mirrorIndex] = mirroredRelationship;
-				} else {
-					nextTargetRelationships.push(mirroredRelationship);
-				}
-
-				nextCharacterRecords[nextTargetId] = {
-					...nextTarget,
-					relationships: nextTargetRelationships,
-				};
-			}
-		} else {
-			const targetId = updatedRelationship.targetCharacterId;
-			const targetCharacter = nextCharacterRecords[targetId];
-			if (targetCharacter) {
-				const targetRelationships = [...targetCharacter.relationships];
-				const mirrorIndex = targetRelationships.findIndex(
-					(relationship) => relationship.id === updatedRelationship.id,
-				);
-				if (mirrorIndex >= 0) {
-					targetRelationships[mirrorIndex] = {
-						...targetRelationships[mirrorIndex],
-						[field]: value,
-					};
-					nextCharacterRecords[targetId] = {
-						...targetCharacter,
-						relationships: targetRelationships,
-					};
-				}
-			}
-		}
-
-		nextCharacterRecords[selectedCharacterId] = {
-			...current,
-			relationships,
-		};
-
-		characterRecords = nextCharacterRecords;
+		characterRecords = nextRecords as typeof characterRecords;
 
 		if (field === 'targetCharacterId') {
 			const sourceCharacterId = selectedCharacterId;
 			const replacement = updatedRelationship;
-			void (async () => {
-				try {
+			void runWithPersistenceFeedback(async () => {
 					const created = await createRelationship({
 						projectId: data.projectId,
 						characterAId: sourceCharacterId,
@@ -484,10 +482,7 @@
 						sourceCharacterId,
 						replacement.targetCharacterId,
 					);
-				} catch (error) {
-					console.error('Failed to persist target relationship change', error);
-				}
-			})();
+			}, 'Could not save relationship target change.');
 			return;
 		}
 
@@ -502,9 +497,10 @@
 			description: relationshipToPersist.notes ?? '',
 		};
 
-		void updateRelationship(relationshipToPersist.id, relationshipChanges).catch((error) => {
-			console.error('Failed to persist relationship update', error);
-		});
+		void runWithPersistenceFeedback(
+			() => updateRelationship(relationshipToPersist.id, relationshipChanges).then(() => undefined),
+			'Could not save relationship changes.',
+		);
 	}
 
 	function addRelationship(relationship: {
@@ -513,56 +509,30 @@
 		status?: string;
 		notes?: string;
 	}) {
-		if (!selectedCharacterId) return;
-		const current = characterRecords[selectedCharacterId];
-		if (!current) return;
+		const sourceCharacterId = selectedCharacterId;
+		if (!sourceCharacterId) return;
 
 		const nextId = `rel-${Date.now()}`;
-		const nextCharacterRecords = { ...characterRecords };
-		nextCharacterRecords[selectedCharacterId] = {
-			...current,
-			relationships: [
-				...current.relationships,
-				{
-					id: nextId,
-					targetCharacterId: relationship.targetCharacterId,
-					relationshipType: relationship.relationshipType ?? '',
-					status: relationship.status,
-					notes: relationship.notes,
-				},
-			],
+		const nextRelationship: LocalRelationship = {
+			id: nextId,
+			targetCharacterId: relationship.targetCharacterId,
+			relationshipType: relationship.relationshipType ?? '',
+			status: relationship.status,
+			notes: relationship.notes,
 		};
-
-		const target = nextCharacterRecords[relationship.targetCharacterId];
-		if (target) {
-			const hasMirror = target.relationships.some((existing) => existing.id === nextId);
-			if (!hasMirror) {
-				nextCharacterRecords[relationship.targetCharacterId] = {
-					...target,
-					relationships: [
-						...target.relationships,
-						{
-							id: nextId,
-							targetCharacterId: selectedCharacterId,
-							relationshipType: relationship.relationshipType ?? '',
-							status: relationship.status,
-							notes: relationship.notes,
-						},
-					],
-				};
-			}
-		}
-
-		characterRecords = nextCharacterRecords;
+		characterRecords = addRelationshipReciprocal(
+			characterRecords as Record<string, IndividualsCharacterRecord>,
+			sourceCharacterId,
+			nextRelationship,
+		) as typeof characterRecords;
 
 		const relationshipType = relationship.relationshipType ?? '';
 		const notes = relationship.notes ?? '';
 		const status = relationship.status ?? '';
-		void (async () => {
-			try {
+		void runWithPersistenceFeedback(async () => {
 				const created = await createRelationship({
 					projectId: data.projectId,
-					characterAId: selectedCharacterId,
+					characterAId: sourceCharacterId,
 					characterBId: relationship.targetCharacterId,
 					type: relationshipType,
 					status,
@@ -571,51 +541,30 @@
 				swapRelationshipIdAcrossCharacters(
 					nextId,
 					created.id,
-					selectedCharacterId,
+					sourceCharacterId,
 					relationship.targetCharacterId,
 				);
-			} catch (error) {
-				console.error('Failed to persist new relationship', error);
-			}
-		})();
+		}, 'Could not create relationship.');
 	}
 
 	function removeRelationship(index: number) {
 		if (!selectedCharacterId) return;
-		const current = characterRecords[selectedCharacterId];
-		if (!current) return;
-		const relationshipToRemove = current.relationships[index];
-		if (!relationshipToRemove) return;
-
-		const relationships = current.relationships.filter(
-			(_, relationshipIndex) => relationshipIndex !== index,
+		const { nextRecords, removedRelationship: relationshipToRemove } = removeRelationshipReciprocal(
+			characterRecords as Record<string, IndividualsCharacterRecord>,
+			selectedCharacterId,
+			index,
 		);
-
-		const nextCharacterRecords = { ...characterRecords };
-		nextCharacterRecords[selectedCharacterId] = {
-			...current,
-			relationships,
-		};
-
-		const target = nextCharacterRecords[relationshipToRemove.targetCharacterId];
-		if (target) {
-			nextCharacterRecords[relationshipToRemove.targetCharacterId] = {
-				...target,
-				relationships: target.relationships.filter(
-					(relationship) => relationship.id !== relationshipToRemove.id,
-				),
-			};
-		}
-
-		characterRecords = nextCharacterRecords;
+		if (!relationshipToRemove) return;
+		characterRecords = nextRecords as typeof characterRecords;
 
 		if (isTemporaryRelationshipId(relationshipToRemove.id)) {
 			return;
 		}
 
-		void removePersistedRelationship(relationshipToRemove.id).catch((error) => {
-			console.error('Failed to delete relationship', error);
-		});
+		void runWithPersistenceFeedback(
+			() => removePersistedRelationship(relationshipToRemove.id),
+			'Could not delete relationship.',
+		);
 	}
 
 	async function deleteSelectedCharacter() {
@@ -629,7 +578,14 @@
 		}
 
 		deletingCharacterId = characterId;
-		await removeCharacter(characterId);
+		const deleted = await runWithPersistenceFeedback(
+			() => removeCharacter(characterId),
+			'Could not delete character.',
+		);
+		if (!deleted) {
+			deletingCharacterId = null;
+			return;
+		}
 
 		const nextRecords = { ...characterRecords };
 		delete nextRecords[characterId];
@@ -691,6 +647,20 @@
 			</div>
 
 			<div class="dossier-footer-actions">
+				{#if showSaveIndicator}
+					<p
+						class={`save-indicator ${saveErrorMessage ? 'is-error' : hasPendingSaves ? 'is-saving' : 'is-saved'}`}
+						role={saveErrorMessage ? 'alert' : 'status'}
+					>
+						{#if hasPendingSaves}
+							Saving changes...
+						{:else if saveErrorMessage}
+							{saveErrorMessage}
+						{:else}
+							All changes saved.
+						{/if}
+					</p>
+				{/if}
 				<DestructiveButton
 					size="sm"
 					onclick={deleteSelectedCharacter}
@@ -706,3 +676,30 @@
 		<EmptyCharacterState />
 	{/snippet}
 </WorldBuildingWorkspacePage>
+
+<style>
+	.dossier-footer-actions {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-3);
+		margin-top: var(--space-4);
+	}
+
+	.save-indicator {
+		margin: 0;
+		font-size: var(--text-xs);
+	}
+
+	.save-indicator.is-saving {
+		color: var(--color-text-muted);
+	}
+
+	.save-indicator.is-saved {
+		color: var(--color-success-on-dark);
+	}
+
+	.save-indicator.is-error {
+		color: var(--color-error);
+	}
+</style>

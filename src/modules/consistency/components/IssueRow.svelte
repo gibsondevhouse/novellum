@@ -55,19 +55,13 @@
 	{#if onResolve || onDismiss || onReopen}
 		<div class="issue-actions">
 			{#if onResolve && issue.status === 'open'}
-				<GhostButton type="button" onclick={() => onResolve?.(issue.id)} class="btn-resolve"
-					>Mark Resolved</GhostButton
-				>
+				<GhostButton type="button" onclick={() => onResolve?.(issue.id)}>Mark Resolved</GhostButton>
 			{/if}
 			{#if onDismiss && issue.status === 'open'}
-				<GhostButton type="button" onclick={() => onDismiss?.(issue.id)} class="btn-dismiss"
-					>Dismiss</GhostButton
-				>
+				<GhostButton type="button" onclick={() => onDismiss?.(issue.id)}>Dismiss</GhostButton>
 			{/if}
 			{#if onReopen && (issue.status === 'resolved' || issue.status === 'dismissed')}
-				<GhostButton type="button" onclick={() => onReopen?.(issue.id)} class="btn-reopen"
-					>Reopen</GhostButton
-				>
+				<GhostButton type="button" onclick={() => onReopen?.(issue.id)}>Reopen</GhostButton>
 			{/if}
 		</div>
 	{/if}
@@ -158,51 +152,5 @@
 		gap: var(--space-2);
 		flex-wrap: wrap;
 		padding-top: var(--space-1);
-	}
-
-	:global(.btn-resolve),
-	:global(.btn-dismiss),
-	:global(.btn-reopen) {
-		padding: var(--space-1) var(--space-3);
-		border-radius: var(--radius-sm);
-		background: transparent;
-		cursor: pointer;
-		font-size: var(--text-xs);
-		font-weight: var(--font-weight-medium);
-		transition: background-color var(--duration-fast) var(--ease-standard);
-	}
-
-	:global(.btn-resolve:focus-visible),
-	:global(.btn-dismiss:focus-visible),
-	:global(.btn-reopen:focus-visible) {
-		outline: none;
-		box-shadow: var(--focus-ring);
-	}
-
-	:global(.btn-resolve) {
-		color: var(--color-success);
-		border: 1px solid var(--color-success);
-	}
-
-	:global(.btn-resolve:hover) {
-		background-color: color-mix(in srgb, var(--color-success) 15%, transparent);
-	}
-
-	:global(.btn-dismiss) {
-		color: var(--color-text-muted);
-		border: 1px solid var(--color-border);
-	}
-
-	:global(.btn-dismiss:hover) {
-		background-color: var(--color-surface-elevated);
-	}
-
-	:global(.btn-reopen) {
-		color: var(--color-text-secondary);
-		border: 1px solid var(--color-border);
-	}
-
-	:global(.btn-reopen:hover) {
-		background-color: var(--color-surface-elevated);
 	}
 </style>

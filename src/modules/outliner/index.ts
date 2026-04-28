@@ -23,7 +23,7 @@ export {
 	updateArc,
 	removeArc,
 	reorderArcs,
-} from './services/arc-repository.js';
+} from '$modules/project/services/arc-repository.js';
 
 // Components
 export { default as HierarchyNavigator } from './components/HierarchyNavigator.svelte';

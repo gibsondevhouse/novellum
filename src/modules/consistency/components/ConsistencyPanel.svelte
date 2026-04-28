@@ -11,7 +11,7 @@
 	} from '../stores/consistency-store.svelte.js';
 	import IssueGroup from './IssueGroup.svelte';
 	import { ISSUE_TYPES } from '../constants.js';
-	import { SurfacePanel } from '$lib/components/ui/index.js';
+	import { SurfacePanel, EmptyStatePanel } from '$lib/components/ui/index.js';
 
 	let { projectId }: { projectId: string } = $props();
 
@@ -71,11 +71,11 @@
 	</div>
 
 	{#if groups.length === 0}
-		<div class="empty-state" role="status" aria-live="polite">
-			<h2>All clear</h2>
-			<p>No issues are currently flagged for this view.</p>
-			<p class="empty-tip">Keep this panel healthy by running continuity checks after major plot or lore edits.</p>
-		</div>
+		<EmptyStatePanel
+			class="consistency-empty"
+			title="All clear"
+			description="No issues are currently flagged for this view. Keep this panel healthy by running continuity checks after major plot or lore edits."
+		/>
 	{:else}
 		<div class="groups-list">
 			{#each groups as group (group.type)}
@@ -171,34 +171,6 @@
 	.metric-card strong {
 		font-size: var(--text-lg);
 		color: var(--color-text-primary);
-	}
-
-	.empty-state {
-		padding: var(--space-8) var(--space-4) var(--space-7);
-		text-align: center;
-		color: var(--color-text-secondary);
-		border: 1px dashed var(--color-border-subtle);
-		border-radius: var(--radius-lg);
-		background: color-mix(in srgb, var(--color-success) 6%, var(--color-surface-overlay));
-	}
-
-	.empty-state h2,
-	.empty-state p {
-		margin: 0;
- 	}
-
-	.empty-state h2 {
-		font-size: var(--text-xl);
-		margin-bottom: var(--space-2);
-	}
-
-	.empty-state p {
-		font-size: var(--text-sm);
-	}
-
-	.empty-tip {
-		margin-top: var(--space-2) !important;
-		color: var(--color-text-muted);
 	}
 
 	.groups-list {

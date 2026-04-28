@@ -10,7 +10,7 @@ const config = {
 		planningNotes: { default: '' },
 	},
 	orderBy: '"order" ASC',
-	queryParams: ['projectId'],
+	queryParams: ['projectId', 'arcId'],
 };
 
 export const GET = createGetHandler(config);

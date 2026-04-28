@@ -115,4 +115,59 @@ describe('individuals migration backfill', () => {
 		expect(relationship.status).toBe('Tense');
 		expect(relationship.description).toBe('Legacy note');
 	});
+
+	it('canonicalizes relationship pairs, removes duplicates, and enforces uniqueness', () => {
+		const db = createLegacyDb();
+		const now = new Date().toISOString();
+
+		db.prepare(
+			`INSERT INTO projects (id, title, genre, logline, synopsis, targetWordCount, status, createdAt, updatedAt)
+			 VALUES ('proj-1', 'Project', '', '', '', 0, '', @createdAt, @updatedAt)`,
+		).run({ createdAt: now, updatedAt: now });
+
+		db.prepare(
+			`INSERT INTO character_relationships (id, projectId, characterAId, characterBId, type, description, createdAt, updatedAt)
+			 VALUES ('rel-1', 'proj-1', 'char-a', 'char-b', 'Ally', '', '2026-01-01T00:00:00.000Z', @updatedAt)`,
+		).run({ updatedAt: now });
+		db.prepare(
+			`INSERT INTO character_relationships (id, projectId, characterAId, characterBId, type, description, createdAt, updatedAt)
+			 VALUES ('rel-2', 'proj-1', 'char-b', 'char-a', 'Ally', '', '2026-01-02T00:00:00.000Z', @updatedAt)`,
+		).run({ updatedAt: now });
+		db.prepare(
+			`INSERT INTO character_relationships (id, projectId, characterAId, characterBId, type, description, createdAt, updatedAt)
+			 VALUES ('rel-3', 'proj-1', 'char-a', 'char-b', 'Ally', '', '2026-01-03T00:00:00.000Z', @updatedAt)`,
+		).run({ updatedAt: now });
+		db.prepare(
+			`INSERT INTO character_relationships (id, projectId, characterAId, characterBId, type, description, createdAt, updatedAt)
+			 VALUES ('rel-self', 'proj-1', 'char-z', 'char-z', 'Self', '', '2026-01-04T00:00:00.000Z', @updatedAt)`,
+		).run({ updatedAt: now });
+
+		runMigrations(db);
+
+		const rows = db
+			.prepare(
+				'SELECT id, characterAId, characterBId FROM character_relationships WHERE projectId = ? ORDER BY id ASC',
+			)
+			.all('proj-1') as Array<{ id: string; characterAId: string; characterBId: string }>;
+
+		expect(rows).toEqual([{ id: 'rel-1', characterAId: 'char-a', characterBId: 'char-b' }]);
+
+		const indexes = db.prepare('PRAGMA index_list(character_relationships)').all() as Array<{
+			name: string;
+			unique: 0 | 1;
+		}>;
+		const uniquePairIndex = indexes.find(
+			(index) => index.name === 'idx_character_relationships_project_pair_unique',
+		);
+		expect(uniquePairIndex?.unique).toBe(1);
+
+		expect(() =>
+			db
+				.prepare(
+					`INSERT INTO character_relationships (id, projectId, characterAId, characterBId, type, status, description, createdAt, updatedAt)
+					 VALUES ('rel-dup', 'proj-1', 'char-a', 'char-b', 'Ally', '', '', @createdAt, @updatedAt)`,
+				)
+				.run({ createdAt: now, updatedAt: now }),
+		).toThrow();
+	});
 });
