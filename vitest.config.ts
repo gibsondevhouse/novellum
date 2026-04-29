@@ -30,5 +30,6 @@ export default defineConfig({
 			$modules: resolve(__dirname, 'src/modules'),
 			$modules: resolve(__dirname, 'src/modules'),
 		},
+		conditions: ['browser'],
 	},
 });

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import DocumentEditorFrame from '$modules/editor/components/DocumentEditorFrame.svelte';
 	import VersionHistoryPanel from '$modules/editor/components/VersionHistoryPanel.svelte';
+	import SaveStatus from '$modules/editor/components/SaveStatus.svelte';
 	import { editorState } from '$modules/editor/stores/editor.svelte.js';
 	import * as autosaveService from '$modules/editor/services/autosave-service.js';
 	import type { AutosaveResult } from '$modules/editor/services/autosave-types.js';
@@ -22,13 +23,6 @@
 		const normalized = editorState.pendingText.replace(/<[^>]+>/g, ' ').trim();
 		if (!normalized) return 0;
 		return normalized.split(/\s+/).length;
-	});
-
-	const saveLabel = $derived.by(() => {
-		if (saveResult.status === 'saving') return 'Saving changes...';
-		if (saveResult.status === 'saved') return 'Saved';
-		if (saveResult.status === 'failed') return saveResult.error ?? 'Save failed';
-		return 'Idle';
 	});
 
 	$effect(() => {
@@ -69,7 +63,7 @@
 			{#snippet actions()}
 				<div class="header-actions" aria-label="Editor controls">
 					<span class="meta-chip">Words: {sceneWordCount}</span>
-					<span class="save-indicator" class:saving={saveResult.status === 'saving'} class:saved={saveResult.status === 'saved'} class:failed={saveResult.status === 'failed'}>{saveLabel}</span>
+					<SaveStatus result={saveResult} />
 					<button class="btn-history" type="button" onclick={() => (showHistory = !showHistory)}>
 						{showHistory ? 'Close History' : 'History'}
 					</button>
@@ -148,24 +142,6 @@
 		border: 1px solid var(--color-border-subtle);
 		background: color-mix(in srgb, var(--color-surface-overlay) 80%, transparent);
 		color: var(--color-text-secondary);
-	}
-
-	.save-indicator {
-		font-size: var(--text-xs);
-		padding: 0.2rem 0.55rem;
-		border-radius: var(--radius-full);
-		border: 1px solid var(--color-border-subtle);
-		color: var(--color-text-muted);
-	}
-
-	.save-indicator.saving {
-		color: var(--color-text-secondary);
-		border-color: var(--color-border-default);
-	}
-
-	.save-indicator.saved {
-		color: var(--color-success);
-		border-color: color-mix(in srgb, var(--color-success) 45%, var(--color-border-default));
 	}
 
 	.btn-history {

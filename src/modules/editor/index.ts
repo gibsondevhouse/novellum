@@ -49,6 +49,7 @@ export {
 export {
 	createSnapshot,
 	listByScene,
+	restoreSnapshot,
 } from './services/snapshot-repository.js';
 
 // Components
@@ -56,3 +57,6 @@ export { default as DocumentEditorFrame } from './components/DocumentEditorFrame
 export { default as EditModeToolbar } from './components/EditModeToolbar.svelte';
 export { default as ManuscriptSurface } from './components/ManuscriptSurface.svelte';
 export { default as VersionHistoryPanel } from './components/VersionHistoryPanel.svelte';
+export { default as SaveStatus } from './components/SaveStatus.svelte';
+export { default as SnapshotHistoryPanel } from './components/SnapshotHistoryPanel.svelte';
+export { default as SnapshotPreviewModal } from './components/SnapshotPreviewModal.svelte';
