@@ -3,12 +3,19 @@
 	import VersionHistoryPanel from '$modules/editor/components/VersionHistoryPanel.svelte';
 	import { editorState } from '$modules/editor/stores/editor.svelte.js';
 	import * as autosaveService from '$modules/editor/services/autosave-service.js';
+	import type { AutosaveResult } from '$modules/editor/services/autosave-types.js';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import { PageHeader } from '$lib/components/ui/index.js';
 
 	let { data } = $props();
 
-	let saveStatus = $state<'saving' | 'saved' | 'idle'>('idle');
+	let saveResult = $state<AutosaveResult>({
+		status: 'idle',
+		savedAt: null,
+		error: null,
+		pendingDraft: null,
+		attempt: 0,
+	});
 	let showHistory = $state(false);
 
 	const sceneWordCount = $derived.by(() => {
@@ -18,14 +25,15 @@
 	});
 
 	const saveLabel = $derived.by(() => {
-		if (saveStatus === 'saving') return 'Saving changes...';
-		if (saveStatus === 'saved') return 'Saved';
+		if (saveResult.status === 'saving') return 'Saving changes...';
+		if (saveResult.status === 'saved') return 'Saved';
+		if (saveResult.status === 'failed') return saveResult.error ?? 'Save failed';
 		return 'Idle';
 	});
 
 	$effect(() => {
 		editorState.setActiveScene(data.scene);
-		autosaveService.mount(data.scene.id, data.scene.projectId, (s) => (saveStatus = s));
+		autosaveService.mount(data.scene.id, data.scene.projectId, (r) => (saveResult = r));
 		return () => autosaveService.unmount();
 	});
 
@@ -61,7 +69,7 @@
 			{#snippet actions()}
 				<div class="header-actions" aria-label="Editor controls">
 					<span class="meta-chip">Words: {sceneWordCount}</span>
-					<span class="save-indicator" class:saving={saveStatus === 'saving'} class:saved={saveStatus === 'saved'}>{saveLabel}</span>
+					<span class="save-indicator" class:saving={saveResult.status === 'saving'} class:saved={saveResult.status === 'saved'} class:failed={saveResult.status === 'failed'}>{saveLabel}</span>
 					<button class="btn-history" type="button" onclick={() => (showHistory = !showHistory)}>
 						{showHistory ? 'Close History' : 'History'}
 					</button>
