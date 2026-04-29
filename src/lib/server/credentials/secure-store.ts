@@ -1,6 +1,6 @@
 import { mkdir, readFile, writeFile, rename, chmod, stat } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import { homedir } from 'node:os';
+import { resolveAppDataDir } from '$lib/server/app-data/path.js';
 
 /**
  * On-disk record stored by a {@link SecureStore} implementation. The shape
@@ -32,11 +32,9 @@ interface FileStoreShape {
 	[providerId: string]: SecureStoreRecord;
 }
 
-function resolveAppDataDir(override?: string): string {
+function resolveStoreDirectory(override?: string): string {
 	if (override) return override;
-	const fromEnv = process.env.NOVELLUM_APP_DATA_DIR;
-	if (fromEnv) return fromEnv;
-	return join(homedir(), '.novellum');
+	return resolveAppDataDir();
 }
 
 /**
@@ -46,7 +44,7 @@ function resolveAppDataDir(override?: string): string {
  * via the `redactRecord` helper before any error handling occurs.
  */
 export function createFileSystemSecureStore(options: { appDataDir?: string } = {}): SecureStore {
-	const dir = resolveAppDataDir(options.appDataDir);
+	const dir = resolveStoreDirectory(options.appDataDir);
 	const filePath = join(dir, 'credentials.json');
 
 	async function readAll(): Promise<FileStoreShape> {
@@ -110,7 +108,7 @@ export function createFileSystemSecureStore(options: { appDataDir?: string } = {
  * For tests and runbooks: assert the credentials file mode is restrictive.
  */
 export async function getSecureStoreFileMode(appDataDir?: string): Promise<number | null> {
-	const filePath = join(resolveAppDataDir(appDataDir), 'credentials.json');
+	const filePath = join(resolveStoreDirectory(appDataDir), 'credentials.json');
 	try {
 		const s = await stat(filePath);
 		return s.mode & 0o777;
