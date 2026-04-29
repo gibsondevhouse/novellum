@@ -5,8 +5,14 @@ import { db } from '$lib/server/db/index.js';
 export const GET: RequestHandler = async ({ url }) => {
 	const projectId = url.searchParams.get('projectId');
 
+	// No projectId → list mode (used by the legacy migration runner and
+	// any other caller that needs the full collection). Returns an
+	// array shape consistent with the other /api/db/<resource> list
+	// endpoints.
 	if (!projectId) {
-		return json({ error: 'projectId is required' }, { status: 400 });
+		const rows = db.prepare('SELECT * FROM export_settings').all() as Record<string, unknown>[];
+		for (const row of rows) row.titlePage = !!row.titlePage;
+		return json(rows);
 	}
 
 	const row = db.prepare('SELECT * FROM export_settings WHERE projectId = ?').get(projectId) as

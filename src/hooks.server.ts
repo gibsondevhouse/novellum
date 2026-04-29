@@ -5,7 +5,15 @@ import { error } from '@sveltejs/kit';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** Matches /api/db/<resource>/<id> and /api/db/<resource>/<id>/<sub>  */
-const API_ID_RE = /^\/api\/db\/[a-z_]+\/([^/]+)/;
+const API_ID_RE = /^\/api\/db\/([a-z_]+)\/([^/]+)/;
+
+/**
+ * Resources whose `<id>` segment is intentionally NOT a UUID. The
+ * preferences store uses dotted string keys (e.g. `app.readerMode`,
+ * `migration.dexieToSqlite.completedAt`) so the global UUID guard
+ * must not apply to them.
+ */
+const NON_UUID_ID_RESOURCES = new Set(['preferences']);
 
 // ── AI endpoint rate limiter ─────────────────────────────────────────────────
 interface RateEntry {
@@ -48,8 +56,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 	// ── 2. UUID validation for /api/db/<resource>/<id> routes ────────────────
 	const idMatch = API_ID_RE.exec(pathname);
 	if (idMatch) {
-		const id = idMatch[1];
-		if (!UUID_RE.test(id)) {
+		const resource = idMatch[1];
+		const id = idMatch[2];
+		if (!NON_UUID_ID_RESOURCES.has(resource) && !UUID_RE.test(id)) {
 			error(400, 'Invalid resource ID format');
 		}
 	}
