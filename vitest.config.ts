@@ -6,6 +6,9 @@ export default defineConfig({
 	plugins: [svelte({ hot: false })],
 	test: {
 		environment: 'jsdom',
+		environmentOptions: {
+			jsdom: { url: 'http://localhost/' },
+		},
 		globals: true,
 		setupFiles: ['./tests/setup.ts'],
 		exclude: ['tests/visual/**', 'tests/e2e/**', 'node_modules/**'],

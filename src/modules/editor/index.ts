@@ -60,3 +60,4 @@ export { default as VersionHistoryPanel } from './components/VersionHistoryPanel
 export { default as SaveStatus } from './components/SaveStatus.svelte';
 export { default as SnapshotHistoryPanel } from './components/SnapshotHistoryPanel.svelte';
 export { default as SnapshotPreviewModal } from './components/SnapshotPreviewModal.svelte';
+export { default as RecoveryPrompt } from './components/RecoveryPrompt.svelte';

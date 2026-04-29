@@ -6,6 +6,7 @@ import {
 	type AutosaveResult,
 	type AutosaveSubscriber,
 } from './autosave-types.js';
+import { writePendingDraft, clearPendingDraft } from './recovery-service.js';
 
 /**
  * Autosave service — single-subscriber, single-active-scene.
@@ -94,6 +95,7 @@ export function getResult(): AutosaveResult {
 export function schedule(text: string): void {
 	if (!state) return;
 	pending = text;
+	writePendingDraft(state.sceneId, state.projectId, text);
 	// Fresh keystroke resets the retry budget so users can recover from
 	// a previously failed save by simply continuing to type.
 	attempt = 0;
@@ -153,6 +155,7 @@ async function runFlush(): Promise<void> {
 			pending = null;
 			attempt = 0;
 			lastSavedAt = now;
+			clearPendingDraft(mounted.sceneId);
 			emit({
 				status: 'saved',
 				savedAt: now,

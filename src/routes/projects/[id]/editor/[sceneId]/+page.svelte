@@ -2,9 +2,12 @@
 	import DocumentEditorFrame from '$modules/editor/components/DocumentEditorFrame.svelte';
 	import VersionHistoryPanel from '$modules/editor/components/VersionHistoryPanel.svelte';
 	import SaveStatus from '$modules/editor/components/SaveStatus.svelte';
+	import RecoveryPrompt from '$modules/editor/components/RecoveryPrompt.svelte';
 	import { editorState } from '$modules/editor/stores/editor.svelte.js';
 	import * as autosaveService from '$modules/editor/services/autosave-service.js';
+	import * as recoveryService from '$modules/editor/services/recovery-service.js';
 	import type { AutosaveResult } from '$modules/editor/services/autosave-types.js';
+	import type { PendingDraft } from '$modules/editor/services/recovery-service.js';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import { PageHeader } from '$lib/components/ui/index.js';
 
@@ -18,6 +21,7 @@
 		attempt: 0,
 	});
 	let showHistory = $state(false);
+	let recoveryDraft = $state<PendingDraft | null>(null);
 
 	const sceneWordCount = $derived.by(() => {
 		const normalized = editorState.pendingText.replace(/<[^>]+>/g, ' ').trim();
@@ -28,6 +32,7 @@
 	$effect(() => {
 		editorState.setActiveScene(data.scene);
 		autosaveService.mount(data.scene.id, data.scene.projectId, (r) => (saveResult = r));
+		recoveryDraft = recoveryService.inspectDraft(data.scene.id, data.scene.content ?? '');
 		return () => autosaveService.unmount();
 	});
 
@@ -42,6 +47,18 @@
 		editorState.pendingText = text;
 		autosaveService.flushNow();
 		showHistory = false;
+	}
+
+	function handleRecoveryRestore(draft: PendingDraft) {
+		recoveryService.discardDraft(draft.sceneId);
+		editorState.pendingText = draft.text;
+		autosaveService.schedule(draft.text);
+		recoveryDraft = null;
+	}
+
+	function handleRecoveryDiscard(draft: PendingDraft) {
+		recoveryService.discardDraft(draft.sceneId);
+		recoveryDraft = null;
 	}
 </script>
 
@@ -89,6 +106,14 @@
 		{/if}
 	</div>
 </div>
+
+{#if recoveryDraft}
+	<RecoveryPrompt
+		draft={recoveryDraft}
+		onRestore={handleRecoveryRestore}
+		onDiscard={handleRecoveryDiscard}
+	/>
+{/if}
 
 <style>
 	.editor-page {
