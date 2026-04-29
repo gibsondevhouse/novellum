@@ -1,9 +1,10 @@
 import Database from 'better-sqlite3';
 import { runMigrations } from './migration-runner.js';
 import { MIGRATION_REGISTRY } from './migration-registry.js';
+import { resolveDatabasePath } from './path.js';
 import { writePreMigrationSnapshot } from './snapshot.js';
 
-const dbPath = process.env.NOVELLUM_DB_PATH ?? './novellum.db';
+const dbPath = resolveDatabasePath();
 
 const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
