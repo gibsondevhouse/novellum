@@ -53,6 +53,10 @@ describe('snapshot pruning', async () => {
 			sceneId: 'sc1',
 			projectId: 'p1',
 			text: 'new snapshot',
+			wordCount: 2,
+			source: 'autosave',
+			label: '',
+			reason: '',
 		});
 		expect(mockApiGet).toHaveBeenCalledWith('/api/db/scene_snapshots', { sceneId: 'sc1' });
 		// Should delete 1 excess snapshot (21 - 20 = 1)

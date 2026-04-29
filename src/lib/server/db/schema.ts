@@ -231,7 +231,11 @@ CREATE TABLE IF NOT EXISTS scene_snapshots (
 	arcId TEXT,
 	projectId TEXT NOT NULL,
 	text TEXT NOT NULL DEFAULT '',
-	createdAt TEXT NOT NULL
+	createdAt TEXT NOT NULL,
+	wordCount INTEGER NOT NULL DEFAULT 0,
+	label TEXT NOT NULL DEFAULT '',
+	source TEXT NOT NULL DEFAULT 'autosave',
+	reason TEXT NOT NULL DEFAULT ''
 );
 
 CREATE TABLE IF NOT EXISTS story_frames (

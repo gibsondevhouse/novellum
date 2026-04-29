@@ -250,12 +250,18 @@ export interface ExportSettings {
 	updatedAt: string;
 }
 
+export type SceneSnapshotSource = 'autosave' | 'manual' | 'pre-restore' | 'pre-migration';
+
 export interface SceneSnapshot {
 	id: string;
 	sceneId: string;
 	projectId: string;
 	text: string;
 	createdAt: string;
+	wordCount: number;
+	label: string;
+	source: SceneSnapshotSource;
+	reason: string;
 }
 
 export interface ArcRef {
