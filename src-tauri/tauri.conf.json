@@ -28,6 +28,11 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "publisher": "Gibson Dev House",
+    "category": "Productivity",
+    "shortDescription": "Novel-writing app with AI assistance.",
+    "longDescription": "Novellum is a desktop novel-writing environment with autosave, snapshot history, and built-in AI assistants for outlining, drafting, and continuity checks.",
+    "copyright": "Copyright © 2026 Gibson Dev House. All rights reserved.",
     "resources": [
       "../build/**/*"
     ],

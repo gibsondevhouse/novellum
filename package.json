@@ -22,7 +22,9 @@
 		"storybook": "storybook dev -p 6006",
 		"build-storybook": "storybook build",
 		"tauri": "tauri",
+		"version:sync": "node scripts/sync-tauri-version.mjs",
 		"desktop:dev": "tauri dev",
+		"predesktop:build": "node scripts/sync-tauri-version.mjs",
 		"desktop:build": "tauri build",
 		"desktop:preview": "tauri build --debug"
 	},
