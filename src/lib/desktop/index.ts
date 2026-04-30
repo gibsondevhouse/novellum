@@ -54,3 +54,4 @@ export async function getDesktop(): Promise<DesktopCapabilities> {
 }
 
 export { isDesktop } from '../platform/platform.js';
+export { checkForUpdates, applyUpdate, type UpdateStatus } from './updater.js';
