@@ -26,7 +26,7 @@ export default tseslint.config(
 			parser: tseslint.parser,
 		},
 	},
-	{ ignores: ['.svelte-kit/', 'dist/', 'build/', 'coverage/', '*.cjs'] },
+	{ ignores: ['.svelte-kit/', 'dist/', 'build/', 'coverage/', 'src-tauri/target/', '*.cjs'] },
 	{
 		rules: {
 			'@typescript-eslint/no-unused-vars': [

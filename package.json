@@ -20,7 +20,11 @@
 		"check:tokens": "node scripts/check-visual-tokens.mjs",
 		"test:visual": "playwright test tests/visual/",
 		"storybook": "storybook dev -p 6006",
-		"build-storybook": "storybook build"
+		"build-storybook": "storybook build",
+		"tauri": "tauri",
+		"desktop:dev": "tauri dev",
+		"desktop:build": "tauri build",
+		"desktop:preview": "tauri build --debug"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
@@ -33,6 +37,8 @@
 		"@sveltejs/adapter-node": "^5.5.4",
 		"@sveltejs/kit": "^2.57.0",
 		"@sveltejs/vite-plugin-svelte": "^7.0.0",
+		"@tauri-apps/api": "^2.10.1",
+		"@tauri-apps/cli": "^2.10.1",
 		"@types/better-sqlite3": "^7.6.13",
 		"@types/diff": "^8.0.0",
 		"@types/dompurify": "^3.2.0",
