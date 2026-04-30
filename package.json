@@ -74,6 +74,7 @@
 	},
 	"dependencies": {
 		"@lucide/svelte": "^1.8.0",
+		"@napi-rs/keyring": "^1.2.0",
 		"@tiptap/core": "^3.22.4",
 		"@tiptap/extension-document": "^3.22.4",
 		"@tiptap/extension-history": "^3.22.4",

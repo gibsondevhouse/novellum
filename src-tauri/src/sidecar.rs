@@ -76,6 +76,7 @@ impl Sidecar {
 			.env("PORT", port.to_string())
 			.env("HOST", "127.0.0.1")
 			.env("NODE_ENV", "production")
+			.env("NOVELLUM_DESKTOP", "1")
 			.stdout(Stdio::piped())
 			.stderr(Stdio::piped());
 

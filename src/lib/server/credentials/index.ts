@@ -10,3 +10,13 @@ export {
 	type SecureStore,
 	type SecureStoreRecord,
 } from './secure-store.js';
+export {
+	createKeyringSecureStore,
+	type KeyringEntry,
+	type KeyringEntryFactory,
+} from './keyring-store.js';
+export {
+	isDesktopRuntime,
+	selectSecureStore,
+	type SelectSecureStoreOptions,
+} from './select-secure-store.js';
