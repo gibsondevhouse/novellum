@@ -89,10 +89,12 @@ impl Sidecar {
 		let child = cmd.spawn().map_err(SidecarError::SpawnFailed)?;
 		let sidecar = Sidecar { child, port };
 		sidecar.wait_until_ready(Duration::from_secs(15))?;
-		// Emitted for Task 05 measurement capture: lets the
-		// developer read the sidecar boot time from Console.app /
-		// the launchctl logs without rebuilding instrumented.
-		log::info!(
+		// Boot timestamp for Task 05 measurement capture. Use
+		// `eprintln!` (not `log::info!`) so it works in release
+		// builds, where `tauri-plugin-log` is not registered. The
+		// sidecar inherits stderr, so this surfaces in the launching
+		// terminal and Console.app.
+		eprintln!(
 			"sidecar: ready on {} after {} ms (node={})",
 			sidecar.url(),
 			spawn_start.elapsed().as_millis(),
