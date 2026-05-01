@@ -17,23 +17,17 @@ struct SidecarState(Mutex<Option<Sidecar>>);
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   let app = tauri::Builder::default()
-    .setup(|app| {
-      if cfg!(debug_assertions) {
-        app.handle().plugin(
-          tauri_plugin_log::Builder::default()
-            .level(log::LevelFilter::Info)
-            .build(),
-        )?;
-      }
-
-      // Tauri's `Menu::default()` populates the standard macOS app
-      // menu (App / File / Edit / View / Window / Help) with the
-      // platform's expected accelerators (Cmd+Q, Cmd+W, Cmd+M,
-      // Edit→Copy/Paste/etc.). We append a "Toggle Developer Tools"
-      // item to the View submenu so `Cmd+Option+I` works without
-      // dropping any of the defaults — replacing the whole menu
-      // (as we did before) silently broke Cmd+Q on macOS.
-      let handle = app.handle();
+    // Configure the menu BEFORE `setup()` runs. `setup()` fires from
+    // inside the AppKit delegate's `applicationDidFinishLaunching`
+    // notification, and calling `app.set_menu()` from there races
+    // with Cocoa's notification dispatch — on a LaunchServices-driven
+    // launch (Finder / open `.app`) it propagates a Rust panic across
+    // the FFI boundary and aborts (`panic_cannot_unwind` in
+    // `tao::app_delegate::did_finish_launching`). Terminal-driven
+    // direct exec of `Contents/MacOS/novellum` skips the AEOpenEvent
+    // and accidentally avoids the race, which is why this only
+    // crashed once we installed to /Applications.
+    .menu(|handle| {
       let toggle_devtools = MenuItem::with_id(
         handle,
         "toggle-devtools",
@@ -57,18 +51,27 @@ pub fn run() {
       )?;
       let menu = Menu::default(handle)?;
       menu.append(&view_menu)?;
-      app.set_menu(menu)?;
-      app.on_menu_event(|app, event| {
-        if event.id() == "toggle-devtools" {
-          if let Some(window) = app.get_webview_window("main") {
-            if window.is_devtools_open() {
-              window.close_devtools();
-            } else {
-              window.open_devtools();
-            }
+      Ok(menu)
+    })
+    .on_menu_event(|app, event| {
+      if event.id() == "toggle-devtools" {
+        if let Some(window) = app.get_webview_window("main") {
+          if window.is_devtools_open() {
+            window.close_devtools();
+          } else {
+            window.open_devtools();
           }
         }
-      });
+      }
+    })
+    .setup(|app| {
+      if cfg!(debug_assertions) {
+        app.handle().plugin(
+          tauri_plugin_log::Builder::default()
+            .level(log::LevelFilter::Info)
+            .build(),
+        )?;
+      }
 
       // In dev (`tauri dev`), Tauri loads `devUrl` (the Vite dev
       // server on :5173) directly. Skip the sidecar in that mode —
