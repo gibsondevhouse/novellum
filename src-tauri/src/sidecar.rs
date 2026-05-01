@@ -67,6 +67,7 @@ impl Sidecar {
 	/// Tauri AppHandle so the same code works in dev and in
 	/// packaged builds.
 	pub fn spawn(app: &AppHandle) -> Result<Self, SidecarError> {
+		let spawn_start = Instant::now();
 		let port = pick_port()?;
 		let node_bin = resolve_node_binary(app)?;
 		let server_entry = resolve_server_entry(app)?;
@@ -77,12 +78,26 @@ impl Sidecar {
 			.env("HOST", "127.0.0.1")
 			.env("NODE_ENV", "production")
 			.env("NOVELLUM_DESKTOP", "1")
-			.stdout(Stdio::piped())
-			.stderr(Stdio::piped());
+			// Inherit stdio so SvelteKit's runtime errors surface in
+			// the terminal (when launched from `open -a Novellum`)
+			// and in macOS Console.app under the Novellum process.
+			// Without this, 500s from `/api/db/*` show no stack
+			// trace anywhere and are impossible to diagnose.
+			.stdout(Stdio::inherit())
+			.stderr(Stdio::inherit());
 
 		let child = cmd.spawn().map_err(SidecarError::SpawnFailed)?;
 		let sidecar = Sidecar { child, port };
 		sidecar.wait_until_ready(Duration::from_secs(15))?;
+		// Emitted for Task 05 measurement capture: lets the
+		// developer read the sidecar boot time from Console.app /
+		// the launchctl logs without rebuilding instrumented.
+		log::info!(
+			"sidecar: ready on {} after {} ms (node={})",
+			sidecar.url(),
+			spawn_start.elapsed().as_millis(),
+			node_bin.display(),
+		);
 		Ok(sidecar)
 	}
 
@@ -119,21 +134,48 @@ fn pick_port() -> Result<u16, SidecarError> {
 	Ok(port)
 }
 
+/// Build target triple, captured at compile time by `build.rs` so
+/// the runtime can locate the bundled `node-<triple>` sidecar that
+/// `scripts/fetch-node.mjs` stages and Tauri's bundler ships next
+/// to the main executable.
+const TARGET_TRIPLE: &str = env!("NOVELLUM_TARGET_TRIPLE");
+
 /// Resolve the Node binary path. Production builds bundle Node as a
-/// Tauri sidecar binary at `binaries/node-<target-triple>` (added in
-/// a follow-up turn via `scripts/fetch-node.mjs`). Dev falls back to
-/// `node` on PATH so contributors do not need a packaged Node.
+/// Tauri sidecar binary declared via `tauri.conf.json#bundle.externalBin`.
+/// At runtime that binary lives next to the main executable, named
+/// `node-<target-triple>` (with a `.exe` suffix on Windows). We look
+/// for it there first, then fall back to `node` on PATH so dev mode
+/// and contributor machines without a fetched bundle still work.
 fn resolve_node_binary(_app: &AppHandle) -> Result<PathBuf, SidecarError> {
-	// TODO(phase-003-followup): once `scripts/fetch-node.mjs` lands
-	// and the `binaries/node-<target-triple>` artifact is bundled
-	// via tauri.conf.json `bundle.externalBin`, prefer the
-	// resolved path from `app.path().resolve(...)`. For now, rely
-	// on `node` from PATH which works in dev and on developer
-	// machines that have Node installed.
+	if let Some(bundled) = bundled_node_binary() {
+		return Ok(bundled);
+	}
 	if which_on_path("node").is_some() {
 		return Ok(PathBuf::from("node"));
 	}
 	Err(SidecarError::NodeBinaryNotFound)
+}
+
+/// Look for the bundled `node-<target-triple>` next to the running
+/// executable. Returns `None` if the binary is not present (dev mode,
+/// or the fetch-node script has not run yet).
+fn bundled_node_binary() -> Option<PathBuf> {
+	let exe = std::env::current_exe().ok()?;
+	let exe_dir = exe.parent()?;
+	let ext = if cfg!(windows) { ".exe" } else { "" };
+	let candidate = exe_dir.join(format!("node-{TARGET_TRIPLE}{ext}"));
+	if candidate.is_file() {
+		return Some(candidate);
+	}
+	// Tauri may strip the triple suffix in some bundle targets; try
+	// the bare names too as a defensive fallback.
+	for name in ["node", "node.exe"] {
+		let alt = exe_dir.join(name);
+		if alt.is_file() {
+			return Some(alt);
+		}
+	}
+	None
 }
 
 /// Resolve the SvelteKit Node server entry point. In dev it lives

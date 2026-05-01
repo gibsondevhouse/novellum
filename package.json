@@ -23,9 +23,11 @@
 		"build-storybook": "storybook build",
 		"tauri": "tauri",
 		"version:sync": "node scripts/sync-tauri-version.mjs",
+		"fetch:node": "node scripts/fetch-node.mjs",
 		"desktop:dev": "tauri dev",
-		"predesktop:build": "node scripts/sync-tauri-version.mjs",
+		"predesktop:build": "node scripts/sync-tauri-version.mjs && node scripts/fetch-node.mjs",
 		"desktop:build": "tauri build",
+		"predesktop:preview": "node scripts/sync-tauri-version.mjs && node scripts/fetch-node.mjs",
 		"desktop:preview": "tauri build --debug"
 	},
 	"devDependencies": {

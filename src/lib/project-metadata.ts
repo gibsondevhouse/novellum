@@ -16,9 +16,9 @@ function isBrowser(): boolean {
 }
 
 function url(projectId: string, scope: MetadataScope, ownerId: string, key?: string): string {
-	const parts = [BASE, projectId, scope, ownerId].map(encodeURIComponent);
-	if (key !== undefined) parts.push(encodeURIComponent(key));
-	return parts.join('/');
+	const segments = [projectId, scope, ownerId];
+	if (key !== undefined) segments.push(key);
+	return `${BASE}/${segments.map(encodeURIComponent).join('/')}`;
 }
 
 export async function getProjectMetadata<T>(

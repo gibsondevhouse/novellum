@@ -2,11 +2,6 @@
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 	import { buildPortabilitySnapshot } from '../services/portability/snapshot-service.js';
-	import {
-		downloadProjectBackup,
-		triggerArchiveDownload,
-		ProjectBackupClientError,
-	} from '../services/project-backup-client.js';
 
 	let {
 		projectId,
@@ -18,9 +13,6 @@
 		onClose: () => void;
 	} = $props();
 
-	type ActiveTab = 'manuscript' | 'backup';
-	let activeTab = $state<ActiveTab>('backup');
-
 	let loading = $state(false);
 	let exporting = $state(false);
 	let copying = $state(false);
@@ -29,12 +21,8 @@
 	let actionError = $state<string | null>(null);
 	let actionSuccess = $state<string | null>(null);
 
-	let backupRunning = $state(false);
-	let backupError = $state<string | null>(null);
-	let backupSuccess = $state<string | null>(null);
-
 	$effect(() => {
-		if (open && activeTab === 'manuscript') {
+		if (open) {
 			void prepareJsonPayload();
 		}
 	});
@@ -119,26 +107,6 @@
 		document.body.removeChild(a);
 		URL.revokeObjectURL(url);
 	}
-
-	async function handleDownloadBackup() {
-		backupRunning = true;
-		backupError = null;
-		backupSuccess = null;
-		try {
-			const result = await downloadProjectBackup(projectId);
-			triggerArchiveDownload(result);
-			backupSuccess = `Downloaded ${result.filename}`;
-		} catch (err) {
-			backupError =
-				err instanceof ProjectBackupClientError
-					? err.message
-					: err instanceof Error
-						? err.message
-						: 'Failed to build project backup.';
-		} finally {
-			backupRunning = false;
-		}
-	}
 </script>
 
 {#if open}
@@ -153,73 +121,19 @@
 			onkeydown={(e) => e.stopPropagation()}
 		>
 			<div class="modal-header">
-				<h2 class="modal-title">Export &amp; Backup</h2>
-				<div class="tab-bar" role="tablist" aria-label="Export options">
-					<button
-						type="button"
-						role="tab"
-						aria-selected={activeTab === 'backup'}
-						class="tab"
-						class:active={activeTab === 'backup'}
-						onclick={() => (activeTab = 'backup')}
-					>
-						Project Backup
-					</button>
-					<button
-						type="button"
-						role="tab"
-						aria-selected={activeTab === 'manuscript'}
-						class="tab"
-						class:active={activeTab === 'manuscript'}
-						onclick={() => (activeTab = 'manuscript')}
-					>
-						Manuscript Export
-					</button>
-				</div>
+				<h2 class="modal-title">Export Project JSON</h2>
 			</div>
 
-			{#if activeTab === 'backup'}
-				<div class="modal-body" role="tabpanel" aria-label="Project Backup">
-					<p class="intro-text">
-						Save a complete <code>.novellum</code> archive of this project from the canonical
-						SQLite database. Use this for long-term backups or to move the project to
-						another Novellum install.
-					</p>
-					<div class="pane">
-						<h3 class="pane-title">Download Project Backup</h3>
-						<p class="pane-description">
-							Generates a single <code>.novellum</code> file containing every project-scoped
-							table along with manifest and checksums. Credentials and app-wide preferences
-							are excluded.
-						</p>
-						<PrimaryButton onclick={handleDownloadBackup} disabled={backupRunning}>
-							{backupRunning ? 'Building backup...' : 'Download .novellum'}
-						</PrimaryButton>
-					</div>
-
-					{#if backupError}
-						<p class="error-text" role="alert">{backupError}</p>
-					{/if}
-					{#if backupSuccess}
-						<p class="success-text" role="status">{backupSuccess}</p>
-					{/if}
-				</div>
-			{:else if loading}
+			{#if loading}
 				<div class="modal-body">
 					<p class="loading-text">Preparing project JSON...</p>
 				</div>
 			{:else}
-				<div class="modal-body" role="tabpanel" aria-label="Manuscript Export">
+				<div class="modal-body">
 					<p class="intro-text">
 						Choose how you want to work with your JSON export. Both options use the same full
 						project payload.
 					</p>
-
-					<aside class="scope-warning" role="note" aria-label="Export scope warning">
-						<strong>Preview format.</strong> This JSON is generated from the legacy Dexie
-						portability layer and is not yet a complete SQLite-backed backup. For a full
-						portable archive, use the Project Backup tab.
-					</aside>
 
 					<div class="split-pane" role="group" aria-label="JSON export actions">
 						<section class="pane">
@@ -256,9 +170,7 @@
 			{/if}
 
 			<div class="modal-footer">
-				<GhostButton onclick={onClose} disabled={loading || exporting || copying || backupRunning}
-					>Close</GhostButton
-				>
+				<GhostButton onclick={onClose} disabled={loading || exporting || copying}>Close</GhostButton>
 			</div>
 		</div>
 	</div>
@@ -296,36 +208,6 @@
 		font-weight: var(--font-weight-medium);
 		color: var(--color-text-primary);
 		margin: 0;
-	}
-
-	.tab-bar {
-		display: flex;
-		gap: var(--space-2);
-		margin-top: var(--space-3);
-	}
-
-	.tab {
-		appearance: none;
-		background: transparent;
-		border: 1px solid transparent;
-		border-bottom-color: var(--color-border-default);
-		color: var(--color-text-muted);
-		padding: var(--space-2) var(--space-3);
-		font-size: var(--text-sm);
-		font-weight: var(--font-weight-medium);
-		cursor: pointer;
-		border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-	}
-
-	.tab:hover {
-		color: var(--color-text-primary);
-	}
-
-	.tab.active {
-		color: var(--color-text-primary);
-		border-color: var(--color-border-strong);
-		border-bottom-color: var(--color-surface-raised);
-		background-color: var(--color-surface-overlay);
 	}
 
 	.modal-body {
@@ -397,21 +279,6 @@
 		margin: 0;
 		font-size: var(--text-sm);
 		color: var(--color-success-on-dark);
-	}
-
-	.scope-warning {
-		margin: 0;
-		padding: var(--space-3) var(--space-4);
-		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-md);
-		background: color-mix(in srgb, var(--color-surface-overlay) 85%, transparent);
-		font-size: var(--text-sm);
-		line-height: var(--leading-relaxed);
-		color: var(--color-text-secondary);
-	}
-
-	.scope-warning strong {
-		color: var(--color-text-primary);
 	}
 
 	@media (max-width: 760px) {
