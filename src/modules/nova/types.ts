@@ -92,3 +92,12 @@ export interface RagContextResult {
 	 * AiContext for `scene_plus_adjacent`. Null when no scene is active. */
 	aiContext?: AiContext | null;
 }
+
+/* ── Error classification (plan-018 stage-005 phase-005) ────────────── */
+
+export type NovaErrorType =
+	| 'rate_limit'
+	| 'invalid_key'
+	| 'context_too_large'
+	| 'network_error'
+	| 'unknown';

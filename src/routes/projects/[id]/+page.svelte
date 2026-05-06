@@ -1,18 +1,31 @@
 <script lang="ts">
+	import { getContext } from 'svelte';
 	import type { Project, WritingStyle } from '$lib/db/domain-types';
+	import type { ProjectHealthSummary } from './services/project-health-service.js';
 	import {
 		ProjectHubHero,
 		StructuralMetricsCarousel,
 		HubProgressCard,
 		HubNextStepCard,
 		HubDetailsPanel,
+		BackupStatusCard,
+		ExportReadinessCard,
+		SaveStatusCard,
+		AIStatusCard,
 	} from '$modules/project';
 
 	let { data }: {
-		data: { project: Project; currentWordCount: number; writingStyles: WritingStyle[] };
+		data: {
+			project: Project;
+			currentWordCount: number;
+			writingStyles: WritingStyle[];
+			health: ProjectHealthSummary;
+		};
 	} = $props();
 
 	const project = $derived(data.project);
+
+	const projectActions = getContext<{ openExport: () => void }>('projectActions');
 </script>
 
 <div class="hub">
@@ -30,6 +43,15 @@
 		/>
 		<HubNextStepCard projectId={project.id} currentWordCount={data.currentWordCount} />
 		<HubDetailsPanel {project} writingStyles={data.writingStyles} />
+		<SaveStatusCard lastSavedAt={data.health.lastSavedAt} />
+		<BackupStatusCard lastBackupAt={data.health.lastBackupAt} projectId={project.id} />
+		<ExportReadinessCard
+			sceneCount={data.health.sceneCount}
+			wordCount={data.health.wordCount}
+			projectId={project.id}
+			onExportRequest={() => projectActions.openExport()}
+		/>
+		<AIStatusCard apiKeyConfigured={data.health.apiKeyConfigured} />
 	</div>
 </div>
 

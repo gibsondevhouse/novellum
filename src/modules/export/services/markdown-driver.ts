@@ -1,32 +1,41 @@
-import type { AssembledProject, ExportOptions } from '../types.js';
+import { getProfile } from './manuscript-profiles.js';
+import type { AssembledManuscript } from '../types.js';
 
-export function buildMarkdown(assembled: AssembledProject, options: ExportOptions): string {
-	const frontMatter = [
-		'---',
-		`title: ${assembled.title}`,
-		`genre: ${assembled.genre || 'Unknown'}`,
-		'author: Unknown',
-		'---',
-		'',
-	].join('\n');
+export function buildMarkdown(manuscript: AssembledManuscript): string {
+	const { metadata, profileId } = manuscript;
+	const profile = getProfile(profileId);
 
-	if (assembled.chapters.length === 0) {
+	const frontMatterLines: string[] = [
+		'---',
+		`title: ${metadata.title ?? ''}`,
+		`author: ${metadata.author || 'Unknown'}`,
+	];
+	if (metadata.subtitle) frontMatterLines.push(`subtitle: ${metadata.subtitle}`);
+	if (metadata.synopsis) frontMatterLines.push(`synopsis: ${metadata.synopsis}`);
+	frontMatterLines.push('---', '');
+
+	const frontMatter = frontMatterLines.join('\n');
+
+	if (manuscript.chapters.length === 0) {
 		return frontMatter;
 	}
 
-	const chapterBlocks = assembled.chapters.map((ch) => {
-		let heading: string;
-		if (options.chapterStyle === 'chapter_number') {
-			heading = `# Chapter ${ch.order + 1}`;
-		} else if (options.chapterStyle === 'both') {
-			heading = `# Chapter ${ch.order + 1}: ${ch.title}`;
-		} else {
-			heading = `# ${ch.title}`;
-		}
+	let titleBlock = '';
+	if (profile.defaults.includeFrontMatter && metadata.title) {
+		titleBlock = `# ${metadata.title}\n\n`;
+		if (metadata.author) titleBlock += `*${metadata.author}*\n\n`;
+	}
 
-		const scenesText = ch.scenes.join('\n\n---\n\n');
-		return `${heading}\n\n${scenesText}`;
+	const chapterBlocks = manuscript.chapters.map((ch) => {
+		const heading = `## ${ch.title}`;
+		const sceneParts = ch.scenes.map((scene) => {
+			if (scene.title) {
+				return `### ${scene.title}\n\n${scene.content}`;
+			}
+			return scene.content;
+		});
+		return `${heading}\n\n${sceneParts.join('\n\n---\n\n')}`;
 	});
 
-	return frontMatter + chapterBlocks.join('\n\n---\n\n');
+	return frontMatter + titleBlock + chapterBlocks.join('\n\n---\n\n');
 }

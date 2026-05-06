@@ -1,3 +1,8 @@
+export { default as ErrorNotice } from './ErrorNotice.svelte';
+export { default as StatusBadge } from './StatusBadge.svelte';
+export { default as ConfirmDialog } from './ConfirmDialog.svelte';
+export { default as Stepper } from './Stepper.svelte';
+export { default as MetadataRow } from './MetadataRow.svelte';
 export { default as PrimaryButton } from './PrimaryButton.svelte';
 export { default as SecondaryButton } from './SecondaryButton.svelte';
 export { default as GhostButton } from './GhostButton.svelte';

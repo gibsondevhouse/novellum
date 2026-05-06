@@ -2,6 +2,7 @@
 	"name": "novellum",
 	"private": true,
 	"version": "0.0.1",
+	"license": "SEE LICENSE IN LICENSE",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
@@ -18,6 +19,7 @@
 		"test:watch": "vitest",
 		"test:coverage": "vitest run --coverage",
 		"check:tokens": "node scripts/check-visual-tokens.mjs",
+		"test:e2e": "playwright test tests/e2e/",
 		"test:visual": "playwright test tests/visual/",
 		"storybook": "storybook dev -p 6006",
 		"build-storybook": "storybook build",
@@ -28,7 +30,8 @@
 		"predesktop:build": "node scripts/sync-tauri-version.mjs && node scripts/fetch-node.mjs",
 		"desktop:build": "tauri build",
 		"predesktop:preview": "node scripts/sync-tauri-version.mjs && node scripts/fetch-node.mjs",
-		"desktop:preview": "tauri build --debug"
+		"desktop:preview": "tauri build --debug",
+		"changelog": "node scripts/generate-changelog.mjs"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
@@ -46,6 +49,7 @@
 		"@types/better-sqlite3": "^7.6.13",
 		"@types/diff": "^8.0.0",
 		"@types/dompurify": "^3.2.0",
+		"@types/js-yaml": "^4.0.9",
 		"@types/node": "^25.6.0",
 		"@typescript-eslint/eslint-plugin": "^8.58.1",
 		"@typescript-eslint/parser": "^8.58.1",
@@ -57,6 +61,7 @@
 		"eslint-plugin-svelte": "^3.17.0",
 		"fake-indexeddb": "^6.2.5",
 		"globals": "^17.5.0",
+		"js-yaml": "^4.1.1",
 		"jsdom": "^29.0.2",
 		"postcss": "^8.5.10",
 		"postcss-html": "^1.8.1",

@@ -3,7 +3,7 @@
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mount, unmount, flushSync } from 'svelte';
-import { NovaPanel, novaPanel, novaSession } from '$modules/nova';
+import { NovaPanel, novaPanel, novaSession, aiSession } from '$modules/nova';
 
 describe('NovaPanel.svelte — error states', () => {
 	let target: HTMLElement;
@@ -15,6 +15,7 @@ describe('NovaPanel.svelte — error states', () => {
 		window.sessionStorage.clear();
 		novaPanel.close();
 		novaSession.clear();
+		aiSession.__resetForTests();
 	});
 
 	afterEach(() => {

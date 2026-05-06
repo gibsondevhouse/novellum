@@ -14,7 +14,7 @@ vi.mock('$modules/nova/services/chat-service.js', () => ({
 	sendNovaChat: vi.fn(),
 }));
 
-import { NovaPanel, novaPanel, novaSession } from '$modules/nova';
+import { NovaPanel, novaPanel, novaSession, aiSession } from '$modules/nova';
 
 describe('NovaPanel.svelte — tool-call / tool-result rendering', () => {
 	let target: HTMLElement;
@@ -26,6 +26,7 @@ describe('NovaPanel.svelte — tool-call / tool-result rendering', () => {
 		window.sessionStorage.clear();
 		novaPanel.close();
 		novaSession.clear();
+		aiSession.__resetForTests();
 	});
 
 	afterEach(() => {

@@ -1,5 +1,6 @@
 import type { Handle } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
+import { getPreference as getServerPreference } from '$lib/server/preferences/preferences-service.js';
 
 // ── UUID validation ──────────────────────────────────────────────────────────
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -87,9 +88,24 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	}
 
+	// ── 4. Onboarding guard ──────────────────────────────────────────────────
+	const isPageRequest = event.request.headers.get('accept')?.includes('text/html') ?? false;
+	const isExempt =
+		pathname.startsWith('/onboarding') ||
+		pathname.startsWith('/api/') ||
+		pathname.startsWith('/_app/') ||
+		/\.[a-z0-9]+$/i.test(pathname); // static assets
+
+	if (isPageRequest && !isExempt) {
+		const completed = getServerPreference<boolean>('app.onboarding.completed');
+		if (completed !== true) {
+			return Response.redirect(new URL('/onboarding', event.url.origin), 302);
+		}
+	}
+
 	const response = await resolve(event);
 
-	// ── 4. Security headers ───────────────────────────────────────────────────
+	// ── 5. Security headers ───────────────────────────────────────────────────
 	response.headers.set('Content-Security-Policy', CSP);
 	response.headers.set('X-Frame-Options', 'DENY');
 	response.headers.set('X-Content-Type-Options', 'nosniff');

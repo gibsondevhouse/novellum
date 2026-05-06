@@ -48,3 +48,7 @@ export { default as HubActionBar } from './components/HubActionBar.svelte';
 export { default as HubProgressCard } from './components/HubProgressCard.svelte';
 export { default as HubNextStepCard } from './components/HubNextStepCard.svelte';
 export { default as HubDetailsPanel } from './components/HubDetailsPanel.svelte';
+export { default as BackupStatusCard } from './components/BackupStatusCard.svelte';
+export { default as ExportReadinessCard } from './components/ExportReadinessCard.svelte';
+export { default as SaveStatusCard } from './components/SaveStatusCard.svelte';
+export { default as AIStatusCard } from './components/AIStatusCard.svelte';

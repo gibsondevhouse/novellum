@@ -60,6 +60,7 @@ export default tseslint.config(
 				{ type: 'module-ai', pattern: ['src/modules/ai/**'] },
 				{ type: 'module-export', pattern: ['src/modules/export/**'] },
 				{ type: 'module-world-building', pattern: ['src/modules/world-building/**'] },
+				{ type: 'module-story-bible', pattern: ['src/modules/story-bible/**'] },
 				{ type: 'module-continuity', pattern: ['src/modules/continuity/**'] },
 				{ type: 'module-reader', pattern: ['src/modules/reader/**'] },
 				{ type: 'module-nova', pattern: ['src/modules/nova/**'] },
@@ -89,8 +90,9 @@ export default tseslint.config(
 								{ to: { type: 'module-project' } },
 								{ to: { type: 'module-ai' } },
 								{ to: { type: 'module-export' } },
-								{ to: { type: 'module-world-building' } },
-								{ to: { type: 'module-continuity' } },
+							{ to: { type: 'module-world-building' } },
+							{ to: { type: 'module-story-bible' } },
+							{ to: { type: 'module-continuity' } },
 								{ to: { type: 'module-reader' } },
 								{ to: { type: 'module-nova' } },
 							],
@@ -123,6 +125,10 @@ export default tseslint.config(
 						{ from: [{ type: 'module-ai' }], allow: [{ to: { type: 'lib' } }] },
 						{
 							from: [{ type: 'module-world-building' }],
+							allow: [{ to: { type: 'lib' } }],
+						},
+						{
+							from: [{ type: 'module-story-bible' }],
 							allow: [{ to: { type: 'lib' } }],
 						},
 						{

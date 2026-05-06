@@ -12,6 +12,11 @@
 		{ id: 'shortcuts', label: 'Shortcuts' },
 		{ id: 'ai', label: 'AI' },
 		{ id: 'data', label: 'Data' },
+		{ id: 'backup', label: 'Backup' },
+		{ id: 'export-defaults', label: 'Export Defaults' },
+		{ id: 'privacy', label: 'Privacy' },
+		{ id: 'updates', label: 'Updates' },
+		{ id: 'about', label: 'About' },
 	];
 
 	const allowed = new Set(items.map((item) => item.id));

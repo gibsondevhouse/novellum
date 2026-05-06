@@ -1,5 +1,22 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mount, unmount, flushSync } from 'svelte';
+
+const isMigrationComplete = vi.fn();
+const preCheck = vi.fn();
+const migrate = vi.fn();
+
+vi.mock('$lib/migration/index.js', () => ({
+	isMigrationComplete: (...args: unknown[]) => isMigrationComplete(...args),
+	preCheck: (...args: unknown[]) => preCheck(...args),
+	migrate: (...args: unknown[]) => migrate(...args),
+	MIGRATION_COMPLETE_KEY: 'migration-complete',
+}));
+
+const getPreference = vi.fn();
+
+vi.mock('$lib/preferences.js', () => ({
+	getPreference: (...args: unknown[]) => getPreference(...args),
+}));
 
 import DataPage from '../../src/routes/settings/data/+page.svelte';
 
@@ -11,6 +28,10 @@ describe('settings/data/+page.svelte', () => {
 		document.body.innerHTML = '';
 		target = document.createElement('div');
 		document.body.appendChild(target);
+		isMigrationComplete.mockReset();
+		preCheck.mockReset();
+		migrate.mockReset();
+		getPreference.mockReset();
 	});
 
 	afterEach(() => {
@@ -20,26 +41,32 @@ describe('settings/data/+page.svelte', () => {
 		}
 	});
 
-	it('renders the Data Portability heading', () => {
+	it('renders the Migrate Data heading', async () => {
+		isMigrationComplete.mockResolvedValue(false);
+		preCheck.mockResolvedValue([]);
 		component = mount(DataPage, { target, props: {} });
 		flushSync();
-		const heading = target.querySelector('#data-portability-heading');
-		expect(heading?.textContent).toContain('Data Portability');
+		await new Promise((resolve) => setTimeout(resolve, 0));
+		flushSync();
+		const heading = target.querySelector('h1.page-header__title');
+		expect(heading?.textContent).toBe('Migrate Data');
 	});
 
-	it('links to the migration tool at /settings/migrate', () => {
+	it('shows loading status on initial mount before async resolves', () => {
+		// Never resolves — keeps phase at 'loading'
+		isMigrationComplete.mockReturnValue(new Promise(() => {}));
 		component = mount(DataPage, { target, props: {} });
 		flushSync();
-		const link = target.querySelector('a.section-link');
-		expect(link?.getAttribute('href')).toBe('/settings/migrate');
-		expect(link?.textContent).toContain('Open Migration Tool');
+		expect(target.textContent).toContain('Checking databases');
 	});
 
-	it('describes the data portability action', () => {
+	it('shows already-complete banner when migration is done', async () => {
+		isMigrationComplete.mockResolvedValue(true);
+		getPreference.mockResolvedValue('2026-01-01T00:00:00.000Z');
 		component = mount(DataPage, { target, props: {} });
 		flushSync();
-		expect(target.textContent).toContain(
-			'Migrate any legacy in-browser data into the canonical SQLite database',
-		);
+		await new Promise((resolve) => setTimeout(resolve, 0));
+		flushSync();
+		expect(target.textContent).toContain('Migration already complete.');
 	});
 });

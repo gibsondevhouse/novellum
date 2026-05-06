@@ -1,6 +1,7 @@
 <script lang="ts">
         import { page } from '$app/state';
 	import { browser } from '$app/environment';
+	import { getContext } from 'svelte';
         import SidebarSection from './SidebarSection.svelte';
         import SidebarItem from './SidebarItem.svelte';
         import { getPreference, setPreference } from '$lib/preferences.js';
@@ -8,6 +9,8 @@
         const PREF_KEY = 'app.lastProjectId';
 
         let base = $state<string | null>(null);
+
+	const projectActions = getContext<{ openExport: () => void } | undefined>('projectActions');
 
         $effect(() => {
 			if (!browser) {
@@ -82,45 +85,6 @@
 				</svg>
 			{/snippet}
 		</SidebarItem>
-		<SidebarItem href="{base}/world-building" label="World Building">
-			{#snippet icon()}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="1em"
-					height="1em"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<circle cx="12" cy="12" r="10"></circle>
-					<line x1="2" y1="12" x2="22" y2="12"></line>
-					<path
-						d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
-					></path>
-				</svg>
-			{/snippet}
-		</SidebarItem>
-		<SidebarItem href="{base}/continuity" label="Continuity">
-			{#snippet icon()}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="1em"
-					height="1em"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-					<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-				</svg>
-			{/snippet}
-		</SidebarItem>
 		<SidebarItem href="{base}/outline" label="Outline">
 			{#snippet icon()}
 				<svg
@@ -142,6 +106,91 @@
 				</svg>
 			{/snippet}
 		</SidebarItem>
+		<SidebarItem href="{base}/world-building" label="Worldbuilding">
+			{#snippet icon()}
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="1em"
+					height="1em"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<circle cx="12" cy="12" r="10"></circle>
+					<line x1="2" y1="12" x2="22" y2="12"></line>
+					<path
+						d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+					></path>
+				</svg>
+			{/snippet}
+		</SidebarItem>
+		<SidebarItem href="{base}/editor" label="AI">
+			{#snippet icon()}
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="1em"
+					height="1em"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+					<path d="M2 17l10 5 10-5"></path>
+					<path d="M2 12l10 5 10-5"></path>
+				</svg>
+			{/snippet}
+		</SidebarItem>
+		<button
+			type="button"
+			class="sidebar-export-btn"
+			onclick={() => projectActions?.openExport()}
+			aria-label="Export project"
+		>
+			<span class="sidebar-export-btn__icon">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="1em"
+					height="1em"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+					<polyline points="17 8 12 3 7 8"></polyline>
+					<line x1="12" y1="3" x2="12" y2="15"></line>
+				</svg>
+			</span>
+			<span class="sidebar-export-btn__label">Export</span>
+		</button>
+		<SidebarItem href="{base}/settings" label="Settings">
+			{#snippet icon()}
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="1em"
+					height="1em"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<circle cx="12" cy="12" r="3"></circle>
+					<path
+						d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+					></path>
+				</svg>
+			{/snippet}
+		</SidebarItem>
 	</SidebarSection>
 {/if}
 
@@ -150,5 +199,41 @@
 		border: none;
 		border-top: 1px solid var(--color-border-default);
 		margin: var(--space-3) var(--space-3);
+	}
+
+	.sidebar-export-btn {
+		display: flex;
+		align-items: center;
+		width: 100%;
+		padding: var(--space-2) var(--space-3);
+		background: transparent;
+		border: none;
+		border-left: 2px solid transparent;
+		color: var(--color-text-primary);
+		font-size: var(--text-sm);
+		gap: var(--space-3);
+		cursor: pointer;
+		text-align: left;
+		transition:
+			color var(--duration-fast) var(--ease-standard),
+			background-color var(--duration-fast) var(--ease-standard);
+	}
+
+	.sidebar-export-btn:hover {
+		background: var(--color-surface-glass);
+	}
+
+	.sidebar-export-btn:focus-visible {
+		outline: 2px solid var(--color-border-focus);
+		outline-offset: -2px;
+		background: var(--color-surface-glass);
+	}
+
+	.sidebar-export-btn__icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 1em;
+		height: 1em;
 	}
 </style>

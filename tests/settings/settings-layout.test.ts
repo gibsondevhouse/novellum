@@ -28,7 +28,7 @@ describe('settings/+layout.svelte', () => {
 		return Array.from(target.querySelectorAll('.pill-nav__btn'));
 	}
 
-	it('renders the five category pills in order', () => {
+	it('renders all ten category pills in order', () => {
 		component = mount(SettingsLayout, { target, props: {} });
 		flushSync();
 		const labels = pillButtons().map((b) => b.textContent?.trim());
@@ -38,6 +38,11 @@ describe('settings/+layout.svelte', () => {
 			'Shortcuts',
 			'AI',
 			'Data',
+			'Backup',
+			'Export Defaults',
+			'Privacy',
+			'Updates',
+			'About',
 		]);
 	});
 
@@ -47,6 +52,11 @@ describe('settings/+layout.svelte', () => {
 		['/settings/shortcuts', 'Shortcuts'],
 		['/settings/ai', 'AI'],
 		['/settings/data', 'Data'],
+		['/settings/backup', 'Backup'],
+		['/settings/export-defaults', 'Export Defaults'],
+		['/settings/privacy', 'Privacy'],
+		['/settings/updates', 'Updates'],
+		['/settings/about', 'About'],
 	])('marks the active pill for %s', (path, label) => {
 		(page as { url: URL }).url = new URL(`http://localhost${path}`);
 		component = mount(SettingsLayout, { target, props: {} });
@@ -57,7 +67,7 @@ describe('settings/+layout.svelte', () => {
 	});
 
 	it('marks no pill active for unrecognized routes', () => {
-		(page as { url: URL }).url = new URL('http://localhost/settings/migrate');
+		(page as { url: URL }).url = new URL('http://localhost/settings/unknown');
 		component = mount(SettingsLayout, { target, props: {} });
 		flushSync();
 		const active = pillButtons().filter((b) => b.classList.contains('active'));

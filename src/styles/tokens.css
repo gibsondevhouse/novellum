@@ -17,6 +17,11 @@
 	--color-charcoal: var(--color-surface-raised);
 	--color-slate: var(--color-surface-ground);
 
+	/* ── Semantic shorthand aliases (stage-008 design-system freeze) ── */
+	--color-surface: var(--color-surface-raised);
+	--color-text: var(--color-text-primary);
+	--color-info: #3b82f6; /* same as --color-nova-blue */
+
 	/* ── Accents ── */
 	--color-nova-blue: #3b82f6; /* primary action / interactive        */
 	--color-nova-blue-hsl: 217 91% 60%;

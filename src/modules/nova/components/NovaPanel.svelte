@@ -12,11 +12,18 @@
 	is the textarea draft.
 -->
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { novaPanel } from '../stores/nova-panel.svelte.js';
 	import { novaSession } from '../stores/nova-session.svelte.js';
 	import { sendNovaChat } from '../services/chat-service.js';
 	import { safeHtml } from '$lib/ai/markdown.js';
 	import type { NovaMessage } from '../types.js';
+	import { aiSession } from '../services/ai-session-service.svelte.js';
+	import { classifyNovaError } from '../utils/classify-nova-error.js';
+	import EmptyStatePanel from '$lib/components/ui/EmptyStatePanel.svelte';
+	import ContextDisclosurePill from './ContextDisclosurePill.svelte';
+	import ModelPickerDropdown from './ModelPickerDropdown.svelte';
+	import NovaErrorBoundary from './NovaErrorBoundary.svelte';
 
 	interface Props {
 		projectId?: string | null;
@@ -41,6 +48,17 @@
 
 	const messages = $derived(novaSession.messages);
 	const isStreaming = $derived(novaSession.isStreaming);
+	const keyConfigured = $derived(aiSession.keyConfigured);
+	const aiLoading = $derived(aiSession.loading);
+	const aiChecked = $derived(aiSession.checked);
+	const novaError = $derived.by(() => {
+		for (let i = novaSession.messages.length - 1; i >= 0; i--) {
+			const m = novaSession.messages[i];
+			if (m.status === 'error' && m.error) return m.error;
+		}
+		return null;
+	});
+	const novaErrorType = $derived(novaError ? classifyNovaError(novaError) : null);
 
 	function isMissingCredentialsError(message: NovaMessage): boolean {
 		const text = message.error ?? '';
@@ -58,6 +76,10 @@
 			activeChapterId,
 		});
 	}
+
+	onMount(() => {
+		void aiSession.hydrate();
+	});
 
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Enter' && !event.shiftKey) {
@@ -118,18 +140,37 @@
 	<aside class="nova-panel" aria-label="Nova copilot">
 		<header class="nova-header">
 			<h2 class="nova-title">Nova</h2>
-			<button
-				type="button"
-				class="nova-close"
-				aria-label="Close Nova"
-				onclick={() => novaPanel.close()}
-			>
-				✕
-			</button>
+			<div class="nova-header-controls">
+				{#if aiLoading}
+					<span class="nova-checking-dot" aria-label="Checking AI configuration…" title="Checking AI configuration…"></span>
+				{/if}
+				{#if keyConfigured}
+					<ContextDisclosurePill />
+					<ModelPickerDropdown />
+				{/if}
+				<button
+					type="button"
+					class="nova-close"
+					aria-label="Close Nova"
+					onclick={() => novaPanel.close()}
+				>
+					✕
+				</button>
+			</div>
 		</header>
 
 		<div class="nova-body" aria-live="polite">
-			{#if messages.length === 0}
+			{#if aiChecked && !keyConfigured}
+				<EmptyStatePanel
+					title="No AI key configured"
+					description="Add your OpenRouter API key in Settings to start using the AI assistant."
+				>
+					{#snippet actions()}
+						<a href="/settings/ai" class="nova-settings-link">Go to Settings</a>
+					{/snippet}
+				</EmptyStatePanel>
+			{:else}
+				{#if messages.length === 0}
 				<p class="nova-placeholder">
 					Hi, I'm Nova. Ask me anything about your manuscript — I'll use the
 					active scene and its neighbours as context.
@@ -146,8 +187,13 @@
 						</button>
 					</div>
 				{/if}
-			{:else}
-				<ul class="nova-log" role="log" aria-label="Conversation with Nova">
+				{:else}
+					<NovaErrorBoundary
+						error={novaError}
+						errorType={novaErrorType}
+						onRetry={() => novaSession.clear()}
+					/>
+					<ul class="nova-log" role="log" aria-label="Conversation with Nova">
 					{#each messages as message (message.id)}
 						{#if message.role === 'user'}
 							<li class="nova-message nova-message-user">
@@ -217,7 +263,8 @@
 							</li>
 						{/if}
 					{/each}
-				</ul>
+					</ul>
+				{/if}
 			{/if}
 		</div>
 
@@ -283,6 +330,38 @@
 		justify-content: space-between;
 		padding: var(--space-3) var(--space-4);
 		border-bottom: 1px solid var(--nova-panel-border);
+	}
+
+	.nova-header-controls {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+	}
+
+	.nova-checking-dot {
+		display: inline-block;
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: var(--color-text-muted);
+		animation: nova-typing-pulse 1s infinite ease-in-out;
+	}
+
+	.nova-settings-link {
+		display: inline-flex;
+		align-items: center;
+		padding: var(--space-2) var(--space-4);
+		border-radius: var(--radius-sm);
+		background: var(--color-surface-raised);
+		color: var(--color-text-secondary);
+		font-size: var(--text-sm);
+		text-decoration: none;
+		border: 1px solid var(--color-border-default);
+	}
+
+	.nova-settings-link:hover {
+		background: var(--color-surface-hover);
+		color: var(--color-text-primary);
 	}
 
 	.nova-title {

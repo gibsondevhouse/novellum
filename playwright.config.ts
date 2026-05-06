@@ -19,8 +19,15 @@ export default defineConfig({
 
 	reporter: [['list'], ['html', { outputFolder: 'tests/visual/playwright-report', open: 'never' }]],
 
+	webServer: {
+		command: 'pnpm run preview',
+		url: 'http://localhost:4173',
+		reuseExistingServer: !process.env.CI,
+		timeout: 120_000,
+	},
+
 	use: {
-		baseURL: process.env.BASE_URL || 'http://localhost:5173',
+		baseURL: process.env.BASE_URL || 'http://localhost:4173',
 		/* Consistent viewport for screenshot comparison */
 		viewport: { width: 1280, height: 720 },
 		/* No animations — deterministic screenshots */

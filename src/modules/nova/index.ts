@@ -16,8 +16,13 @@ import { registerStubTools } from './services/stub-tools.js';
 registerStubTools();
 
 export { default as NovaPanel } from './components/NovaPanel.svelte';
+export { default as ContextDisclosurePill } from './components/ContextDisclosurePill.svelte';
+export { default as ModelPickerDropdown } from './components/ModelPickerDropdown.svelte';
+export { default as NovaErrorBoundary } from './components/NovaErrorBoundary.svelte';
 export { novaPanel } from './stores/nova-panel.svelte.js';
 export { novaSession } from './stores/nova-session.svelte.js';
+export type { ContextDisclosureState } from './stores/nova-session.svelte.js';
+export { aiSession, AiSessionStore } from './services/ai-session-service.svelte.js';
 export { buildRagContext } from './services/context-hooks.js';
 export { sendNovaChat, type SendChatInput } from './services/chat-service.js';
 export { dispatchTool } from './services/tool-router.js';
@@ -27,6 +32,7 @@ export {
 	listTools,
 } from './services/tool-registry.js';
 export { registerStubTools, STUB_TOOLS } from './services/stub-tools.js';
+export { classifyNovaError } from './utils/classify-nova-error.js';
 export {
 	isNovaAgenticEnabled,
 	setNovaAgenticFlag,
@@ -39,6 +45,7 @@ export type {
 	NovaMessage,
 	NovaMessageStatus,
 	NovaRole,
+	NovaErrorType,
 	RagContextRequest,
 	RagContextResult,
 	RagPolicy,

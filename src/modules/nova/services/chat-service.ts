@@ -64,17 +64,27 @@ export async function sendNovaChat(input: SendChatInput): Promise<void> {
 	const task: AiTask = resolveTask(action, uiCtx);
 
 	let aiContext: AiContext = EMPTY_AI_CONTEXT;
+	let ragResult: Awaited<ReturnType<typeof buildRagContext>> | null = null;
 	try {
-		const rag = await buildRagContext({
+		ragResult = await buildRagContext({
 			projectId: input.projectId ?? '',
 			activeSceneId: input.activeSceneId,
 			policy: 'scene_plus_adjacent',
 		});
-		if (rag.aiContext) aiContext = rag.aiContext;
+		if (ragResult.aiContext) aiContext = ragResult.aiContext;
 	} catch {
 		// Fall back to empty context — the chat still runs.
 		aiContext = EMPTY_AI_CONTEXT;
 	}
+
+	const contextItemCount =
+		(aiContext.scene ? 1 : 0) +
+		aiContext.adjacentScenes.length +
+		aiContext.characters.length +
+		aiContext.locations.length +
+		aiContext.loreEntries.length +
+		aiContext.plotThreads.length;
+	novaSession.setContextDisclosure(ragResult?.includedScopes ?? [], contextItemCount);
 
 	const systemPrompt = buildPrompt(task, aiContext);
 

@@ -1,29 +1,22 @@
-# Novellum User Documentation
+# Novellum Documentation
 
-User-facing documentation for Novellum, a local-first, AI-assisted novel production system.
+## User Docs
 
-## Updated
+For authors installing and using Novellum:
 
-- Last updated: 2026-04-20
+- [Install Guide](user/install.md) — download and install on macOS and Windows.
+- [Quick Start](user/quick-start.md) — create your first project and write your first scene.
+- [Local-First & Your Data](user/local-first.md) — where your data lives and how to back it up.
+- [AI Setup](user/ai-setup.md) — configure your OpenRouter API key.
+- [Export](user/export.md) — compile your manuscript and choose an export format.
+- [Keyboard Shortcuts](user/keyboard-shortcuts.md) — editor and navigation shortcuts.
+- [FAQ](user/faq.md) — common questions answered.
 
-## Core Principles
+## Developer Docs
 
-- Local-first project ownership
-- AI as collaborator, not autonomous author
-- Structured creative workflow from planning to export
-- Continuity and causality as first-class editing concerns
+For contributors and agents working on the Novellum codebase:
 
-## Documentation Index
-
-- [Setup Guide](./docs/setup-guide.md): Prerequisites, install, and local run instructions.
-- [User Manual](./docs/user-manual.md): Product walkthrough for core workspaces and AI-assisted flows.
-
-## Feature Areas
-
-- Project Hub: Create and manage writing projects.
-- World Building: Personae, Atlas, Archive, Threads, and Chronicles.
-- Outliner: Build and refine narrative structure.
-- Editor Workspace: Scene drafting, writing flow, and progress tooling.
-- Continuity Engine: Detect timeline/lore/character inconsistencies.
-- AI Assist: Context-scoped brainstorming, rewriting, editing, and summaries.
-- Export: Produce distributable manuscript formats.
+- [Architecture](developer/architecture.md) — stack, module boundaries, and data-layer rules.
+- [Contributing](developer/contributing.md) — setup, commands, workflow, and test requirements.
+- [Testing](developer/testing.md) — Vitest and Playwright patterns, coverage thresholds.
+- [Deployment](developer/deployment.md) — Tauri build steps, version sync, and signing.

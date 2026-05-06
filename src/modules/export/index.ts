@@ -1,7 +1,24 @@
 export { exportProject } from './services/export-service.js';
 export { default as ExportModal } from './components/ExportModal.svelte';
 export { getExportSettings, updateExportSettings } from './services/export-settings-repository.js';
-export type { ExportFormat, ExportOptions, AssembledProject, AssembledChapter } from './types.js';
+export type {
+	ExportFormat,
+	ExportOptions,
+	AssembledProject,
+	AssembledChapter,
+	ManuscriptProfileId,
+	ManuscriptMetadata,
+	ManuscriptCompileOptions,
+	AssembledScene,
+	AssembledManuscriptChapter,
+	AssembledManuscript,
+} from './types.js';
+export { assembleManuscript } from './services/manuscript-assembler.js';
+export {
+	MANUSCRIPT_PROFILES,
+	getProfile,
+} from './services/manuscript-profiles.js';
+export type { ManuscriptProfile } from './services/manuscript-profiles.js';
 export {
 	EXPORT_FORMAT_OPTIONS,
 	FORMAT_EXTENSIONS,

@@ -3,13 +3,15 @@
  * needs to embed the running build's version (manifests, backups,
  * UI footers) MUST import from here.
  *
- * Sourced from `package.json#version` so the npm version, the
- * desktop installer version (synced via `scripts/sync-tauri-version.mjs`),
- * and the runtime constant can never drift.
+ * APP_VERSION is injected at build time by Vite via the define block in
+ * vite.config.ts. The fallback '0.0.0-dev' is a safety net for test
+ * environments where the define block is not applied.
  */
-import pkg from '../../package.json' with { type: 'json' };
 
-export const APP_VERSION: string = pkg.version;
+export const APP_VERSION: string =
+	// PACKAGE_VERSION is replaced at build time by the vite.config.ts define block.
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	((import.meta.env as any).PACKAGE_VERSION as string | undefined) ?? '0.0.0-dev';
 
 /**
  * Accessor preferred by new call sites. Equivalent to reading

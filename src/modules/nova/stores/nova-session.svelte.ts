@@ -13,6 +13,11 @@ import {
 	type StreamController,
 } from '../services/stream-controller.js';
 
+export interface ContextDisclosureState {
+	scopes: string[]; // e.g. ['scene', 'characters', 'locations']
+	itemCount: number; // total items across all scopes
+}
+
 interface AppendInput {
 	role: NovaRole;
 	content: string;
@@ -24,6 +29,7 @@ interface AppendInput {
 class NovaSessionStore {
 	messages = $state<NovaMessage[]>([]);
 	activeStreamId = $state<string | null>(null);
+	contextDisclosure = $state<ContextDisclosureState | null>(null);
 	private controllers = new Map<string, StreamController>();
 
 	get latest(): NovaMessage | null {
@@ -32,6 +38,10 @@ class NovaSessionStore {
 
 	get isStreaming(): boolean {
 		return this.activeStreamId !== null;
+	}
+
+	setContextDisclosure(scopes: string[], itemCount: number): void {
+		this.contextDisclosure = { scopes, itemCount };
 	}
 
 	append(input: AppendInput): NovaMessage {

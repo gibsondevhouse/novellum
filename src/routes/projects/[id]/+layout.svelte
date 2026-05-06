@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { setContext } from 'svelte';
+	import { onMount, setContext } from 'svelte';
 	import type { Project } from '$lib/db/domain-types';
 	import EditProjectForm from '$modules/project/components/EditProjectForm.svelte';
 	import DeleteProjectDialog from '$modules/project/components/DeleteProjectDialog.svelte';
-	import ExportModal from '$modules/export/components/ExportModal.svelte';
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	import SurfacePanel from '$lib/components/ui/SurfacePanel.svelte';
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -15,6 +14,14 @@
 	let showEditForm = $state(false);
 	let showDeleteDialog = $state(false);
 	let showExportModal = $state(false);
+
+	let ExportModal = $state<
+		typeof import('$modules/export/components/ExportModal.svelte')['default'] | undefined
+	>(undefined);
+	onMount(async () => {
+		const mod = await import('$modules/export/components/ExportModal.svelte');
+		ExportModal = mod.default;
+	});
 
 	const project = $derived(data.project);
 
@@ -30,7 +37,7 @@
 			showExportModal = true;
 		},
 		openImport: () => {
-			goto('/settings/migrate');
+			goto('/settings/data');
 		}
 	});
 
@@ -60,9 +67,10 @@
 	<DeleteProjectDialog projectId={project.id} oncancel={() => (showDeleteDialog = false)} />
 {/if}
 
-{#if showExportModal}
+{#if showExportModal && ExportModal}
 	<ExportModal
 		projectId={project.id}
+		projectTitle={project.title}
 		open={showExportModal}
 		onClose={() => (showExportModal = false)}
 	/>

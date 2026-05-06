@@ -14,7 +14,7 @@ vi.mock('$modules/nova/services/chat-service.js', () => ({
 	sendNovaChat: (...args: unknown[]) => sendNovaChatMock(...args),
 }));
 
-import { NovaPanel, novaPanel, novaSession } from '$modules/nova';
+import { NovaPanel, novaPanel, novaSession, aiSession } from '$modules/nova';
 
 describe('NovaPanel.svelte — chat interactions', () => {
 	let target: HTMLElement;
@@ -27,6 +27,7 @@ describe('NovaPanel.svelte — chat interactions', () => {
 		novaPanel.close();
 		novaSession.clear();
 		sendNovaChatMock.mockReset();
+		aiSession.__resetForTests();
 	});
 
 	afterEach(() => {
