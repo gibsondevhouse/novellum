@@ -36,7 +36,7 @@ Runtime agents that power the Novellum application features.
 ## Development Conventions and Workflow
 
 ### Modular Architecture
-Functionality is organized by **vertical domain slices** (e.g., `bible`, `workspace`, `editor`, `outliner`, `continuity`).
+Functionality is organized by **vertical domain slices** (e.g., `project`, `world-building`, `outline`, `editor`, `continuity`).
 - **Strict Boundaries**: Import boundaries are enforced via ESLint (`eslint-plugin-boundaries`) to prevent cross-module leakage.
 - **Rules**: Every module owns its components, services, and stores. Read `dev-docs/modular-boundaries.md` before coding.
 

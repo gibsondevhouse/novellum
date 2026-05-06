@@ -3,14 +3,14 @@
 	import type { Location } from '$lib/db/domain-types';
 	import { translator } from '$lib/i18n';
 	import { getProjectMetadata, setProjectMetadata } from '$lib/project-metadata.js';
-	import RealmDossierPane from '$modules/bible/components/RealmDossierPane.svelte';
-	import RealmEmptyState from '$modules/bible/components/RealmEmptyState.svelte';
-	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
+	import RealmDossierPane from '$modules/world-building/components/RealmDossierPane.svelte';
+	import RealmEmptyState from '$modules/world-building/components/RealmEmptyState.svelte';
+	import WorldBuildingWorkspacePage from '$modules/world-building/components/WorldBuildingWorkspacePage.svelte';
 	import {
 		formatLocationSubtitle,
 		formatRealmMeta,
 		isRealmLocation,
-	} from '$modules/bible/narrative-locations.js';
+	} from '$modules/world-building/narrative-locations.js';
 	import {
 		getLocations,
 		getLocationSaving,
@@ -18,7 +18,7 @@
 		submitCreateLocation,
 		submitDeleteLocation,
 		submitUpdateLocation,
-	} from '$modules/bible/stores/bible-crud.svelte.js';
+	} from '$modules/world-building/stores/world-building-crud.svelte.js';
 
 	let { data }: { data: { projectId: string; locations: Location[] } } = $props();
 

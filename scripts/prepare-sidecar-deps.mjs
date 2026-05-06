@@ -37,7 +37,15 @@
  */
 
 import { spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
+import {
+	cpSync,
+	existsSync,
+	mkdirSync,
+	readdirSync,
+	readFileSync,
+	rmSync,
+} from 'node:fs';
+import { builtinModules } from 'node:module';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -188,5 +196,173 @@ if (result.status !== 0) {
 	);
 	process.exit(1);
 }
+
+// ---------------------------------------------------------------------------
+// Stage the prod-dep closure of the SvelteKit server bundle.
+//
+// `@sveltejs/adapter-node` does NOT bundle every npm dep into the chunk
+// graph; many (e.g. `clsx`, `devalue`, `cookie`, ...) remain as bare
+// `import 'pkg'` statements at runtime. When the .app is launched from
+// /Applications, Node's resolver has no `node_modules/` to walk into and
+// throws ERR_MODULE_NOT_FOUND, which causes the sidecar to die during
+// boot, which causes Tauri's `setup()` hook to fail, which propagates a
+// Rust panic across the AppKit FFI boundary and aborts the whole app.
+//
+// Fix: scan every server-side .js under build/ for bare specifiers, then
+// recursively stage each package + its `dependencies` into
+// `build/node_modules/`. Idempotent with the explicit native deps above.
+// ---------------------------------------------------------------------------
+
+const NODE_BUILTINS = new Set([
+	...builtinModules,
+	...builtinModules.map((m) => `node:${m}`),
+]);
+
+function findServerJsFiles(dir, out = []) {
+	for (const entry of readdirSync(dir, { withFileTypes: true })) {
+		// Skip the staged tree (we don't want to scan our own copies),
+		// the client bundle (browser-only, no Node imports), and any
+		// nested node_modules.
+		if (
+			entry.name === 'node_modules' ||
+			entry.name === 'client' ||
+			entry.name.startsWith('.')
+		) {
+			continue;
+		}
+		const full = join(dir, entry.name);
+		if (entry.isDirectory()) {
+			findServerJsFiles(full, out);
+		} else if (entry.name.endsWith('.js') || entry.name.endsWith('.mjs')) {
+			out.push(full);
+		}
+	}
+	return out;
+}
+
+// Two regexes — `from '...'`-style + side-effect `import '...'` +
+// dynamic `import('...')`. We accept some false positives (e.g.
+// strings inside template literals) since the closure walker only
+// stages packages that exist in `node_modules` anyway.
+const STATIC_IMPORT_RE =
+	/(?:import|export)[\s\S]*?from\s*['"]([^'"\n]+)['"]/g;
+const SIDE_EFFECT_IMPORT_RE = /(?<![.\w])import\s*['"]([^'"\n]+)['"]/g;
+const DYNAMIC_IMPORT_RE = /import\s*\(\s*['"]([^'"\n]+)['"]\s*\)/g;
+
+function topLevelPackageName(spec) {
+	if (spec.startsWith('@')) {
+		const parts = spec.split('/');
+		if (parts.length < 2) return null;
+		return `${parts[0]}/${parts[1]}`;
+	}
+	return spec.split('/')[0];
+}
+
+function extractBareImports(src) {
+	const out = new Set();
+	for (const re of [STATIC_IMPORT_RE, SIDE_EFFECT_IMPORT_RE, DYNAMIC_IMPORT_RE]) {
+		re.lastIndex = 0;
+		let m;
+		while ((m = re.exec(src)) !== null) {
+			const spec = m[1];
+			if (!spec) continue;
+			if (
+				spec.startsWith('.') ||
+				spec.startsWith('/') ||
+				NODE_BUILTINS.has(spec) ||
+				NODE_BUILTINS.has(spec.split('/')[0])
+			) {
+				continue;
+			}
+			const name = topLevelPackageName(spec);
+			if (name) out.add(name);
+		}
+	}
+	return out;
+}
+
+function findPackageSource(name) {
+	const direct = join(PROJECT_ROOT, 'node_modules', name);
+	if (existsSync(direct)) return direct;
+	return resolveFromPnpmStore(name);
+}
+
+function readPkgDeps(pkgDir) {
+	try {
+		const pkg = JSON.parse(
+			readFileSync(join(pkgDir, 'package.json'), 'utf8'),
+		);
+		return [
+			...Object.keys(pkg.dependencies ?? {}),
+			...Object.keys(pkg.optionalDependencies ?? {}),
+		];
+	} catch {
+		return [];
+	}
+}
+
+function stagePackageClosure(seedPkgs) {
+	const visited = new Set();
+	// Pre-mark packages we already staged manually so we don't re-copy
+	// them but still recurse into their declared deps.
+	for (const entry of readdirSync(STAGE_DIR, { withFileTypes: true })) {
+		if (entry.name.startsWith('@')) {
+			for (const sub of readdirSync(join(STAGE_DIR, entry.name))) {
+				visited.add(`${entry.name}/${sub}`);
+			}
+		} else {
+			visited.add(entry.name);
+		}
+	}
+	// Seed the queue with everything from the build scan plus the deps
+	// of packages we already staged.
+	const queue = [...seedPkgs];
+	for (const name of [...visited]) {
+		const dst = join(STAGE_DIR, name);
+		for (const dep of readPkgDeps(dst)) queue.push(dep);
+	}
+
+	let added = 0;
+	let missing = 0;
+	while (queue.length > 0) {
+		const name = queue.shift();
+		if (visited.has(name)) continue;
+		visited.add(name);
+
+		const src = findPackageSource(name);
+		if (!src) {
+			// Many bare imports that "look" like packages are actually
+			// optional peer deps the bundle never reaches at runtime.
+			// Warn but don't fail — the sidecar will surface a real
+			// ERR_MODULE_NOT_FOUND on boot if one was actually needed.
+			console.warn(`  skip ${name} (not installed)`);
+			missing += 1;
+			continue;
+		}
+
+		const dst = join(STAGE_DIR, name);
+		mkdirSync(dirname(dst), { recursive: true });
+		cpSync(src, dst, { recursive: true, dereference: true });
+		added += 1;
+
+		for (const dep of readPkgDeps(dst)) queue.push(dep);
+	}
+
+	console.log(
+		`  closure: staged ${added} package(s), skipped ${missing} unresolved`,
+	);
+}
+
+const serverFiles = findServerJsFiles(BUILD_DIR);
+const seedPkgs = new Set();
+for (const file of serverFiles) {
+	for (const name of extractBareImports(readFileSync(file, 'utf8'))) {
+		seedPkgs.add(name);
+	}
+}
+console.log(
+	`prepare-sidecar-deps: scanned ${serverFiles.length} server file(s), found ${seedPkgs.size} bare import(s)`,
+);
+stagePackageClosure(seedPkgs);
 
 console.log('prepare-sidecar-deps: done');

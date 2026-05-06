@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { StoryFrame } from '$lib/db/domain-types';
-	import { updateStoryFrame } from '$modules/outliner/services/story-structure-service.js';
+	import { updateStoryFrame } from '$modules/outline/services/story-structure-service.js';
 	import { SurfacePanel } from '$lib/components/ui/index.js';
 
 	let { storyFrame, onUpdate } = $props<{

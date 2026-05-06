@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import IndividualsWorkspaceShell from '$modules/bible/components/IndividualsWorkspaceShell.svelte';
-	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
-	import type { WorldBuildingTopSectionId } from '$modules/bible/worldbuilding-navigation.js';
+	import IndividualsWorkspaceShell from '$modules/world-building/components/IndividualsWorkspaceShell.svelte';
+	import WorldBuildingSubheaderNav from '$modules/world-building/components/WorldBuildingSubheaderNav.svelte';
+	import type { WorldBuildingTopSectionId } from '$modules/world-building/worldbuilding-navigation.js';
 
 	type WorkspaceOption = {
 		id: string;

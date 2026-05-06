@@ -104,6 +104,21 @@ test.describe('Visual Regression — Route Family Baselines', () => {
 		await expect(page).toHaveScreenshot('books-shelf.png');
 	});
 
+	test('Reader empty state — project with no readable content', async ({ page, request }) => {
+		// plan-021 stage-001: a project with no scenes (or all-empty scenes)
+		// must fall through to the reader EmptyStatePanel with both CTAs
+		// visible. Seed a fresh project via the API to keep the baseline
+		// deterministic without depending on existing local data.
+		const projectId = await createVisualProject(request, `Visual Reader Empty ${Date.now()}`);
+		try {
+			await page.goto(`/books/${projectId}`);
+			await waitForStableRender(page);
+			await expect(page).toHaveScreenshot('reader-empty-state.png');
+		} finally {
+			await request.delete(`/api/db/projects/${projectId}`);
+		}
+	});
+
 	test('Stories — full page', async ({ page }) => {
 		await page.goto('/stories');
 		await waitForStableRender(page);
@@ -111,7 +126,10 @@ test.describe('Visual Regression — Route Family Baselines', () => {
 	});
 
 	test('Settings — full page', async ({ page }) => {
-		await page.goto('/settings');
+		// plan-022 stage-001: /settings now redirects to /settings/appearance.
+		// Pin the AI sub-route so this baseline keeps covering the ApiSettings
+		// surface (now relocated under /settings/ai).
+		await page.goto('/settings/ai');
 		await waitForStableRender(page);
 		await expect(page).toHaveScreenshot('settings.png');
 	});

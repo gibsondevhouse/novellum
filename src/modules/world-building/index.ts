@@ -2,10 +2,10 @@ export * from './types.js';
 export * from './constants.js';
 
 // Store — UI state
-export * from './stores/story-bible.svelte.ts';
+export * from './stores/world-building-store.svelte.ts';
 
 // Store — CRUD actions
-export * from './stores/bible-crud.svelte.ts';
+export * from './stores/world-building-crud.svelte.ts';
 
 // Components
 export { default as CharacterCard } from './components/CharacterCard.svelte';

@@ -4,7 +4,7 @@ import {
 	buildWorldBuildingLandingProps,
 	getWorldBuildingSubSectionId,
 	getWorldBuildingTopSection,
-} from '../../src/modules/bible/worldbuilding-navigation.js';
+} from '../../src/modules/world-building/worldbuilding-navigation.js';
 
 describe('worldbuilding-navigation', () => {
 	it('includes a characters landing config with standard links', () => {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import CharacterSelect from '$modules/bible/components/CharacterSelect.svelte';
+	import CharacterSelect from '$modules/world-building/components/CharacterSelect.svelte';
 	import { GhostButton, SectionHeader } from '$lib/components/ui/index.js';
 	type FactionOption = { id: string; name: string; role?: string; summary?: string };
 	type Relationship = { id: string; targetFactionId: string; relationshipType?: string; status?: string; notes?: string };

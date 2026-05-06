@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { translator } from '$lib/i18n';
 	import { createAssetsStore } from '$modules/assets/stores/assets.svelte';
-	import EmptyFactionState from '$modules/bible/components/EmptyFactionState.svelte';
-	import FactionContinuityPanel from '$modules/bible/components/FactionContinuityPanel.svelte';
-	import FactionCoreIdentityPanel from '$modules/bible/components/FactionCoreIdentityPanel.svelte';
-	import FactionCulturePanel from '$modules/bible/components/FactionCulturePanel.svelte';
-	import FactionCurrentStatePanel from '$modules/bible/components/FactionCurrentStatePanel.svelte';
-	import FactionDetailHeader from '$modules/bible/components/FactionDetailHeader.svelte';
-	import FactionMembersPanel from '$modules/bible/components/FactionMembersPanel.svelte';
-	import FactionRelationshipPanel from '$modules/bible/components/FactionRelationshipPanel.svelte';
-	import FactionStoryFunctionPanel from '$modules/bible/components/FactionStoryFunctionPanel.svelte';
-	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
+	import EmptyFactionState from '$modules/world-building/components/EmptyFactionState.svelte';
+	import FactionContinuityPanel from '$modules/world-building/components/FactionContinuityPanel.svelte';
+	import FactionCoreIdentityPanel from '$modules/world-building/components/FactionCoreIdentityPanel.svelte';
+	import FactionCulturePanel from '$modules/world-building/components/FactionCulturePanel.svelte';
+	import FactionCurrentStatePanel from '$modules/world-building/components/FactionCurrentStatePanel.svelte';
+	import FactionDetailHeader from '$modules/world-building/components/FactionDetailHeader.svelte';
+	import FactionMembersPanel from '$modules/world-building/components/FactionMembersPanel.svelte';
+	import FactionRelationshipPanel from '$modules/world-building/components/FactionRelationshipPanel.svelte';
+	import FactionStoryFunctionPanel from '$modules/world-building/components/FactionStoryFunctionPanel.svelte';
+	import WorldBuildingWorkspacePage from '$modules/world-building/components/WorldBuildingWorkspacePage.svelte';
 	import { getProjectMetadata, setProjectMetadata } from '$lib/project-metadata.js';
 
 	type FactionRelationship = {

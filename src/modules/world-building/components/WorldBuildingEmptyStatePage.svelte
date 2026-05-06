@@ -2,7 +2,7 @@
 	import EmptyStatePanel from '$lib/components/ui/EmptyStatePanel.svelte';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
-	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
+	import WorldBuildingSubheaderNav from '$modules/world-building/components/WorldBuildingSubheaderNav.svelte';
 	import {
 		getCharacterSaving,
 		getLocationSaving,
@@ -14,8 +14,8 @@
 		submitCreateLoreEntry,
 		submitCreatePlotThread,
 		submitCreateTimelineEvent,
-	} from '$modules/bible/stores/bible-crud.svelte.js';
-	import type { WorldBuildingTopSectionId } from '$modules/bible/worldbuilding-navigation.js';
+	} from '$modules/world-building/stores/world-building-crud.svelte.js';
+	import type { WorldBuildingTopSectionId } from '$modules/world-building/worldbuilding-navigation.js';
 
 	let {
 		projectId,

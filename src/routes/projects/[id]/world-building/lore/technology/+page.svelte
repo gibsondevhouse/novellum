@@ -2,9 +2,9 @@
 	import { untrack } from 'svelte';
 	import type { LoreEntry } from '$lib/db/domain-types';
 	import { translator } from '$lib/i18n';
-	import TechnologyDossierPane from '$modules/bible/components/TechnologyDossierPane.svelte';
-	import WorldBuildingWorkspaceEmptyState from '$modules/bible/components/WorldBuildingWorkspaceEmptyState.svelte';
-	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
+	import TechnologyDossierPane from '$modules/world-building/components/TechnologyDossierPane.svelte';
+	import WorldBuildingWorkspaceEmptyState from '$modules/world-building/components/WorldBuildingWorkspaceEmptyState.svelte';
+	import WorldBuildingWorkspacePage from '$modules/world-building/components/WorldBuildingWorkspacePage.svelte';
 	import {
 		getLoreEntries,
 		getLoreSaving,
@@ -12,7 +12,7 @@
 		submitCreateLoreEntry,
 		submitUpdateLoreEntry,
 		submitDeleteLoreEntry,
-	} from '$modules/bible/stores/bible-crud.svelte.js';
+	} from '$modules/world-building/stores/world-building-crud.svelte.js';
 
 	let { data }: { data: { projectId: string; loreEntries: LoreEntry[] } } = $props();
 

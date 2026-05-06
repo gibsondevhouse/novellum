@@ -2,15 +2,15 @@
 	import type { TimelineEvent, Character } from '$lib/db/domain-types';
 	import { translator } from '$lib/i18n';
 	import { DestructiveButton, GhostButton } from '$lib/components/ui/index.js';
-	import ChronicleSystemForm from '$modules/bible/components/ChronicleSystemForm.svelte';
-	import WorldBuildingWorkspaceEmptyState from '$modules/bible/components/WorldBuildingWorkspaceEmptyState.svelte';
-	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
+	import ChronicleSystemForm from '$modules/world-building/components/ChronicleSystemForm.svelte';
+	import WorldBuildingWorkspaceEmptyState from '$modules/world-building/components/WorldBuildingWorkspaceEmptyState.svelte';
+	import WorldBuildingWorkspacePage from '$modules/world-building/components/WorldBuildingWorkspacePage.svelte';
 	import {
 		chronicleMeta,
 		chronicleSubtitle,
 		isChronicleKind,
 		parseChroniclePayload,
-	} from '$modules/bible/chronicle-systems.js';
+	} from '$modules/world-building/chronicle-systems.js';
 	import {
 		getTimelineEvents,
 		getTimelineSaving,
@@ -18,7 +18,7 @@
 		submitCreateTimelineEvent,
 		submitUpdateTimelineEvent,
 		submitDeleteTimelineEvent,
-	} from '$modules/bible/stores/bible-crud.svelte.js';
+	} from '$modules/world-building/stores/world-building-crud.svelte.js';
 
 	let {
 		data,

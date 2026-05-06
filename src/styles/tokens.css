@@ -189,4 +189,52 @@
 	/* ── Focus ── */
 	--focus-ring: 0 0 0 2px var(--color-border-focus);
 	--focus-ring-offset: 0 0 0 4px var(--color-surface-raised), 0 0 0 6px var(--color-border-focus);
+
+	/* ── Reader page geometry ──────────────────────────────────────────────
+	   Tokens for the long-form reading surface (book + classic views).
+	   Margins are generous on the inline axis to preserve the eye-rest the
+	   prose needs, and the max measure is held to a paperback-typical
+	   65–72ch so lines never grow uncomfortably wide on a desktop window.
+	*/
+	--reader-page-padding-block-start: var(--space-10); /* 40px */
+	--reader-page-padding-block-end: var(--space-12); /* 48px */
+	--reader-page-padding-inline: var(--space-8); /* 32px */
+	--reader-measure-max: 68ch;
+	--reader-prose-font: var(--font-display);
+	--reader-prose-size: var(--text-lg); /* 18px */
+	--reader-prose-leading: var(--leading-relaxed); /* 1.75 */
+	--reader-prose-tracking: var(--tracking-normal);
+
+	/* ── Editor page geometry ─────────────────────────────────────────────
+	   Word-processor geometry for the manuscript editor. Independent of
+	   --reader-page-* so editor and reader can drift in spec. The editor
+	   measure is held tighter (65ch) than the reader's because authors
+	   parse their own prose at closer range than readers consume it.
+	*/
+	--editor-page-padding-block-start: var(--space-12); /* 48px */
+	--editor-page-padding-block-end: var(--space-12); /* 48px */
+	--editor-page-padding-inline: var(--space-10); /* 40px */
+	--editor-measure-max: 65ch;
+	--editor-page-surface: var(--color-surface-raised);
+	--editor-page-shadow: var(--shadow-sm);
+	--editor-page-radius: var(--radius-md);
+
+	/* ── Editor typography (plan-022 stage-002) ──────────────────────────
+	   User-controllable editor text size and line spacing. Bound on
+	   `<html>` by the `appearance` store (`$lib/stores/appearance.svelte.ts`)
+	   from preferences `app.editor.fontSize` and `app.editor.lineSpacing`.
+	   Defaults match the pre-stage editor visual: 16px / 1.75.
+	   Plan-023 stage-007 wires the editor pane to consume these.
+	*/
+	--editor-font-size: var(--text-base); /* 16px */
+	--editor-line-height: var(--leading-relaxed); /* 1.75 */
+
+	/* ── Nova copilot panel (plan-023 stage-004) ─────────────────────────
+	   Right-side editor copilot surface. Tokens are the single source of
+	   truth — `NovaPanel.svelte` references these names exclusively.
+	*/
+	--nova-panel-width: 360px;
+	--nova-panel-bg: var(--color-surface-raised);
+	--nova-panel-border: var(--color-border-default);
+	--nova-panel-shadow: var(--shadow-lg);
 }

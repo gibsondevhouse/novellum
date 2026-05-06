@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { translator } from '$lib/i18n';
 	import { SectionHeader } from '$lib/components/ui/index.js';
-	import WorldBuildingSubheaderNav from '$modules/bible/components/WorldBuildingSubheaderNav.svelte';
-	import type { WorldBuildingTopSectionId } from '$modules/bible/worldbuilding-navigation.js';
+	import WorldBuildingSubheaderNav from '$modules/world-building/components/WorldBuildingSubheaderNav.svelte';
+	import type { WorldBuildingTopSectionId } from '$modules/world-building/worldbuilding-navigation.js';
 
 	type LandingLink = {
 		id: string;

@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const storyFrameStub = vi.fn().mockResolvedValue({ id: 'sf-1', projectId: 'p1' });
 const createActStub = vi.fn().mockResolvedValue({ id: 'act-1', projectId: 'p1', title: 'Act I' });
 
-vi.mock('../../src/modules/outliner/services/story-structure-service.js', () => ({
+vi.mock('../../src/modules/outline/services/story-structure-service.js', () => ({
 	getOrCreateStoryFrame: storyFrameStub,
 	createAct: createActStub,
 }));
@@ -28,7 +28,7 @@ vi.mock('../../src/lib/legacy/dexie/db', () => ({
 
 describe('outline-to-story-workspace migration', async () => {
 	const { migrateOutlineToStoryWorkspace } = await import(
-		'../../src/modules/outliner/services/migrations/outline-to-story-workspace.js'
+		'../../src/modules/outline/services/migrations/outline-to-story-workspace.js'
 	);
 
 	beforeEach(() => {

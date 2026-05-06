@@ -45,7 +45,7 @@
 	);
 	const cardHref = $derived(
 		destination === 'hub'
-			? `/projects/${project.id}/hub`
+			? `/projects/${project.id}`
 			: destination === 'outline'
 				? `/projects/${project.id}/outline`
 				: `/books/${project.id}`,

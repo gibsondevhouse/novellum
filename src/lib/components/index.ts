@@ -1,4 +1,3 @@
-export { default as AiPanel } from './AiPanel.svelte';
 export { default as AppHeader } from './AppHeader.svelte';
 export { default as AppSidebar } from './AppSidebar.svelte';
 export { default as Breadcrumb } from './Breadcrumb.svelte';

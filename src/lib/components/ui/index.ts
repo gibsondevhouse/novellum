@@ -8,6 +8,14 @@ export { default as SectionHeader } from './SectionHeader.svelte';
 export { default as EmptyStatePanel } from './EmptyStatePanel.svelte';
 export { default as Input } from './Input.svelte';
 export { default as PillNav } from './PillNav.svelte';
+export { default as PillToolbar } from './PillToolbar.svelte';
+export type {
+	PillToolbarItem,
+	PillToolbarButtonItem,
+	PillToolbarDividerItem,
+	PillToolbarMenuItem,
+	PillToolbarMenuChildItem,
+} from './PillToolbar.svelte';
 export { default as PageHeader } from './PageHeader.svelte';
 export { default as WorkspaceShell } from './WorkspaceShell.svelte';
 export { default as WorkspaceHero } from './WorkspaceHero.svelte';

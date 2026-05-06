@@ -1,5 +1,5 @@
 import type { PageLoad } from './$types';
-import { getOutlineData } from '$modules/outliner/services/outline-data-service.js';
+import { getOutlineData } from '$modules/outline/services/outline-data-service.js';
 
 export const ssr = false;
 

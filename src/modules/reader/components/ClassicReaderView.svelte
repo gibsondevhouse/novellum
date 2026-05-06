@@ -1,5 +1,5 @@
 <script lang="ts">
-
+	import { onMount } from 'svelte';
 
 	interface ClassicProject {
 		id: string;
@@ -26,9 +26,29 @@
 	interface Props {
 		project: ClassicProject;
 		chapters: ClassicChapter[];
+		/**
+		 * plan-023 stage-003: optional deep-link target. When provided and a
+		 * matching `#scene-<id>` anchor is rendered, the reader scrolls to it
+		 * once on mount. Subsequent prop changes do not re-scroll — fresh
+		 * navigation triggers a new mount per the deep-link contract.
+		 */
+		targetSceneId?: string | null;
 	}
 
-	let { project, chapters }: Props = $props();
+	let { project, chapters, targetSceneId = null }: Props = $props();
+
+	onMount(() => {
+		if (typeof window === 'undefined') return;
+		if (!targetSceneId) return;
+		const sceneId = targetSceneId;
+		// Single rAF guards against transition timing; chapters are rendered
+		// synchronously but the wrapping route may animate in.
+		requestAnimationFrame(() => {
+			const el = document.getElementById(`scene-${sceneId}`);
+			if (!el) return;
+			el.scrollIntoView({ behavior: 'instant', block: 'start' });
+		});
+	});
 
 	function extractReadableText(html: string): string {
 		if (!html.trim()) return '';
@@ -128,7 +148,10 @@
 	.reader-shell {
 		max-width: 880px;
 		margin: 0 auto;
-		padding: var(--space-10) 0 var(--space-12);
+		padding:
+			var(--reader-page-padding-block-start)
+			var(--reader-page-padding-inline)
+			var(--reader-page-padding-block-end);
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-8);
@@ -284,12 +307,15 @@
 	}
 
 	.reader-scene-content {
-		font-family: var(--font-sans);
-		font-size: var(--text-base);
-		line-height: var(--leading-relaxed);
+		font-family: var(--reader-prose-font);
+		font-size: var(--reader-prose-size);
+		line-height: var(--reader-prose-leading);
+		letter-spacing: var(--reader-prose-tracking);
 		color: var(--color-text-primary);
 		white-space: pre-wrap;
 		margin: 0;
+		max-width: var(--reader-measure-max);
+		overflow-wrap: anywhere;
 	}
 
 	.reader-empty,

@@ -10,7 +10,7 @@
 		type MajorArcPayload,
 		type SubPlotPayload,
 		type MotivationPayload,
-	} from '$modules/bible/thread-systems.js';
+	} from '$modules/world-building/thread-systems.js';
 
 	type ArcOption = { id: string; name: string };
 

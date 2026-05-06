@@ -13,9 +13,16 @@
 		project: ReaderInputProject;
 		chapters: ReaderInputChapter[];
 		fullscreen?: boolean;
+		/**
+		 * Optional deep-link target. When provided and matched against the
+		 * derived page array on mount, the reader scrolls to that page instead
+		 * of restoring the previously-saved index. Consumed by plan-023's
+		 * editor → reader handoff.
+		 */
+		targetPageId?: string | null;
 	}
 
-	let { project, chapters, fullscreen = false }: Props = $props();
+	let { project, chapters, fullscreen = false, targetPageId = null }: Props = $props();
 
 	const pages: ReaderPage[] = $derived(buildReaderPages(project, chapters));
 
@@ -34,6 +41,13 @@
 
 	const totalPages = $derived(pages.length);
 
+	/**
+	 * Virtualization contract (plan-021 stage-003 phase-004):
+	 * regardless of how many pages `pages` contains, the reader mounts at
+	 * most two `BookPage` instances at a time (single-column phone view
+	 * mounts one). DOM size therefore stays flat for 100k+ word
+	 * manuscripts; only `pages` (a plain JS array of metadata) grows.
+	 */
 	const visiblePages = $derived.by((): Array<ReaderPage | null> => {
 		if (totalPages === 0) return [];
 		if (isSingle) {
@@ -80,9 +94,19 @@
 
 	onMount(() => {
 		if (typeof window === 'undefined') return;
-		// Restore saved page position
-		const saved = getBookPageIndex(project.id);
-		if (saved > 0) currentIndex = saved;
+		// Deep-link target (plan-023 handoff) takes precedence over saved position.
+		if (targetPageId) {
+			const targetIndex = pages.findIndex((page) => page.id === targetPageId);
+			if (targetIndex >= 0) {
+				currentIndex = targetIndex;
+			} else {
+				const saved = getBookPageIndex(project.id);
+				if (saved > 0) currentIndex = saved;
+			}
+		} else {
+			const saved = getBookPageIndex(project.id);
+			if (saved > 0) currentIndex = saved;
+		}
 		const updateWidth = () => {
 			viewportWidth = window.innerWidth;
 		};

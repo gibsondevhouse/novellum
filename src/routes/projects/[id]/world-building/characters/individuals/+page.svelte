@@ -12,22 +12,22 @@
 		createRelationship,
 		removeRelationship as removePersistedRelationship,
 		updateRelationship,
-	} from '$modules/bible/services/character-repository.js';
+	} from '$modules/world-building/services/character-repository.js';
 	import {
 		addRelationshipReciprocal,
 		removeRelationshipReciprocal,
 		updateRelationshipReciprocal,
 		type IndividualsCharacterRecord,
-	} from '$modules/bible/services/individuals-relationship-state.js';
-	import CharacterCorePanel from '$modules/bible/components/CharacterCorePanel.svelte';
-	import CharacterDetailHeader from '$modules/bible/components/CharacterDetailHeader.svelte';
-	import ContinuityPanel from '$modules/bible/components/ContinuityPanel.svelte';
-	import EmptyCharacterState from '$modules/bible/components/EmptyCharacterState.svelte';
-	import NarrativeStatePanel from '$modules/bible/components/NarrativeStatePanel.svelte';
-	import RelationshipPanel from '$modules/bible/components/RelationshipPanel.svelte';
-	import StoryFunctionPanel from '$modules/bible/components/StoryFunctionPanel.svelte';
-	import VoicePanel from '$modules/bible/components/VoicePanel.svelte';
-	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
+	} from '$modules/world-building/services/individuals-relationship-state.js';
+	import CharacterCorePanel from '$modules/world-building/components/CharacterCorePanel.svelte';
+	import CharacterDetailHeader from '$modules/world-building/components/CharacterDetailHeader.svelte';
+	import ContinuityPanel from '$modules/world-building/components/ContinuityPanel.svelte';
+	import EmptyCharacterState from '$modules/world-building/components/EmptyCharacterState.svelte';
+	import NarrativeStatePanel from '$modules/world-building/components/NarrativeStatePanel.svelte';
+	import RelationshipPanel from '$modules/world-building/components/RelationshipPanel.svelte';
+	import StoryFunctionPanel from '$modules/world-building/components/StoryFunctionPanel.svelte';
+	import VoicePanel from '$modules/world-building/components/VoicePanel.svelte';
+	import WorldBuildingWorkspacePage from '$modules/world-building/components/WorldBuildingWorkspacePage.svelte';
 
 	type LoadedData = {
 		projectId: string;

@@ -44,7 +44,7 @@
 	<hr class="sidebar-divider" />
 
 	<SidebarSection label="LAST PROJECT" collapsible>
-		<SidebarItem href="{base}/hub" label="Hub">
+		<SidebarItem href={base} label="Hub">
 			{#snippet icon()}
 				<svg
 					xmlns="http://www.w3.org/2000/svg"

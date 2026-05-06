@@ -1,5 +1,5 @@
 import type { ConsistencyIssue } from '$lib/db/domain-types';
-import { getIssuesByProjectId, updateIssueStatus } from '../services/consistency-repository.js';
+import { getIssuesByProjectId, updateIssueStatus } from '../services/continuity-repository.js';
 
 let issues: ConsistencyIssue[] = $state([]);
 const openIssues: ConsistencyIssue[] = $derived(issues.filter((i) => i.status === 'open'));

@@ -1,5 +1,5 @@
 export type { ChapterWithScenes, ChapterWithScenesAndAct, BeatFocus, OutlineSelection } from './types.js';
-export * from './stores/outliner.svelte.js';
+export * from './stores/outline-store.svelte.js';
 export { computeMetrics, SPARSITY_THRESHOLDS } from './services/pacing-telemetry.js';
 export type { PacingMetrics } from './services/pacing-telemetry.js';
 export {

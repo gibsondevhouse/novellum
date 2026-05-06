@@ -109,7 +109,7 @@ export function openHub(project: Project): void {
 	// Update lastOpenedAt implicitly in background
 	// eslint-disable-next-line svelte/prefer-svelte-reactivity
 	updateProject(project.id, { lastOpenedAt: new Date().toISOString() }).catch(console.error);
-	goto(`/projects/${project.id}/hub`);
+	goto(`/projects/${project.id}`);
 }
 
 export async function submitUpdate(

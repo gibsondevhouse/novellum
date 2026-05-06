@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import {
 	readCharacterScratchpad,
 	writeCharacterScratchpad,
-} from '$modules/bible/services/character-dossier-files.js';
+} from '$modules/world-building/services/character-dossier-files.js';
 
 export const GET: RequestHandler = async ({ params }) => {
 	const scratchpad = await readCharacterScratchpad(params.projectId, params.charId);

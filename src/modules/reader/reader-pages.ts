@@ -44,7 +44,32 @@ export interface ReaderInputProject {
 	coverUrl?: string;
 }
 
+export interface ReaderPageBox {
+	/**
+	 * Visible text lines that fit within a single reader page. Derived from the
+	 * rendered page-box height divided by line-height (see strategy-spike.md).
+	 */
+	linesPerPage: number;
+	/**
+	 * Approximate characters that fit on a single visual line at the chosen
+	 * typography. Derived from `--reader-measure-max` (68ch) at the reader
+	 * prose font.
+	 */
+	charsPerLine: number;
+	/**
+	 * Anti-orphan rule: if a flush would leave the next page with fewer than
+	 * this many lines of a paragraph, push the paragraph forward instead.
+	 * Defaults to 2 (one-line widows are forbidden).
+	 */
+	minTrailingLines?: number;
+}
+
 export interface BuildReaderPagesOptions {
+	/**
+	 * Preferred: explicit page-box geometry. When provided this takes
+	 * precedence over the legacy character-budget options below.
+	 */
+	pageBox?: ReaderPageBox;
 	/** Approximate target characters per page for scene chunking. Default 2100. */
 	targetCharsPerPage?: number;
 	/** Min characters per page before forcing a chunk break. Default 1500. */
@@ -54,8 +79,32 @@ export interface BuildReaderPagesOptions {
 const DEFAULT_TARGET = 2100;
 const DEFAULT_MIN = 1500;
 
+/**
+ * Default page box matching stage-002 reader typography:
+ *   - --reader-prose-size: 18px
+ *   - --reader-prose-leading: 1.75 → ~31.5px line height
+ *   - --reader-measure-max: 68ch (~64 chars at the chosen serif)
+ *   - page-box height ≈ 880px content area → ~28 lines.
+ *
+ * Re-derive at the call site if the reader tokens change so the engine stays
+ * deterministic but tracks visual reality.
+ */
+export const DEFAULT_READER_PAGE_BOX: Readonly<Required<ReaderPageBox>> = Object.freeze({
+	linesPerPage: 28,
+	charsPerLine: 64,
+	minTrailingLines: 2,
+});
+
 const SCENE_NOT_WRITTEN = 'Scene not written yet.';
 const CHAPTER_NOT_WRITTEN = 'No scenes in this chapter yet.';
+
+/** Minimum visual lines a paragraph occupies (a single-word paragraph still costs one line). */
+function estimateParagraphLines(text: string, charsPerLine: number): number {
+	if (charsPerLine <= 0) return 1;
+	const length = text.length;
+	if (length === 0) return 1;
+	return Math.max(1, Math.ceil(length / charsPerLine));
+}
 
 function extractText(html: string): string {
 	if (!html.trim()) return '';
@@ -88,16 +137,31 @@ function splitParagraphs(text: string): string[] {
 }
 
 /**
- * Group paragraphs into deterministic chunks of approximately `targetCharsPerPage` characters.
- * Paragraph boundaries are preserved. A single oversize paragraph is allowed to occupy a page on
- * its own rather than being split mid-word.
+ * Group paragraphs into deterministic chunks that respect a page-box budget.
+ *
+ * When `options.pageBox` is supplied the engine uses line-aware accounting
+ * (paragraph lines + inter-paragraph gap) and an anti-orphan rule that pushes
+ * a paragraph to the next page rather than leaving a sub-`minTrailingLines`
+ * widow at the top.
+ *
+ * When `options.pageBox` is omitted the engine falls back to the legacy
+ * character-budget heuristic. Both modes preserve paragraph boundaries and
+ * keep oversize paragraphs intact (rather than splitting mid-word).
  */
 export function chunkSceneContent(text: string, options: BuildReaderPagesOptions = {}): string[] {
-	const target = options.targetCharsPerPage ?? DEFAULT_TARGET;
-	const min = Math.min(options.minCharsPerPage ?? DEFAULT_MIN, target);
 	const paragraphs = splitParagraphs(text);
 	if (paragraphs.length === 0) return [];
 
+	if (options.pageBox) {
+		return chunkByPageBox(paragraphs, options.pageBox);
+	}
+
+	const target = options.targetCharsPerPage ?? DEFAULT_TARGET;
+	const min = Math.min(options.minCharsPerPage ?? DEFAULT_MIN, target);
+	return chunkByCharBudget(paragraphs, target, min);
+}
+
+function chunkByCharBudget(paragraphs: string[], target: number, min: number): string[] {
 	const pages: string[] = [];
 	let current: string[] = [];
 	let currentLength = 0;
@@ -115,16 +179,76 @@ export function chunkSceneContent(text: string, options: BuildReaderPagesOptions
 			currentLength = projected;
 			continue;
 		}
-		// We would exceed target. Decide whether to flush before adding.
 		if (currentLength >= min || paragraphLength > target) {
 			pages.push(current.join('\n\n'));
 			current = [paragraph];
 			currentLength = paragraphLength;
 		} else {
-			// Allow overshoot to honor min-per-page rule.
 			current.push(paragraph);
 			currentLength = projected;
 		}
+	}
+
+	if (current.length > 0) {
+		pages.push(current.join('\n\n'));
+	}
+
+	return pages;
+}
+
+function chunkByPageBox(paragraphs: string[], pageBox: ReaderPageBox): string[] {
+	const linesPerPage = Math.max(1, Math.floor(pageBox.linesPerPage));
+	const charsPerLine = Math.max(1, Math.floor(pageBox.charsPerLine));
+	const minTrailing = Math.max(1, Math.floor(pageBox.minTrailingLines ?? 2));
+
+	const pages: string[] = [];
+	let current: string[] = [];
+	let currentLines = 0;
+
+	for (const paragraph of paragraphs) {
+		const lines = estimateParagraphLines(paragraph, charsPerLine);
+		const gap = current.length === 0 ? 0 : 1;
+		const projected = currentLines + gap + lines;
+
+		if (projected <= linesPerPage) {
+			current.push(paragraph);
+			currentLines = projected;
+			continue;
+		}
+
+		// Would overflow. Decide how to split.
+		const remainingOnCurrent = linesPerPage - currentLines - gap;
+		if (current.length === 0) {
+			// Oversize single paragraph: keep it on its own page rather than
+			// splitting mid-word. Reading layer applies overflow-wrap: anywhere.
+			pages.push(paragraph);
+			current = [];
+			currentLines = 0;
+			continue;
+		}
+
+		// Anti-widow guard: if the carry-over to the next page would leave the
+		// paragraph with fewer than `minTrailing` lines on either side, prefer
+		// flushing the current page and giving the next one the whole paragraph.
+		const wouldOverflowBy = projected - linesPerPage;
+		const carryLines = lines - Math.max(0, remainingOnCurrent);
+		const wouldOrphan =
+			remainingOnCurrent > 0 && remainingOnCurrent < minTrailing && lines > remainingOnCurrent;
+		const wouldWidow = carryLines > 0 && carryLines < minTrailing && lines > carryLines;
+
+		void wouldOverflowBy; // reserved for future tuning
+
+		if (wouldOrphan || wouldWidow) {
+			pages.push(current.join('\n\n'));
+			current = [paragraph];
+			currentLines = lines;
+			continue;
+		}
+
+		// Default: flush the current page and start the next with this paragraph.
+		pages.push(current.join('\n\n'));
+		current = [paragraph];
+		currentLines = lines;
 	}
 
 	if (current.length > 0) {
@@ -238,4 +362,24 @@ export function buildReaderPages(
 	});
 
 	return pages.map((page, index) => ({ ...page, pageNumber: index + 1 }));
+}
+
+/**
+ * plan-023 stage-003: map an authoring `sceneId` to the first
+ * `ReaderPage.id` whose page renders that scene. Returns `null` when no
+ * page references the scene (unknown id, scene removed, etc.) so callers
+ * can fall back to saved/initial position without throwing.
+ *
+ * Pure & deterministic — re-derives `buildReaderPages` from the same
+ * inputs. Not memoized; if a hot path needs it, memoize at the call site.
+ */
+export function mapSceneIdToReaderPageId(
+	sceneId: string,
+	project: ReaderInputProject,
+	chapters: ReaderInputChapter[],
+): string | null {
+	if (!sceneId) return null;
+	const pages = buildReaderPages(project, chapters);
+	const match = pages.find((page) => page.sceneId === sceneId);
+	return match ? match.id : null;
 }

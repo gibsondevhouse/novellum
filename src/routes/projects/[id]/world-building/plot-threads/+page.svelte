@@ -1,6 +1,6 @@
 <script lang="ts">
-	import WorldBuildingTopSectionLanding from '$modules/bible/components/WorldBuildingTopSectionLanding.svelte';
-	import { buildWorldBuildingLandingProps } from '$modules/bible/worldbuilding-navigation.js';
+	import WorldBuildingTopSectionLanding from '$modules/world-building/components/WorldBuildingTopSectionLanding.svelte';
+	import { buildWorldBuildingLandingProps } from '$modules/world-building/worldbuilding-navigation.js';
 
 	let { data }: { data: { projectId: string } } = $props();
 

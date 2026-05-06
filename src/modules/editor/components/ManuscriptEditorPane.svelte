@@ -3,18 +3,41 @@
 	import { Editor as TipTapEditor } from '@tiptap/core';
 	import Placeholder from '@tiptap/extension-placeholder';
 	import StarterKit from '@tiptap/starter-kit';
+	import Underline from '@tiptap/extension-underline';
+	import Image from '@tiptap/extension-image';
+	import { Table } from '@tiptap/extension-table';
+	import { TableRow } from '@tiptap/extension-table-row';
+	import { TableHeader } from '@tiptap/extension-table-header';
+	import { TableCell } from '@tiptap/extension-table-cell';
 	import { GhostButton } from '$lib/components/ui/index.js';
 
 	/* eslint-disable @typescript-eslint/no-explicit-any */
 
 	interface Props {
 		content: string;
-		title: string;
 		onContentChange: (html: string) => void;
-		onTitleChange?: (title: string) => void;
+		/**
+		 * Fires once after the TipTap editor instance is constructed.
+		 * Allows the route to lift the instance for an external toolbar.
+		 * Called with `null` on destroy.
+		 */
+		oneditorReady?: (editor: any | null) => void;
+		/**
+		 * Fires on every TipTap onUpdate / onSelectionUpdate so external
+		 * toolbars can re-derive `isActive` press state.
+		 */
+		ontick?: () => void;
+		/** Spellcheck toggle, applied to the contenteditable host. */
+		spellcheck?: boolean;
 	}
 
-	let { content, title = '', onContentChange, onTitleChange }: Props = $props();
+	let {
+		content,
+		onContentChange,
+		oneditorReady,
+		ontick,
+		spellcheck = true,
+	}: Props = $props();
 
 	let editorHost: HTMLElement;
 	let bubbleMenuHost: HTMLElement | null = null;
@@ -23,7 +46,6 @@
 	let isSelecting = $state(false);
 	let bubbleMenuVisible = $state(false);
 	let bubbleMenuPosition = $state({ top: 0, left: 0 });
-	let localTitle = $derived(title);
 
 	onMount(() => {
 		editor = new (TipTapEditor as any)({
@@ -34,6 +56,12 @@
 					bulletList: { keepMarks: true },
 					orderedList: { keepMarks: true },
 				}),
+				Underline,
+				Image.configure({ inline: false, allowBase64: false }),
+				Table.configure({ resizable: false }),
+				TableRow,
+				TableHeader,
+				TableCell,
 				Placeholder.configure({
 					placeholder: 'Begin drafting...',
 					showOnlyCurrent: false,
@@ -44,6 +72,7 @@
 			onUpdate: ({ editor: currentEditor }: { editor: any }) => {
 				onContentChange(currentEditor.getHTML());
 				updateTick += 1;
+				ontick?.();
 			},
 			onSelectionUpdate: ({ editor: currentEditor }: { editor: any }) => {
 				const hasSelection = !currentEditor.state.selection.empty;
@@ -52,17 +81,20 @@
 					updateBubbleMenuPosition(currentEditor);
 				}
 				updateTick += 1;
+				ontick?.();
 			},
 			editorProps: {
 				attributes: {
 					class: 'manuscript-canvas',
-					spellcheck: 'true',
+					spellcheck: String(spellcheck),
 				},
 			},
 		});
+		oneditorReady?.(editor);
 	});
 
 	onDestroy(() => {
+		oneditorReady?.(null);
 		editor?.destroy();
 		editor = null;
 	});
@@ -72,6 +104,25 @@
 		const currentHtml = editor.getHTML();
 		if (content !== currentHtml) {
 			editor.commands.setContent(content || '<p></p>', { emitUpdate: false });
+		}
+	});
+
+	$effect(() => {
+		if (!editor) return;
+		const next = String(spellcheck);
+		editor.setOptions({
+			editorProps: {
+				attributes: {
+					class: 'manuscript-canvas',
+					spellcheck: next,
+				},
+			},
+		});
+		// Ensure the live DOM node also reflects the new value, since
+		// setOptions may only re-apply on the next render cycle.
+		const dom = editorHost?.querySelector('.manuscript-canvas');
+		if (dom instanceof HTMLElement) {
+			dom.setAttribute('spellcheck', next);
 		}
 	});
 
@@ -130,31 +181,10 @@
 		void updateTick;
 		return editor ? check() : false;
 	}
-
-	function handleTitleChange(newTitle: string): void {
-		localTitle = newTitle;
-		onTitleChange?.(newTitle);
-	}
 </script>
 
 <div class="editor-root">
-	<div class="editor-column">
-		<!-- Title Input -->
-		<input
-			type="text"
-			class="title-input"
-			placeholder="Title"
-			value={localTitle}
-			onchange={(e) => handleTitleChange((e.target as HTMLInputElement).value)}
-			onkeyup={(e) => {
-				const target = e.target as HTMLInputElement;
-				if (e.key !== 'Enter') {
-					handleTitleChange(target.value);
-				}
-			}}
-			aria-label="Scene title"
-		/>
-
+	<div class="editor-page">
 		<!-- Editor Canvas -->
 		<div bind:this={editorHost} class="editor-host"></div>
 	</div>
@@ -250,57 +280,33 @@
 		flex: 1;
 		min-height: 0;
 		flex-direction: column;
+		align-items: center;
 		padding: 0;
 		background: transparent;
 		position: relative;
 	}
 
-	.editor-column {
-		max-width: 720px;
-		margin: 0 auto;
+	.editor-page {
+		max-width: var(--editor-measure-max);
 		width: 100%;
-		flex: 1;
 		display: flex;
 		flex-direction: column;
-		padding: clamp(4rem, 8vw, 6rem) clamp(1rem, 4vw, 3rem) clamp(3rem, 6vw, 4rem);
+		padding-block-start: var(--editor-page-padding-block-start);
+		padding-block-end: var(--editor-page-padding-block-end);
+		padding-inline: var(--editor-page-padding-inline);
+		margin-block: var(--space-8);
 		box-sizing: border-box;
-		background: transparent;
-		border: none;
-		box-shadow: none;
-	}
-
-	.title-input {
-		appearance: none;
-		border: none;
-		outline: none;
-		background: transparent;
-		font-family: var(--font-sans);
-		font-size: clamp(2rem, 5vw, 2.5rem);
-		font-weight: 700;
-		line-height: 1.2;
-		letter-spacing: -0.01em;
-		color: var(--color-text-primary);
-		margin: 0 0 clamp(2rem, 4vw, 3rem);
-		padding: 0;
-		width: 100%;
-		text-align: left;
-
-		&::placeholder {
-			color: var(--color-text-muted);
-			opacity: 0.4;
-		}
-
-		&:focus {
-			outline: none;
-		}
+		background: var(--editor-page-surface);
+		box-shadow: var(--editor-page-shadow);
+		border-radius: var(--editor-page-radius);
 	}
 
 	.editor-host {
 		flex: 1;
 		outline: none;
 		font-family: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
-		font-size: clamp(1rem, 1vw + 0.9rem, 1.1rem);
-		line-height: 1.9;
+		font-size: var(--editor-font-size);
+		line-height: var(--editor-line-height);
 		letter-spacing: 0.005em;
 		color: var(--color-text-primary);
 		caret-color: var(--color-nova-blue);
@@ -458,13 +464,16 @@
 		margin: 0 0.25rem;
 	}
 
-	@media (max-width: 768px) {
-		.editor-column {
-			padding: clamp(3rem, 6vw, 4rem) clamp(0.75rem, 3vw, 1.5rem) clamp(2rem, 4vw, 3rem);
-		}
-
-		.title-input {
-			font-size: clamp(1.5rem, 5vw, 2rem);
+	@media (max-width: 720px) {
+		.editor-page {
+			max-width: 100%;
+			margin-block: 0;
+			background: transparent;
+			box-shadow: none;
+			border-radius: 0;
+			padding-inline: var(--space-4);
+			padding-block-start: var(--space-8);
+			padding-block-end: var(--space-6);
 		}
 
 		.bubble-menu {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import DocumentEditorFrame from '$modules/editor/components/DocumentEditorFrame.svelte';
+	import SceneEditorFrame from '$modules/editor/components/SceneEditorFrame.svelte';
 	import VersionHistoryPanel from '$modules/editor/components/VersionHistoryPanel.svelte';
 	import SaveStatus from '$modules/editor/components/SaveStatus.svelte';
 	import RecoveryPrompt from '$modules/editor/components/RecoveryPrompt.svelte';
@@ -90,7 +90,7 @@
 	</div>
 
 	<div class="editor-body">
-		<DocumentEditorFrame
+		<SceneEditorFrame
 			initialContent={data.scene.content ?? ''}
 			onContentChange={(html) => editorState.pendingText = html}
 		/>

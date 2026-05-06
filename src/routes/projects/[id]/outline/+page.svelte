@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { Chapter, Scene, StoryFrame, Act, Arc, Character } from '$lib/db/domain-types';
-	import type { ChapterWithScenes } from '$modules/outliner/types.js';
+	import type { ChapterWithScenes } from '$modules/outline/types.js';
 	import { WorkspaceShell, WorkspaceHero } from '$lib/components/ui/index.js';
-	import HierarchyNavigator from '$modules/outliner/components/HierarchyNavigator.svelte';
-	import ActClarityPanel from '$modules/outliner/components/ActClarityPanel.svelte';
-	import ChapterClarityPanel from '$modules/outliner/components/ChapterClarityPanel.svelte';
-	import SceneClarityPanel from '$modules/outliner/components/SceneClarityPanel.svelte';
+	import HierarchyNavigator from '$modules/outline/components/HierarchyNavigator.svelte';
+	import ActClarityPanel from '$modules/outline/components/ActClarityPanel.svelte';
+	import ChapterClarityPanel from '$modules/outline/components/ChapterClarityPanel.svelte';
+	import SceneClarityPanel from '$modules/outline/components/SceneClarityPanel.svelte';
 	import {
 		getSelectedActId,
 		getSelectedChapterId,
@@ -15,8 +15,8 @@
 		setSelectedChapter,
 		setSelectedScene,
 		setActiveProject,
-	} from '$modules/outliner/stores/outliner.svelte.js';
-	import { createAct, updateAct } from '$modules/outliner/services/story-structure-service.js';
+	} from '$modules/outline/stores/outline-store.svelte.js';
+	import { createAct, updateAct } from '$modules/outline/services/story-structure-service.js';
 	import { updateChapter } from '$modules/project/services/chapter-repository.js';
 	import { createScene, updateScene } from '$modules/editor/services/scene-repository.js';
 	import { createBeat } from '$modules/editor/services/beat-repository.js';

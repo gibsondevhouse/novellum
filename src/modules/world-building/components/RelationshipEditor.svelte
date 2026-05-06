@@ -8,7 +8,7 @@
 		initRelationships,
 		submitCreateRelationship,
 		submitDeleteRelationship,
-	} from '../stores/bible-crud.svelte.ts';
+	} from '../stores/world-building-crud.svelte.ts';
 	import { GhostButton, PrimaryButton } from '$lib/components/ui/index.js';
 
 	let { characterId, projectId, allCharacters, initialRelationships, onSelectCharacter } = $props<{

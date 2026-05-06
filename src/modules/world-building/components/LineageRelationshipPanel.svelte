@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { GhostButton, SectionHeader } from '$lib/components/ui/index.js';
-	import CharacterSelect from '$modules/bible/components/CharacterSelect.svelte';
+	import CharacterSelect from '$modules/world-building/components/CharacterSelect.svelte';
 
 	type LineageOption = { id: string; name: string; role?: string; summary?: string };
 	type Relationship = {

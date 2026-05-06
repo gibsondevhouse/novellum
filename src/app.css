@@ -1,8 +1,8 @@
 @import './styles/reset.css';
 @import './styles/tokens.css';
 @import './styles/components.css';
-@import './styles/bible-entities.css';
-@import './styles/bible.css';
+@import './styles/world-building-entities.css';
+@import './styles/world-building.css';
 @import './styles/shadcn.css';
 
 html {

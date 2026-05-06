@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { PacingMetrics } from '$modules/outliner/services/pacing-telemetry.js';
+	import type { PacingMetrics } from '$modules/outline/services/pacing-telemetry.js';
 	import PacingSignal from './PacingSignal.svelte';
 
 	let { chapterCount, sceneCount, metrics } = $props<{

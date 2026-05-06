@@ -1,4 +1,4 @@
-import { getPlotThreadsByProjectId } from '$modules/bible/services/plot-thread-repository.js';
+import { getPlotThreadsByProjectId } from '$modules/world-building/services/plot-thread-repository.js';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ params }) => {

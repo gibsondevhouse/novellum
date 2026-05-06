@@ -8,7 +8,7 @@
 		resolveIssue,
 		dismissIssue,
 		reopenIssue,
-	} from '../stores/consistency-store.svelte.js';
+	} from '../stores/continuity-store.svelte.js';
 	import IssueGroup from './IssueGroup.svelte';
 	import { ISSUE_TYPES } from '../constants.js';
 	import { SurfacePanel, EmptyStatePanel } from '$lib/components/ui/index.js';

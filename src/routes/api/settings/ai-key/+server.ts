@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createCredentialService } from '$lib/server/credentials/credential-service.js';
+import { selectSecureStore } from '$lib/server/credentials/select-secure-store.js';
 import { createOpenRouterProvider } from '$lib/ai/providers/openrouter-provider.js';
 
 /**
@@ -11,7 +12,7 @@ import { createOpenRouterProvider } from '$lib/ai/providers/openrouter-provider.
  */
 
 function service() {
-	return createCredentialService();
+	return createCredentialService(selectSecureStore());
 }
 function openrouter() {
 	return createOpenRouterProvider();

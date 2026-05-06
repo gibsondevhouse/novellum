@@ -15,7 +15,7 @@
 		type EraPayload,
 		type KeyEventPayload,
 		type PersonalHistoryPayload,
-	} from '$modules/bible/chronicle-systems.js';
+	} from '$modules/world-building/chronicle-systems.js';
 
 	let {
 		event = null,

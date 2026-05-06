@@ -2,7 +2,7 @@
 	import { untrack } from 'svelte';
 	import { SvelteSet } from 'svelte/reactivity';
 	import type { Act, Arc } from '$lib/db/domain-types';
-	import type { ChapterWithScenes } from '$modules/outliner/types.js';
+	import type { ChapterWithScenes } from '$modules/outline/types.js';
 	import { WorkspaceInspector, GhostButton } from '$lib/components/ui/index.js';
 
 	type NarrativeRole = 'setup' | 'escalation' | 'resolution' | '';

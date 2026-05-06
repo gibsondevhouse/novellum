@@ -7,7 +7,7 @@ const ROOT = join(__dirname, '..', '..', 'src');
 const ALLOWED_PREFIXES = [
 	'lib/legacy/',
 	'lib/migration/',
-	'modules/outliner/services/migrations/',
+	'modules/outline/services/migrations/',
 	'modules/export/services/portability/',
 	'modules/export/services/__tests__/',
 	'modules/assets/',

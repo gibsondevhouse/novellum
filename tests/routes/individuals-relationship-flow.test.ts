@@ -4,7 +4,7 @@ import {
 	removeRelationshipReciprocal,
 	updateRelationshipReciprocal,
 	type IndividualsCharacterRecord,
-} from '../../src/modules/bible/services/individuals-relationship-state.js';
+} from '../../src/modules/world-building/services/individuals-relationship-state.js';
 
 type TestCharacterRecord = IndividualsCharacterRecord & {
 	name: string;

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { translator } from '$lib/i18n';
-	import WorldBuildingPlaceholderPage from '$modules/bible/components/WorldBuildingPlaceholderPage.svelte';
+	import WorldBuildingEmptyStatePage from '$modules/world-building/components/WorldBuildingEmptyStatePage.svelte';
 
 	const projectId = $derived(page.params.id ?? '');
 </script>
@@ -10,7 +10,7 @@
 	<title>{$translator('worldbuilding.page.maps.title')}</title>
 </svelte:head>
 
-<WorldBuildingPlaceholderPage
+<WorldBuildingEmptyStatePage
 	{projectId}
 	topSection="locations"
 	activeId="maps"

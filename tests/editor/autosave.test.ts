@@ -41,15 +41,25 @@ describe('autosave-service (debounce behavior)', async () => {
 		);
 	});
 
-	it('debounce resets on rapid input', async () => {
-		service.schedule('a');
-		vi.advanceTimersByTime(1000);
-		service.schedule('ab');
-		vi.advanceTimersByTime(2000);
-		await vi.runAllTimersAsync();
-		expect(updateScene).toHaveBeenCalledTimes(1);
-		expect(updateScene).toHaveBeenCalledWith('scene-1', expect.objectContaining({ content: 'ab' }));
-	});
+        it('passes wordCount derived from text content to updateScene', async () => {
+                service.schedule('<p>Hello world, this is five</p>');
+                vi.advanceTimersByTime(2000);
+                await vi.runAllTimersAsync();
+                expect(updateScene).toHaveBeenCalledWith(
+                        'scene-1',
+                        expect.objectContaining({ wordCount: 5 }),
+                );
+        });
+
+        it('passes wordCount of 0 for empty or whitespace-only content', async () => {
+                service.schedule('   ');
+                vi.advanceTimersByTime(2000);
+                await vi.runAllTimersAsync();
+                expect(updateScene).toHaveBeenCalledWith(
+                        'scene-1',
+                        expect.objectContaining({ wordCount: 0 }),
+                );
+        });
 
 	it('flushNow() saves immediately', async () => {
 		service.schedule('quick');

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { buildPrompt } from '../../src/lib/ai/prompt-builder.js';
+import { NOVA_IDENTITY_BLOCK } from '../../src/lib/ai/constants.js';
 import type { AiTask, AiContext } from '../../src/lib/ai/types.js';
 
 const task: AiTask = {
@@ -120,6 +121,15 @@ describe('prompt-builder', () => {
 		const prompt = buildPrompt(task, emptyCtx);
 		expect(prompt).toContain('You are a literary fiction drafter.');
 	});
+
+        it('prepends Nova identity block before the task role', () => {
+                const prompt = buildPrompt(task, emptyCtx);
+                expect(prompt).toContain(NOVA_IDENTITY_BLOCK);
+                // Identity must appear before the task-specific role text
+                const identityPos = prompt.indexOf(NOVA_IDENTITY_BLOCK);
+                const rolePos = prompt.indexOf('You are a literary fiction drafter.');
+                expect(identityPos).toBeLessThan(rolePos);
+        });
 
 	it('includes character names when present', () => {
 		const prompt = buildPrompt(task, richCtx);

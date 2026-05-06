@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { translator } from '$lib/i18n';
 	import { createAssetsStore } from '$modules/assets/stores/assets.svelte';
-	import EmptyLineageState from '$modules/bible/components/EmptyLineageState.svelte';
-	import LineageContinuityPanel from '$modules/bible/components/LineageContinuityPanel.svelte';
-	import LineageCoreIdentityPanel from '$modules/bible/components/LineageCoreIdentityPanel.svelte';
-	import LineageCurrentStatePanel from '$modules/bible/components/LineageCurrentStatePanel.svelte';
-	import LineageDetailHeader from '$modules/bible/components/LineageDetailHeader.svelte';
-	import LineageInheritanceCulturePanel from '$modules/bible/components/LineageInheritanceCulturePanel.svelte';
-	import LineageMembersPanel from '$modules/bible/components/LineageMembersPanel.svelte';
-	import LineageRelationshipPanel from '$modules/bible/components/LineageRelationshipPanel.svelte';
-	import LineageStoryFunctionPanel from '$modules/bible/components/LineageStoryFunctionPanel.svelte';
-	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
+	import EmptyLineageState from '$modules/world-building/components/EmptyLineageState.svelte';
+	import LineageContinuityPanel from '$modules/world-building/components/LineageContinuityPanel.svelte';
+	import LineageCoreIdentityPanel from '$modules/world-building/components/LineageCoreIdentityPanel.svelte';
+	import LineageCurrentStatePanel from '$modules/world-building/components/LineageCurrentStatePanel.svelte';
+	import LineageDetailHeader from '$modules/world-building/components/LineageDetailHeader.svelte';
+	import LineageInheritanceCulturePanel from '$modules/world-building/components/LineageInheritanceCulturePanel.svelte';
+	import LineageMembersPanel from '$modules/world-building/components/LineageMembersPanel.svelte';
+	import LineageRelationshipPanel from '$modules/world-building/components/LineageRelationshipPanel.svelte';
+	import LineageStoryFunctionPanel from '$modules/world-building/components/LineageStoryFunctionPanel.svelte';
+	import WorldBuildingWorkspacePage from '$modules/world-building/components/WorldBuildingWorkspacePage.svelte';
 	import { getProjectMetadata, setProjectMetadata } from '$lib/project-metadata.js';
 
 	type LineageRelationship = {

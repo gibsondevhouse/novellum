@@ -28,6 +28,15 @@
 	}
 
 	onMount(async () => {
+		// If the header's "+" button navigated here with ?create=1,
+		// honour that immediately and skip the last-read redirect so
+		// the user can actually reach the create modal.
+		if (page.url.searchParams.has('create')) {
+			showLibrary = true;
+			showCreateProject = true;
+			await loadProjects();
+			return;
+		}
 		// If the user has a last-read book and didn't explicitly request the library, redirect.
 		const lastId = getLastReadBookId();
 		if (lastId && !page.url.searchParams.has('library')) {

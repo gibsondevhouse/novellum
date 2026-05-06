@@ -53,9 +53,10 @@ export {
 } from './services/snapshot-repository.js';
 
 // Components
-export { default as DocumentEditorFrame } from './components/DocumentEditorFrame.svelte';
+export { default as SceneEditorFrame } from './components/SceneEditorFrame.svelte';
 export { default as EditModeToolbar } from './components/EditModeToolbar.svelte';
-export { default as ManuscriptSurface } from './components/ManuscriptSurface.svelte';
+export { default as ManuscriptEditorPane } from './components/ManuscriptEditorPane.svelte';
+export { default as EditorToolbar } from './components/EditorToolbar.svelte';
 export { default as VersionHistoryPanel } from './components/VersionHistoryPanel.svelte';
 export { default as SaveStatus } from './components/SaveStatus.svelte';
 export { default as SnapshotHistoryPanel } from './components/SnapshotHistoryPanel.svelte';

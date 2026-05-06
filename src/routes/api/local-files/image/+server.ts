@@ -1,5 +1,5 @@
 import type { RequestHandler } from './$types';
-import { readWorkspaceImage } from '$modules/bible/services/character-dossier-files.js';
+import { readWorkspaceImage } from '$modules/world-building/services/character-dossier-files.js';
 
 export const GET: RequestHandler = async ({ url }) => {
 	const filePath = url.searchParams.get('path');

@@ -11,7 +11,14 @@ export default defineConfig({
 		},
 		globals: true,
 		setupFiles: ['./tests/setup.ts'],
-		exclude: ['tests/visual/**', 'tests/e2e/**', 'node_modules/**'],
+		exclude: [
+			'tests/visual/**',
+			'tests/e2e/**',
+			'node_modules/**',
+			'build/**',
+			'src-tauri/target/**',
+			'.svelte-kit/**',
+		],
 		coverage: {
 			provider: 'v8',
 			reporter: ['text', 'json', 'html'],
@@ -31,7 +38,8 @@ export default defineConfig({
 		alias: {
 			$lib: resolve(__dirname, 'src/lib'),
 			$modules: resolve(__dirname, 'src/modules'),
-			$modules: resolve(__dirname, 'src/modules'),
+			'$app/state': resolve(__dirname, 'tests/__mocks__/app-state.ts'),
+			'$app/navigation': resolve(__dirname, 'tests/__mocks__/app-navigation.ts'),
 		},
 		conditions: ['browser'],
 	},

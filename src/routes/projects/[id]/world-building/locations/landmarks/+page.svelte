@@ -3,15 +3,15 @@
 	import type { Location } from '$lib/db/domain-types';
 	import { translator } from '$lib/i18n';
 	import { getProjectMetadata, setProjectMetadata } from '$lib/project-metadata.js';
-	import LandmarkDossierPane from '$modules/bible/components/LandmarkDossierPane.svelte';
-	import LandmarkEmptyState from '$modules/bible/components/LandmarkEmptyState.svelte';
-	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
+	import LandmarkDossierPane from '$modules/world-building/components/LandmarkDossierPane.svelte';
+	import LandmarkEmptyState from '$modules/world-building/components/LandmarkEmptyState.svelte';
+	import WorldBuildingWorkspacePage from '$modules/world-building/components/WorldBuildingWorkspacePage.svelte';
 	import {
 		formatLandmarkMeta,
 		formatLocationSubtitle,
 		isLandmarkLocation,
 		isRealmLocation,
-	} from '$modules/bible/narrative-locations.js';
+	} from '$modules/world-building/narrative-locations.js';
 	import {
 		getLocations,
 		getLocationSaving,
@@ -19,7 +19,7 @@
 		submitCreateLocation,
 		submitDeleteLocation,
 		submitUpdateLocation,
-	} from '$modules/bible/stores/bible-crud.svelte.js';
+	} from '$modules/world-building/stores/world-building-crud.svelte.js';
 
 	type RealmOption = {
 		id: string;

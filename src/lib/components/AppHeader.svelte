@@ -11,7 +11,7 @@
 	import {
 		buildWorldBuildingTopItems,
 		getWorldBuildingTopSection,
-	} from '$modules/bible/worldbuilding-navigation.js';
+	} from '$modules/world-building/worldbuilding-navigation.js';
 	import { getReaderMode, setReaderMode, type ReaderMode } from '$lib/stores/reader-mode.svelte.js';
 	let isWorldBuildingRoute = $derived(page.url.pathname.includes('/world-building'));
 
@@ -111,7 +111,7 @@
 	});
 
 	function handleNewProject() {
-		goto('/');
+		goto('/books?create=1');
 	}
 
 	function handleWorldBuildingSelect(id: string) {

@@ -2,7 +2,7 @@ import type { PageLoad } from './$types';
 import { getScenesByProjectId } from '$modules/editor/services/scene-repository.js';
 import { getProjectById } from '$modules/project/services/project-repository.js';
 import { getChaptersByProjectId } from '$modules/project/services/chapter-repository.js';
-import { getCharactersByProjectId } from '$modules/bible/services/character-repository.js';
+import { getCharactersByProjectId } from '$modules/world-building/services/character-repository.js';
 
 export const load: PageLoad = async ({ params }) => {
 	const [scenes, project, chapters, characters] = await Promise.all([

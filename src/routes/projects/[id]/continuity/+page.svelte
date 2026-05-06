@@ -1,8 +1,8 @@
 <script lang="ts">
-	import ConsistencyPanel from '$modules/consistency/components/ConsistencyPanel.svelte';
+	import ContinuityPanel from '$modules/continuity/components/ContinuityPanel.svelte';
 	import SurfacePanel from '$lib/components/ui/SurfacePanel.svelte';
 	import PageHeader from '$lib/components/ui/PageHeader.svelte';
-	import { getOpenCount } from '$modules/consistency/stores/consistency-store.svelte.js';
+	import { getOpenCount } from '$modules/continuity/stores/continuity-store.svelte.js';
 
 	let { data } = $props<{ data: { projectId: string } }>();
 </script>
@@ -30,7 +30,7 @@
 	</PageHeader>
 
 	<section id="continuity-panel-issues" aria-label="Issue triage">
-		<ConsistencyPanel projectId={data.projectId} />
+		<ContinuityPanel projectId={data.projectId} />
 	</section>
 </div>
 

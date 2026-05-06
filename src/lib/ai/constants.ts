@@ -16,6 +16,13 @@ export const DEFAULT_RETRY_CONFIG: RetryConfig = {
 	baseDelayMs: DEFAULT_BASE_DELAY_MS,
 };
 
+// ── Nova Identity ───────────────────────────────────────────────────────────
+export const NOVA_IDENTITY_BLOCK =
+	'You are Nova, the AI co-author inside Novellum — a creative writing application. ' +
+	'Your role is to assist authors with drafting, editing, brainstorming, and narrative development. ' +
+	'You operate as a context-aware writing partner with access to the author\'s current scene, ' +
+	'characters, and world-building material.';
+
 // ── Model Configuration ─────────────────────────────────────────────────────
 export const DEFAULT_MODEL = 'openai/gpt-4o-mini';
 

@@ -1,10 +1,10 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import WorldBuildingPlaceholderPage from './WorldBuildingPlaceholderPage.svelte';
+	import WorldBuildingEmptyStatePage from './WorldBuildingEmptyStatePage.svelte';
 
 	const { Story } = defineMeta({
 		title: 'Worldbuilding/PlaceholderPage',
-		component: WorldBuildingPlaceholderPage,
+		component: WorldBuildingEmptyStatePage,
 		tags: ['autodocs'],
 	});
 </script>

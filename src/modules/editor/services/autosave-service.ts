@@ -9,6 +9,17 @@ import {
 import { writePendingDraft, clearPendingDraft } from './recovery-service.js';
 
 /**
+ * Strips HTML tags and returns a whitespace-separated word count.
+ * Used so the hub always reflects the current prose length.
+ */
+function computeWordCount(html: string): number {
+	const plain = html.replace(/<[^>]*>/g, ' ').replace(/&[a-z]+;/gi, ' ');
+	const trimmed = plain.trim();
+	if (!trimmed) return 0;
+	return trimmed.split(/\s+/).filter((w) => w.length > 0).length;
+}
+
+/**
  * Autosave service — single-subscriber, single-active-scene.
  *
  * The editor route mounts the service for the active scene, schedules
@@ -148,7 +159,8 @@ async function runFlush(): Promise<void> {
 		});
 		const now = new Date().toISOString();
 		try {
-			await updateScene(mounted.sceneId, { content: text, updatedAt: now });
+			const wordCount = computeWordCount(text);
+			await updateScene(mounted.sceneId, { content: text, wordCount, updatedAt: now });
 			if (text.trim().length > 0) {
 				await createSnapshot(mounted.sceneId, mounted.projectId, text);
 			}

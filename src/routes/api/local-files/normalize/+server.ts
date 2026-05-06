@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { normalizeWorkspaceRelativePath } from '$modules/bible/services/character-dossier-files.js';
+import { normalizeWorkspaceRelativePath } from '$modules/world-building/services/character-dossier-files.js';
 
 export const POST: RequestHandler = async ({ request }) => {
 	const body = (await request.json()) as { path?: string };

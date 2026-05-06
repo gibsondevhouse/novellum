@@ -1,8 +1,8 @@
-import { getCharactersByProjectId } from '$modules/bible/services/character-repository.js';
+import { getCharactersByProjectId } from '$modules/world-building/services/character-repository.js';
 import type { Arc, Act, Scene, Character, Beat, Stage, Milestone } from '$lib/db/domain-types';
-import type { ChapterWithScenes } from '$modules/outliner/types.js';
+import type { ChapterWithScenes } from '$modules/outline/types.js';
 import { getArcsByProjectId } from '$modules/project/services/arc-repository.js';
-import { getActsByProjectId, getMilestonesByProjectId } from '$modules/outliner/services/story-structure-service.js';
+import { getActsByProjectId, getMilestonesByProjectId } from '$modules/outline/services/story-structure-service.js';
 import { getChaptersByProjectId } from '$modules/project/services/chapter-repository.js';
 import { getScenesByProjectId } from '$modules/editor/services/scene-repository.js';
 import { getBeatsByProjectId } from '$modules/editor/services/beat-repository.js';

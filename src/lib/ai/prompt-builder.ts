@@ -4,6 +4,7 @@ import {
 	CONSTRAINTS_BY_TYPE,
 	TASK_DESCRIPTIONS,
 	OUTPUT_FORMAT_DESCRIPTIONS,
+	NOVA_IDENTITY_BLOCK,
 } from './constants.js';
 
 function serializeContext(ctx: AiContext): string {
@@ -89,7 +90,7 @@ export function buildPrompt(task: AiTask, ctx: AiContext): string {
 	let contextBody = serializeContext(ctx);
 
 	const headerParts = [
-		`## ROLE\n${task.role}`,
+		`## ROLE\n${NOVA_IDENTITY_BLOCK}\n\n${task.role}`,
 		`## TASK\n${TASK_DESCRIPTIONS[task.taskType] ?? 'Complete the requested task.'}`
 	];
 

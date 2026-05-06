@@ -2,10 +2,10 @@
 	import type { PlotThread } from '$lib/db/domain-types';
 	import { translator } from '$lib/i18n';
 	import { DestructiveButton, GhostButton } from '$lib/components/ui/index.js';
-	import ThreadSystemForm from '$modules/bible/components/ThreadSystemForm.svelte';
-	import WorldBuildingWorkspaceEmptyState from '$modules/bible/components/WorldBuildingWorkspaceEmptyState.svelte';
-	import WorldBuildingWorkspacePage from '$modules/bible/components/WorldBuildingWorkspacePage.svelte';
-	import { isThreadKind, optionMeta, optionSubtitle } from '$modules/bible/thread-systems.js';
+	import ThreadSystemForm from '$modules/world-building/components/ThreadSystemForm.svelte';
+	import WorldBuildingWorkspaceEmptyState from '$modules/world-building/components/WorldBuildingWorkspaceEmptyState.svelte';
+	import WorldBuildingWorkspacePage from '$modules/world-building/components/WorldBuildingWorkspacePage.svelte';
+	import { isThreadKind, optionMeta, optionSubtitle } from '$modules/world-building/thread-systems.js';
 	import {
 		getPlotThreads,
 		getPlotThreadSaving,
@@ -13,7 +13,7 @@
 		submitCreatePlotThread,
 		submitUpdatePlotThread,
 		submitDeletePlotThread,
-	} from '$modules/bible/stores/bible-crud.svelte.js';
+	} from '$modules/world-building/stores/world-building-crud.svelte.js';
 
 	let { data }: { data: { projectId: string; plotThreads: PlotThread[] } } = $props();
 

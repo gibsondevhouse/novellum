@@ -27,7 +27,7 @@ const {
 	getRelationshipsByProjectId,
 	updateRelationship,
 	removeRelationship,
-} = await import('../../src/modules/bible/services/character-repository.js');
+} = await import('../../src/modules/world-building/services/character-repository.js');
 
 beforeEach(() => {
 	vi.clearAllMocks();

@@ -8,9 +8,14 @@
 		project: ReaderInputProject;
 		chapters: ReaderInputChapter[];
 		onExit: () => void;
+		/**
+		 * plan-023 stage-003: forwarded to the embedded `BookReaderView`
+		 * so the deep-link target survives the fullscreen wrapper.
+		 */
+		targetPageId?: string | null;
 	}
 
-	let { project, chapters, onExit }: Props = $props();
+	let { project, chapters, onExit, targetPageId = null }: Props = $props();
 
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape') {
@@ -45,7 +50,7 @@
 	</div>
 
 	<div class="reader-fullscreen__body">
-		<BookReaderView {project} {chapters} fullscreen={true} />
+		<BookReaderView {project} {chapters} {targetPageId} fullscreen={true} />
 	</div>
 </div>
 

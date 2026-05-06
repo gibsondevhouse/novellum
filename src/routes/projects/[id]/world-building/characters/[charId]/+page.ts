@@ -2,7 +2,7 @@ import {
 	getCharacterById,
 	getCharactersByProjectId,
 	getRelationshipsByProjectId,
-} from '$modules/bible/services/character-repository.js';
+} from '$modules/world-building/services/character-repository.js';
 import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 

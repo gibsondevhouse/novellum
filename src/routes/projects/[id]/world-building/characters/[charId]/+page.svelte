@@ -1,12 +1,12 @@
 <script lang="ts">
 	import type { Character, CharacterRelationship } from '$lib/db/domain-types';
-	import CharacterForm from '$modules/bible/components/CharacterForm.svelte';
-	import RelationshipEditor from '$modules/bible/components/RelationshipEditor.svelte';
+	import CharacterForm from '$modules/world-building/components/CharacterForm.svelte';
+	import RelationshipEditor from '$modules/world-building/components/RelationshipEditor.svelte';
 	import {
 		getCharacterSaving,
 		submitUpdateCharacter,
 		submitDeleteCharacter,
-	} from '$modules/bible/stores/bible-crud.svelte.js';
+	} from '$modules/world-building/stores/world-building-crud.svelte.js';
 	import { goto } from '$app/navigation';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import {

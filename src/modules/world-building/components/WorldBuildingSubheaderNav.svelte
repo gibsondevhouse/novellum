@@ -6,7 +6,7 @@
 	import {
 		buildWorldBuildingSubItems,
 		type WorldBuildingTopSectionId,
-	} from '$modules/bible/worldbuilding-navigation.js';
+	} from '$modules/world-building/worldbuilding-navigation.js';
 
 	let { projectId, topSection, activeId, ariaLabel } = $props<{
 		projectId: string;

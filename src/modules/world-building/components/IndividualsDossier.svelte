@@ -14,10 +14,10 @@
 		PrimaryButton,
 		SurfacePanel,
 	} from '$lib/components/ui/index.js';
-	import CharacterAssetLinker from '$modules/bible/components/CharacterAssetLinker.svelte';
-	import CharacterForm from '$modules/bible/components/CharacterForm.svelte';
-	import CharacterScratchpad from '$modules/bible/components/CharacterScratchpad.svelte';
-	import RelationshipEditor from '$modules/bible/components/RelationshipEditor.svelte';
+	import CharacterAssetLinker from '$modules/world-building/components/CharacterAssetLinker.svelte';
+	import CharacterForm from '$modules/world-building/components/CharacterForm.svelte';
+	import CharacterScratchpad from '$modules/world-building/components/CharacterScratchpad.svelte';
+	import RelationshipEditor from '$modules/world-building/components/RelationshipEditor.svelte';
 	import {
 		getCharacters,
 		getCharacterSaving,
@@ -27,7 +27,7 @@
 		submitCreateCharacter,
 		submitDeleteCharacter,
 		submitUpdateCharacter,
-	} from '$modules/bible/stores/bible-crud.svelte.js';
+	} from '$modules/world-building/stores/world-building-crud.svelte.js';
 
 	let {
 		projectId,

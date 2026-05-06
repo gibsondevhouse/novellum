@@ -1,7 +1,7 @@
 import {
 	getCharactersByProjectId,
 	getRelationshipsByProjectId,
-} from '$modules/bible/services/character-repository.js';
+} from '$modules/world-building/services/character-repository.js';
 import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ params }) => {

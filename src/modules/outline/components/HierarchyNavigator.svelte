@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { Chapter, Scene, StoryFrame, Act } from '$lib/db/domain-types';
-	import type { ChapterWithScenes } from '$modules/outliner/types.js';
+	import type { ChapterWithScenes } from '$modules/outline/types.js';
 	import {
 		createChapter,
 		removeChapter,
@@ -12,7 +12,7 @@
 		removeScene,
 		reorderScenes,
 	} from '$modules/editor/services/scene-repository.js';
-	import { toggleChapter } from '$modules/outliner/stores/outliner.svelte.js';
+	import { toggleChapter } from '$modules/outline/stores/outline-store.svelte.js';
 	import OutlineEmptyState from './OutlineEmptyState.svelte';
 	import AddChapterForm from './AddChapterForm.svelte';
 	import ActGroup from './ActGroup.svelte';

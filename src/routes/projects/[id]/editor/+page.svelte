@@ -1,19 +1,20 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import type { Chapter, Character, Project, Scene } from '$lib/db/domain-types';
-	import AiPanel from '$lib/components/AiPanel.svelte';
 	import EmptyStatePanel from '$lib/components/ui/EmptyStatePanel.svelte';
-	import { pushState } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { aiPanel } from '$lib/stores/ai-panel.svelte';
+	import { NovaPanel, novaPanel, sendNovaChat } from '$modules/nova';
 	import { editorState } from '../../../../modules/editor/stores/editor.svelte.ts';
 	import * as autosaveService from '$modules/editor/services/autosave-service.js';
-	import ManuscriptSurface from '$modules/editor/components/ManuscriptSurface.svelte';
+	import ManuscriptEditorPane from '$modules/editor/components/ManuscriptEditorPane.svelte';
+	import EditorToolbar from '$modules/editor/components/EditorToolbar.svelte';
 	import { updateScene } from '$modules/editor/services/scene-repository.js';
-	import { GhostButton, PageHeader } from '$lib/components/ui/index.js';
 	import {
 		getProjectMetadata,
 		setProjectMetadata,
 	} from '$lib/project-metadata.js';
+	import { appearance } from '$lib/stores/appearance.svelte.js';
 
 	type OutcomeType = 'win' | 'loss' | 'partial' | 'reversal' | '';
 	type SceneLengthEstimate = 'short' | 'medium' | 'long' | '';
@@ -73,6 +74,19 @@
 	let storyCompassCollapsed = $state(false);
 	let initialTotalWords = $state(0);
 	let initializedBaseline = $state(false);
+	// plan-023 stage-002: lifted TipTap editor instance + reactivity tick
+	// + spellcheck toggle, all owned by the route and consumed by
+	// EditorToolbar / ManuscriptEditorPane.
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let tipTapEditor = $state<any | null>(null);
+	let editorTick = $state(0);
+	let spellcheckEnabled = $state(true);
+
+	// plan-023 stage-007: hydrate appearance preferences so that
+	// --editor-font-size / --editor-line-height CSS vars are applied.
+	onMount(() => {
+		void appearance.hydrate();
+	});
 
 	const activeScene = $derived.by((): Scene | null => {
 		const sceneId = editorState.activeSceneId;
@@ -92,10 +106,6 @@
 		if (!activeScene) return null;
 		return data.chapters.find((chapter: Chapter) => chapter.id === activeScene.chapterId) ?? null;
 	});
-
-	const editorContextLabel = $derived.by(
-		() => `${activeChapter?.title ?? 'Unassigned chapter'}${data.project ? ` · ${data.project.title}` : ''}`,
-	);
 
 	const activeWordCount = $derived.by(() => countWords(activeContent));
 	const normalizedContent = $derived.by(() => normalizeText(activeContent));
@@ -346,32 +356,6 @@
 		}
 	}
 
-	function handleTitleChange(newTitle: string): void {
-		if (!activeScene) return;
-		activeScene.title = newTitle;
-		void persistActiveScenePatch({ title: newTitle });
-	}
-
-	function escapeHtml(text: string): string {
-		return text
-			.replace(/&/g, '&amp;')
-			.replace(/</g, '&lt;')
-			.replace(/>/g, '&gt;')
-			.replace(/"/g, '&quot;')
-			.replace(/'/g, '&#39;');
-	}
-
-	function toParagraphHtml(text: string): string {
-		const parts = text
-			.split(/\n\s*\n/)
-			.map((part) => part.trim())
-			.filter(Boolean);
-		if (parts.length === 0) return '';
-		return parts
-			.map((part) => `<p>${escapeHtml(part).replace(/\n/g, '<br>')}</p>`)
-			.join('');
-	}
-
 	function countWords(text: string): number {
 		const normalized = text.replace(/<[^>]+>/g, ' ').trim();
 		if (!normalized) return 0;
@@ -532,45 +516,33 @@
 		void persistActiveScenePatch({ characterIds: next });
 	}
 
-	// Close AI panel when user navigates back via browser history
-	$effect(() => {
-		if (!page.state?.aiPanelOpen && aiPanel.isOpen) {
-			aiPanel.isOpen = false;
-		}
-	});
-
-	async function handleAccept(text: string) {
-		const sceneId = editorState.activeSceneId;
-		if (!sceneId) return;
-		const appendix = toParagraphHtml(text);
-		const updated = appendix ? `${activeContent}${appendix}` : activeContent;
-		activeContent = updated;
-
-		const scene = data.scenes.find((s: Scene) => s.id === sceneId);
-		if (scene) {
-			scene.content = updated;
-			autosaveService.schedule(updated);
-		}
+	// plan-023 stage-005: quick-prompt entry point. Opens Nova (if
+	// closed) and submits the supplied prompt as a real chat message via
+	// `sendNovaChat`. Quick-prompt buttons (continue/dialogue/tension/
+	// summary) will be re-housed inside the Nova module in a follow-up;
+	// for now any consumer can call this with an arbitrary prompt.
+	async function handleAskAi(prompt: string): Promise<void> {
+		if (!novaPanel.isOpen) novaPanel.open();
+		await sendNovaChat({
+			prompt,
+			projectId: data.project?.id ?? null,
+			activeSceneId: editorState.activeSceneId,
+			activeChapterId: activeChapter?.id ?? null,
+		});
 	}
 
-	function handleAskAi(mode: 'continue' | 'dialogue' | 'tension' | 'summary') {
-		if (!aiPanel.isOpen) {
-			// Shallow-route: push history entry so browser back closes the panel
-			pushState('', { ...page.state, aiPanelOpen: true });
-			aiPanel.toggle();
+	function handleViewInReader(): void {
+		// plan-023 stage-003: navigate to the books reader for the
+		// current project. When a scene is active, encode it as the
+		// reserved `?scene=<id>` query so the reader can deep-link
+		// scroll. Browser back returns to the editor; scene selection
+		// lives in `editorState.activeSceneId` (process-scoped store).
+		if (!activeScene) {
+			void goto(`/books/${data.project.id}`);
+			return;
 		}
-		const context = activeContent.slice(-1200);
-		const prompt =
-			mode === 'dialogue'
-				? `Revise this excerpt to sharpen dialogue while preserving tone and intent:\n\n${context}`
-				: mode === 'tension'
-					? `Increase immediate tension in this scene excerpt without changing core events:\n\n${context}`
-					: mode === 'summary'
-						? `Summarize this scene in one vivid sentence and list what changes by the end:\n\n${context}`
-						: activeContent
-							? `Continue this scene naturally from the current ending:\n\n${context}`
-							: 'Help me start a new scene.';
-		aiPanel.requestSuggestion(prompt);
+		const url = `/books/${data.project.id}?scene=${encodeURIComponent(activeScene.id)}`;
+		void goto(url);
 	}
 </script>
 
@@ -578,7 +550,7 @@
 	<title>Editor — Novellum</title>
 </svelte:head>
 
-<div class="editor-page" class:ai-open={aiPanel.isOpen}>
+<div class="editor-page" class:ai-open={novaPanel.isOpen}>
 	<aside class="doc-list" aria-label="Scene navigator">
 		<div class="doc-list-header">
 			<div class="doc-list-title">Draft Queue</div>
@@ -617,53 +589,56 @@
 	</aside>
 
 	<main class="editor-area" aria-label="Writing workspace">
-		<header class="editor-toolbar">
-			<PageHeader
-				eyebrow="Drafting Studio"
-				title={activeScene?.title ?? 'Scene'}
-				description={editorContextLabel}
-			>
-				{#snippet actions()}
-					<div class="inline-context" aria-label="Writing context controls">
-						<label class="inline-field">
-							<span>POV</span>
-							<select
-								value={activeScene?.povCharacterId ?? ''}
-								onchange={(event) =>
-									void persistPovCharacter((event.target as HTMLSelectElement).value)}
-							>
-								<option value="">Unassigned</option>
-								{#each data.characters as character (character.id)}
-									<option value={character.id}>{character.name}</option>
-								{/each}
-							</select>
-						</label>
-					</div>
-					<div class="nav-actions">
-						<button class="nav-btn" onclick={() => goToScene(-1)} disabled={activeSceneIndex <= 0}>Previous</button>
-						<button class="nav-btn" onclick={() => goToScene(1)} disabled={activeSceneIndex < 0 || activeSceneIndex >= data.scenes.length - 1}>Next</button>
-					</div>
-					<div class="ai-actions-wrap">
-						<span class="ai-actions-label">AI Commands</span>
-						<div class="ai-actions" role="toolbar" aria-label="AI scene tools">
-							<GhostButton onclick={() => handleAskAi('continue')} title="Continue scene">Continue</GhostButton>
-							<GhostButton onclick={() => handleAskAi('dialogue')} title="Punch up dialogue">Dialogue</GhostButton>
-							<GhostButton onclick={() => handleAskAi('tension')} title="Raise tension">Tension</GhostButton>
-							<GhostButton onclick={() => handleAskAi('summary')} title="Summarize scene">Summary</GhostButton>
-						</div>
-					</div>
-				{/snippet}
-			</PageHeader>
+		<header class="editor-toolbar" aria-label="Editor toolbar">
+			<EditorToolbar
+				editor={tipTapEditor}
+				tick={editorTick}
+				spellcheck={spellcheckEnabled}
+				onToggleSpellcheck={(next) => (spellcheckEnabled = next)}
+				onViewInReader={handleViewInReader}
+				novaPanelOpen={novaPanel.isOpen}
+				onToggleNova={() => novaPanel.toggle()}
+			/>
+			<div class="editor-context-row" aria-label="Scene context controls">
+				<label class="inline-field">
+					<span>POV</span>
+					<select
+						value={activeScene?.povCharacterId ?? ''}
+						onchange={(event) =>
+							void persistPovCharacter((event.target as HTMLSelectElement).value)}
+					>
+						<option value="">Unassigned</option>
+						{#each data.characters as character (character.id)}
+							<option value={character.id}>{character.name}</option>
+						{/each}
+					</select>
+				</label>
+				<div class="nav-actions">
+					<button
+						type="button"
+						class="nav-btn"
+						onclick={() => goToScene(-1)}
+						disabled={activeSceneIndex <= 0}
+					>Previous</button>
+					<button
+						type="button"
+						class="nav-btn"
+						onclick={() => goToScene(1)}
+						disabled={activeSceneIndex < 0 || activeSceneIndex >= data.scenes.length - 1}
+					>Next</button>
+				</div>
+			</div>
 		</header>
 		{#if data.scenes.length === 0}
 			<EmptyStatePanel title="No scenes yet." description="Add one from the Outline." />
 		{:else}
 			<div class="editor-scroll">
-				<ManuscriptSurface
+				<ManuscriptEditorPane
 					content={activeContent}
-					title={activeScene?.title ?? ''}
 					onContentChange={handleManuscriptChange}
-					onTitleChange={handleTitleChange}
+					oneditorReady={(ed) => (tipTapEditor = ed)}
+					ontick={() => (editorTick += 1)}
+					spellcheck={spellcheckEnabled}
 				/>
 			</div>
 		{/if}
@@ -778,7 +753,12 @@
 		{/if}
 	</aside>
 
-	<AiPanel onAccept={handleAccept} />
+	<NovaPanel
+		projectId={data.project?.id ?? null}
+		activeSceneId={editorState.activeSceneId}
+		activeChapterId={activeChapter?.id ?? null}
+		onQuickPrompt={handleAskAi}
+	/>
 </div>
 
 <style>
@@ -892,47 +872,21 @@
 	}
 
 	.editor-toolbar {
-		display: block;
-		padding: var(--space-4);
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+		padding: var(--space-3) var(--space-4);
 		border-bottom: 1px solid var(--color-border-default);
 		background: var(--color-surface-ground);
 	}
 
-	.editor-toolbar :global(.page-header) {
-		border-bottom: none;
-		padding-bottom: 0;
-		align-items: flex-start;
-	}
-
-	.editor-toolbar :global(.page-header__eyebrow) {
-		font-size: var(--text-xs);
-		text-transform: uppercase;
-		letter-spacing: var(--tracking-wide);
-		color: var(--color-text-muted);
-	}
-
-	.editor-toolbar :global(.page-header__title) {
-		font-size: var(--text-2xl);
-		line-height: 1.1;
-	}
-
-	.editor-toolbar :global(.page-header__description) {
-		font-size: var(--text-sm);
-		line-height: var(--leading-normal);
-		color: var(--color-text-muted);
-	}
-
-	.editor-toolbar :global(.page-header__right) {
+	.editor-context-row {
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--space-3);
-		justify-content: flex-end;
-		align-items: flex-end;
-	}
-
-	.inline-context {
-		display: flex;
+		justify-content: center;
 		align-items: center;
+		padding-inline: var(--space-2);
 	}
 
 	.inline-field {
@@ -947,22 +901,9 @@
 		min-width: 150px;
 	}
 
-	.nav-actions,
-	.ai-actions {
+	.nav-actions {
 		display: flex;
 		gap: var(--space-2);
-	}
-
-	.ai-actions-wrap {
-		display: grid;
-		gap: var(--space-1);
-	}
-
-	.ai-actions-label {
-		font-size: var(--text-xs);
-		text-transform: uppercase;
-		letter-spacing: var(--tracking-wide);
-		color: var(--color-text-muted);
 	}
 
 	.nav-btn {
@@ -1018,10 +959,6 @@
 	}
 
 	.story-compass {
-		display: none;
-	}
-
-	:global(.ai-panel) {
 		display: none;
 	}
 
@@ -1182,14 +1119,6 @@
 	@media (max-width: 1520px) {
 		.editor-toolbar {
 			flex-wrap: wrap;
-		}
-
-		.ai-actions {
-			width: 100%;
-		}
-
-		.inline-context {
-			order: 3;
 		}
 	}
 
