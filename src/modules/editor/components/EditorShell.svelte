@@ -3,7 +3,7 @@
 	import EmptyStatePanel from '$lib/components/ui/EmptyStatePanel.svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { NovaPanel, novaPanel, sendNovaChat } from '$modules/nova';
+	import { novaPanel } from '$modules/nova';
 	import { editorState } from '../stores/editor.svelte.js';
 	import * as autosaveService from '../services/autosave-service.js';
 	import ManuscriptEditorPane from './ManuscriptEditorPane.svelte';
@@ -477,17 +477,6 @@
 		void persistActiveScenePatch({ characterIds: next });
 	}
 
-	// plan-023 stage-005: quick-prompt entry point.
-	async function handleAskAi(prompt: string): Promise<void> {
-		if (!novaPanel.isOpen) novaPanel.open();
-		await sendNovaChat({
-			prompt,
-			projectId: data.project?.id ?? null,
-			activeSceneId: editorState.activeSceneId,
-			activeChapterId: activeChapter?.id ?? null,
-		});
-	}
-
 	function handleViewInReader(): void {
 		if (!activeScene) {
 			void goto(`/books/${data.project?.id}`);
@@ -619,12 +608,6 @@
 		/>
 	{/if}
 
-	<NovaPanel
-		projectId={data.project?.id ?? null}
-		activeSceneId={editorState.activeSceneId}
-		activeChapterId={activeChapter?.id ?? null}
-		onQuickPrompt={handleAskAi}
-	/>
 </div>
 
 <style>

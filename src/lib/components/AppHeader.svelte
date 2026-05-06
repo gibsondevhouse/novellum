@@ -7,6 +7,7 @@
 	import ModelSelector from './ModelSelector.svelte';
 	import PillNav from './ui/PillNav.svelte';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
+	import { novaPanel } from '$modules/nova';
 	import { locale } from '$lib/i18n';
 	import {
 		buildWorldBuildingTopItems,
@@ -137,9 +138,13 @@
 		const query = params.toString();
 		void goto(`${page.url.pathname}${query ? `?${query}` : ''}`);
 	}
+
+	function handleCopilotToggle() {
+		novaPanel.toggle();
+	}
 </script>
 
-<header class="app-header">
+<header class="app-header" class:app-header--copilot-open={novaPanel.isOpen}>
 	<div class="header-left">
 		{#if displayTitle}
 			<div class="header-context">
@@ -217,16 +222,17 @@
 			</svg>
 		</button>
 
-		<a
-			href="/nova"
+		<button
+			type="button"
 			class="header-action"
-			class:header-action--active={isNovaRoute}
-			aria-label="Nova AI"
+			class:header-action--active={novaPanel.isOpen}
+			onclick={handleCopilotToggle}
+			aria-label={novaPanel.isOpen ? 'Hide Copilot' : 'Show Copilot'}
 		>
 			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 				<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
 			</svg>
-		</a>
+		</button>
 
 		<a
 			href="/settings"
@@ -273,6 +279,10 @@
 		position: sticky;
 		top: 0;
 		z-index: 20;
+	}
+
+	.app-header--copilot-open {
+		padding-right: calc(var(--space-4) + var(--nova-panel-width));
 	}
 
 	.header-left {

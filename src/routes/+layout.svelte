@@ -2,6 +2,7 @@
 	import '../app.css';
 	import { onMount } from 'svelte';
 	import { onNavigate } from '$app/navigation';
+	import { page } from '$app/state';
 	import favicon from '$lib/assets/favicon.svg';
 
 	import AppSidebar from '$lib/components/AppSidebar.svelte';
@@ -9,9 +10,14 @@
 	import AppShell from '$lib/components/AppShell.svelte';
 	import OnboardingModal from '$lib/components/OnboardingModal.svelte';
 	import ToastContainer from '$lib/components/ToastContainer.svelte';
+	import { NovaPanel } from '$modules/nova';
 	import { initLocale } from '$lib/i18n';
 
 	let { children } = $props();
+
+	const activeProjectId = $derived(page.params.id ?? null);
+	const activeSceneId = $derived(page.url.searchParams.get('sceneId'));
+	const activeChapterId = $derived(page.url.searchParams.get('chapterId'));
 
 	onMount(() => {
 		initLocale();
@@ -57,6 +63,12 @@
 
 	{@render children()}
 </AppShell>
+
+<NovaPanel
+	projectId={activeProjectId}
+	activeSceneId={activeSceneId}
+	activeChapterId={activeChapterId}
+/>
 
 <OnboardingModal />
 <ToastContainer />
