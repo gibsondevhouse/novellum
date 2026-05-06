@@ -1,46 +1,64 @@
 <script lang="ts">
-        import { page } from '$app/state';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { browser } from '$app/environment';
-	import { getContext } from 'svelte';
-        import SidebarSection from './SidebarSection.svelte';
-        import SidebarItem from './SidebarItem.svelte';
-        import { getPreference, setPreference } from '$lib/preferences.js';
+	import SidebarSection from './SidebarSection.svelte';
+	import SidebarItem from './SidebarItem.svelte';
+	import { getPreference, setPreference } from '$lib/preferences.js';
 
-        const PREF_KEY = 'app.lastProjectId';
+	const PREF_KEY = 'app.lastProjectId';
 
-        let base = $state<string | null>(null);
+    let base = $state<string | null>(null);
 
-	const projectActions = getContext<{ openExport: () => void } | undefined>('projectActions');
+	function withExportFlag(search: string): string {
+		const raw = search.startsWith('?') ? search.slice(1) : search;
+		const filtered = raw
+			.split('&')
+			.filter(Boolean)
+			.filter((entry) => !entry.startsWith('export='));
+		filtered.push('export=1');
+		return `?${filtered.join('&')}`;
+	}
 
-        $effect(() => {
+	function openLastProjectExport(): void {
+		if (!browser || !base) return;
+
+		const activePath = page.url.pathname;
+		const inProjectScope = activePath === base || activePath.startsWith(`${base}/`);
+		const targetPath = inProjectScope ? activePath : base;
+		const nextSearch = inProjectScope ? withExportFlag(page.url.search) : '?export=1';
+		void goto(`${targetPath}${nextSearch}`);
+	}
+
+	$effect(() => {
 			if (!browser) {
 				base = null;
 				return;
 			}
 
-                const currentId = page.params.id;
-                const isProjectRoute = page.url.pathname.startsWith('/projects/');
+			const currentId = page.params.id;
+			const isProjectRoute = page.url.pathname.startsWith('/projects/');
 
-                if (isProjectRoute && currentId && currentId !== 'undefined') {
-                        localStorage.setItem('novellum_last_project_id', currentId);
-                        void setPreference(PREF_KEY, currentId);
-                        base = `/projects/${currentId}`;
-                } else {
-                        const storedId = localStorage.getItem('novellum_last_project_id');
-                        if (storedId) {
-                                base = `/projects/${storedId}`;
-                        } else {
-                                base = null;
-                                // Reconcile from SQLite-canonical store when local cache is empty.
-                                void getPreference<string | null>(PREF_KEY, null).then((remote) => {
-                                        if (remote) {
-                                                localStorage.setItem('novellum_last_project_id', remote);
-                                                base = `/projects/${remote}`;
-                                        }
-                                });
-                        }
-                }
-        });
+			if (isProjectRoute && currentId && currentId !== 'undefined') {
+				localStorage.setItem('novellum_last_project_id', currentId);
+				void setPreference(PREF_KEY, currentId);
+				base = `/projects/${currentId}`;
+			} else {
+				const storedId = localStorage.getItem('novellum_last_project_id');
+				if (storedId) {
+					base = `/projects/${storedId}`;
+				} else {
+					base = null;
+					// Reconcile from SQLite-canonical store when local cache is empty.
+					void getPreference<string | null>(PREF_KEY, null).then((remote) => {
+						if (remote) {
+							localStorage.setItem('novellum_last_project_id', remote);
+							base = `/projects/${remote}`;
+						}
+					});
+				}
+			}
+		});
 </script>
 
 {#if base}
@@ -127,7 +145,7 @@
 				</svg>
 			{/snippet}
 		</SidebarItem>
-		<SidebarItem href="{base}/editor" label="AI">
+		<SidebarItem href="{base}/editor?panel=ai" label="AI Assistant">
 			{#snippet icon()}
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -149,7 +167,7 @@
 		<button
 			type="button"
 			class="sidebar-export-btn"
-			onclick={() => projectActions?.openExport()}
+			onclick={openLastProjectExport}
 			aria-label="Export project"
 		>
 			<span class="sidebar-export-btn__icon">
@@ -171,7 +189,7 @@
 			</span>
 			<span class="sidebar-export-btn__label">Export</span>
 		</button>
-		<SidebarItem href="{base}/settings" label="Settings">
+		<SidebarItem href="/settings" label="Settings">
 			{#snippet icon()}
 				<svg
 					xmlns="http://www.w3.org/2000/svg"

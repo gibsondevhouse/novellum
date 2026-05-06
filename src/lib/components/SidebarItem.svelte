@@ -16,12 +16,14 @@
 		locked?: boolean;
 	} = $props();
 
+	const normalizedHrefPath = $derived(href ? href.split('?')[0] : undefined);
+
 	let isActive = $derived(
 		active ??
-			(href === '/'
+			(normalizedHrefPath === '/'
 				? page.url.pathname === '/'
-				: href
-					? page.url.pathname.startsWith(href)
+				: normalizedHrefPath
+					? page.url.pathname.startsWith(normalizedHrefPath)
 					: false),
 	);
 </script>

@@ -97,8 +97,15 @@
 		return data.scenes.find((scene: Scene) => scene.id === sceneId) ?? null;
 	});
 
+	const requestedPanel = $derived(page.url.searchParams.get('panel'));
 	const selectedChapterId = $derived(page.url.searchParams.get('chapterId'));
 	const selectedSceneId = $derived(page.url.searchParams.get('sceneId'));
+
+	$effect(() => {
+		if (requestedPanel === 'ai' && !novaPanel.isOpen) {
+			novaPanel.open();
+		}
+	});
 
 	const activeSceneIndex = $derived.by((): number => {
 		if (!activeScene) return -1;

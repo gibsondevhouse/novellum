@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { onMount, setContext } from 'svelte';
 	import type { Project } from '$lib/db/domain-types';
 	import EditProjectForm from '$modules/project/components/EditProjectForm.svelte';
@@ -14,6 +15,7 @@
 	let showEditForm = $state(false);
 	let showDeleteDialog = $state(false);
 	let showExportModal = $state(false);
+	let lastExportFlag = $state<string | null>(null);
 
 	let ExportModal = $state<
 		typeof import('$modules/export/components/ExportModal.svelte')['default'] | undefined
@@ -24,6 +26,34 @@
 	});
 
 	const project = $derived(data.project);
+
+	$effect(() => {
+		const exportFlag = page.url.searchParams.get('export');
+		if (exportFlag === '1' && lastExportFlag !== '1') {
+			showExportModal = true;
+		}
+		lastExportFlag = exportFlag;
+	});
+
+	function removeExportFlag(search: string): string {
+		const raw = search.startsWith('?') ? search.slice(1) : search;
+		const filtered = raw
+			.split('&')
+			.filter(Boolean)
+			.filter((entry) => !entry.startsWith('export='));
+		return filtered.length > 0 ? `?${filtered.join('&')}` : '';
+	}
+
+	function closeExportModal(): void {
+		showExportModal = false;
+		if (!page.url.searchParams.has('export')) return;
+
+		void goto(`${page.url.pathname}${removeExportFlag(page.url.search)}`, {
+			replaceState: true,
+			keepFocus: true,
+			noScroll: true,
+		});
+	}
 
 	// Expose utility triggers to child routes via context
 	setContext('projectActions', {
@@ -72,7 +102,7 @@
 		projectId={project.id}
 		projectTitle={project.title}
 		open={showExportModal}
-		onClose={() => (showExportModal = false)}
+		onClose={closeExportModal}
 	/>
 {/if}
 

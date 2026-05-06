@@ -8,6 +8,13 @@
 	// Backup export moved to Settings → Data (plan-018 stage-004).
 	import type { ManuscriptProfileId, ManuscriptMetadata } from '../types.js';
 
+	type EditableMetadata = {
+		title: string;
+		author: string;
+		subtitle: string;
+		synopsis: string;
+	};
+
 	let {
 		projectId,
 		projectTitle,
@@ -24,18 +31,37 @@
 
 	let selectedProfile = $state<ManuscriptProfileId>('standard_manuscript');
 	let format = $state<'markdown' | 'docx' | 'epub'>('markdown');
-	let metadata = $state<ManuscriptMetadata>({});
+	let metadata = $state<EditableMetadata>({
+		title: '',
+		author: '',
+		subtitle: '',
+		synopsis: '',
+	});
 	let exporting = $state(false);
 	let error = $state<string | null>(null);
 	let success = $state(false);
 
 	$effect(() => {
 		if (open) {
-			metadata = { title: projectTitle, author: projectAuthor };
+			metadata = {
+				title: projectTitle,
+				author: projectAuthor,
+				subtitle: '',
+				synopsis: '',
+			};
 			error = null;
 			success = false;
 		}
 	});
+
+	function toManuscriptMetadata(value: EditableMetadata): ManuscriptMetadata {
+		return {
+			title: value.title,
+			author: value.author,
+			subtitle: value.subtitle,
+			synopsis: value.synopsis,
+		};
+	}
 
 	function makeSafeFilename(title: string, ext: string): string {
 		const safe =
@@ -65,9 +91,10 @@
 
 		try {
 			const profile = getProfile(selectedProfile);
+			const exportMetadata = toManuscriptMetadata(metadata);
 			const manuscript = await assembleManuscript(projectId, {
 				profileId: selectedProfile,
-				metadata,
+				metadata: exportMetadata,
 				...profile.defaults,
 			});
 
@@ -88,7 +115,7 @@
 				ext = 'epub';
 			}
 
-			downloadBlob(blob, makeSafeFilename(metadata.title ?? projectTitle, ext));
+			downloadBlob(blob, makeSafeFilename(metadata.title || projectTitle, ext));
 			success = true;
 		} catch (e) {
 			error = (e as Error).message;
