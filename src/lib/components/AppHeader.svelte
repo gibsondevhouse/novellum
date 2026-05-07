@@ -144,7 +144,7 @@
 	}
 </script>
 
-<header class="app-header" class:app-header--copilot-open={novaPanel.isOpen}>
+<header class="app-header">
 	<div class="header-left">
 		{#if displayTitle}
 			<div class="header-context">
@@ -272,17 +272,16 @@
 		align-items: center;
 		justify-content: space-between;
 		height: 48px;
-		padding: 0 var(--space-4);
+		padding-top: 0;
+		padding-bottom: 0;
+		padding-left: var(--space-4);
+		padding-right: var(--space-4);
 		background-color: var(--color-surface-base);
 		border-bottom: 1px solid var(--color-border-subtle);
 		flex-shrink: 0;
 		position: sticky;
 		top: 0;
 		z-index: 20;
-	}
-
-	.app-header--copilot-open {
-		padding-right: calc(var(--space-4) + var(--nova-panel-width));
 	}
 
 	.header-left {
@@ -431,7 +430,10 @@
 
 		.app-header {
 			gap: var(--space-2);
-			padding: 0 var(--space-3);
+			padding-top: 0;
+			padding-bottom: 0;
+			padding-left: var(--space-3);
+			padding-right: var(--space-3);
 		}
 
 		.editor-subheader {

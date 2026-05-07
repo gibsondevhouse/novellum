@@ -29,19 +29,12 @@
 		projectId?: string | null;
 		activeSceneId?: string | null;
 		activeChapterId?: string | null;
-		/**
-		 * Optional callback for quick-prompts surfaced in the empty
-		 * state. The editor route wires this to its `handleAskAi`
-		 * adapter, which feeds the same `sendNovaChat` pipeline.
-		 */
-		onQuickPrompt?: (prompt: string) => void | Promise<void>;
 	}
 
 	let {
 		projectId = null,
 		activeSceneId = null,
 		activeChapterId = null,
-		onQuickPrompt,
 	}: Props = $props();
 
 	type NovaChatMode = 'chat' | 'scribe' | 'research';
@@ -49,6 +42,7 @@
 	type ChatModeOption = {
 		value: NovaChatMode;
 		label: string;
+		shortLabel: string;
 		description: string;
 		comingSoon?: boolean;
 	};
@@ -61,71 +55,47 @@
 		mimeType: string;
 	};
 
-	type PromptStarter = {
-		label: string;
-		prompt: string;
-	};
-
 	const CHAT_MODE_OPTIONS: ChatModeOption[] = [
 		{
 			value: 'chat',
 			label: 'Chat',
+			shortLabel: 'C',
 			description: 'Brainstorm and general story conversation.',
 		},
 		{
 			value: 'scribe',
 			label: 'Scribe',
+			shortLabel: 'S',
 			description: 'Agentic writing copilot for concrete drafting tasks.',
 		},
 		{
 			value: 'research',
 			label: 'Research',
+			shortLabel: 'R',
 			description: 'Web-layer story research and citations.',
 			comingSoon: true,
 		},
 	];
 
-	const CHAT_STARTERS: PromptStarter[] = [
-		{
-			label: 'Story spark',
-			prompt:
-				'Give me 5 high-concept story sparks based on a protagonist with a dangerous secret and one impossible deadline.',
-		},
-		{
-			label: 'Character depth',
-			prompt:
-				'Help me deepen my protagonist: give me hidden fear, contradiction, coping mechanism, and one pressure-test scene idea.',
-		},
-		{
-			label: 'Scene tension',
-			prompt:
-				'I have a slow scene. Give me 3 ways to increase tension without adding action, only through subtext and stakes.',
-		},
-	];
-
-	const SCRIBE_STARTERS: PromptStarter[] = [
-		{
-			label: 'Draft pass',
-			prompt:
-				'Draft a grounded scene where two allies negotiate after a betrayal. Keep it dialogue-forward and emotionally sharp.',
-		},
-		{
-			label: 'Outline beats',
-			prompt:
-				'Build a 6-beat scene outline for this chapter segment: setup, friction, reveal, pivot, consequence, hook.',
-		},
-		{
-			label: 'Revision pass',
-			prompt:
-				'Revise this scene for clarity, stronger verbs, and cleaner pacing while preserving voice and POV.',
-		},
-	];
+	const PANEL_WIDTH_STORAGE_KEY = 'novellum.nova.panel.width';
+	const PANEL_DEFAULT_WIDTH = 360;
+	const PANEL_MIN_WIDTH = 280;
+	const PANEL_MAX_WIDTH = 520;
+	const PANEL_KEYBOARD_STEP = 16;
 
 	let draft = $state('');
 	let selectedMode = $state<NovaChatMode>('chat');
 	let stagedAttachments = $state<StagedAttachment[]>([]);
 	let attachmentInputEl = $state<HTMLInputElement | null>(null);
 	let composerInputEl = $state<HTMLTextAreaElement | null>(null);
+	let resizeHandleEl = $state<HTMLButtonElement | null>(null);
+	let panelWidth = $state<number>(readStoredPanelWidth());
+	let isCompactViewport = $state(false);
+	let isResizing = $state(false);
+
+	let activeResizePointerId: number | null = null;
+	let resizeStartX = 0;
+	let resizeStartWidth = PANEL_DEFAULT_WIDTH;
 
 	const messages = $derived(novaSession.messages);
 	const isStreaming = $derived(novaSession.isStreaming);
@@ -133,16 +103,6 @@
 	const selectedModeMeta = $derived.by(
 		() => CHAT_MODE_OPTIONS.find((option) => option.value === selectedMode) ?? CHAT_MODE_OPTIONS[0],
 	);
-	const activePromptStarters = $derived.by(() => {
-		if (selectedMode === 'scribe') return SCRIBE_STARTERS;
-		if (selectedMode === 'research') return [];
-		return CHAT_STARTERS;
-	});
-	const attachmentSummary = $derived.by(() => {
-		if (stagedAttachments.length === 0) return 'No files attached';
-		if (stagedAttachments.length === 1) return '1 file attached';
-		return `${stagedAttachments.length} files attached`;
-	});
 	const composerPlaceholder = $derived.by(() => {
 		if (isStreaming) return 'Copilot is responding…';
 		if (selectedMode === 'chat') {
@@ -206,10 +166,126 @@
 		attachmentInputEl?.click();
 	}
 
-	function applyStarter(prompt: string): void {
-		if (isResearchMode) return;
-		draft = prompt;
-		queueMicrotask(() => composerInputEl?.focus());
+	function clampPanelWidth(next: number): number {
+		if (!Number.isFinite(next)) return PANEL_DEFAULT_WIDTH;
+		return Math.max(PANEL_MIN_WIDTH, Math.min(PANEL_MAX_WIDTH, Math.round(next)));
+	}
+
+	function readStoredPanelWidth(): number {
+		if (typeof window === 'undefined') return PANEL_DEFAULT_WIDTH;
+		try {
+			const raw = window.localStorage.getItem(PANEL_WIDTH_STORAGE_KEY);
+			if (!raw) return PANEL_DEFAULT_WIDTH;
+			return clampPanelWidth(Number.parseInt(raw, 10));
+		} catch {
+			return PANEL_DEFAULT_WIDTH;
+		}
+	}
+
+	function persistPanelWidth(width: number): void {
+		if (typeof window === 'undefined') return;
+		try {
+			window.localStorage.setItem(PANEL_WIDTH_STORAGE_KEY, String(width));
+		} catch {
+			/* ignore quota / disabled-storage */
+		}
+	}
+
+	function syncPanelWidthVar(width: number): void {
+		if (typeof document === 'undefined') return;
+		document.documentElement.style.setProperty('--nova-panel-width', `${width}px`);
+	}
+
+	function setPanelWidth(next: number, persist = true): void {
+		const clamped = clampPanelWidth(next);
+		panelWidth = clamped;
+		syncPanelWidthVar(clamped);
+		if (persist) persistPanelWidth(clamped);
+	}
+
+	function beginResize(event: PointerEvent): void {
+		if (isCompactViewport) return;
+		event.preventDefault();
+
+		isResizing = true;
+		activeResizePointerId = event.pointerId;
+		resizeStartX = event.clientX;
+		resizeStartWidth = panelWidth;
+		resizeHandleEl?.setPointerCapture(event.pointerId);
+
+		window.addEventListener('pointermove', handleResizePointerMove);
+		window.addEventListener('pointerup', handleResizePointerUp);
+		window.addEventListener('pointercancel', handleResizePointerUp);
+
+		if (typeof document !== 'undefined') {
+			document.body.style.cursor = 'col-resize';
+			document.body.style.userSelect = 'none';
+		}
+	}
+
+	function stopResize(persist = true): void {
+		if (!isResizing) return;
+
+		isResizing = false;
+		window.removeEventListener('pointermove', handleResizePointerMove);
+		window.removeEventListener('pointerup', handleResizePointerUp);
+		window.removeEventListener('pointercancel', handleResizePointerUp);
+
+		if (activeResizePointerId !== null) {
+			try {
+				resizeHandleEl?.releasePointerCapture(activeResizePointerId);
+			} catch {
+				/* no-op */
+			}
+		}
+		activeResizePointerId = null;
+
+		if (persist) persistPanelWidth(panelWidth);
+
+		if (typeof document !== 'undefined') {
+			document.body.style.cursor = '';
+			document.body.style.userSelect = '';
+		}
+	}
+
+	function handleResizePointerMove(event: PointerEvent): void {
+		if (!isResizing) return;
+		const delta = resizeStartX - event.clientX;
+		setPanelWidth(resizeStartWidth + delta, false);
+	}
+
+	function handleResizePointerUp(event: PointerEvent): void {
+		if (!isResizing) return;
+		if (activeResizePointerId !== null && event.pointerId !== activeResizePointerId) return;
+		stopResize(true);
+	}
+
+	function handleResizeHandleKeydown(event: KeyboardEvent): void {
+		if (isCompactViewport) return;
+		const step = event.shiftKey ? PANEL_KEYBOARD_STEP * 2 : PANEL_KEYBOARD_STEP;
+
+		if (event.key === 'ArrowLeft') {
+			event.preventDefault();
+			setPanelWidth(panelWidth + step);
+			return;
+		}
+
+		if (event.key === 'ArrowRight') {
+			event.preventDefault();
+			setPanelWidth(panelWidth - step);
+			return;
+		}
+
+		if (event.key === 'Home') {
+			event.preventDefault();
+			setPanelWidth(PANEL_MIN_WIDTH);
+			return;
+		}
+
+		if (event.key === 'End') {
+			event.preventDefault();
+			setPanelWidth(PANEL_MAX_WIDTH);
+		}
 	}
 
 	function handleAttachmentSelect(event: Event): void {
@@ -259,6 +335,23 @@
 
 	onMount(() => {
 		void aiSession.hydrate();
+		setPanelWidth(panelWidth, false);
+
+		if (typeof window === 'undefined') return;
+
+		const compactMedia = window.matchMedia('(max-width: 900px)');
+		const handleCompactChange = (event: MediaQueryListEvent): void => {
+			isCompactViewport = event.matches;
+			if (event.matches) stopResize(false);
+		};
+
+		isCompactViewport = compactMedia.matches;
+		compactMedia.addEventListener('change', handleCompactChange);
+
+		return () => {
+			compactMedia.removeEventListener('change', handleCompactChange);
+			stopResize(false);
+		};
 	});
 
 	function handleKeydown(event: KeyboardEvent) {
@@ -317,41 +410,31 @@
 </script>
 
 {#if novaPanel.isOpen}
-	<aside class="nova-panel" aria-label="Copilot panel">
-		<header class="nova-header">
-			<div class="nova-mode-picker">
-				<label class="nova-mode-picker__label" for="nova-mode-select">Mode</label>
-				<select
-					id="nova-mode-select"
-					class="nova-mode-picker__select"
-					bind:value={selectedMode}
-					aria-label="Copilot chat mode"
-				>
-					{#each CHAT_MODE_OPTIONS as option}
-						<option value={option.value}>
-							{option.comingSoon ? `${option.label} (coming soon)` : option.label}
-						</option>
-					{/each}
-				</select>
-			</div>
-			<div class="nova-header-controls">
+	<aside class="nova-panel" class:is-resizing={isResizing} aria-label="Copilot panel">
+		<button
+			bind:this={resizeHandleEl}
+			type="button"
+			class="nova-resize-handle"
+			role="slider"
+			aria-orientation="horizontal"
+			aria-label="Resize Copilot panel"
+			aria-valuemin={PANEL_MIN_WIDTH}
+			aria-valuemax={PANEL_MAX_WIDTH}
+			aria-valuenow={panelWidth}
+			aria-valuetext={`${panelWidth}px`}
+			disabled={isCompactViewport}
+			onpointerdown={beginResize}
+			onkeydown={handleResizeHandleKeydown}
+		></button>
+		{#if keyConfigured}
+			<div class="nova-session-tray" aria-label="Session controls">
 				{#if aiLoading}
 					<span class="nova-checking-dot" aria-label="Checking AI configuration…" title="Checking AI configuration…"></span>
 				{/if}
-				{#if keyConfigured}
-					<ContextDisclosurePill />
-					<ModelPickerDropdown />
-				{/if}
-				<button
-					type="button"
-					class="nova-close"
-					aria-label="Close Copilot"
-					onclick={() => novaPanel.close()}
-				>
-					✕
-				</button>
+				<ContextDisclosurePill />
+				<ModelPickerDropdown />
 			</div>
-		</header>
+		{/if}
 
 		<div class="nova-body" aria-live="polite">
 			{#if aiChecked && !keyConfigured}
@@ -364,40 +447,7 @@
 					{/snippet}
 				</EmptyStatePanel>
 			{:else}
-				{#if messages.length === 0}
-				<section class="nova-welcome">
-					<span class="nova-welcome__kicker">{selectedModeMeta.label} mode</span>
-					<p class="nova-placeholder">{selectedModeMeta.description}</p>
-
-					{#if !isResearchMode}
-						<div class="nova-starters" aria-label="Suggested copilot starters">
-							{#each activePromptStarters as starter (starter.label)}
-								<button
-									type="button"
-									class="nova-starter"
-									disabled={isStreaming}
-									onclick={() => applyStarter(starter.prompt)}
-								>
-									{starter.label}
-								</button>
-							{/each}
-						</div>
-					{/if}
-
-					{#if onQuickPrompt && activeSceneId && !isResearchMode}
-						<div class="nova-quick-prompts">
-							<button
-								type="button"
-								class="nova-quick-prompt"
-								disabled={isStreaming}
-								onclick={() => void onQuickPrompt?.('Continue this scene naturally from where it leaves off.')}
-							>
-								Continue scene
-							</button>
-						</div>
-					{/if}
-				</section>
-				{:else}
+				{#if messages.length > 0}
 					<NovaErrorBoundary
 						error={novaError}
 						errorType={novaErrorType}
@@ -480,100 +530,107 @@
 
 		<footer class="nova-footer">
 			<form
-				class="nova-input-form"
+				class="nova-composer"
 				onsubmit={(event) => {
 					event.preventDefault();
 					void submitDraft();
 				}}
 			>
-				<div class="nova-composer">
-					<div class="nova-composer__toolbar">
-						<div class="nova-composer__toolbar-left">
-							<input
-								bind:this={attachmentInputEl}
-								type="file"
-								class="nova-attachment-input"
-								onchange={handleAttachmentSelect}
-								accept=".txt,.md,.pdf,.doc,.docx,.rtf,.odt,image/*"
-								multiple
-							/>
-							<button
-								type="button"
-								class="nova-attach-button"
-								onclick={openAttachmentPicker}
-								aria-label="Upload documents and images"
-							>
-								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M21.44 11.05 12.25 20.2a6 6 0 0 1-8.48-8.48l9.19-9.19a4 4 0 0 1 5.66 5.66L9.41 17.4a2 2 0 1 1-2.83-2.83l8.49-8.48"></path>
-								</svg>
-								<span>Upload</span>
-							</button>
-							<span class="nova-attachment-summary">{attachmentSummary}</span>
-						</div>
-						<span class="nova-composer__mode-pill" class:is-soon={isResearchMode}>
-							{isResearchMode ? 'Research soon' : `${selectedModeMeta.label} mode`}
-						</span>
-					</div>
-					<p class="nova-composer__mode-copy">{selectedModeMeta.description}</p>
+				<div class="nova-composer__row">
+					<input
+						bind:this={attachmentInputEl}
+						type="file"
+						class="nova-attachment-input"
+						onchange={handleAttachmentSelect}
+						accept=".txt,.md,.pdf,.doc,.docx,.rtf,.odt,image/*"
+						multiple
+					/>
 
-					{#if stagedAttachments.length > 0}
-						<ul class="nova-attachment-list" aria-label="Staged attachments">
-							{#each stagedAttachments as attachment (attachment.id)}
-								<li class="nova-attachment-chip">
-									<div class="nova-attachment-chip__copy">
-										<strong>{attachment.name}</strong>
-										<span>{attachment.kind} · {formatFileSize(attachment.size)}</span>
-									</div>
-									<button
-										type="button"
-										class="nova-attachment-chip__remove"
-										onclick={() => removeAttachment(attachment.id)}
-										aria-label={`Remove ${attachment.name}`}
-									>
-										Remove
-									</button>
-								</li>
+					<div class="nova-square-stack">
+						<select
+							class="nova-mode-square"
+							bind:value={selectedMode}
+							aria-label="Copilot chat mode"
+							title={`${selectedModeMeta.label} mode`}
+						>
+							{#each CHAT_MODE_OPTIONS as option}
+								<option value={option.value}>{option.shortLabel}</option>
 							{/each}
-						</ul>
-					{/if}
+						</select>
 
-					{#if isResearchMode}
-						<p class="nova-mode-notice" role="status">
-							Research mode is coming soon with a dedicated web research layer.
-						</p>
-					{/if}
-
-					<div class="nova-composer__row">
-						<textarea
-							bind:this={composerInputEl}
-							class="nova-input"
-							bind:value={draft}
-							onkeydown={handleKeydown}
-							placeholder={composerPlaceholder}
-							rows="3"
-							aria-label="Ask Copilot"
-							disabled={isStreaming || isResearchMode}
-						></textarea>
-						{#if isStreaming}
-							<button
-								type="button"
-								class="nova-action nova-action-abort"
-								onclick={abortActiveStream}
-								aria-label="Abort response"
-							>
-								Stop
-							</button>
-						{:else}
-							<button
-								type="submit"
-								class="nova-action nova-action-send"
-								disabled={!canSubmit}
-							>
-								{isResearchMode ? 'Coming soon' : 'Send'}
-							</button>
-						{/if}
+						<button
+							type="button"
+							class="nova-upload-icon"
+							onclick={openAttachmentPicker}
+							aria-label="Upload documents and images"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M21.44 11.05 12.25 20.2a6 6 0 0 1-8.48-8.48l9.19-9.19a4 4 0 0 1 5.66 5.66L9.41 17.4a2 2 0 1 1-2.83-2.83l8.49-8.48"></path>
+							</svg>
+						</button>
 					</div>
+
+					<textarea
+						bind:this={composerInputEl}
+						class="nova-input"
+						bind:value={draft}
+						onkeydown={handleKeydown}
+						placeholder={composerPlaceholder}
+						rows="3"
+						aria-label="Ask Copilot"
+						disabled={isStreaming || isResearchMode}
+					></textarea>
+
+					{#if isStreaming}
+						<button
+							type="button"
+							class="nova-action nova-action-stop"
+							onclick={abortActiveStream}
+							aria-label="Abort response"
+						>
+							<span class="nova-stop-glyph" aria-hidden="true"></span>
+							<span class="sr-only">Stop</span>
+						</button>
+					{:else}
+						<button
+							type="submit"
+							class="nova-action nova-action-send"
+							disabled={!canSubmit}
+							aria-label="Send message"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+								<path d="m22 2-7 20-4-9-9-4z"></path>
+								<path d="M22 2 11 13"></path>
+							</svg>
+							<span class="sr-only">Send</span>
+						</button>
+					{/if}
 				</div>
+
+				{#if stagedAttachments.length > 0}
+					<ul class="nova-attachment-inline" aria-label="Staged attachments">
+						{#each stagedAttachments as attachment (attachment.id)}
+							<li class="nova-attachment-chip">
+								<span class="nova-attachment-chip__name">{attachment.name}</span>
+								<span class="nova-attachment-chip__meta">{formatFileSize(attachment.size)}</span>
+								<button
+									type="button"
+									class="nova-attachment-chip__remove"
+									onclick={() => removeAttachment(attachment.id)}
+									aria-label={`Remove ${attachment.name}`}
+								>
+									Remove
+								</button>
+							</li>
+						{/each}
+					</ul>
+				{/if}
+
+				{#if isResearchMode}
+					<p class="nova-mode-notice" role="status">
+						Research mode is coming soon with a dedicated web research layer.
+					</p>
+				{/if}
 			</form>
 		</footer>
 	</aside>
@@ -581,69 +638,115 @@
 
 <style>
 	.nova-panel {
+		--nova-panel-width-min: 280px;
+		--nova-panel-width-max: 520px;
 		position: fixed;
-		top: 0;
+		top: 48px;
 		right: 0;
 		bottom: 0;
-		width: var(--nova-panel-width);
+		width: clamp(var(--nova-panel-width-min), var(--nova-panel-width), var(--nova-panel-width-max));
+		max-width: min(var(--nova-panel-width-max), calc(100vw - 48px));
+		min-width: var(--nova-panel-width-min);
 		display: flex;
 		flex-direction: column;
-		background:
-			radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--color-teal) 10%, transparent) 0%, transparent 52%),
-			var(--nova-panel-bg);
+		background: var(--color-surface-ground);
 		border-left: 1px solid var(--nova-panel-border);
 		box-shadow: var(--nova-panel-shadow);
 		z-index: 50;
 		color: var(--color-text-primary);
-		overflow: hidden;
 	}
 
-	.nova-header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: var(--space-3) var(--space-4);
-		border-bottom: 1px solid var(--nova-panel-border);
-		background: color-mix(in srgb, var(--color-surface-base) 92%, transparent);
-		backdrop-filter: blur(6px);
+	.nova-resize-handle {
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		width: 10px;
+		padding: 0;
+		margin: 0;
+		border: none;
+		background: transparent;
+		cursor: col-resize;
+		touch-action: none;
+		z-index: 2;
 	}
 
-	.nova-mode-picker {
-		display: flex;
-		align-items: center;
-		gap: var(--space-2);
-		min-width: 0;
+	.nova-resize-handle::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 4px;
+		transform: translateY(-50%);
+		width: 2px;
+		height: 56px;
+		border-radius: var(--radius-full);
+		background: var(--color-border-strong);
+		opacity: 0;
+		transition: opacity var(--duration-fast) var(--ease-standard);
 	}
 
-	.nova-mode-picker__label {
+	.nova-panel:hover .nova-resize-handle::after,
+	.nova-panel.is-resizing .nova-resize-handle::after,
+	.nova-resize-handle:focus-visible::after {
+		opacity: 1;
+	}
+
+	.nova-resize-handle:focus-visible {
+		outline: none;
+		box-shadow: inset var(--focus-ring);
+	}
+
+	.nova-mode-square,
+	.nova-upload-icon,
+	.nova-action,
+	.nova-attachment-chip__remove {
+		transition:
+			background-color var(--duration-fast) var(--ease-standard),
+			border-color var(--duration-fast) var(--ease-standard),
+			color var(--duration-fast) var(--ease-standard),
+			opacity var(--duration-fast) var(--ease-standard);
+	}
+
+	.nova-mode-square:focus-visible,
+	.nova-upload-icon:focus-visible,
+	.nova-action:focus-visible,
+	.nova-attachment-chip__remove:focus-visible {
+		outline: none;
+		box-shadow: var(--focus-ring);
+	}
+
+	.nova-action:disabled,
+	.nova-attachment-chip__remove:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.nova-mode-square {
+		appearance: none;
+		-webkit-appearance: none;
+		width: 36px;
+		height: 36px;
+		padding: 0;
+		margin: 0;
+		border-radius: var(--radius-md);
+		border: 1px solid var(--color-border-default);
+		background: var(--color-surface-overlay);
+		color: var(--color-text-secondary);
 		font-size: var(--text-xs);
 		font-weight: var(--font-weight-semibold);
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-		color: var(--color-text-muted);
+		text-align: center;
+		text-align-last: center;
+		cursor: pointer;
 	}
 
-	.nova-mode-picker__select {
-		min-width: 190px;
-		height: 32px;
-		padding: 0 var(--space-2);
-		border-radius: var(--radius-sm);
-		border: 1px solid var(--color-border-default);
-		background: color-mix(in srgb, var(--color-surface-overlay) 88%, transparent);
+	.nova-mode-square:hover {
+		background: var(--color-surface-hover);
 		color: var(--color-text-primary);
-		font-size: var(--text-sm);
-		font-weight: var(--font-weight-medium);
 	}
 
-	.nova-mode-picker__select:focus-visible {
-		outline: 2px solid var(--color-border-focus);
-		outline-offset: 1px;
-	}
-
-	.nova-header-controls {
-		display: flex;
-		align-items: center;
-		gap: var(--space-2);
+	.nova-mode-square option {
+		background: var(--color-surface-ground);
+		color: var(--color-text-primary);
 	}
 
 	.nova-checking-dot {
@@ -655,12 +758,28 @@
 		animation: nova-typing-pulse 1s infinite ease-in-out;
 	}
 
+	.nova-session-tray {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		padding: var(--space-2) var(--space-4);
+		border-bottom: 1px solid var(--color-border-default);
+		background: var(--color-surface-ground);
+	}
+
+	.nova-body {
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
+		padding: var(--space-4);
+	}
+
 	.nova-settings-link {
 		display: inline-flex;
 		align-items: center;
 		padding: var(--space-2) var(--space-4);
-		border-radius: var(--radius-sm);
-		background: var(--color-surface-raised);
+		border-radius: var(--radius-md);
+		background: var(--color-surface-overlay);
 		color: var(--color-text-secondary);
 		font-size: var(--text-sm);
 		text-decoration: none;
@@ -670,127 +789,6 @@
 	.nova-settings-link:hover {
 		background: var(--color-surface-hover);
 		color: var(--color-text-primary);
-	}
-
-	.nova-close {
-		background: transparent;
-		border: 1px solid transparent;
-		color: var(--color-text-secondary);
-		font-size: var(--text-base);
-		line-height: 1;
-		padding: var(--space-1) var(--space-2);
-		border-radius: var(--radius-sm);
-		cursor: pointer;
-	}
-
-	.nova-close:hover {
-		background: var(--color-surface-hover);
-		color: var(--color-text-primary);
-	}
-
-	.nova-close:focus-visible {
-		outline: 2px solid var(--color-border-focus);
-		outline-offset: 2px;
-	}
-
-	.nova-body {
-		flex: 1 1 auto;
-		overflow-y: auto;
-		padding: var(--space-4);
-		scrollbar-gutter: stable;
-	}
-
-	.nova-welcome {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-3);
-		padding: var(--space-3);
-		border: 1px solid color-mix(in srgb, var(--color-border-default) 72%, transparent);
-		border-radius: var(--radius-md);
-		background:
-			linear-gradient(
-				150deg,
-				color-mix(in srgb, var(--color-surface-overlay) 94%, transparent) 0%,
-				color-mix(in srgb, var(--color-surface-ground) 96%, transparent) 100%
-			);
-	}
-
-	.nova-welcome__kicker {
-		display: inline-flex;
-		align-items: center;
-		width: fit-content;
-		padding: 2px var(--space-2);
-		border-radius: 999px;
-		font-size: 11px;
-		font-weight: var(--font-weight-semibold);
-		letter-spacing: 0.05em;
-		text-transform: uppercase;
-		color: var(--color-text-secondary);
-		background: color-mix(in srgb, var(--color-surface-ground) 82%, transparent);
-		border: 1px solid color-mix(in srgb, var(--color-border-subtle) 75%, transparent);
-	}
-
-	.nova-placeholder {
-		margin: 0;
-		color: var(--color-text-secondary);
-		font-size: 13px;
-		line-height: var(--leading-relaxed);
-	}
-
-	.nova-starters {
-		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: var(--space-2);
-	}
-
-	.nova-starter {
-		padding: var(--space-2) var(--space-2);
-		text-align: left;
-		border-radius: var(--radius-sm);
-		border: 1px solid color-mix(in srgb, var(--color-border-default) 85%, transparent);
-		background: color-mix(in srgb, var(--color-surface-overlay) 95%, transparent);
-		color: var(--color-text-secondary);
-		font-size: 12px;
-		font-weight: var(--font-weight-medium);
-		cursor: pointer;
-	}
-
-	.nova-starter:hover {
-		background: var(--color-surface-hover);
-		color: var(--color-text-primary);
-		border-color: color-mix(in srgb, var(--color-border-strong) 80%, transparent);
-	}
-
-	.nova-starter:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
-	.nova-quick-prompts {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--space-2);
-		margin-top: var(--space-3);
-	}
-
-	.nova-quick-prompt {
-		padding: var(--space-1) var(--space-3);
-		border: 1px solid var(--color-border-default);
-		border-radius: 999px;
-		background: var(--color-surface-overlay);
-		color: var(--color-text-secondary);
-		font-size: var(--text-xs);
-		cursor: pointer;
-	}
-
-	.nova-quick-prompt:hover {
-		background: var(--color-surface-hover);
-		color: var(--color-text-primary);
-	}
-
-	.nova-quick-prompt:disabled {
-		opacity: 0.4;
-		cursor: not-allowed;
 	}
 
 	.nova-log {
@@ -810,7 +808,8 @@
 		justify-content: flex-end;
 	}
 
-	.nova-message-nova {
+	.nova-message-nova,
+	.nova-message-tool {
 		justify-content: flex-start;
 	}
 
@@ -824,21 +823,20 @@
 	}
 
 	.nova-bubble-user {
-		background: color-mix(in srgb, var(--color-teal) 24%, transparent);
+		background: var(--color-surface-ground);
+		border: 1px solid var(--color-border-default);
 		color: var(--color-text-primary);
-		border: 1px solid color-mix(in srgb, var(--color-teal) 38%, transparent);
 		white-space: pre-wrap;
 	}
 
 	.nova-bubble-nova {
 		background: var(--color-surface-overlay);
+		border: 1px solid var(--color-border-default);
 		color: var(--color-text-primary);
-		border: 1px solid var(--color-border-subtle);
 	}
 
 	.nova-bubble-nova.is-error {
-		background: color-mix(in srgb, var(--color-error) 12%, transparent);
-		border-color: color-mix(in srgb, var(--color-error) 38%, transparent);
+		border-color: var(--color-error);
 		color: var(--color-error);
 	}
 
@@ -853,7 +851,7 @@
 	}
 
 	.nova-error-hint a {
-		color: var(--color-text-link, var(--color-teal));
+		color: var(--color-nova-blue);
 		text-decoration: underline;
 	}
 
@@ -866,7 +864,7 @@
 	}
 
 	.nova-prose :global(code) {
-		font-family: var(--font-mono, monospace);
+		font-family: var(--font-mono);
 		font-size: 0.9em;
 	}
 
@@ -899,7 +897,9 @@
 	}
 
 	@keyframes nova-typing-pulse {
-		0%, 80%, 100% {
+		0%,
+		80%,
+		100% {
 			opacity: 0.3;
 			transform: scale(0.8);
 		}
@@ -910,206 +910,70 @@
 	}
 
 	.nova-footer {
-		border-top: 1px solid var(--nova-panel-border);
+		border-top: 1px solid var(--color-border-default);
 		padding: var(--space-3) var(--space-4);
-		background:
-			linear-gradient(
-				180deg,
-				color-mix(in srgb, var(--color-surface-base) 94%, transparent) 0%,
-				color-mix(in srgb, var(--color-surface-overlay) 96%, transparent) 100%
-			);
-	}
-
-	.nova-input-form {
-		display: block;
+		background: var(--color-surface-ground);
 	}
 
 	.nova-composer {
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-2);
-		padding: var(--space-2);
-		border-radius: var(--radius-lg);
-		border: 1px solid color-mix(in srgb, var(--color-border-default) 80%, transparent);
-		background:
-			linear-gradient(
-				135deg,
-				color-mix(in srgb, var(--color-surface-overlay) 96%, transparent) 0%,
-				color-mix(in srgb, var(--color-surface-ground) 98%, transparent) 100%
-			);
-		box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-border-default) 20%, transparent);
 	}
 
-	.nova-composer__toolbar {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
+	.nova-composer__row {
+		display: grid;
+		grid-template-columns: 36px 1fr 36px;
+		align-items: end;
 		gap: var(--space-2);
 	}
 
-	.nova-composer__toolbar-left {
+	.nova-square-stack {
 		display: flex;
-		align-items: center;
+		flex-direction: column;
 		gap: var(--space-2);
-		min-width: 0;
-	}
-
-	.nova-attachment-summary {
-		font-size: 12px;
-		color: var(--color-text-muted);
-		white-space: nowrap;
-	}
-
-	.nova-composer__mode-copy {
-		margin: 0;
-		font-size: 12px;
-		color: var(--color-text-muted);
-		line-height: var(--leading-relaxed);
-		padding-inline: var(--space-1);
-	}
-
-	.nova-composer__mode-pill {
-		display: inline-flex;
-		align-items: center;
-		padding: 2px var(--space-2);
-		border-radius: 999px;
-		font-size: 11px;
-		font-weight: var(--font-weight-semibold);
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
-		color: color-mix(in srgb, var(--color-teal) 78%, var(--color-text-primary));
-		border: 1px solid color-mix(in srgb, var(--color-teal) 38%, transparent);
-		background: color-mix(in srgb, var(--color-teal) 10%, transparent);
-	}
-
-	.nova-composer__mode-pill.is-soon {
-		color: var(--color-text-secondary);
-		border-color: color-mix(in srgb, var(--color-border-default) 85%, transparent);
-		background: color-mix(in srgb, var(--color-surface-ground) 90%, transparent);
 	}
 
 	.nova-attachment-input {
 		display: none;
 	}
 
-	.nova-attach-button {
+	.nova-upload-icon {
 		display: inline-flex;
 		align-items: center;
-		gap: var(--space-1);
-		padding: var(--space-1) var(--space-2);
-		border-radius: var(--radius-full);
-		border: 1px solid color-mix(in srgb, var(--color-border-default) 85%, transparent);
-		background: color-mix(in srgb, var(--color-surface-overlay) 92%, transparent);
-		color: var(--color-text-secondary);
-		font-size: var(--text-xs);
-		font-weight: var(--font-weight-medium);
-		cursor: pointer;
-		white-space: nowrap;
-	}
-
-	.nova-attach-button:hover {
-		background: var(--color-surface-hover);
-		color: var(--color-text-primary);
-	}
-
-	.nova-attach-button:focus-visible {
-		outline: 2px solid var(--color-border-focus);
-		outline-offset: 1px;
-	}
-
-	.nova-attachment-list {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-1);
-	}
-
-	.nova-attachment-chip {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: var(--space-2);
-		padding: var(--space-2);
-		border: 1px solid color-mix(in srgb, var(--color-border-subtle) 85%, transparent);
-		border-radius: var(--radius-sm);
-		background: color-mix(in srgb, var(--color-surface-overlay) 92%, transparent);
-	}
-
-	.nova-attachment-chip__copy {
-		display: flex;
-		flex-direction: column;
-		min-width: 0;
-		gap: 2px;
-	}
-
-	.nova-attachment-chip__copy strong {
-		font-size: var(--text-xs);
-		font-weight: var(--font-weight-semibold);
-		color: var(--color-text-primary);
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.nova-attachment-chip__copy span {
-		font-size: 11px;
-		color: var(--color-text-muted);
-		text-transform: capitalize;
-	}
-
-	.nova-attachment-chip__remove {
-		padding: 2px var(--space-2);
-		border-radius: var(--radius-full);
+		justify-content: center;
+		width: 36px;
+		height: 36px;
+		border-radius: var(--radius-md);
 		border: 1px solid var(--color-border-default);
-		background: transparent;
+		background: var(--color-surface-overlay);
 		color: var(--color-text-secondary);
-		font-size: 11px;
 		cursor: pointer;
 	}
 
-	.nova-attachment-chip__remove:hover {
+	.nova-upload-icon:hover {
 		background: var(--color-surface-hover);
 		color: var(--color-text-primary);
-	}
-
-	.nova-mode-notice {
-		margin: 0;
-		padding: var(--space-2);
-		font-size: var(--text-xs);
-		line-height: var(--leading-relaxed);
-		border-radius: var(--radius-sm);
-		border: 1px solid color-mix(in srgb, var(--color-border-default) 78%, transparent);
-		background: color-mix(in srgb, var(--color-surface-ground) 94%, transparent);
-		color: var(--color-text-secondary);
-	}
-
-	.nova-composer__row {
-		display: flex;
-		align-items: flex-end;
-		gap: var(--space-2);
 	}
 
 	.nova-input {
-		flex: 1 1 auto;
-		min-height: 74px;
-		max-height: 160px;
+		width: 100%;
+		min-height: 96px;
+		max-height: 220px;
 		padding: var(--space-2) var(--space-3);
 		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-sm);
-		background: color-mix(in srgb, var(--color-surface-base) 95%, transparent);
+		border-radius: var(--radius-md);
+		background: var(--color-surface-overlay);
 		color: var(--color-text-primary);
 		font-size: var(--text-sm);
 		line-height: var(--leading-relaxed);
 		font-family: inherit;
 		resize: none;
-		box-shadow: inset 0 1px 1px color-mix(in srgb, var(--color-border-default) 22%, transparent);
 	}
 
 	.nova-input:focus-visible {
-		outline: 2px solid var(--color-border-focus);
-		outline-offset: 1px;
+		outline: none;
+		box-shadow: var(--focus-ring);
 	}
 
 	.nova-input:disabled {
@@ -1118,100 +982,121 @@
 	}
 
 	.nova-action {
-		flex: 0 0 auto;
-		padding: var(--space-2) var(--space-3);
-		border-radius: var(--radius-sm);
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 36px;
+		height: 36px;
+		padding: 0;
+		border-radius: var(--radius-md);
 		border: 1px solid transparent;
 		font-size: var(--text-sm);
 		font-weight: var(--font-weight-medium);
 		cursor: pointer;
 	}
 
+	.nova-action svg {
+		display: block;
+	}
+
 	.nova-action-send {
-		background:
-			linear-gradient(
-				160deg,
-				color-mix(in srgb, var(--color-teal) 88%, white) 0%,
-				var(--color-teal) 100%
-			);
-		color: var(--color-text-on-accent, white);
-		min-width: 96px;
-		box-shadow: 0 6px 14px color-mix(in srgb, var(--color-teal) 32%, transparent);
+		background: var(--color-nova-blue);
+		border-color: var(--color-nova-blue);
+		color: var(--color-text-on-dark);
 	}
 
 	.nova-action-send:disabled {
-		opacity: 0.4;
-		cursor: not-allowed;
+		opacity: 0.45;
 	}
 
-	.nova-action-abort {
-		background: transparent;
+	.nova-action-stop {
+		background: var(--color-surface-overlay);
 		border-color: var(--color-border-default);
 		color: var(--color-text-secondary);
 	}
 
-	.nova-action-abort:hover {
+	.nova-action-stop:hover {
 		background: var(--color-surface-hover);
 		color: var(--color-text-primary);
 	}
 
-	@media (max-width: 960px) {
-		.nova-starters {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
+	.nova-stop-glyph {
+		display: inline-block;
+		width: 10px;
+		height: 10px;
+		border-radius: var(--radius-xs);
+		background: currentColor;
 	}
 
-	@media (max-width: 680px) {
-		.nova-header {
-			padding-inline: var(--space-3);
-		}
-
-		.nova-mode-picker__label {
-			display: none;
-		}
-
-		.nova-mode-picker__select {
-			min-width: 152px;
-		}
-
-		.nova-header-controls {
-			gap: var(--space-1);
-		}
-
-		.nova-starters {
-			grid-template-columns: 1fr;
-		}
-
-		.nova-composer__toolbar,
-		.nova-composer__toolbar-left,
-		.nova-composer__row {
-			flex-wrap: wrap;
-		}
-
-		.nova-composer__mode-pill {
-			margin-left: auto;
-		}
-
-		.nova-attachment-summary {
-			white-space: normal;
-		}
-
-		.nova-action {
-			width: 100%;
-		}
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
 	}
 
-	@media (max-width: 900px) {
-		.nova-panel {
-			width: 100vw;
-			border-left: none;
-		}
+	.nova-attachment-inline {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2);
+		list-style: none;
+		margin: 0;
+		padding: 0;
 	}
 
-	/* plan-023 stage-006 — tool-call / tool-result chips. Uses
-	   existing surface and text tokens; no new tokens introduced. */
-	.nova-message-tool {
-		justify-content: flex-start;
+	.nova-attachment-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-1);
+		padding: var(--space-1) var(--space-2);
+		border-radius: 999px;
+		border: 1px solid var(--color-border-default);
+		background: var(--color-surface-overlay);
+		max-width: 100%;
+	}
+
+	.nova-attachment-chip__name {
+		font-size: var(--text-xs);
+		color: var(--color-text-primary);
+		max-width: 170px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.nova-attachment-chip__meta {
+		font-size: 11px;
+		color: var(--color-text-muted);
+	}
+
+	.nova-attachment-chip__remove {
+		border: none;
+		background: transparent;
+		color: var(--color-text-secondary);
+		font-size: 11px;
+		cursor: pointer;
+		text-decoration: underline;
+		border-radius: var(--radius-md);
+	}
+
+	.nova-attachment-chip__remove:hover {
+		color: var(--color-text-primary);
+	}
+
+	.nova-mode-notice {
+		margin: 0;
+		padding: var(--space-2);
+		font-size: var(--text-xs);
+		line-height: var(--leading-relaxed);
+		border-radius: var(--radius-md);
+		border: 1px solid var(--color-border-default);
+		background: var(--color-surface-overlay);
+		color: var(--color-text-secondary);
 	}
 
 	.nova-tool-chip {
@@ -1222,15 +1107,14 @@
 		padding: var(--space-2) var(--space-3);
 		border-radius: var(--radius-md);
 		background: var(--color-surface-overlay);
-		border: 1px dashed var(--color-border-subtle);
+		border: 1px solid var(--color-border-default);
 		color: var(--color-text-secondary);
 		font-size: var(--text-xs);
 		line-height: var(--leading-relaxed);
 	}
 
 	.nova-tool-chip.is-error {
-		background: color-mix(in srgb, var(--color-error) 12%, transparent);
-		border-color: color-mix(in srgb, var(--color-error) 38%, transparent);
+		border-color: var(--color-error);
 		color: var(--color-error);
 	}
 
@@ -1241,7 +1125,7 @@
 	}
 
 	.nova-tool-id {
-		font-family: var(--font-mono, monospace);
+		font-family: var(--font-mono);
 		color: var(--color-text-primary);
 	}
 
@@ -1265,12 +1149,34 @@
 	.nova-tool-payload {
 		margin: var(--space-1) 0 0;
 		padding: var(--space-2);
-		background: var(--color-surface-base, var(--color-surface-overlay));
-		border-radius: var(--radius-sm);
-		font-family: var(--font-mono, monospace);
+		background: var(--color-surface-ground);
+		border-radius: var(--radius-md);
+		font-family: var(--font-mono);
 		font-size: var(--text-xs);
 		color: var(--color-text-primary);
 		white-space: pre-wrap;
 		overflow-x: auto;
+	}
+
+	@media (max-width: 900px) {
+		.nova-panel {
+			top: 48px;
+			width: 100vw;
+			max-width: none;
+			min-width: 0;
+			border-left: none;
+		}
+
+		.nova-resize-handle {
+			display: none;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.nova-session-tray,
+		.nova-body,
+		.nova-footer {
+			padding-inline: var(--space-3);
+		}
 	}
 </style>

@@ -489,7 +489,6 @@
 
 <div
 	class="editor-page"
-	class:ai-open={novaPanel.isOpen}
 	class:editor-focus-mode={editorPreferences.focusMode}
 	class:mode-planning={editorPreferences.mode === 'planning'}
 	class:mode-revision={editorPreferences.mode === 'revision'}
@@ -627,10 +626,6 @@
 		grid-template-columns: 250px 1fr 320px;
 	}
 
-	.editor-page.mode-planning.ai-open {
-		grid-template-columns: 250px 1fr 320px 280px;
-	}
-
 	.editor-page.mode-revision {
 		grid-template-columns: 1fr;
 	}
@@ -734,8 +729,7 @@
 			align-items: flex-start;
 		}
 
-		.editor-page.mode-planning,
-		.editor-page.mode-planning.ai-open {
+		.editor-page.mode-planning {
 			grid-template-columns: 1fr;
 		}
 
