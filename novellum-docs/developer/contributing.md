@@ -1,113 +1,76 @@
-# Contributing to Novellum
+# Contributing
 
-Thank you for contributing. This guide covers everything you need to get the development environment running, understand the codebase conventions, and submit quality pull requests.
+> Last verified: 2026-05-07
 
----
+## Before you write code
 
-## Prerequisites
+1. **Open an issue or pick one.** New work needs a tracked reason.
+2. **For non-trivial changes, write a plan.** Plans live under [../../dev-docs/plans/](../../dev-docs/plans/) and follow the 4-tier system in [../../dev-docs/05-workflow/planning-conventions.md](../../dev-docs/05-workflow/planning-conventions.md). Plans need approval before stages start.
+3. **Branch off `master`.** Name it `<type>/<short-slug>`, e.g. `feat/reader-empty-state` or `fix/nova-key-persistence`.
 
-Make sure the following are installed before cloning:
+## While you write code
 
-| Tool | Minimum version | Check |
-| :--- | :--- | :--- |
-| Node.js | 20.19 or later | `node --version` |
-| pnpm | 9.0 or later | `pnpm --version` |
-| Rust (Tauri builds only) | stable | `rustup update stable` |
+- **Svelte 5 Runes only.** No legacy `$:` reactivity, no `export let`.
+- **Modular boundaries.** Cross-module imports go through `index.ts` barrels (`$modules/<domain>`). ESLint blocks the alternative.
+- **Server-only stays server-only.** Anything in `src/lib/server/` cannot be imported from client code.
+- **Tokens, not magic numbers.** All visual values come from `src/styles/tokens.css`. `pnpm check:tokens` enforces.
+- **Tests next to features.** New code in a module needs tests under `tests/<module>/`.
+- **Keep `+server.ts` exports clean.** Only HTTP handlers, `config`, or `_`-prefixed extras. Helpers go in sibling files.
 
-**pnpm is required.** Do not use `npm` or `yarn`. All install and run commands in this guide use `pnpm`.
+## Before you open a PR
 
-Rust is only needed if you are building the Tauri desktop shell. For web-only development it is not required.
+Run all gates locally:
 
----
-
-## Setup
-
-```sh
-git clone https://github.com/novellum/novellum.git
-cd novellum
-pnpm install
-pnpm run dev
+```bash
+pnpm check
+pnpm lint
+pnpm lint:css
+pnpm check:tokens
+pnpm test
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser. The development server supports hot module replacement — changes to `.svelte` and `.ts` files are reflected immediately.
+If your change is UI-visible, also run:
 
----
-
-## All Available Commands
-
-| Command | Description |
-| :--- | :--- |
-| `pnpm run dev` | Start the Vite development server at `localhost:5173`. |
-| `pnpm run build` | Build the production web bundle to `build/`. |
-| `pnpm run preview` | Preview the production build at `localhost:4173`. |
-| `pnpm run check` | Run `svelte-check` for Svelte and TypeScript diagnostics. |
-| `pnpm run lint` | Run ESLint including `eslint-plugin-boundaries` module-boundary checks. |
-| `pnpm run lint:css` | Run Stylelint across all `.css` and `.svelte` style blocks. |
-| `pnpm run format` | Run Prettier on all files. |
-| `pnpm run test` | Run the full Vitest test suite once. |
-| `pnpm run test:watch` | Run Vitest in watch mode (re-runs on file change). |
-| `pnpm run test:coverage` | Run Vitest with v8 coverage. HTML report at `coverage/index.html`. |
-| `pnpm run test:visual` | Run Playwright visual regression tests in `tests/visual/`. |
-| `pnpm run storybook` | Start the Storybook component playground at `localhost:6006`. |
-| `pnpm run build-storybook` | Build a static Storybook output (used in CI verification). |
-| `pnpm run desktop:dev` | Start Tauri + Vite dev server in desktop mode. |
-| `pnpm run desktop:build` | Build the Tauri desktop app for the current platform. Runs `version:sync` and `fetch:node` automatically. |
-| `pnpm run version:sync` | Sync `package.json` version into `src-tauri/tauri.conf.json`. |
-| `pnpm run fetch:node` | Download the sidecar Node.js binary for the desktop build. |
-
----
-
-## Development Workflow
-
-### Branch naming
-
-Branch from `master` using a consistent naming convention:
-
-```text
-feat/<short-slug>       # New features
-fix/<short-slug>        # Bug fixes
-chore/<short-slug>      # Maintenance, dependency updates, docs
-refactor/<short-slug>   # Refactors without behaviour change
+```bash
+pnpm test:e2e
+pnpm test:visual
 ```
 
-Examples: `feat/export-epub`, `fix/nova-context-trim`, `chore/update-sveltekit`.
+If a visual snapshot intentionally changes, update it in the same PR and explain why in the PR body.
 
-### Opening a pull request
+## Opening the PR
 
-1. Push your branch to the repository.
-2. Open a PR against `master` with a clear title and a short description of the change.
-3. CI must pass: type check (`pnpm run check`), lint (`pnpm run lint`), and tests (`pnpm run test`).
-4. A Reviewer Agent sign-off is required before merge.
+- **Title:** present-tense imperative — "add reader empty state", "fix nova key persistence".
+- **Body:**
+  - What changed and why.
+  - Plan / stage / phase reference if applicable (e.g. `Closes plan-021 stage 002 phase 001`).
+  - Screenshots or recordings for UI changes.
+  - Any migration notes.
+- **Scope:** keep PRs small. One concern per PR. If your branch sprawls, split it.
 
----
+## Review
 
-## Module Boundary Rules
+- A reviewer will check architecture, boundaries, tests, and visual fidelity.
+- Address review notes by pushing follow-up commits; squash on merge if appropriate.
 
-Novellum enforces strict vertical domain isolation via `eslint-plugin-boundaries`. This is not optional.
+## Commit hygiene
 
-The key rule: **every module exposes only what is declared in its `index.ts`**. Never import from an internal module path.
+- Logical commits with focused messages.
+- Squash trivial WIP commits before merge.
+- Reference plan IDs in commit bodies where helpful.
 
-```ts
-// Allowed
-import { getCharacters } from '$modules/bible';
+## What we will reject
 
-// Forbidden — boundary violation, will fail lint
-import { getCharacters } from '$modules/bible/services/character-service';
-```
+- Hardcoded colors, pixels, or magic font sizes (token violation).
+- Cross-module imports that bypass the barrel.
+- New `export let` or `$:` reactivity in Svelte components.
+- Logic in `+page.svelte` / `+layout.svelte` that should live in a module service.
+- New `+server.ts` files that export helpers with arbitrary names.
+- Removing tests because they're red. Fix the cause.
 
-Running `pnpm run lint` will surface boundary violations. If one is flagged, restructure the import — do not suppress the ESLint rule. Violations are blocking.
+## What we love
 
-→ See [architecture.md](architecture.md) for the full boundary layer diagram.
-
----
-
-## Test Requirements
-
-Every feature or bug fix must ship with a test. The following coverage thresholds are enforced:
-
-- `src/lib/services/**` — **≥ 80% line coverage**
-- `src/lib/ai/**` — **≥ 80% line coverage**
-
-Run `pnpm run test:coverage` and open `coverage/index.html` to find coverage gaps before submitting a PR.
-
-→ See [testing.md](testing.md) for detailed Vitest patterns and mocking guidance.
+- Plans that capture trade-offs honestly.
+- Small, well-scoped PRs.
+- Tests that document behavior other tests assumed.
+- Doc updates with the code change (especially under `dev-docs/`).

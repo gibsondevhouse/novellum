@@ -1,5 +1,7 @@
 # Novellum Agent Ecosystem
 
+> Last verified: 2026-05-07
+
 Novellum is built around a dual-layer agent architecture. Rather than relying on a single general-purpose AI, the system delegates tasks to specialized, focused agents.
 
 This document serves as the master reference for both the **Meta-Agents** (used during development) and the **Runtime Agents** (used within the application).
@@ -31,16 +33,20 @@ Located in `src/lib/ai/`, these agents power the features that authors interact 
 
 ### The Functional Roster
 
-| Agent | Purpose | Triggers & Use Cases | Output |
-| :--- | :--- | :--- | :--- |
-| **BrainstormAgent** | Generates creative ideas based on minimal input. | Loglines, new character concepts, scene hooks. | List of structured ideas. |
-| **OutlineAgent** | Generates or refines structured outlines. | Creating initial acts/chapters, pacing improvements. | Hierarchical narrative nodes. |
-| **DraftAgent** | Generates narrative prose. | Writing new scenes, filling narrative gaps. | Narrative text block. |
-| **ContinuityAgent** | Detects inconsistencies in the story. | Running checks against timeline, lore, and character traits. | Structured issue/warning list. |
-| **EditAgent** | Improves clarity, flow, and prose quality. | Sentence refinement, developmental editing. | Line edit suggestions. |
-| **StyleAgent** | Ensures stylistic consistency. | Tone alignment, voice consistency checks. | Rewrite suggestions based on tone. |
-| **SummaryAgent** | Condenses content into structured summaries. | Auto-generating chapter recaps. | Concise summary strings. |
-| **RewriteAgent** | Provides alternative versions of existing text. | Adjusting pacing, shifting tone. | Multiple text options. |
+Status legend: **Shipped** = available in the app today. **Planned** = scoped, not yet implemented.
+
+| Agent | Status | Purpose | Triggers & Use Cases | Output |
+| :--- | :--- | :--- | :--- | :--- |
+| **ContinuityAgent** | Shipped | Detects inconsistencies in the story. | Running checks against timeline, lore, and character traits. | Structured issue/warning list. |
+| **EditAgent** | Shipped | Improves clarity, flow, and prose quality. | Sentence refinement, developmental editing. | Line edit suggestions. |
+| **RewriteAgent** | Shipped | Provides alternative versions of existing text. | Adjusting pacing, shifting tone. | Multiple text options. |
+| **StyleAgent** | Shipped | Ensures stylistic consistency. | Tone alignment, voice consistency checks. | Rewrite suggestions based on tone. |
+| **BrainstormAgent** | Planned | Generates creative ideas based on minimal input. | Loglines, new character concepts, scene hooks. | List of structured ideas. |
+| **OutlineAgent** | Planned | Generates or refines structured outlines. | Creating initial acts/chapters, pacing improvements. | Hierarchical narrative nodes. |
+| **DraftAgent** | Planned | Generates narrative prose. | Writing new scenes, filling narrative gaps. | Narrative text block. |
+| **SummaryAgent** | Planned | Condenses content into structured summaries. | Auto-generating chapter recaps. | Concise summary strings. |
+
+Shipped agents live under `src/lib/ai/<agent>-agent.ts`. See [dev-docs/03-ai/agents-map.md](./dev-docs/03-ai/agents-map.md) for the canonical breakdown.
 
 ---
 

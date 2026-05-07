@@ -25,13 +25,19 @@ This directory houses critical configuration and definitions for the Gemini CLI 
 
 ### 2. Product Agent Layer (`src/lib/ai/`)
 Runtime agents that power the Novellum application features.
-- **Core Agents**: `ContinuityAgent`, `EditAgent`, `RewriteAgent`, `StyleAgent`, `BrainstormAgent`, `OutlineAgent`, `DraftAgent`, `SummaryAgent`.
-- **Infrastructure**: `ContextEngine`, `PromptBuilder`, `ModelRouter`, `OpenRouterClient` (Streaming HTTP implementation).
-- **See also**: [`AGENTS.md`](./AGENTS.md) for a comprehensive breakdown of all agents.
+- **Shipped agents**: `ContinuityAgent`, `EditAgent`, `RewriteAgent`, `StyleAgent`.
+- **Planned agents**: `BrainstormAgent`, `OutlineAgent`, `DraftAgent`, `SummaryAgent`.
+- **Infrastructure**: `ContextEngine`, `PromptBuilder`, `ModelRouter`, `OpenRouterClient` (streaming HTTP via the `/api/ai` proxy).
+- **See also**: [`AGENTS.md`](./AGENTS.md) for the dual-layer agent reference.
 
 ### 3. Documentation & Planning (`dev-docs/`)
-- **`plans/`**: Holds strategic plans (Plan -> Stage -> Phase -> Part).
-- **Core Docs**: `architecture.md`, `agents-map.md`, `ai-pipeline.md`, `context-engine.md`, `modular-boundaries.md`, `prompt-system.md`.
+The canonical developer reference. New IA (2026-05):
+- `01-project/` — overview, roadmap, **journey** (chronological history).
+- `02-architecture/` — system, frontend, backend, routing, data-model, modular-boundaries, tauri-shell.
+- `03-ai/` — pipeline, agents-map, context-engine, prompt-system.
+- `04-modules/` — one page per module.
+- `05-workflow/` — dev-workflow, planning-conventions, testing, portability-runbook, release.
+- `plans/` — active and archived plans (Plan → Stage → Phase → Part).
 
 ## Development Conventions and Workflow
 
@@ -68,20 +74,29 @@ Functionality is organized by **vertical domain slices** (e.g., `project`, `worl
 
 ## Recent Accomplishments
 
-- **Plan-012 (Codebase Extraction)**: Major refactor of duplicated repository patterns and store CRUD boilerplate (~840 lines reduced).
-- **Refactor-010 (Visual Consistency)**: Enforced visual consistency across route families through baseline rulebooks and automated token checks.
-- **AI Engine Implementation**: Browser proxies to `/api/ai`; server-side OpenRouter provider in `src/lib/ai/providers/openrouter-provider.ts` with streaming support.
-- **Frontend Hardening**: Production-grade error boundaries, accessibility improvements, and design system enforcement.
+- **Plan-013 (Workspace Hierarchy Flow)**: Arc → Act → Chapter → Scene → Beat fully wired across all workspace modes.
+- **Plan-017 (World-Building Consolidation)**: Personae, Atlas, Archive, Threads, Chronicles unified under a single shell; legacy Story Bible deprecated with redirects.
+- **AI Pipeline (shipped)**: Server-side OpenRouter provider, `/api/ai` proxy with streaming, four runtime agents (Continuity, Edit, Rewrite, Style).
+- **Portability**: `.novellum.zip` import/export round-trip with snapshots and assets; Dexie scoped to portability only.
+- **Visual Consistency**: Token enforcement (`pnpm check:tokens`) and `eslint-plugin-boundaries` running in CI.
+- **Documentation Refactor (this pass)**: Full IA reset under `dev-docs/`, user/developer split under `novellum-docs/`, archive snapshots preserved.
 
 ## Current Focus (Active Plans)
 
-- **Plan-013 (Workspace Hierarchy Flow)**: Wiring the full Arc → Act → Chapter → Scene parent-child data flow across all workspace modes.
+- **Plan-018 (V1 Product Experience)** — drafting.
+- **Plan-019 (Pre-Release Hardening)** — drafting.
+- **Plan-020 (UI/UX Polish)** — drafting.
+- **Plan-021 (Reader Surface)** — drafting.
+- **Plan-022 (Settings IA)** — drafting.
+- **Plan-023 (Hub Dashboard)** — drafting.
+
+See [`dev-docs/plans/MASTER-PLAN.md`](./dev-docs/plans/MASTER-PLAN.md) for the canonical status board.
 
 ## Vulnerabilities and Fragilities
 
-- **Legacy Persistence**: Dexie code still exists in `src/lib/db`, `src/lib/migration`, and `src/modules/export` for migration and snapshotting. Be careful not to use it for new features.
-- **Transition State**: While Svelte 5 usage is high, some older components or patterns might still linger in less-frequented routes.
-- **Data Model Complexity**: The deep hierarchy (Arc/Act/Chapter/Scene) being implemented in Plan-013 requires careful foreign key management and UI filtering.
+- **Legacy Persistence**: Dexie remains in `src/lib/db` and `src/modules/export` strictly for portability snapshots. Do not use for new live reads/writes.
+- **Sidebar/active-project detection**: Path parsing is brittle on routes outside `/projects/<id>/...`. Verified gotcha — see `dev-docs/02-architecture/routing.md`.
+- **`+server.ts` export discipline**: ESLint restricts to handlers / `config` / `_`-prefixed exports. Helpers must live in sibling files.
 
 ## Plan Completion and Continuity Checklist
 
