@@ -59,7 +59,7 @@
 	.recovery-backdrop {
 		position: fixed;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.55);
+		background: var(--color-scrim-strong);
 		display: flex;
 		align-items: center;
 		justify-content: center;

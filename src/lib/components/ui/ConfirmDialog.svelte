@@ -76,7 +76,7 @@
 	}
 
 	.confirm-dialog::backdrop {
-		background: rgba(0, 0, 0, 0.6);
+		background: var(--color-scrim-strong);
 	}
 
 	.confirm-dialog__panel {

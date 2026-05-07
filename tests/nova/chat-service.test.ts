@@ -111,7 +111,6 @@ describe('sendNovaChat', () => {
 	it('flips assistant message to error on transport failure', async () => {
 		streamCompleteMock.mockImplementationOnce(async function* () {
 			throw new Error('Network down');
-			// eslint-disable-next-line no-unreachable
 			yield '';
 		});
 

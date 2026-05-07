@@ -46,7 +46,7 @@
 		font-size: var(--text-xs);
 		color: var(--color-text-secondary);
 		cursor: pointer;
-		transition: background-color 0.1s ease, color 0.1s ease;
+		transition: background-color var(--duration-fast) var(--ease-standard), color var(--duration-fast) var(--ease-standard);
 	}
 
 	.mode-btn:last-child {

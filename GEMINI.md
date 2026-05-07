@@ -75,28 +75,28 @@ Functionality is organized by **vertical domain slices** (e.g., `project`, `worl
 ## Recent Accomplishments
 
 - **Plan-013 (Workspace Hierarchy Flow)**: Arc → Act → Chapter → Scene → Beat fully wired across all workspace modes.
-- **Plan-017 (World-Building Consolidation)**: Personae, Atlas, Archive, Threads, Chronicles unified under a single shell; legacy Story Bible deprecated with redirects.
-- **AI Pipeline (shipped)**: Server-side OpenRouter provider, `/api/ai` proxy with streaming, four runtime agents (Continuity, Edit, Rewrite, Style).
-- **Portability**: `.novellum.zip` import/export round-trip with snapshots and assets; Dexie scoped to portability only.
-- **Visual Consistency**: Token enforcement (`pnpm check:tokens`) and `eslint-plugin-boundaries` running in CI.
-- **Documentation Refactor (this pass)**: Full IA reset under `dev-docs/`, user/developer split under `novellum-docs/`, archive snapshots preserved.
+- **Plan-017 (V1 Trust Foundation)**: SQLite source-of-truth, versioned migrations, backup/restore, BYOK security via OS keyring, autosave/recovery, desktop packaging.
+- **Plan-018 (V1 Product Experience)**: Export quality, editor writing-first refactor, hub trust cards, settings trust center, AI assistant V1 scope, onboarding, worldbuilding scope audit, design-system freeze, doc tracks, CI/release pipeline, licensing, QA + beta DoD.
+- **Plan-020 (Quick Fixes & Nova Identity)**: Nova identity prompt, OpenRouter key persistence fix, hub word count accuracy.
+- **Plan-022 (Settings IA)**: Categorized PillNav settings shell — Appearance, Defaults, Shortcuts, AI, Data — with typed preferences via `/api/db/preferences`.
+- **Plan-023 (Editor Redesign & Nova Copilot)**: Word-processor-style editor with toolbar PillNav, view-in-reader handoff, Nova right-panel copilot with chat + RAG and agentic stubs.
+- **Documentation Refactor (2026-05-07)**: Full IA reset under `dev-docs/`, user/developer split under `novellum-docs/`, archive snapshots preserved, project journey written for collaborators.
 
 ## Current Focus (Active Plans)
 
-- **Plan-018 (V1 Product Experience)** — drafting.
-- **Plan-019 (Pre-Release Hardening)** — drafting.
-- **Plan-020 (UI/UX Polish)** — drafting.
-- **Plan-021 (Reader Surface)** — drafting.
-- **Plan-022 (Settings IA)** — drafting.
-- **Plan-023 (Hub Dashboard)** — drafting.
+Two plans remain open. Neither blocks the next desktop build.
 
-See [`dev-docs/plans/MASTER-PLAN.md`](./dev-docs/plans/MASTER-PLAN.md) for the canonical status board.
+- **Plan-019 (Naming Consistency)** — `draft`. Codebase-wide alignment of route segments, module folders, and component names with `dev-docs/` terminology.
+- **Plan-021 (Reader Pagination)** — `draft`. Reader empty state, page margins/typography, and pagination engine.
+
+Next era of development: **full AI integration including image-generation models**. New plans will be drafted under `dev-docs/plans/` and tracked in [`dev-docs/plans/MASTER-PLAN.md`](./dev-docs/plans/MASTER-PLAN.md).
 
 ## Vulnerabilities and Fragilities
 
 - **Legacy Persistence**: Dexie remains in `src/lib/db` and `src/modules/export` strictly for portability snapshots. Do not use for new live reads/writes.
 - **Sidebar/active-project detection**: Path parsing is brittle on routes outside `/projects/<id>/...`. Verified gotcha — see `dev-docs/02-architecture/routing.md`.
 - **`+server.ts` export discipline**: ESLint restricts to handlers / `config` / `_`-prefixed exports. Helpers must live in sibling files.
+- **Naming drift** (covered by plan-019): some route segments and module folders disagree with current `dev-docs/` terminology. Cosmetic but worth closing before a major release.
 
 ## Plan Completion and Continuity Checklist
 

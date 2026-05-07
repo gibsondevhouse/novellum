@@ -40,3 +40,36 @@ if (typeof window !== 'undefined') {
 		configurable: true,
 	});
 }
+
+// jsdom does not implement matchMedia. Provide a minimal, stable shim so
+// components that subscribe to media queries (e.g. NovaPanel responsive layout)
+// can mount in unit tests.
+if (typeof window !== 'undefined' && typeof window.matchMedia !== 'function') {
+	const createMql = (query: string): MediaQueryList => {
+		const listeners = new Set<(ev: MediaQueryListEvent) => void>();
+		const mql = {
+			matches: false,
+			media: query,
+			onchange: null,
+			addEventListener: (_type: string, listener: (ev: MediaQueryListEvent) => void) => {
+				listeners.add(listener);
+			},
+			removeEventListener: (_type: string, listener: (ev: MediaQueryListEvent) => void) => {
+				listeners.delete(listener);
+			},
+			addListener: (listener: (ev: MediaQueryListEvent) => void) => {
+				listeners.add(listener);
+			},
+			removeListener: (listener: (ev: MediaQueryListEvent) => void) => {
+				listeners.delete(listener);
+			},
+			dispatchEvent: () => true,
+		} as unknown as MediaQueryList;
+		return mql;
+	};
+	Object.defineProperty(window, 'matchMedia', {
+		value: createMql,
+		writable: true,
+		configurable: true,
+	});
+}

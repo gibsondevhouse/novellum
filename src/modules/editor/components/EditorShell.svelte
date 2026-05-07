@@ -112,7 +112,7 @@
 		return data.scenes.findIndex((scene: Scene) => scene.id === activeScene.id);
 	});
 
-	const activeChapter = $derived.by((): Chapter | null => {
+	const _activeChapter = $derived.by((): Chapter | null => {
 		if (!activeScene) return null;
 		return data.chapters.find((chapter: Chapter) => chapter.id === activeScene.chapterId) ?? null;
 	});

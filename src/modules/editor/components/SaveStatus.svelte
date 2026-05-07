@@ -69,7 +69,7 @@
 		color: var(--color-text-muted, #888);
 		background: var(--color-surface-subtle, transparent);
 		border-radius: var(--radius-sm, 4px);
-		transition: color 200ms ease, background-color 200ms ease;
+		transition: color var(--duration-enter) var(--ease-standard), background-color var(--duration-enter) var(--ease-standard);
 	}
 	.save-status[data-tone='saving'] {
 		color: var(--color-accent, #6c8ef5);
@@ -79,6 +79,6 @@
 	}
 	.save-status[data-tone='failed'] {
 		color: var(--color-danger, #e03131);
-		background: var(--color-danger-soft, rgba(224, 49, 49, 0.08));
+		background: var(--color-danger-soft);
 	}
 </style>

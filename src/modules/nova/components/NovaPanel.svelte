@@ -29,12 +29,14 @@
 		projectId?: string | null;
 		activeSceneId?: string | null;
 		activeChapterId?: string | null;
+		onQuickPrompt?: (prompt: string) => void;
 	}
 
 	let {
 		projectId = null,
 		activeSceneId = null,
 		activeChapterId = null,
+		onQuickPrompt,
 	}: Props = $props();
 
 	type NovaChatMode = 'chat' | 'scribe' | 'research';
@@ -293,6 +295,7 @@
 		if (!(inputEl instanceof HTMLInputElement) || !inputEl.files) return;
 
 		const next = [...stagedAttachments];
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- local dedup, not reactive state
 		const seen = new Set(next.map((item) => `${item.name}:${item.size}:${item.mimeType}`));
 		for (const file of Array.from(inputEl.files)) {
 			const candidate: StagedAttachment = {
@@ -410,7 +413,7 @@
 </script>
 
 {#if novaPanel.isOpen}
-	<aside class="nova-panel" class:is-resizing={isResizing} aria-label="Copilot panel">
+	<aside class="nova-panel" class:is-resizing={isResizing} aria-label="Nova copilot">
 		<button
 			bind:this={resizeHandleEl}
 			type="button"
@@ -426,6 +429,14 @@
 			onpointerdown={beginResize}
 			onkeydown={handleResizeHandleKeydown}
 		></button>
+		<header class="nova-header">
+			<button
+				type="button"
+				class="nova-close"
+				aria-label="Close Nova"
+				onclick={() => novaPanel.close()}
+			>×</button>
+		</header>
 		{#if keyConfigured}
 			<div class="nova-session-tray" aria-label="Session controls">
 				{#if aiLoading}
@@ -447,6 +458,17 @@
 					{/snippet}
 				</EmptyStatePanel>
 			{:else}
+				{#if messages.length === 0}
+					<div class="nova-greeting">
+						<p class="nova-greeting-title">Hi, I'm Nova.</p>
+						<p class="nova-greeting-body">Ask me anything about your project.</p>
+						<button
+							type="button"
+							class="nova-quick-prompt"
+							onclick={() => onQuickPrompt?.('Summarize what we know so far.')}
+						>Summarize what we know so far</button>
+					</div>
+				{/if}
 				{#if messages.length > 0}
 					<NovaErrorBoundary
 						error={novaError}
@@ -530,7 +552,7 @@
 
 		<footer class="nova-footer">
 			<form
-				class="nova-composer"
+				class="nova-composer nova-input-form"
 				onsubmit={(event) => {
 					event.preventDefault();
 					void submitDraft();
@@ -553,7 +575,7 @@
 							aria-label="Copilot chat mode"
 							title={`${selectedModeMeta.label} mode`}
 						>
-							{#each CHAT_MODE_OPTIONS as option}
+							{#each CHAT_MODE_OPTIONS as option (option.value)}
 								<option value={option.value}>{option.shortLabel}</option>
 							{/each}
 						</select>
@@ -584,12 +606,12 @@
 					{#if isStreaming}
 						<button
 							type="button"
-							class="nova-action nova-action-stop"
+							class="nova-action nova-action-stop nova-action-abort"
 							onclick={abortActiveStream}
 							aria-label="Abort response"
 						>
 							<span class="nova-stop-glyph" aria-hidden="true"></span>
-							<span class="sr-only">Stop</span>
+							Stop
 						</button>
 					{:else}
 						<button
@@ -755,7 +777,7 @@
 		height: 6px;
 		border-radius: 50%;
 		background: var(--color-text-muted);
-		animation: nova-typing-pulse 1s infinite ease-in-out;
+		animation: nova-typing-pulse var(--duration-pulse) infinite var(--ease-editorial);
 	}
 
 	.nova-session-tray {
@@ -765,6 +787,70 @@
 		padding: var(--space-2) var(--space-4);
 		border-bottom: 1px solid var(--color-border-default);
 		background: var(--color-surface-ground);
+	}
+
+	.nova-header {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		padding: var(--space-2) var(--space-4);
+	}
+
+	.nova-close {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: var(--space-7);
+		height: var(--space-7);
+		border: 0;
+		border-radius: var(--radius-sm);
+		background: transparent;
+		color: var(--color-text-secondary);
+		font-size: var(--text-lg);
+		line-height: 1;
+		cursor: pointer;
+	}
+
+	.nova-close:hover {
+		background: var(--color-surface-overlay);
+		color: var(--color-text-primary);
+	}
+
+	.nova-greeting {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+		padding: var(--space-6) var(--space-2);
+		text-align: center;
+	}
+
+	.nova-greeting-title {
+		margin: 0;
+		font-size: var(--text-lg);
+		font-weight: 600;
+		color: var(--color-text-primary);
+	}
+
+	.nova-greeting-body {
+		margin: 0;
+		font-size: var(--text-sm);
+		color: var(--color-text-secondary);
+	}
+
+	.nova-quick-prompt {
+		align-self: center;
+		margin-top: var(--space-2);
+		padding: var(--space-2) var(--space-4);
+		border: 1px solid var(--color-border-default);
+		border-radius: var(--radius-md);
+		background: var(--color-surface-overlay);
+		color: var(--color-text-primary);
+		font-size: var(--text-sm);
+		cursor: pointer;
+	}
+
+	.nova-quick-prompt:hover {
+		background: var(--color-surface-raised);
 	}
 
 	.nova-body {
@@ -819,7 +905,7 @@
 		border-radius: var(--radius-md);
 		font-size: var(--text-sm);
 		line-height: var(--leading-relaxed);
-		word-wrap: break-word;
+		overflow-wrap: break-word;
 	}
 
 	.nova-bubble-user {
@@ -885,7 +971,7 @@
 		height: 6px;
 		border-radius: 50%;
 		background: var(--color-text-muted);
-		animation: nova-typing-pulse 1s infinite ease-in-out;
+		animation: nova-typing-pulse var(--duration-pulse) infinite var(--ease-editorial);
 	}
 
 	.nova-typing span:nth-child(2) {
@@ -1035,7 +1121,7 @@
 		padding: 0;
 		margin: -1px;
 		overflow: hidden;
-		clip: rect(0, 0, 0, 0);
+		clip-path: inset(50%);
 		white-space: nowrap;
 		border: 0;
 	}

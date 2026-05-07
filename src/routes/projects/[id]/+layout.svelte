@@ -100,7 +100,6 @@
 {#if showExportModal && ExportModal}
 	<ExportModal
 		projectId={project.id}
-		projectTitle={project.title}
 		open={showExportModal}
 		onClose={closeExportModal}
 	/>

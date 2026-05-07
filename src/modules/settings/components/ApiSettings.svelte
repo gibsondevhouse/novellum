@@ -208,13 +208,13 @@
 	}
 
 	.status-chip--ok {
-		background: var(--color-status-ok-bg, rgba(34, 197, 94, 0.15));
-		color: var(--color-status-ok-fg, rgb(74, 222, 128));
+		background: var(--color-status-ok-bg, var(--color-success-bg));
+		color: var(--color-status-ok-fg, var(--color-success-fg));
 	}
 
 	.status-chip--warn {
-		background: var(--color-status-warn-bg, rgba(250, 204, 21, 0.15));
-		color: var(--color-status-warn-fg, rgb(250, 204, 21));
+		background: var(--color-status-warn-bg, var(--color-warning-bg));
+		color: var(--color-status-warn-fg, var(--color-warning-fg));
 	}
 
 	.setting-group {

@@ -227,7 +227,7 @@
 
 	.shortcuts__row {
 		border-bottom: 1px solid var(--color-border-subtle);
-		transition: background 120ms ease;
+		transition: background var(--duration-fast) var(--ease-standard);
 	}
 
 	.shortcuts__row:last-child {
@@ -283,7 +283,7 @@
 		font-size: var(--text-sm);
 		font-weight: var(--font-weight-medium);
 		color: var(--color-accent-primary);
-		animation: shortcuts-pulse 1.2s ease-in-out infinite;
+		animation: shortcuts-pulse var(--duration-pulse) var(--ease-editorial) infinite;
 	}
 
 	.shortcuts__escape-hint {
@@ -303,7 +303,7 @@
 		border-radius: var(--radius-sm);
 		border: 1px solid transparent;
 		cursor: pointer;
-		transition: background 120ms ease, border-color 120ms ease;
+		transition: background var(--duration-fast) var(--ease-standard), border-color var(--duration-fast) var(--ease-standard);
 	}
 
 	.shortcuts__btn--edit,

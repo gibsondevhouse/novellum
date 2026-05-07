@@ -195,6 +195,10 @@ function checkShadowTokens(css, startLine) {
 			if (/^(VAR_REMOVED|none|inherit|unset|initial|revert)\s*(!important)?$/i.test(value)) {
 				continue;
 			}
+			// Allow `inset VAR_REMOVED` (token-driven inset focus rings)
+			if (/^inset\s+VAR_REMOVED\s*(!important)?$/i.test(value)) {
+				continue;
+			}
 			violations.push({
 				rule: 'RULE-T5',
 				line: lineNum,
