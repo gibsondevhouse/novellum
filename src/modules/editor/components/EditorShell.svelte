@@ -21,6 +21,7 @@
 	import SceneNavigator from './SceneNavigator.svelte';
 	import SceneContextPanel from './SceneContextPanel.svelte';
 	import SceneCompassPanel from './SceneCompassPanel.svelte';
+	import SceneSignalNudge from './SceneSignalNudge.svelte';
 	import { useSceneSignals } from '../services/scene-signals.svelte.js';
 	import { countWords } from '../services/scene-analysis-utils.js';
 	import type { OutcomeType, SceneLengthEstimate, SceneDefinition } from '../services/scene-signals.svelte.js';
@@ -417,6 +418,13 @@
 				onClose={() => editorPreferences.setMode('writing')}
 			/>
 		{/if}
+
+		<SceneSignalNudge
+			signals={liveSignals}
+			sceneGoal={quickIntent.goal || sceneDefinition.sceneGoal}
+			sceneId={editorState.activeSceneId}
+		/>
+
 		<footer class="editor-footer" aria-label="Writing progress">
 			<div class="progress-block">
 				<span>Scene progress</span>
@@ -503,6 +511,7 @@
 	}
 
 	.editor-area {
+		position: relative;
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
