@@ -1,6 +1,3 @@
-/**
- * plan-023 stage-006 phase-002 — stub tool handler tests.
- */
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
 	STUB_TOOLS,
@@ -36,7 +33,7 @@ describe('stub-tools', () => {
 	});
 
 	it.each(EXPECTED_IDS)(
-		'each stub handler returns not-yet-supported with output=null and a plan-XXX message: %s',
+		'each stub handler returns not-yet-supported with output=null and a message containing the tool id: %s',
 		async (toolId) => {
 			registerStubTools();
 			const entry = getTool(toolId);
@@ -50,7 +47,7 @@ describe('stub-tools', () => {
 			expect(result.status).toBe('not-yet-supported');
 			expect(result.output).toBeNull();
 			expect(result.error).toContain(toolId);
-			expect(result.error).toContain('plan-XXX');
+			expect(result.error).toContain('not yet implemented');
 		},
 	);
 
@@ -64,7 +61,7 @@ describe('stub-tools', () => {
 		});
 		expect(result.status).toBe('not-yet-supported');
 		expect(result.output).toBeNull();
-		expect(result.error).toContain('plan-XXX');
+		expect(result.error).toContain('continuity.scan-scene');
 	});
 
 	it('every stub definition declares a JSONSchema-shaped inputSchema', () => {
