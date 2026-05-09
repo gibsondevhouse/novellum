@@ -9,8 +9,8 @@ import { describe, expect, it } from 'vitest';
  * the defaults store and applies `defaults.readerView` via `setReaderMode`.
  * Source-string regression because the behavior is wired through onMount.
  */
-describe('books/[id]/+page.svelte — default reader view', () => {
-	const source = readFileSync(resolve('src/routes/books/[id]/+page.svelte'), 'utf8');
+describe('ReaderExperience — default reader view', () => {
+	const source = readFileSync(resolve('src/modules/reader/components/ReaderExperience.svelte'), 'utf8');
 
 	it('imports the defaults store', () => {
 		expect(source).toContain("from '$lib/stores/defaults.svelte.js'");

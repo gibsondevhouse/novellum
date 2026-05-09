@@ -106,7 +106,7 @@ function estimateParagraphLines(text: string, charsPerLine: number): number {
 	return Math.max(1, Math.ceil(length / charsPerLine));
 }
 
-function extractText(html: string): string {
+export function extractReadableText(html: string): string {
 	if (!html.trim()) return '';
 	if (typeof DOMParser === 'undefined') {
 		// Fallback: very light HTML strip for non-DOM environments.
@@ -314,7 +314,7 @@ export function buildReaderPages(
 
 		chapter.scenes.forEach((scene, sceneIndex) => {
 			const sceneTitle = scene.title || `Scene ${sceneIndex + 1}`;
-			const text = extractText(scene.content);
+			const text = extractReadableText(scene.content);
 			if (!text) {
 				pages.push({
 					id: `scene:${scene.id}:empty`,
