@@ -7,10 +7,12 @@
 		reorderBeats,
 		getBeatsBySceneId,
 	} from '$modules/editor/services/beat-repository.js';
+	import { goto } from '$app/navigation';
 	import {
 		getProjectMetadata,
 		setProjectMetadata,
 	} from '$lib/project-metadata.js';
+	import { WorkspaceInspector, GhostButton } from '$lib/components/ui/index.js';
 
 	type OutcomeType = 'win' | 'loss' | 'partial' | 'reversal' | '';
 	type DraftStatus = 'idea' | 'draft' | 'revised' | 'locked' | '';
@@ -287,7 +289,9 @@
 		[ids[index], ids[index + 1]] = [ids[index + 1], ids[index]];
 		void reorderBeatsLocal(ids);
 	}
-	import { WorkspaceInspector, GhostButton } from '$lib/components/ui/index.js';
+	function draftThisScene(): void {
+		void goto(`/projects/${projectId}/editor?sceneId=${scene.id}`);
+	}
 </script>
 
 <WorkspaceInspector aria-label="Scene editor">
@@ -301,7 +305,18 @@
 				placeholder="Scene title"
 				aria-label="Scene title"
 			/>
-			<span class="scene-number">Scene {sceneNumber}</span>
+			<div class="scene-header__meta">
+				<span class="scene-number">Scene {sceneNumber}</span>
+				<button
+					type="button"
+					class="draft-cta"
+					onclick={draftThisScene}
+					title="Open this scene in the editor"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+					Draft
+				</button>
+			</div>
 		</div>
 		<input
 			class="scene-summary"
@@ -663,6 +678,32 @@
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
 		color: var(--color-text-muted);
+	}
+
+	.scene-header__meta {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+		flex-shrink: 0;
+	}
+
+	.draft-cta {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-1);
+		padding: 3px 10px;
+		background: var(--color-nova-blue);
+		color: #fff;
+		border: none;
+		border-radius: var(--radius-sm);
+		font-size: var(--text-xs);
+		font-weight: var(--font-weight-medium);
+		cursor: pointer;
+		transition: opacity var(--duration-fast) var(--ease-standard);
+	}
+
+	.draft-cta:hover {
+		opacity: 0.85;
 	}
 
 	.scene-summary,

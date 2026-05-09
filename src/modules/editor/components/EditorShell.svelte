@@ -221,42 +221,44 @@
 			// Reconcile with SQLite-canonical store (clarity is shared with the outliner).
 			const pid = scene.projectId;
 			const sid = scene.id;
-			void getProjectMetadata<Partial<SceneDefinition> | null>(
-				pid,
-				'scene',
-				sid,
-				'clarity',
-				null,
-			).then((remote) => {
-				if (!remote || sid !== currentSceneId) return;
-				sceneDefinition = {
-					sceneGoal: remote.sceneGoal ?? sceneDefinition.sceneGoal,
-					immediateObstacle: remote.immediateObstacle ?? sceneDefinition.immediateObstacle,
-					tensionSource: remote.tensionSource ?? sceneDefinition.tensionSource,
-					turningPoint: remote.turningPoint ?? sceneDefinition.turningPoint,
-					outcome: (remote.outcome as OutcomeType) ?? sceneDefinition.outcome,
-					startState: remote.startState ?? sceneDefinition.startState,
-					endState: remote.endState ?? sceneDefinition.endState,
-					draftStatus: remote.draftStatus ?? sceneDefinition.draftStatus,
-					lengthEstimate:
-						(remote.lengthEstimate as SceneLengthEstimate) ?? sceneDefinition.lengthEstimate,
-				};
-			});
-			void getProjectMetadata<Partial<QuickIntent> | null>(
-				pid,
-				'scene',
-				sid,
-				'quickIntent',
-				null,
-			).then((remote) => {
-				if (!remote || sid !== currentSceneId) return;
-				quickIntent = {
-					goal: remote.goal ?? quickIntent.goal,
-					obstacle: remote.obstacle ?? quickIntent.obstacle,
-					outcome: (remote.outcome as OutcomeType) ?? quickIntent.outcome,
-				};
-				// Phase 4: removed localStorage.setItem cache write
-			});
+			void (async () => {
+				const clarity = await getProjectMetadata<Partial<SceneDefinition> | null>(
+					pid, 'scene', sid, 'clarity', null,
+				);
+				if (sid !== currentSceneId) return;
+				if (clarity) {
+					sceneDefinition = {
+						sceneGoal: clarity.sceneGoal ?? sceneDefinition.sceneGoal,
+						immediateObstacle: clarity.immediateObstacle ?? sceneDefinition.immediateObstacle,
+						tensionSource: clarity.tensionSource ?? sceneDefinition.tensionSource,
+						turningPoint: clarity.turningPoint ?? sceneDefinition.turningPoint,
+						outcome: (clarity.outcome as OutcomeType) ?? sceneDefinition.outcome,
+						startState: clarity.startState ?? sceneDefinition.startState,
+						endState: clarity.endState ?? sceneDefinition.endState,
+						draftStatus: clarity.draftStatus ?? sceneDefinition.draftStatus,
+						lengthEstimate: (clarity.lengthEstimate as SceneLengthEstimate) ?? sceneDefinition.lengthEstimate,
+					};
+				}
+				const savedIntent = await getProjectMetadata<Partial<QuickIntent> | null>(
+					pid, 'scene', sid, 'quickIntent', null,
+				);
+				if (sid !== currentSceneId) return;
+				if (savedIntent) {
+					quickIntent = {
+						goal: savedIntent.goal ?? quickIntent.goal,
+						obstacle: savedIntent.obstacle ?? quickIntent.obstacle,
+						outcome: (savedIntent.outcome as OutcomeType) ?? quickIntent.outcome,
+					};
+				} else if (sceneDefinition.sceneGoal) {
+					// Auto-seed Quick Intent from scene definition when none is saved yet.
+					quickIntent = {
+						goal: sceneDefinition.sceneGoal,
+						obstacle: sceneDefinition.immediateObstacle,
+						outcome: sceneDefinition.outcome,
+					};
+					void setProjectMetadata<QuickIntent>(pid, 'scene', sid, 'quickIntent', quickIntent);
+				}
+			})();
 		}
 	});
 
