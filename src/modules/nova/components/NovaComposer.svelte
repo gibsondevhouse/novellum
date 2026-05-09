@@ -5,6 +5,7 @@
 -->
 <script lang="ts">
 	import { novaSession } from '../stores/nova-session.svelte.js';
+	import { novaPanel } from '../stores/nova-panel.svelte.js';
 	import { sendNovaChat } from '../services/chat-service.js';
 
 	type NovaChatMode = 'chat' | 'scribe' | 'research';
@@ -72,6 +73,14 @@
 		return 'Research mode is coming soon: web-backed narrative research.';
 	});
 	const canSubmit = $derived(draft.trim().length > 0 && !isStreaming && !isResearchMode);
+
+	$effect(() => {
+		const pending = novaPanel.pendingPrompt;
+		if (pending !== null) {
+			draft = pending;
+			novaPanel.clearPendingPrompt();
+		}
+	});
 
 	function classifyAttachmentKind(file: File): StagedAttachment['kind'] {
 		if (file.type.startsWith('image/')) return 'image';

@@ -29,6 +29,8 @@
 		ontick?: () => void;
 		/** Spellcheck toggle, applied to the contenteditable host. */
 		spellcheck?: boolean;
+		/** Called when the user clicks "Ask Nova" with selected text. */
+		onAskNova?: (selectedText: string) => void;
 	}
 
 	let {
@@ -37,6 +39,7 @@
 		oneditorReady,
 		ontick,
 		spellcheck = true,
+		onAskNova,
 	}: Props = $props();
 
 	let editorHost: HTMLElement;
@@ -149,25 +152,32 @@
 				return;
 			}
 
-			const editorRect = editorHost?.getBoundingClientRect();
-			if (!editorRect) {
-				bubbleMenuVisible = false;
-				return;
-			}
+			// coordsAtPos returns viewport coordinates; since the bubble menu uses
+			// position: fixed, we use viewport coords directly without editorRect.
+			const menuWidth = bubbleMenuHost?.offsetWidth ?? 240;
+			const menuHeight = bubbleMenuHost?.offsetHeight ?? 40;
+			const vw = typeof window !== 'undefined' ? window.innerWidth : 1280;
 
-			const menuRect = bubbleMenuHost?.getBoundingClientRect();
-			if (!menuRect) {
-				bubbleMenuVisible = false;
-				return;
-			}
+			const rawTop = start.top - menuHeight - 10;
+			const rawLeft = (start.left + end.left) / 2 - menuWidth / 2;
 
-			const top = start.top - editorRect.top - 50;
-			const left = (start.left + end.left) / 2 - editorRect.left - menuRect.width / 2;
-
-			bubbleMenuPosition = { top, left };
+			bubbleMenuPosition = {
+				top: Math.max(8, rawTop),
+				left: Math.max(8, Math.min(rawLeft, vw - menuWidth - 8)),
+			};
 			bubbleMenuVisible = true;
 		} catch {
 			bubbleMenuVisible = false;
+		}
+	}
+
+	function getSelectedText(): string {
+		if (!editor) return '';
+		try {
+			const { from, to } = editor.state.selection;
+			return editor.state.doc.textBetween(from, to, ' ');
+		} catch {
+			return '';
 		}
 	}
 
@@ -223,7 +233,16 @@
 			title="Italic"
 			aria-label="Toggle italic"
 		>
-			<span class="bubble-icon">I</span>
+			<span class="bubble-icon bubble-icon--italic">I</span>
+		</GhostButton>
+		<GhostButton
+			type="button"
+			class={`bubble-btn ${pressed(() => editor!.isActive('underline')) ? 'active' : ''}`}
+			onclick={() => exec(() => editor!.chain().focus().toggleUnderline().run())}
+			title="Underline"
+			aria-label="Toggle underline"
+		>
+			<span class="bubble-icon bubble-icon--underline">U</span>
 		</GhostButton>
 		<GhostButton
 			type="button"
@@ -232,7 +251,7 @@
 			title="Strikethrough"
 			aria-label="Toggle strikethrough"
 		>
-			<span class="bubble-icon">S</span>
+			<span class="bubble-icon bubble-icon--strike">S</span>
 		</GhostButton>
 		<span class="bubble-divider"></span>
 		<GhostButton
@@ -271,6 +290,22 @@
 		>
 			<span class="bubble-icon">"</span>
 		</GhostButton>
+		{#if onAskNova}
+			<span class="bubble-divider"></span>
+			<GhostButton
+				type="button"
+				class="bubble-btn bubble-btn--nova"
+				onclick={() => {
+					const text = getSelectedText();
+					if (text) onAskNova(text);
+				}}
+				title="Ask Nova about this selection"
+				aria-label="Ask Nova about selected text"
+			>
+				<svg class="bubble-nova-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.88 5.76a2 2 0 0 0 1.27 1.27L21 12l-5.85 1.97a2 2 0 0 0-1.27 1.27L12 21l-1.88-5.76a2 2 0 0 0-1.27-1.27L3 12l5.85-1.97a2 2 0 0 0 1.27-1.27L12 3z"/></svg>
+				<span class="bubble-nova-label">Nova</span>
+			</GhostButton>
+		{/if}
 	</div>
 </div>
 
@@ -455,6 +490,42 @@
 		font-family: var(--font-sans);
 		font-weight: 600;
 		letter-spacing: 0.02em;
+	}
+
+	.bubble-icon--italic {
+		font-style: italic;
+	}
+
+	.bubble-icon--underline {
+		text-decoration: underline;
+	}
+
+	.bubble-icon--strike {
+		text-decoration: line-through;
+	}
+
+	:global(.bubble-btn--nova) {
+		display: inline-flex;
+		align-items: center;
+		gap: 3px;
+		color: var(--color-nova-blue) !important;
+		opacity: 0.8;
+	}
+
+	:global(.bubble-btn--nova:hover) {
+		opacity: 1;
+		background: color-mix(in srgb, var(--color-nova-blue) 12%, transparent) !important;
+	}
+
+	.bubble-nova-icon {
+		display: block;
+		flex-shrink: 0;
+	}
+
+	.bubble-nova-label {
+		font-family: var(--font-sans);
+		font-size: 0.78rem;
+		font-weight: 600;
 	}
 
 	.bubble-divider {

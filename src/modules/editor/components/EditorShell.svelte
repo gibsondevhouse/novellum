@@ -369,6 +369,10 @@
 					oneditorReady={(ed) => (tipTapEditor = ed)}
 					ontick={() => (editorTick += 1)}
 					spellcheck={spellcheckEnabled}
+					onAskNova={(text) =>
+						novaPanel.openWithPrompt(
+							`About this passage:\n\n"${text.slice(0, 500)}"\n\n`,
+						)}
 				/>
 			</div>
 		{/if}
