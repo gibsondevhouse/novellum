@@ -12,6 +12,7 @@ import type {
 	ChatInstruction,
 	WritingStyle
 } from '$lib/db/domain-types';
+import type { SceneIntentSnapshot } from '$lib/stores/scene-intent.svelte.js';
 
 export type ContextPolicy =
 	| 'scene_only'
@@ -93,6 +94,13 @@ export interface AiContext {
 	systemPrompts?: SystemPrompt[];
 	chatInstructions?: ChatInstruction[];
 	writingStyles?: WritingStyle[];
+	/**
+	 * Writer-defined intent + live writing signals for the active scene.
+	 * Published by the editor through `$lib/stores/scene-intent`. Lets Nova
+	 * answer with awareness of what the writer set out to do, not just the
+	 * prose they have produced so far.
+	 */
+	sceneIntent?: SceneIntentSnapshot;
 }
 
 // Legacy types — kept for backward compatibility with existing consumers

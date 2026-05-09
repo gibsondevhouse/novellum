@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { novaPanel } from '$modules/nova';
+	import { sceneIntent } from '$lib/stores/scene-intent.svelte.js';
 	import { editorState } from '../stores/editor.svelte.js';
 	import * as autosaveService from '../services/autosave-service.js';
 	import ManuscriptEditorPane from './ManuscriptEditorPane.svelte';
@@ -114,6 +115,38 @@
 	);
 
 	const { activeWordCount, sceneTargetWords, sceneProgress, pacingHint, liveSignals, progressFlags, sceneCompassRows } = signals;
+
+	$effect(() => {
+		const sceneId = editorState.activeSceneId;
+		if (!sceneId) {
+			sceneIntent.clear();
+			return;
+		}
+		sceneIntent.set({
+			sceneId,
+			quickGoal: quickIntent.goal,
+			quickObstacle: quickIntent.obstacle,
+			quickOutcome: quickIntent.outcome,
+			sceneGoal: sceneDefinition.sceneGoal,
+			immediateObstacle: sceneDefinition.immediateObstacle,
+			tensionSource: sceneDefinition.tensionSource,
+			turningPoint: sceneDefinition.turningPoint,
+			outcome: sceneDefinition.outcome,
+			startState: sceneDefinition.startState,
+			endState: sceneDefinition.endState,
+			liveSignals: signals.liveSignals,
+			progressFlags: signals.progressFlags,
+			pacingHint: signals.pacingHint,
+			wordCount: signals.activeWordCount,
+			targetWords: signals.sceneTargetWords,
+		});
+	});
+
+	$effect(() => {
+		return () => {
+			sceneIntent.clear();
+		};
+	});
 
 	const totalCurrentWords = $derived.by(() => {
 		return data.scenes.reduce(

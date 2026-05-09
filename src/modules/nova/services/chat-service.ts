@@ -17,6 +17,7 @@ import { buildPrompt } from '$lib/ai/prompt-builder.js';
 import { resolveTask } from '$lib/ai/task-resolver.js';
 import type { AiContext, AiTask, AIRequestPayload, UiContext } from '$lib/ai/types.js';
 import { getSelectedModel } from '$lib/stores/model-selection.svelte.js';
+import { sceneIntent } from '$lib/stores/scene-intent.svelte.js';
 import { novaSession } from '../stores/nova-session.svelte.js';
 import { buildRagContext } from './context-hooks.js';
 import { isNovaAgenticEnabled } from './feature-flags.js';
@@ -75,6 +76,13 @@ export async function sendNovaChat(input: SendChatInput): Promise<void> {
 	} catch {
 		// Fall back to empty context — the chat still runs.
 		aiContext = EMPTY_AI_CONTEXT;
+	}
+
+	// Fold in the writer's live scene intent + signals when they apply to
+	// the active scene. Editor publishes this through the scene-intent store.
+	const intentSnapshot = sceneIntent.current;
+	if (intentSnapshot && input.activeSceneId && intentSnapshot.sceneId === input.activeSceneId) {
+		aiContext = { ...aiContext, sceneIntent: intentSnapshot };
 	}
 
 	const contextItemCount =
