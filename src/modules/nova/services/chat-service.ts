@@ -91,11 +91,6 @@ export async function sendNovaChat(input: SendChatInput): Promise<void> {
 	const streaming = novaSession.beginStream('nova');
 	const signal = novaSession.getSignal(streaming.id);
 
-	// stage-006: tool dispatch is not yet wired end-to-end. When the
-	// agentic flag is enabled we *advertise* the registered tool
-	// definitions to OpenRouter, but the chat loop does NOT yet parse
-	// tool-call deltas from the response. Future stages thread tool
-	// calls back through `dispatchTool`.
 	const payload: AIRequestPayload & { tools?: ToolDefinition[] } = {
 		model: getSelectedModel(),
 		messages: [
@@ -103,6 +98,9 @@ export async function sendNovaChat(input: SendChatInput): Promise<void> {
 			{ role: 'user', content: trimmed },
 		],
 	};
+	// Tool advertisement is guarded by the agentic flag (off by default).
+	// The streaming loop does not yet parse tool_use blocks — enabling
+	// this flag is intentionally experimental until the parse loop lands.
 	if (isNovaAgenticEnabled()) {
 		payload.tools = listTools();
 	}

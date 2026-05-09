@@ -1,10 +1,10 @@
 /**
- * plan-023 stage-006 phase-002 — Stub tool handlers.
+ * Stub tool handlers for Nova's four planned agentic tools.
  *
- * Registers the four agentic tool slots with no-op handlers that
- * return `not-yet-supported`. Real implementations land in plan-024
- * (worldbuilding), plan-025 (continuity), plan-026 (outline). The
- * literal placeholder `plan-XXX` is preserved in error strings.
+ * These slots are registered so the tool registry is populated for
+ * incremental implementation. Real handlers replace these one-by-one
+ * as each integration lands. Tools are only advertised to the model
+ * when PUBLIC_NOVELLUM_NOVA_AGENTIC is enabled (default: off).
  */
 
 import type { ToolDefinition, ToolHandler } from '../types.js';
@@ -14,7 +14,7 @@ function notYetSupported(toolId: string): ToolHandler {
 	return async () => ({
 		status: 'not-yet-supported',
 		output: null,
-		error: `Tool ${toolId} is registered but not yet wired (planned for plan-XXX).`,
+		error: `Tool '${toolId}' is not yet implemented.`,
 	});
 }
 

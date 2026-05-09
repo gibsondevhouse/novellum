@@ -1,5 +1,6 @@
 export * from './constants.js';
 export * from './services/continuity-repository.js';
+export * from './services/run-check-service.js';
 export * from './stores/continuity-store.svelte.js';
 
 // Components

@@ -11,7 +11,7 @@ import type {
 	NovaContextRequestPayload,
 	NovaContextResponsePayload,
 	NovaContextTruncationEntry,
-} from '$modules/ai/types.js';
+} from '$lib/ai/nova-context-types.js';
 import type Database from 'better-sqlite3';
 
 const DEFAULT_MAX_CONTEXT_CHARS = 100_000;

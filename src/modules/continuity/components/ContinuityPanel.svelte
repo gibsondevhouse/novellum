@@ -9,6 +9,7 @@
 		dismissIssue,
 		reopenIssue,
 	} from '../stores/continuity-store.svelte.js';
+	import { runContinuityCheck } from '../services/run-check-service.js';
 	import IssueGroup from './IssueGroup.svelte';
 	import { ISSUE_TYPES } from '../constants.js';
 	import { SurfacePanel, EmptyStatePanel } from '$lib/components/ui/index.js';
@@ -16,6 +17,21 @@
 	let { projectId }: { projectId: string } = $props();
 
 	let showAll = $state(false);
+	let checking = $state(false);
+	let checkError = $state<string | null>(null);
+
+	async function handleRunCheck() {
+		checking = true;
+		checkError = null;
+		try {
+			await runContinuityCheck(projectId);
+			await loadIssues(projectId);
+		} catch (err) {
+			checkError = err instanceof Error ? err.message : 'Continuity check failed.';
+		} finally {
+			checking = false;
+		}
+	}
 
 	const visibleIssues = $derived(showAll ? getIssues() : getOpenIssues());
 	const allIssues = $derived(getIssues());
@@ -45,11 +61,24 @@
 				<p class="panel-eyebrow">Continuity Triage</p>
 				<h1 id="consistency-title">Consistency Issues</h1>
 			</div>
-			<label class="show-all-toggle">
-				<input type="checkbox" bind:checked={showAll} />
-				Show resolved and dismissed
-			</label>
+			<div class="toolbar-actions">
+				<label class="show-all-toggle">
+					<input type="checkbox" bind:checked={showAll} />
+					Show resolved and dismissed
+				</label>
+				<button
+					class="run-check-btn"
+					onclick={handleRunCheck}
+					disabled={checking}
+					aria-busy={checking}
+				>
+					{checking ? 'Analysing…' : 'Run Check'}
+				</button>
+			</div>
 		</div>
+		{#if checkError}
+			<p class="check-error" role="alert">{checkError}</p>
+		{/if}
 		<div class="metrics-grid" aria-label="Issue summary">
 			<div class="metric-card">
 				<span class="metric-label">Open View</span>
@@ -74,7 +103,7 @@
 		<EmptyStatePanel
 			class="consistency-empty"
 			title="All clear"
-			description="No issues are currently flagged for this view. Keep this panel healthy by running continuity checks after major plot or lore edits."
+			description="No issues flagged for this view. Use 'Run Check' to scan your project for timeline, character, lore, and plot-thread inconsistencies."
 		/>
 	{:else}
 		<div class="groups-list">
@@ -127,6 +156,45 @@
 
 	.panel-toolbar h1 {
 		margin: 0;
+	}
+
+	.toolbar-actions {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		flex-wrap: wrap;
+	}
+
+	.run-check-btn {
+		padding: var(--space-2) var(--space-4);
+		background: var(--color-teal);
+		color: var(--color-black);
+		border: none;
+		border-radius: var(--radius-md);
+		font-size: var(--text-sm);
+		font-weight: var(--font-weight-medium);
+		cursor: pointer;
+		transition: background-color var(--transition-color);
+		white-space: nowrap;
+	}
+
+	.run-check-btn:hover:not(:disabled) {
+		background: var(--color-teal-dark);
+	}
+
+	.run-check-btn:disabled {
+		opacity: 0.65;
+		cursor: not-allowed;
+	}
+
+	.check-error {
+		margin: 0;
+		padding: var(--space-2) var(--space-3);
+		border-radius: var(--radius-md);
+		background: color-mix(in srgb, var(--color-red, #e55) 15%, transparent);
+		border: 1px solid color-mix(in srgb, var(--color-red, #e55) 40%, transparent);
+		color: var(--color-text-primary);
+		font-size: var(--text-sm);
 	}
 
 	.show-all-toggle {
