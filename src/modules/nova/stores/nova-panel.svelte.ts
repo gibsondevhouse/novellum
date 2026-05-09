@@ -28,6 +28,7 @@ function persist(value: boolean): void {
 
 class NovaPanelStore {
 	isOpen = $state<boolean>(readInitial());
+	pendingPrompt = $state<string | null>(null);
 
 	open(): void {
 		this.isOpen = true;
@@ -42,6 +43,16 @@ class NovaPanelStore {
 	toggle(): void {
 		this.isOpen = !this.isOpen;
 		persist(this.isOpen);
+	}
+
+	openWithPrompt(prompt: string): void {
+		this.pendingPrompt = prompt;
+		this.isOpen = true;
+		persist(true);
+	}
+
+	clearPendingPrompt(): void {
+		this.pendingPrompt = null;
 	}
 }
 

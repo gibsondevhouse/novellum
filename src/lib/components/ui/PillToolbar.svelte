@@ -179,6 +179,10 @@
 	function isSnippet(value: unknown): value is Snippet {
 		return typeof value === 'function';
 	}
+
+	function isSvgIcon(value: string | Snippet): value is string {
+		return typeof value === 'string' && value.trimStart().startsWith('<svg');
+	}
 </script>
 
 <div
@@ -214,6 +218,9 @@
 			>
 				{#if isSnippet(item.icon)}
 					{@render item.icon()}
+				{:else if isSvgIcon(item.icon)}
+					<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+					{@html item.icon}
 				{:else}
 					<span class="pill-toolbar__icon">{item.icon}</span>
 				{/if}
@@ -241,6 +248,9 @@
 				>
 					{#if isSnippet(item.icon)}
 						{@render item.icon()}
+					{:else if isSvgIcon(item.icon)}
+						<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+						{@html item.icon}
 					{:else}
 						<span class="pill-toolbar__icon">{item.icon}</span>
 					{/if}

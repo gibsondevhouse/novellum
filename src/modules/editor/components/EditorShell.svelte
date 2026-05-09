@@ -20,21 +20,9 @@
 	import SceneNavigator from './SceneNavigator.svelte';
 	import SceneContextPanel from './SceneContextPanel.svelte';
 	import SceneCompassPanel from './SceneCompassPanel.svelte';
-
-	type OutcomeType = 'win' | 'loss' | 'partial' | 'reversal' | '';
-	type SceneLengthEstimate = 'short' | 'medium' | 'long' | '';
-
-	type SceneDefinition = {
-		sceneGoal: string;
-		immediateObstacle: string;
-		tensionSource: string;
-		turningPoint: string;
-		outcome: OutcomeType;
-		startState: string;
-		endState: string;
-		draftStatus: string;
-		lengthEstimate: SceneLengthEstimate;
-	};
+	import { useSceneSignals } from '../services/scene-signals.svelte.js';
+	import { countWords } from '../services/scene-analysis-utils.js';
+	import type { OutcomeType, SceneLengthEstimate, SceneDefinition } from '../services/scene-signals.svelte.js';
 
 	type QuickIntent = {
 		goal: string;
@@ -117,136 +105,15 @@
 		return data.chapters.find((chapter: Chapter) => chapter.id === activeScene.chapterId) ?? null;
 	});
 
-	const activeWordCount = $derived.by(() => countWords(activeContent));
-	const normalizedContent = $derived.by(() => normalizeText(activeContent));
+	const activeGoal = $derived(quickIntent.goal.trim() || sceneDefinition.sceneGoal.trim());
 
-	const activeGoal = $derived.by(() => {
-		return quickIntent.goal.trim() || sceneDefinition.sceneGoal.trim();
-	});
+	const signals = useSceneSignals(
+		() => activeContent,
+		() => activeGoal,
+		() => sceneDefinition,
+	);
 
-	const sceneCompassRows = $derived.by(() => {
-		const changeValue =
-			sceneDefinition.startState.trim() && sceneDefinition.endState.trim()
-				? `${sceneDefinition.startState.trim()} -> ${sceneDefinition.endState.trim()}`
-				: '';
-		return [
-			{
-				label: 'Goal',
-				value: sceneDefinition.sceneGoal.trim() || 'No clear goal defined',
-				missing: sceneDefinition.sceneGoal.trim().length === 0,
-			},
-			{
-				label: 'Obstacle',
-				value: sceneDefinition.immediateObstacle.trim() || 'No clear obstacle defined',
-				missing: sceneDefinition.immediateObstacle.trim().length === 0,
-			},
-			{
-				label: 'Tension',
-				value: sceneDefinition.tensionSource.trim() || 'Tension not yet established',
-				missing: sceneDefinition.tensionSource.trim().length === 0,
-			},
-			{
-				label: 'Turn',
-				value: sceneDefinition.turningPoint.trim() || 'No turning point defined yet',
-				missing: sceneDefinition.turningPoint.trim().length === 0,
-			},
-			{
-				label: 'Change',
-				value: changeValue || 'No meaningful change defined',
-				missing: changeValue.length === 0,
-			},
-		];
-	});
-
-	const paragraphs = $derived.by(() => {
-		return normalizeText(activeContent)
-			.split(/\n\s*\n/)
-			.map((part) => part.trim())
-			.filter(Boolean);
-	});
-
-	const recentText = $derived.by(() => {
-		return paragraphs.slice(-2).join(' ');
-	});
-
-	const dialogueDensity = $derived.by(() => {
-		const quotes = (activeContent.match(/["""]/g) ?? []).length;
-		return activeContent.length > 0 ? quotes / activeContent.length : 0;
-	});
-
-	const tensionKeywords = ['danger', 'risk', 'threat', 'fear', 'urgent', 'panic', 'pressure', 'doubt'];
-	const conflictKeywords = ['but', 'however', 'refused', 'blocked', 'argued', 'fight', 'clash', 'resist'];
-	const turnKeywords = ['suddenly', 'instead', 'then', 'until', 'revealed', 'realized', 'finally', 'pivot'];
-	const actionKeywords = ['ran', 'grabbed', 'pushed', 'hit', 'moved', 'dashed', 'chased', 'slammed'];
-
-	const tensionHits = $derived.by(() => keywordHits(normalizedContent, tensionKeywords));
-	const recentTensionHits = $derived.by(() => keywordHits(recentText, tensionKeywords));
-	const conflictHits = $derived.by(() => keywordHits(normalizedContent, conflictKeywords));
-	const turnHits = $derived.by(() => keywordHits(normalizedContent, turnKeywords));
-	const actionHits = $derived.by(() => keywordHits(normalizedContent, actionKeywords));
-
-	const pacingHint = $derived.by(() => {
-		if (dialogueDensity > 0.018) return 'Dialogue-heavy';
-		if (actionHits >= 3 && actionHits > tensionHits) return 'Action-heavy';
-		if (tensionHits > 0) return 'Slow build with tension';
-		return 'Slow build';
-	});
-
-	const liveSignals = $derived.by(() => {
-		const signals: string[] = [];
-		if (dialogueDensity > 0.018) signals.push('Dialogue-heavy scene.');
-		if (activeWordCount > 140 && recentTensionHits === 0) {
-			signals.push('Low tension detected in recent paragraphs.');
-		}
-		if (activeWordCount > 180 && conflictHits === 0) {
-			signals.push('No clear conflict present yet.');
-		}
-		if (activeWordCount > 260 && turnHits === 0) {
-			signals.push('No turning point detected yet.');
-		}
-
-		const goalTokens = extractSignalTerms(activeGoal);
-		if (goalTokens.length > 0 && activeWordCount > 160) {
-			const mentions = goalTokens.some((token) => recentText.includes(token));
-			if (!mentions) {
-				signals.push('Scene may be drifting from its goal.');
-			}
-		}
-
-		if (signals.length === 0) {
-			signals.push('Scene momentum looks steady.');
-		}
-
-		return signals;
-	});
-
-	const progressFlags = $derived.by(() => {
-		const flags: string[] = [];
-		if (activeWordCount > 260 && turnHits === 0) flags.push('No turning point yet');
-
-		const firstConflictIndex = findFirstKeywordIndex(normalizedContent, conflictKeywords);
-		const driftThreshold = Math.floor(normalizedContent.length * 0.6);
-		if (firstConflictIndex > driftThreshold && conflictHits > 0) {
-			flags.push('Conflict introduced late');
-		}
-		return flags;
-	});
-
-	const sceneTargetWords = $derived.by(() => {
-		switch (sceneDefinition.lengthEstimate) {
-			case 'short':
-				return 900;
-			case 'long':
-				return 2000;
-			case 'medium':
-			default:
-				return 1400;
-		}
-	});
-
-	const sceneProgress = $derived.by(() => {
-		return Math.min(100, Math.round((activeWordCount / Math.max(1, sceneTargetWords)) * 100));
-	});
+	const { activeWordCount, sceneTargetWords, sceneProgress, pacingHint, liveSignals, progressFlags, sceneCompassRows } = signals;
 
 	const totalCurrentWords = $derived.by(() => {
 		return data.scenes.reduce(
@@ -387,48 +254,6 @@
 		}
 	}
 
-	function countWords(text: string): number {
-		const normalized = text.replace(/<[^>]+>/g, ' ').trim();
-		if (!normalized) return 0;
-		return normalized.split(/\s+/).length;
-	}
-
-	function normalizeText(text: string): string {
-		return text
-			.replace(/<[^>]+>/g, ' ')
-			.toLowerCase()
-			.replace(/[^a-z0-9\s\n']/g, ' ')
-			.replace(/\s+/g, ' ')
-			.trim();
-	}
-
-	function keywordHits(text: string, keywords: string[]): number {
-		if (!text) return 0;
-		return keywords.reduce((total, keyword) => {
-			const regex = new RegExp(`\\b${keyword}\\b`, 'g');
-			return total + (text.match(regex)?.length ?? 0);
-		}, 0);
-	}
-
-	function findFirstKeywordIndex(text: string, keywords: string[]): number {
-		if (!text) return -1;
-		let first = -1;
-		for (const keyword of keywords) {
-			const index = text.indexOf(keyword);
-			if (index >= 0 && (first < 0 || index < first)) first = index;
-		}
-		return first;
-	}
-
-	function extractSignalTerms(text: string): string[] {
-		return text
-			.toLowerCase()
-			.split(/\s+/)
-			.map((token) => token.replace(/[^a-z0-9']/g, ''))
-			.filter((token) => token.length >= 4)
-			.slice(0, 5);
-	}
-
 	function persistQuickIntent(): void {
 		if (!activeScene) return;
 		// Phase 4: removed localStorage.setItem cache; persist to SQLite only
@@ -544,6 +369,10 @@
 					oneditorReady={(ed) => (tipTapEditor = ed)}
 					ontick={() => (editorTick += 1)}
 					spellcheck={spellcheckEnabled}
+					onAskNova={(text) =>
+						novaPanel.openWithPrompt(
+							`About this passage:\n\n"${text.slice(0, 500)}"\n\n`,
+						)}
 				/>
 			</div>
 		{/if}
