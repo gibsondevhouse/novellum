@@ -16,13 +16,13 @@ const PAGE_PATH = resolve(
 	'..',
 	'..',
 	'src',
-	'routes',
-	'books',
-	'[id]',
-	'+page.svelte',
+	'modules',
+	'reader',
+	'components',
+	'ReaderExperience.svelte',
 );
 
-describe('books/[id] reader — empty state', () => {
+describe('ReaderExperience — empty state', () => {
 	const source = readFileSync(PAGE_PATH, 'utf8');
 
 	it('imports EmptyStatePanel', () => {
@@ -30,16 +30,15 @@ describe('books/[id] reader — empty state', () => {
 	});
 
 	it('computes hasReadableContent from chapter scenes', () => {
-		expect(source).toContain('hasReadableContent');
-		expect(source).toMatch(/replace\(\/<\[\^>\]\*>\/g, ''\)/);
+		expect(source).toContain('isReadable');
 	});
 
 	it('renders EmptyStatePanel when content is empty', () => {
-		expect(source).toMatch(/\{#if !hasReadableContent\}[\s\S]*<EmptyStatePanel/);
+		expect(source).toMatch(/\{#if !isReadable\}[\s\S]*<EmptyStatePanel/);
 	});
 
 	it('offers a CTA to the project hub and a CTA back to the library', () => {
-		expect(source).toContain('/projects/${data.project.id}');
+		expect(source).toContain('/projects/${project.id}');
 		expect(source).toContain("goto('/books')");
 	});
 });

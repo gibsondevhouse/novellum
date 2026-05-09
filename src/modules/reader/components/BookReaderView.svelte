@@ -132,11 +132,7 @@
 	{/if}
 
 	<div class="book-reader__controls">
-		{#if !fullscreen}
-			<a class="book-reader__back" href="/books?library=1">← Library</a>
-		{:else}
-			<span></span>
-		{/if}
+		<span></span>
 		<div class="book-reader__nav-group">
 			<button
 				type="button"
@@ -204,30 +200,6 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-3);
-	}
-
-	.book-reader__back {
-		text-decoration: none;
-		font-size: var(--text-xs);
-		letter-spacing: var(--tracking-widest);
-		text-transform: uppercase;
-		color: var(--color-text-muted);
-		white-space: nowrap;
-		border-bottom: 1px solid transparent;
-		transition:
-			color var(--duration-fast) var(--ease-standard),
-			border-color var(--duration-fast) var(--ease-standard);
-	}
-
-	.book-reader__back:hover {
-		color: var(--color-text-secondary);
-		border-color: var(--color-border-default);
-	}
-
-	.book-reader__back:focus-visible {
-		outline: none;
-		box-shadow: var(--focus-ring);
-		border-radius: var(--radius-xs);
 	}
 
 	.book-reader__counter {

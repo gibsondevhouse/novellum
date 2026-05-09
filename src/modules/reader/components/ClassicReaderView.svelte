@@ -1,31 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-
-	interface ClassicProject {
-		id: string;
-		title: string;
-		coverUrl?: string;
-		genre: string;
-		logline: string;
-	}
-
-	interface ClassicScene {
-		id: string;
-		title: string;
-		order: number;
-		content: string;
-	}
-
-	interface ClassicChapter {
-		id: string;
-		title: string;
-		order: number;
-		scenes: ClassicScene[];
-	}
+	import {
+		extractReadableText,
+		type ReaderInputChapter,
+		type ReaderInputProject,
+	} from '../reader-pages.js';
 
 	interface Props {
-		project: ClassicProject;
-		chapters: ClassicChapter[];
+		project: ReaderInputProject;
+		chapters: ReaderInputChapter[];
 		/**
 		 * plan-023 stage-003: optional deep-link target. When provided and a
 		 * matching `#scene-<id>` anchor is rendered, the reader scrolls to it
@@ -49,19 +32,6 @@
 			el.scrollIntoView({ behavior: 'instant', block: 'start' });
 		});
 	});
-
-	function extractReadableText(html: string): string {
-		if (!html.trim()) return '';
-		const doc = new DOMParser().parseFromString(html, 'text/html');
-		const paragraphNodes = Array.from(
-			doc.body.querySelectorAll('p, h1, h2, h3, h4, h5, h6, li, blockquote'),
-		);
-		if (paragraphNodes.length > 0) {
-			const chunks = paragraphNodes.map((node) => node.textContent?.trim() ?? '').filter(Boolean);
-			return chunks.join('\n\n');
-		}
-		return (doc.body.textContent ?? '').trim();
-	}
 
 	const genres = $derived(
 		(project.genre ?? '')
@@ -104,7 +74,6 @@
 						{/each}
 					</div>
 				{/if}
-				<a class="reader-back" href="/books?library=1">Back to Library</a>
 			</div>
 		</div>
 	</div>
@@ -209,31 +178,6 @@
 		line-height: var(--leading-relaxed);
 		color: var(--color-text-secondary);
 		margin: 0;
-	}
-
-	.reader-back {
-		width: fit-content;
-		text-decoration: none;
-		font-size: var(--text-xs);
-		letter-spacing: var(--tracking-widest);
-		text-transform: uppercase;
-		color: var(--color-text-muted);
-		padding: var(--space-1) 0;
-		border-bottom: 1px solid transparent;
-		transition:
-			color var(--duration-fast) var(--ease-standard),
-			border-color var(--duration-fast) var(--ease-standard);
-	}
-
-	.reader-back:hover {
-		color: var(--color-text-secondary);
-		border-color: var(--color-border-default);
-	}
-
-	.reader-back:focus-visible {
-		outline: none;
-		box-shadow: var(--focus-ring);
-		border-radius: var(--radius-xs);
 	}
 
 	.reader-genres {
