@@ -62,3 +62,6 @@ coverage/
 dev-docs/
 
 # .github/ is tracked — CI/CD workflows are part of the shipped product.
+
+# Claude Code local worktrees and scratch state
+.claude/
