@@ -59,11 +59,11 @@ describe('settings/ai/+page.svelte', () => {
 		expect(buttons[0].getAttribute('aria-selected')).toBe('true');
 	});
 
-	it('ollama and lm-studio buttons are disabled', () => {
+	it('ollama tab is enabled, lm-studio is still disabled', () => {
 		component = mount(AiPage, { target, props: {} });
 		flushSync();
 		const buttons = target.querySelectorAll('[role="tablist"] button');
-		expect((buttons[1] as HTMLButtonElement).disabled).toBe(true);
+		expect((buttons[1] as HTMLButtonElement).disabled).toBe(false);
 		expect((buttons[2] as HTMLButtonElement).disabled).toBe(true);
 	});
 });

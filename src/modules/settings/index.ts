@@ -42,4 +42,5 @@ export {
 export { default as ApiSettings } from './components/ApiSettings.svelte';
 export { default as ThemeSelector } from './components/ThemeSelector.svelte';
 export { default as OpenRouterPanel } from './components/OpenRouterPanel.svelte';
+export { default as OllamaPanel } from './components/OllamaPanel.svelte';
 export { default as ProviderComingSoon } from './components/ProviderComingSoon.svelte';

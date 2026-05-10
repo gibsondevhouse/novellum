@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { OpenRouterPanel, ProviderComingSoon } from '$modules/settings';
+	import { OpenRouterPanel, OllamaPanel, ProviderComingSoon } from '$modules/settings';
 	import { featureFlags } from '$lib/feature-flags.svelte.js';
 
 	let activeProvider = $state<'openrouter' | 'ollama' | 'lm-studio'>('openrouter');
@@ -31,11 +31,11 @@
 		aria-selected={activeProvider === 'ollama'}
 		data-active={activeProvider === 'ollama'}
 		class="provider-tab"
-		disabled
+		class:provider-tab--active={activeProvider === 'ollama'}
+		onclick={() => (activeProvider = 'ollama')}
 		type="button"
 	>
 		Ollama
-		<span class="badge-soon">Coming soon</span>
 	</button>
 	<button
 		role="tab"
@@ -53,10 +53,7 @@
 {#if activeProvider === 'openrouter'}
 	<OpenRouterPanel />
 {:else if activeProvider === 'ollama'}
-	<ProviderComingSoon
-		name="Ollama"
-		description="Run open-source models locally. No API key required."
-	/>
+	<OllamaPanel />
 {:else}
 	<ProviderComingSoon
 		name="LM Studio"
@@ -65,9 +62,13 @@
 {/if}
 
 <section class="labs-section" aria-labelledby="labs-heading">
-	<h3 id="labs-heading" class="labs-heading">Labs</h3>
+	<h3 id="labs-heading" class="labs-heading">Lab Features</h3>
 	<p class="labs-description">
-		Enable experimental features that are still in development. These may be unstable.
+		Opt-in previews of in-development AI capabilities. Enabling Labs reveals experimental
+		surfaces — additional Nova actions, draft agents, and prompt-system tools — that
+		haven't completed their stability review. Expect rough edges, occasional regressions,
+		and breaking changes between releases. Disable at any time to return to the stable
+		feature set.
 	</p>
 	<label class="labs-toggle-label">
 		<input
@@ -76,7 +77,7 @@
 			checked={featureFlags.labsEnabled}
 			onchange={(e) => featureFlags.setLabsEnabled((e.target as HTMLInputElement).checked)}
 		/>
-		Enable Labs features
+		Enable Lab features
 	</label>
 </section>
 

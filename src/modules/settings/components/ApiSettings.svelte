@@ -48,8 +48,10 @@
 			status = await saveKey(providerId, apiKey.trim());
 			apiKey = '';
 			toast('API key saved.', 'success');
-		} catch {
-			toast('Could not save API key. Please retry.', 'error');
+		} catch (err) {
+			const message =
+				err instanceof Error && err.message ? err.message : 'Could not save API key. Please retry.';
+			toast(message, 'error');
 		} finally {
 			isSaving = false;
 		}

@@ -5,13 +5,38 @@ import type { UiContext } from '$lib/ai/types.js';
 import { db } from '$lib/server/db/index.js';
 import type { ChatInstruction, SystemPrompt, WritingStyle } from '$lib/db/domain-types.js';
 import { createCredentialService } from '$lib/server/credentials/credential-service.js';
-import { createOpenRouterProvider } from '$lib/ai/providers/index.js';
-import type { CompletionMessage } from '$lib/ai/providers/index.js';
+import {
+	createOpenRouterProvider,
+	createOllamaProvider,
+	OLLAMA_DEFAULT_BASE_URL,
+} from '$lib/ai/providers/index.js';
+import type { AiProvider, CompletionMessage } from '$lib/ai/providers/index.js';
+import { getPreference } from '$lib/server/preferences/preferences-service.js';
+import {
+	ACTIVE_PROVIDER_KEY,
+	OLLAMA_BASE_URL_KEY,
+	OLLAMA_MODEL_KEY,
+	type ActiveProvider,
+} from '$lib/ai/provider-config.js';
+import { ensureOllamaRunning } from '$lib/server/ai/ollama-launcher.js';
 
 const credentialService = createCredentialService();
-const provider = createOpenRouterProvider();
+const openRouterProvider = createOpenRouterProvider();
 
 const MOCK_ENABLED = () => process.env.NOVELLUM_AI_MOCK === '1';
+
+interface ResolvedProvider {
+	provider: AiProvider;
+	apiKey: string;
+	/** When set, overrides the model the caller asked for (Ollama). */
+	modelOverride?: string;
+	id: ActiveProvider;
+}
+
+type LoadResult =
+	| { kind: 'ok'; resolved: ResolvedProvider }
+	| { kind: 'mock' }
+	| { kind: 'no_creds' };
 
 export const GET: RequestHandler = () => {
 	return new Response(JSON.stringify({ ok: true }), {
@@ -40,11 +65,37 @@ function isProxyShape(body: unknown): body is ProxyBody {
 	);
 }
 
-async function loadKeyOrRespond(): Promise<
-	{ kind: 'ok'; key: string } | { kind: 'mock' } | { kind: 'no_creds' }
-> {
+async function loadKeyOrRespond(): Promise<LoadResult> {
+	const activeProvider: ActiveProvider =
+		getPreference<ActiveProvider>(ACTIVE_PROVIDER_KEY) ?? 'openrouter';
+
+	if (activeProvider === 'ollama') {
+		const baseUrl =
+			getPreference<string>(OLLAMA_BASE_URL_KEY) ?? OLLAMA_DEFAULT_BASE_URL;
+		const modelOverride = getPreference<string>(OLLAMA_MODEL_KEY) ?? undefined;
+		// Make sure the daemon is up before we try to talk to it.
+		const launchResult = await ensureOllamaRunning(baseUrl);
+		if (!launchResult.ok) {
+			console.warn(`[api/ai] ollama launch failed: ${launchResult.message}`);
+		}
+		return {
+			kind: 'ok',
+			resolved: {
+				provider: createOllamaProvider({ baseUrl }),
+				apiKey: '',
+				modelOverride,
+				id: 'ollama',
+			},
+		};
+	}
+
 	const key = await credentialService.loadProviderKey('openrouter');
-	if (key) return { kind: 'ok', key };
+	if (key) {
+		return {
+			kind: 'ok',
+			resolved: { provider: openRouterProvider, apiKey: key, id: 'openrouter' },
+		};
+	}
 	if (MOCK_ENABLED()) {
 		console.warn('[api/ai] NOVELLUM_AI_MOCK=1 — returning mock responses');
 		return { kind: 'mock' };
@@ -74,7 +125,7 @@ export const POST: RequestHandler = async ({ request }) => {
 };
 
 async function handleProxy(body: ProxyBody): Promise<Response> {
-	const model = body.model as string;
+	const requestedModel = body.model as string;
 	const messages = body.messages as CompletionMessage[];
 	const wantStream = body.stream === true;
 
@@ -83,15 +134,18 @@ async function handleProxy(body: ProxyBody): Promise<Response> {
 
 	if (keyResult.kind === 'mock') {
 		if (wantStream) return mockStreamResponse();
-		return json({ text: '[Mock AI response]', model, tokensUsed: 0 });
+		return json({ text: '[Mock AI response]', model: requestedModel, tokensUsed: 0 });
 	}
+
+	const { provider, apiKey, modelOverride } = keyResult.resolved;
+	const model = modelOverride ?? requestedModel;
 
 	if (wantStream) {
 		const encoder = new TextEncoder();
 		const stream = new ReadableStream<Uint8Array>({
 			async start(controller) {
 				try {
-					for await (const chunk of provider.stream(keyResult.key, { model, messages })) {
+					for await (const chunk of provider.stream(apiKey, { model, messages })) {
 						if (chunk.type === 'delta') {
 							controller.enqueue(
 								encoder.encode(
@@ -132,7 +186,7 @@ async function handleProxy(body: ProxyBody): Promise<Response> {
 	}
 
 	try {
-		const result = await provider.complete(keyResult.key, { model, messages });
+		const result = await provider.complete(apiKey, { model, messages });
 		return json({
 			text: result.content,
 			model: result.model,
@@ -177,7 +231,7 @@ async function handleTask(body: TaskBody): Promise<Response> {
 	if (chatInstructions.length > 0) ctx.chatInstructions = chatInstructions;
 
 	const prompt = buildPrompt(task, ctx);
-	const model = selectModel(task.taskType);
+	const defaultModel = selectModel(task.taskType);
 
 	const keyResult = await loadKeyOrRespond();
 	if (keyResult.kind === 'no_creds') return noCredentialsResponse();
@@ -188,8 +242,11 @@ async function handleTask(body: TaskBody): Promise<Response> {
 		});
 	}
 
+	const { provider, apiKey, modelOverride } = keyResult.resolved;
+	const model = modelOverride ?? defaultModel;
+
 	try {
-		const result = await provider.complete(keyResult.key, {
+		const result = await provider.complete(apiKey, {
 			model,
 			messages: [{ role: 'user', content: prompt }],
 		});
