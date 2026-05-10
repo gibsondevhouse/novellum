@@ -1,10 +1,24 @@
 # Novellum Agent Ecosystem
 
-> Last verified: 2026-05-07
+> Last verified: 2026-05-10
 
 Novellum is built around a dual-layer agent architecture. Rather than relying on a single general-purpose AI, the system delegates tasks to specialized, focused agents.
 
 This document serves as the master reference for both the **Meta-Agents** (used during development) and the **Runtime Agents** (used within the application).
+
+---
+
+## 0. Resuming Work — Active Plan Discovery
+
+Any agent (Codex CLI, Claude Code, Gemini CLI, GitHub Copilot Chat) starting a session **without an explicit task** must:
+
+1. Read [`dev-docs/plans/ACTIVE-PLAN.md`](./dev-docs/plans/ACTIVE-PLAN.md) — its `## Current` section names the plan slug being worked on.
+2. Open that plan's `plan.md`, find the first stage / phase / part whose `status` is not `complete`, and continue from there.
+3. Follow the rules in [`.github/instructions/plan-conventions.instructions.md`](./.github/instructions/plan-conventions.instructions.md): pre-impl checklist → implementation → post-impl checklist → append-only `impl.log.md` → at least one file in `evidence/`.
+4. Roll status upward only when all children are complete.
+5. When a plan reaches `complete`, update both `ACTIVE-PLAN.md` (move it to `Recently completed`, advance the `Current` pointer) **and** `dev-docs/plans/MASTER-PLAN.md`.
+
+The full prompt lives at [`.github/prompts/continue-plan.prompt.md`](./.github/prompts/continue-plan.prompt.md). It is the canonical entry point for "continue whatever plan is active" across every supported assistant.
 
 ---
 
