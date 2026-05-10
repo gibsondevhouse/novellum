@@ -15,11 +15,18 @@ type ProjectRow = { id: string };
  * resolved (DB error, missing record, malformed pref), silently falls
  * back to the library (`/`, no redirect).
  *
+ * The sidebar Home button passes `?home=1` to bypass this redirect so
+ * clicking Home always lands on the library, regardless of the user's
+ * preferred launch destination.
+ *
  * NOTE: SvelteKit's `redirect()` works by throwing — the surrounding
  * `try/catch` blocks below isolate **only** the I/O calls, and the
  * `throw redirect(...)` lives outside them.
  */
-export const load: ServerLoad = async () => {
+export const load: ServerLoad = async ({ url }) => {
+	// Sidebar Home button explicitly opts out of the launch-time redirect.
+	if (url.searchParams.has('home')) return {};
+
 	let pref: HomePage = 'library';
 	try {
 		const stored = getPreference<HomePage>('app.defaults.homePage');

@@ -3,12 +3,14 @@
 	import SidebarSection from './SidebarSection.svelte';
 	import SidebarItem from './SidebarItem.svelte';
 	import ActiveProjectSection from './ActiveProjectSection.svelte';
+	import { sidebar } from '$lib/stores/sidebar.svelte.js';
 
-	let collapsed = $state(false);
 	let searchQuery = $state('');
 
+	let collapsed = $derived(sidebar.collapsed);
+
 	function toggleSidebar() {
-		collapsed = !collapsed;
+		sidebar.toggle();
 	}
 
 	let isHomeActive = $derived(page.url.pathname === '/');
@@ -74,7 +76,7 @@
 
 	<nav id="sidebar-nav-content" class="sidebar-scroll" aria-label="Primary navigation links">
 		<SidebarSection>
-			<SidebarItem href="/" label="Home" active={isHomeActive}>
+			<SidebarItem href="/?home=1" label="Home" active={isHomeActive}>
 			{#snippet icon()}
 				<svg
 					xmlns="http://www.w3.org/2000/svg"

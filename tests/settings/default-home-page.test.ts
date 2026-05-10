@@ -28,7 +28,7 @@ async function loadServer() {
 async function callLoad() {
 	const mod = await loadServer();
 	type LoadFn = (event: unknown) => Promise<unknown>;
-	return await (mod.load as unknown as LoadFn)({});
+	return await (mod.load as unknown as LoadFn)({ url: new URL('http://localhost/') });
 }
 
 function expectRedirect(err: unknown, status: number, location: string) {
@@ -138,5 +138,22 @@ describe('+page.server.ts (root) — Default Home Page redirect', () => {
 		getServerPreference.mockReturnValue('garbage');
 		const out = await callLoad();
 		expect(out).toEqual({});
+	});
+
+	it("bypasses the redirect when the URL carries '?home=1' (sidebar Home button)", async () => {
+		getServerPreference.mockImplementation((key: string) => {
+			if (key === 'app.defaults.homePage') return 'last-read';
+			if (key === 'app.readerMode')
+				return { mode: 'classic', lastBookId: 'book-123', pageIndex: {} };
+			return undefined;
+		});
+		const mod = await loadServer();
+		type LoadFn = (event: unknown) => Promise<unknown>;
+		const out = await (mod.load as unknown as LoadFn)({
+			url: new URL('http://localhost/?home=1'),
+		});
+		expect(out).toEqual({});
+		// Preference reads should be skipped entirely on the bypass path.
+		expect(getServerPreference).not.toHaveBeenCalled();
 	});
 });
