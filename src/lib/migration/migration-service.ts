@@ -49,12 +49,26 @@ export async function preCheck(): Promise<PreCheckResult[]> {
 	const results: PreCheckResult[] = [];
 
 	for (const { table, apiPath } of MIGRATION_TABLES) {
-		const dexieCount = await (db[table] as Table).count();
-		const sqliteRows = await apiGet<unknown[]>(apiPath);
+		let dexieCount = 0;
+		try {
+			dexieCount = await (db[table] as Table).count();
+		} catch {
+			/* Dexie unavailable (e.g. fresh install, packaged app) → 0 */
+		}
+
+		let sqliteCount = 0;
+		try {
+			const sqliteRows = await apiGet<unknown[]>(apiPath);
+			sqliteCount = sqliteRows.length;
+		} catch {
+			/* SQLite endpoint not reachable yet → report 0, surface in UI as
+			   no-data state rather than a blocking error. */
+		}
+
 		results.push({
 			table: table as string,
 			dexieCount,
-			sqliteCount: sqliteRows.length,
+			sqliteCount,
 		});
 	}
 
