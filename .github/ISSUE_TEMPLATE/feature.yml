@@ -1,0 +1,44 @@
+name: New Feature Request
+about: Use this template to request a new feature.
+title: 'Feature Request: [Brief Description]'
+labels: 'feature'
+assignees: ''
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## New Feature Request
+
+        Please describe the new feature you would like to see implemented. Provide details on its purpose and desired functionality.
+
+---
+- type: input
+  id: feature_name
+  name: Feature Name
+  description: 'A concise name for the feature.'
+  placeholder: "e.g., 'AI-Powered Plot Generator'"
+  is_required: true
+- type: textarea
+  id: feature_description
+  name: Feature Description
+  description: 'Detailed explanation of the feature, its purpose, and how it should work.'
+  placeholder: 'Describe the feature, its benefits, and user interaction.'
+  is_required: true
+- type: input
+  id: related_plan_issue
+  name: Related Plan/Issue (Optional)
+  description: 'Link to an existing plan part or issue number if this feature request is tied to it.'
+  placeholder: "e.g., 'dev-docs/plans/.../part-xxx.md' or '#123'"
+  is_required: false
+- type: choice
+  id: priority
+  name: Priority
+  description: 'How important is this feature?'
+  options:
+    - Low
+    - Medium
+    - High
+    - Critical
+  default: Medium
+  is_required: true

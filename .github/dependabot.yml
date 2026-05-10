@@ -1,0 +1,32 @@
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: America/New_York
+    reviewers:
+      - gibsondevhouse
+    labels:
+      - dependencies
+    open-pull-requests-limit: 5
+    ignore:
+      # Deliberate: major version bumps require a conscious upgrade decision.
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: America/New_York
+    reviewers:
+      - gibsondevhouse
+    labels:
+      - dependencies
+      - github-actions
