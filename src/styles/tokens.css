@@ -255,3 +255,73 @@
 	--nova-panel-border: var(--color-border-default);
 	--nova-panel-shadow: var(--shadow-lg);
 }
+
+/* =============================================================================
+   Light theme overrides
+   Activated by `<html data-theme="light">` (set by ThemeSelector / theme service).
+   Mirrors the surface, text, border, and shadow tokens for a parchment-toned
+   light surface. Other tokens (spacing, typography scale, motion, accents)
+   intentionally inherit from `:root` to keep a single source of truth.
+   ============================================================================= */
+:root[data-theme='light'] {
+	/* ── Surface Layers ── */
+	--color-surface-base: #f5f3ee;
+	--color-surface-ground: #efece5;
+	--color-surface-raised: #ffffff;
+	--color-surface-overlay: #f9f7f2;
+	--color-surface-elevated: #ffffff;
+	--color-surface-hover: #ebe7df;
+	--color-surface-glass: rgba(0, 0, 0, 0.04);
+
+	/* ── Text ── */
+	--color-text-primary: #1a1a1a;
+	--color-text-primary-hsl: 0 0% 10%;
+	--color-text-secondary: #4b5563;
+	--color-text-secondary-hsl: 220 14% 34%;
+	--color-text-muted: #6b7280;
+	--color-text-muted-hsl: 220 9% 46%;
+
+	/* ── Borders ── */
+	--color-border-default: rgba(0, 0, 0, 0.12);
+	--color-border-subtle: rgba(0, 0, 0, 0.06);
+	--color-border-strong: rgba(0, 0, 0, 0.2);
+	--color-border-focus: rgba(59, 130, 246, 0.6);
+
+	/* ── Tints / state surfaces ── */
+	--color-ai-tint: rgba(99, 102, 241, 0.08);
+	--color-selection: rgba(59, 130, 246, 0.12);
+	--color-success-bg: rgba(34, 197, 94, 0.18);
+	--color-success-fg: #166534;
+	--color-warning-bg: rgba(250, 204, 21, 0.22);
+	--color-warning-fg: #92400e;
+	--color-success-subtle: rgba(34, 197, 94, 0.18);
+	--color-success-on-dark: #166534;
+	--color-error-subtle: rgba(239, 68, 68, 0.18);
+	--color-error-on-dark: #991b1b;
+	--color-danger-soft: rgba(224, 49, 49, 0.1);
+	--color-text-on-dark: #ffffff;
+
+	/* ── Backdrops / scrims ── */
+	--color-scrim: rgba(0, 0, 0, 0.35);
+	--color-scrim-strong: rgba(0, 0, 0, 0.45);
+	--color-scrim-soft: rgba(0, 0, 0, 0.25);
+
+	/* ── HSL parity (Tailwind / bits-ui) ── */
+	--color-surface-base-hsl: 40 25% 95%;
+	--color-surface-ground-hsl: 42 22% 92%;
+	--color-surface-raised-hsl: 0 0% 100%;
+	--color-surface-overlay-hsl: 40 30% 97%;
+	--color-surface-elevated-hsl: 0 0% 100%;
+	--color-border-default-hsl: 0 0% 0%;
+	--color-border-subtle-hsl: 0 0% 0%;
+
+	/* ── Shadows (lighter, softer on light surfaces) ── */
+	--shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.06);
+	--shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+	--shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.06);
+	--shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
+	--shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.14), 0 4px 16px rgba(0, 0, 0, 0.08);
+
+	/* ── Editor page surface override ── */
+	--editor-page-surface: var(--color-surface-raised);
+}

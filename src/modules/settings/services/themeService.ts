@@ -32,11 +32,17 @@ export function applyTheme(theme: Theme): void {
 	if (typeof window === 'undefined' || typeof document === 'undefined') return;
 
 	const root = document.documentElement;
+	let resolved: 'dark' | 'light';
 
 	if (theme === 'system') {
 		const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-		root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+		resolved = prefersDark ? 'dark' : 'light';
 	} else {
-		root.setAttribute('data-theme', theme);
+		resolved = theme;
 	}
+
+	root.setAttribute('data-theme', resolved);
+	// Keep the UA's `color-scheme` in sync so native form controls,
+	// scrollbars, and the canvas background match the active palette.
+	root.style.colorScheme = resolved;
 }
