@@ -23,6 +23,7 @@
 	import { useSceneSignals } from '../services/scene-signals.svelte.js';
 	import { countWords } from '../services/scene-analysis-utils.js';
 	import type { OutcomeType, SceneLengthEstimate, SceneDefinition } from '../services/scene-signals.svelte.js';
+	import { SHORTCUT_EVENT, type ShortcutEventDetail } from '$lib/keyboard/index.js';
 
 	type QuickIntent = {
 		goal: string;
@@ -231,6 +232,22 @@
 			autosaveService.flushNow();
 			autosaveService.unmount();
 		};
+	});
+
+	$effect(() => {
+		const handler = (event: Event) => {
+			const detail = (event as CustomEvent<ShortcutEventDetail>).detail;
+			if (!detail) return;
+			if (detail.actionId === 'save-scene') {
+				if (currentSceneId) void autosaveService.flushNow();
+				return;
+			}
+			if (detail.actionId === 'view-in-reader') {
+				handleViewInReader();
+			}
+		};
+		window.addEventListener(SHORTCUT_EVENT, handler);
+		return () => window.removeEventListener(SHORTCUT_EVENT, handler);
 	});
 
 	function handleManuscriptChange(html: string): void {

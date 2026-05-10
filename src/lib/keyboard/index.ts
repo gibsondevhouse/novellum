@@ -15,3 +15,8 @@ export {
 	resetAll,
 	hasConflict,
 } from './keymap-registry.js';
+export {
+	installGlobalShortcuts,
+	SHORTCUT_EVENT,
+	type ShortcutEventDetail,
+} from './global-handler.js';

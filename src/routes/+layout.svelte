@@ -12,6 +12,8 @@
 	import ToastContainer from '$lib/components/ToastContainer.svelte';
 	import { NovaPanel } from '$modules/nova';
 	import { initLocale } from '$lib/i18n';
+	import { appearance } from '$lib/stores/appearance.svelte.js';
+	import { installGlobalShortcuts } from '$lib/keyboard/global-handler.js';
 
 	let { children } = $props();
 
@@ -21,19 +23,33 @@
 
 	onMount(() => {
 		initLocale();
+		// Hydrate user-controllable editor typography globally so the editor
+		// reflects saved preferences regardless of which route launches first.
+		void appearance.hydrate();
+		// Install global keyboard shortcut dispatcher.
+		const uninstallShortcuts = installGlobalShortcuts();
 
 		// Register service worker for stale-chunk protection
-		if (!('serviceWorker' in navigator)) return;
+		let removeSwListener: (() => void) | null = null;
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker
+				.register('/service-worker.js', { type: 'module' })
+				.catch(() => {});
+			// Handle stale-chunk signal: reload the page to pick up fresh assets
+			const handleSwMessage = (event: MessageEvent) => {
+				if ((event.data as { type?: string } | null)?.type === 'STALE_CHUNK') {
+					window.location.reload();
+				}
+			};
+			navigator.serviceWorker.addEventListener('message', handleSwMessage);
+			removeSwListener = () =>
+				navigator.serviceWorker.removeEventListener('message', handleSwMessage);
+		}
 
-		navigator.serviceWorker.register('/service-worker.js', { type: 'module' }).catch(() => {});
-		// Handle stale-chunk signal: reload the page to pick up fresh assets
-		const handleSwMessage = (event: MessageEvent) => {
-			if ((event.data as { type?: string } | null)?.type === 'STALE_CHUNK') {
-				window.location.reload();
-			}
+		return () => {
+			uninstallShortcuts();
+			removeSwListener?.();
 		};
-		navigator.serviceWorker.addEventListener('message', handleSwMessage);
-		return () => navigator.serviceWorker.removeEventListener('message', handleSwMessage);
 	});
 
 	// Enable View Transitions API for route changes (with reduced-motion safety via CSS)
