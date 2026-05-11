@@ -28,7 +28,7 @@ describe('settings/+layout.svelte', () => {
 		return Array.from(target.querySelectorAll('.pill-nav__btn'));
 	}
 
-	it('renders all ten category pills in order', () => {
+	it('renders all eleven category pills in order', () => {
 		component = mount(SettingsLayout, { target, props: {} });
 		flushSync();
 		const labels = pillButtons().map((b) => b.textContent?.trim());
@@ -43,6 +43,7 @@ describe('settings/+layout.svelte', () => {
 			'Privacy',
 			'Updates',
 			'About',
+			'Legal',
 		]);
 	});
 
@@ -57,6 +58,7 @@ describe('settings/+layout.svelte', () => {
 		['/settings/privacy', 'Privacy'],
 		['/settings/updates', 'Updates'],
 		['/settings/about', 'About'],
+		['/settings/legal', 'Legal'],
 	])('marks the active pill for %s', (path, label) => {
 		(page as { url: URL }).url = new URL(`http://localhost${path}`);
 		component = mount(SettingsLayout, { target, props: {} });

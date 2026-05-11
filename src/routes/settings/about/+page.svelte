@@ -47,6 +47,14 @@
 						<dt class="about__label">License</dt>
 						<dd class="about__value">{info.license}</dd>
 					</div>
+					<div class="about__detail-row">
+						<dt class="about__label">Legal</dt>
+						<dd class="about__value">
+							<a class="about__link" href="/settings/legal">
+								View EULA &amp; third-party notices
+							</a>
+						</dd>
+					</div>
 				</dl>
 			</SurfaceCard>
 		</section>
@@ -100,5 +108,10 @@
 		font: var(--font-body-sm);
 		color: var(--color-text-primary);
 		margin: 0;
+	}
+
+	.about__link {
+		color: var(--color-accent);
+		text-decoration: underline;
 	}
 </style>

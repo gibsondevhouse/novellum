@@ -17,6 +17,7 @@
 		{ id: 'privacy', label: 'Privacy' },
 		{ id: 'updates', label: 'Updates' },
 		{ id: 'about', label: 'About' },
+		{ id: 'legal', label: 'Legal' },
 	];
 
 	const allowed = new Set(items.map((item) => item.id));
