@@ -3,6 +3,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { classifyNovaError } from '../../src/modules/nova/utils/classify-nova-error.js';
+import { AppError } from '../../src/lib/errors.js';
 
 describe('classifyNovaError', () => {
 	it('returns rate_limit for 429 status message', () => {
@@ -64,5 +65,13 @@ describe('classifyNovaError', () => {
 	it('handles non-Error values via string coercion', () => {
 		expect(classifyNovaError('429 rate limit')).toBe('rate_limit');
 		expect(classifyNovaError({ toString: () => 'invalid_key problem' })).toBe('invalid_key');
+	});
+
+	it('classifies AppError(AI_INVALID_KEY) as invalid_key', () => {
+		expect(classifyNovaError(new AppError('AI_INVALID_KEY'))).toBe('invalid_key');
+	});
+
+	it('classifies AppError(AI_RATE_LIMIT) as rate_limit', () => {
+		expect(classifyNovaError(new AppError('AI_RATE_LIMIT'))).toBe('rate_limit');
 	});
 });

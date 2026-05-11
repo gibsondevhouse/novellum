@@ -2,12 +2,20 @@ import type {
 	AiModel,
 	AiProvider,
 	AiProviderConfig,
+	AiProviderErrorCode,
 	AiProviderFactory,
 	CompletionRequest,
 	CompletionResponse,
 	StreamChunk,
 	ValidateKeyResult,
 } from './types.js';
+import { AiProviderError } from './types.js';
+
+function classifyStatus(status: number): AiProviderErrorCode {
+	if (status === 401 || status === 403) return 'invalid_key';
+	if (status === 429) return 'rate_limit';
+	return 'provider_error';
+}
 
 const DEFAULT_BASE_URL = 'https://openrouter.ai/api/v1';
 const DEFAULT_APP_REFERER = 'http://localhost:5174';
@@ -133,8 +141,12 @@ class OpenRouterProvider implements AiProvider {
 		});
 
 		if (!response.ok) {
-			const message = await readErrorMessage(response);
-			throw new Error(redact(`OpenRouter complete failed: ${message}`, apiKey));
+			const message = redact(await readErrorMessage(response), apiKey);
+			throw new AiProviderError(
+				classifyStatus(response.status),
+				response.status,
+				`OpenRouter complete failed: ${message}`,
+			);
 		}
 
 		const body = (await response.json()) as {
@@ -179,6 +191,8 @@ class OpenRouterProvider implements AiProvider {
 				type: 'error',
 				message: redact(`OpenRouter stream failed: ${message}`, apiKey),
 				recoverable: false,
+				status: response.status,
+				code: classifyStatus(response.status),
 			};
 			return;
 		}

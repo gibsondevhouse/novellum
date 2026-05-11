@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { OpenRouterClient, MissingCredentialsError } from '../../src/lib/ai/openrouter';
+import { AppError } from '../../src/lib/errors';
 
 /**
  * As of plan-017 stage-005 phase-003, OpenRouterClient is a thin proxy
@@ -78,6 +79,37 @@ describe('OpenRouterClient (browser proxy)', () => {
 
 			await expect(client.complete({ model: 'm1', messages: [] })).rejects.toThrow(/rate limited/);
 		});
+
+		it('maps a 401 invalid_key to AppError(AI_INVALID_KEY)', async () => {
+			vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+				jsonResponse(
+					{ error: { code: 'invalid_key', message: 'OpenRouter complete failed: bad token' } },
+					401,
+				),
+			);
+
+			const promise = client.complete({ model: 'm1', messages: [] });
+			await expect(promise).rejects.toBeInstanceOf(AppError);
+			await expect(promise).rejects.toMatchObject({ code: 'AI_INVALID_KEY' });
+		});
+
+		it('maps a 429 rate_limit to AppError(AI_RATE_LIMIT)', async () => {
+			vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+				jsonResponse({ error: { code: 'rate_limit', message: 'OpenRouter rate limited' } }, 429),
+			);
+
+			const promise = client.complete({ model: 'm1', messages: [] });
+			await expect(promise).rejects.toBeInstanceOf(AppError);
+			await expect(promise).rejects.toMatchObject({ code: 'AI_RATE_LIMIT' });
+		});
+
+		it('treats a bare 401 (no error.code) as AI_INVALID_KEY, not MissingCredentials', async () => {
+			vi.mocked(globalThis.fetch).mockResolvedValueOnce(jsonResponse({}, 401));
+
+			const promise = client.complete({ model: 'm1', messages: [] });
+			await expect(promise).rejects.toBeInstanceOf(AppError);
+			await expect(promise).rejects.toMatchObject({ code: 'AI_INVALID_KEY' });
+		});
 	});
 
 	describe('streamComplete', () => {
@@ -126,6 +158,46 @@ describe('OpenRouterClient (browser proxy)', () => {
 					void _chunk;
 				}
 			}).rejects.toThrow(/upstream boom/);
+		});
+
+		it('maps a 401 invalid_key pre-stream to AppError(AI_INVALID_KEY)', async () => {
+			vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+				jsonResponse(
+					{ error: { code: 'invalid_key', message: 'OpenRouter stream failed: bad token' } },
+					401,
+				),
+			);
+
+			let caught: unknown;
+			try {
+				for await (const _chunk of client.streamComplete({ model: 'm1', messages: [] })) {
+					void _chunk;
+				}
+			} catch (err) {
+				caught = err;
+			}
+			expect(caught).toBeInstanceOf(AppError);
+			expect(caught).toMatchObject({ code: 'AI_INVALID_KEY' });
+		});
+
+		it('maps a 429 rate_limit pre-stream to AppError(AI_RATE_LIMIT)', async () => {
+			vi.mocked(globalThis.fetch).mockResolvedValueOnce(
+				jsonResponse(
+					{ error: { code: 'rate_limit', message: 'OpenRouter rate limited' } },
+					429,
+				),
+			);
+
+			let caught: unknown;
+			try {
+				for await (const _chunk of client.streamComplete({ model: 'm1', messages: [] })) {
+					void _chunk;
+				}
+			} catch (err) {
+				caught = err;
+			}
+			expect(caught).toBeInstanceOf(AppError);
+			expect(caught).toMatchObject({ code: 'AI_RATE_LIMIT' });
 		});
 	});
 });

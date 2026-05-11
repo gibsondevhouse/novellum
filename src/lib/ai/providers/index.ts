@@ -2,6 +2,7 @@ export type {
 	AiModel,
 	AiProvider,
 	AiProviderConfig,
+	AiProviderErrorCode,
 	AiProviderFactory,
 	CompletionMessage,
 	CompletionRequest,
@@ -9,6 +10,7 @@ export type {
 	StreamChunk,
 	ValidateKeyResult,
 } from './types.js';
+export { AiProviderError } from './types.js';
 export { OpenRouterProvider, createOpenRouterProvider } from './openrouter-provider.js';
 export {
 	OllamaProvider,

@@ -77,7 +77,15 @@ export interface CompletionResponse {
 export type StreamChunk =
 	| { type: 'delta'; content: string }
 	| { type: 'done'; finishReason: CompletionResponse['finishReason']; usage?: CompletionResponse['usage'] }
-	| { type: 'error'; message: string; recoverable: boolean };
+	| {
+			type: 'error';
+			message: string;
+			recoverable: boolean;
+			/** Set when the upstream HTTP status is known (pre-stream failures). */
+			status?: number;
+			/** Set when the failure can be classified — used by the proxy to map onto the user-facing AppError code. */
+			code?: AiProviderErrorCode;
+	  };
 
 export interface AiProvider {
 	/** Stable identifier used by the credential store (e.g. `'openrouter'`). */
@@ -132,3 +140,33 @@ export interface AiProviderConfig {
  * implementations behind the {@link AiProvider} interface.
  */
 export type AiProviderFactory = (config?: AiProviderConfig) => AiProvider;
+
+/**
+ * Discriminator for provider failures that the proxy and the browser
+ * client need to distinguish (so the UI can surface the right
+ * user-friendly message from `error-map`).
+ */
+export type AiProviderErrorCode = 'invalid_key' | 'rate_limit' | 'provider_error';
+
+/**
+ * Typed error thrown by an {@link AiProvider}'s `complete` / `stream`
+ * methods when the upstream vendor returns a 4xx / 5xx. The proxy
+ * (`/api/ai`) maps these codes onto HTTP status + a structured error
+ * body; the browser-side client (`OpenRouterClient`) maps the body
+ * back onto the user-facing `AppError` codes
+ * (`AI_INVALID_KEY`, `AI_RATE_LIMIT`).
+ *
+ * The `message` is the upstream provider's error text, with the
+ * caller's API key already redacted by the implementation.
+ */
+export class AiProviderError extends Error {
+	readonly code: AiProviderErrorCode;
+	readonly status: number;
+
+	constructor(code: AiProviderErrorCode, status: number, message: string) {
+		super(message);
+		this.name = 'AiProviderError';
+		this.code = code;
+		this.status = status;
+	}
+}

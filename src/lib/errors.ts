@@ -3,6 +3,8 @@ export type ErrorCode =
   | 'PREF_WRITE_FAILED'
   | 'DB_QUERY_FAILED'
   | 'AI_KEY_MISSING'
+  | 'AI_INVALID_KEY'
+  | 'AI_RATE_LIMIT'
   | 'AI_REQUEST_FAILED'
   | 'EXPORT_FAILED';
 
@@ -11,6 +13,10 @@ const ERROR_MESSAGES: Record<ErrorCode, string> = {
   PREF_WRITE_FAILED: 'Failed to save preference. Your settings may not have been saved.',
   DB_QUERY_FAILED: 'Database error. Please try again or restart the app.',
   AI_KEY_MISSING: 'No AI API key configured. Add your OpenRouter key in Settings → AI.',
+  AI_INVALID_KEY:
+    'Your AI API key was rejected. Open Settings → AI to update or re-enter your OpenRouter key.',
+  AI_RATE_LIMIT:
+    'Too many AI requests. Please wait a moment and try again.',
   AI_REQUEST_FAILED: 'AI request failed. Check your API key and network connection.',
   EXPORT_FAILED: 'Export failed. Please try again or choose a different format.',
 };

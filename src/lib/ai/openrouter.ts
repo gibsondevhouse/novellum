@@ -1,4 +1,5 @@
 import type { AIRequestPayload, AIResponse } from './types.js';
+import { AppError } from '../errors.js';
 
 /**
  * Browser-facing OpenRouter client.
@@ -17,6 +18,40 @@ export class MissingCredentialsError extends Error {
 }
 
 const PROXY_URL = '/api/ai';
+
+interface ProxyErrorBody {
+	error?: { code?: string; message?: string };
+}
+
+async function readProxyError(response: Response): Promise<ProxyErrorBody> {
+	try {
+		return (await response.json()) as ProxyErrorBody;
+	} catch {
+		return {};
+	}
+}
+
+/**
+ * Maps a non-OK proxy response onto the right user-facing error.
+ * Throws `MissingCredentialsError` for "no key configured", an
+ * `AppError` keyed on `AI_INVALID_KEY` / `AI_RATE_LIMIT` for the
+ * named DoD codes, or a generic `Error` carrying the upstream message.
+ */
+function throwMappedProxyError(response: Response, body: ProxyErrorBody, surface: string): never {
+	const code = body.error?.code;
+	const message = body.error?.message;
+
+	if (response.status === 401 && code === 'no_credentials') {
+		throw new MissingCredentialsError();
+	}
+	if (code === 'invalid_key' || (response.status === 401 && code !== 'no_credentials')) {
+		throw new AppError('AI_INVALID_KEY', new Error(message ?? `proxy ${surface} failed: 401`));
+	}
+	if (code === 'rate_limit' || response.status === 429) {
+		throw new AppError('AI_RATE_LIMIT', new Error(message ?? `proxy ${surface} failed: 429`));
+	}
+	throw new Error(`[OpenRouterClient] proxy ${surface} failed: ${message ?? response.status}`);
+}
 
 async function postProxy(body: object, init?: { signal?: AbortSignal }): Promise<Response> {
 	return fetch(PROXY_URL, {
@@ -37,18 +72,9 @@ export class OpenRouterClient {
 			options,
 		);
 
-		if (response.status === 401) {
-			throw new MissingCredentialsError();
-		}
 		if (!response.ok || !response.body) {
-			let detail = `${response.status}`;
-			try {
-				const body = (await response.json()) as { error?: { message?: string } };
-				if (body?.error?.message) detail = body.error.message;
-			} catch {
-				/* ignore */
-			}
-			throw new Error(`[OpenRouterClient] proxy stream failed: ${detail}`);
+			const body = await readProxyError(response);
+			throwMappedProxyError(response, body, 'stream');
 		}
 
 		const reader = response.body.getReader();
@@ -96,18 +122,9 @@ export class OpenRouterClient {
 			options,
 		);
 
-		if (response.status === 401) {
-			throw new MissingCredentialsError();
-		}
 		if (!response.ok) {
-			let detail = `${response.status}`;
-			try {
-				const body = (await response.json()) as { error?: { message?: string } };
-				if (body?.error?.message) detail = body.error.message;
-			} catch {
-				/* ignore */
-			}
-			throw new Error(`[OpenRouterClient] proxy complete failed: ${detail}`);
+			const body = await readProxyError(response);
+			throwMappedProxyError(response, body, 'complete');
 		}
 
 		const data = (await response.json()) as {

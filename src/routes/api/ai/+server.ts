@@ -6,11 +6,17 @@ import { db } from '$lib/server/db/index.js';
 import type { ChatInstruction, SystemPrompt, WritingStyle } from '$lib/db/domain-types.js';
 import { createCredentialService } from '$lib/server/credentials/credential-service.js';
 import {
+	AiProviderError,
 	createOpenRouterProvider,
 	createOllamaProvider,
 	OLLAMA_DEFAULT_BASE_URL,
 } from '$lib/ai/providers/index.js';
-import type { AiProvider, CompletionMessage } from '$lib/ai/providers/index.js';
+import type {
+	AiProvider,
+	AiProviderErrorCode,
+	CompletionMessage,
+	StreamChunk,
+} from '$lib/ai/providers/index.js';
 import { getPreference } from '$lib/server/preferences/preferences-service.js';
 import {
 	ACTIVE_PROVIDER_KEY,
@@ -110,6 +116,19 @@ function noCredentialsResponse(): Response {
 	);
 }
 
+function statusForProviderCode(code: AiProviderErrorCode, fallbackStatus?: number): number {
+	if (code === 'invalid_key') return 401;
+	if (code === 'rate_limit') return 429;
+	return fallbackStatus && fallbackStatus >= 400 ? fallbackStatus : 502;
+}
+
+function providerErrorResponse(err: AiProviderError): Response {
+	return json(
+		{ error: { code: err.code, message: err.message } },
+		{ status: statusForProviderCode(err.code, err.status) },
+	);
+}
+
 export const POST: RequestHandler = async ({ request }) => {
 	let body: unknown = null;
 	try {
@@ -141,26 +160,62 @@ async function handleProxy(body: ProxyBody): Promise<Response> {
 	const model = modelOverride ?? requestedModel;
 
 	if (wantStream) {
+		const iterator = provider.stream(apiKey, { model, messages })[Symbol.asyncIterator]();
+
+		// Peek the first chunk so pre-stream auth/rate-limit failures can be
+		// surfaced as a real HTTP error response (with the right status code
+		// and structured `error.code`) instead of being swallowed inside an
+		// SSE error event after a 200.
+		let firstResult: IteratorResult<StreamChunk>;
+		try {
+			firstResult = await iterator.next();
+		} catch (err) {
+			if (err instanceof AiProviderError) {
+				return providerErrorResponse(err);
+			}
+			const message = err instanceof Error ? err.message : 'stream init error';
+			return json({ error: { code: 'provider_error', message } }, { status: 502 });
+		}
+
+		if (!firstResult.done && firstResult.value.type === 'error' && firstResult.value.code) {
+			return json(
+				{
+					error: {
+						code: firstResult.value.code,
+						message: firstResult.value.message,
+					},
+				},
+				{ status: statusForProviderCode(firstResult.value.code, firstResult.value.status) },
+			);
+		}
+
 		const encoder = new TextEncoder();
 		const stream = new ReadableStream<Uint8Array>({
 			async start(controller) {
+				const emit = (chunk: StreamChunk) => {
+					if (chunk.type === 'delta') {
+						controller.enqueue(
+							encoder.encode(
+								`data: ${JSON.stringify({ choices: [{ delta: { content: chunk.content } }] })}\n\n`,
+							),
+						);
+					} else if (chunk.type === 'done') {
+						controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+					} else {
+						controller.enqueue(
+							encoder.encode(
+								`data: ${JSON.stringify({ error: { message: chunk.message } })}\n\n`,
+							),
+						);
+					}
+				};
+
 				try {
-					for await (const chunk of provider.stream(apiKey, { model, messages })) {
-						if (chunk.type === 'delta') {
-							controller.enqueue(
-								encoder.encode(
-									`data: ${JSON.stringify({ choices: [{ delta: { content: chunk.content } }] })}\n\n`,
-								),
-							);
-						} else if (chunk.type === 'done') {
-							controller.enqueue(encoder.encode('data: [DONE]\n\n'));
-						} else {
-							controller.enqueue(
-								encoder.encode(
-									`data: ${JSON.stringify({ error: { message: chunk.message } })}\n\n`,
-								),
-							);
-						}
+					if (!firstResult.done) emit(firstResult.value);
+					while (true) {
+						const next = await iterator.next();
+						if (next.done) break;
+						emit(next.value);
 					}
 				} catch (err) {
 					controller.enqueue(
@@ -193,6 +248,9 @@ async function handleProxy(body: ProxyBody): Promise<Response> {
 			tokensUsed: result.usage?.totalTokens ?? 0,
 		});
 	} catch (err) {
+		if (err instanceof AiProviderError) {
+			return providerErrorResponse(err);
+		}
 		const message = err instanceof Error ? err.message : 'unknown';
 		return json({ error: { code: 'provider_error', message } }, { status: 502 });
 	}
@@ -252,6 +310,9 @@ async function handleTask(body: TaskBody): Promise<Response> {
 		});
 		return json({ content: result.content });
 	} catch (err) {
+		if (err instanceof AiProviderError) {
+			return providerErrorResponse(err);
+		}
 		const message = err instanceof Error ? err.message : 'unknown';
 		return json({ error: { code: 'provider_error', message } }, { status: 502 });
 	}
