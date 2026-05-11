@@ -51,7 +51,7 @@ describe('settings/backup/+page.svelte', () => {
 		expect(restoreBtn).toBeTruthy();
 	});
 
-	it('renders the "Create backup" button as disabled', () => {
+	it('renders the "Create backup" button as enabled (idle state)', () => {
 		component = mount(BackupPage, { target, props: {} });
 		flushSync();
 		const buttons = Array.from(target.querySelectorAll('button'));
@@ -59,6 +59,9 @@ describe('settings/backup/+page.svelte', () => {
 			b.textContent?.trim().includes('Create backup'),
 		);
 		expect(createBtn).toBeTruthy();
-		expect(createBtn?.disabled).toBe(true);
+		// Phase-007 (plan-024 stage-001) wired this button to /api/backup/all.
+		// It is now disabled only while a backup is in progress; the idle
+		// state is enabled so the user can click it.
+		expect(createBtn?.disabled).toBe(false);
 	});
 });
