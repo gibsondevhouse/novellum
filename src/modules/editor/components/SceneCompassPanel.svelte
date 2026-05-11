@@ -331,7 +331,7 @@
 	}
 
 	.signal-item--warn .signal-dot {
-		background: hsl(38 90% 55%);
+		background: hsl(38deg 90% 55%);
 	}
 
 	.signal-item--warn {
@@ -475,6 +475,6 @@
 		display: grid;
 		gap: 2px;
 		font-size: var(--text-xs);
-		color: hsl(38 90% 45%);
+		color: hsl(38deg 90% 45%);
 	}
 </style>

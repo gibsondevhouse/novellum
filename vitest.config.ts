@@ -18,6 +18,7 @@ export default defineConfig({
 			'build/**',
 			'src-tauri/target/**',
 			'.svelte-kit/**',
+			'.claude/**',
 		],
 		coverage: {
 			provider: 'v8',
