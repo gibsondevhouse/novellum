@@ -2,6 +2,7 @@
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
+	import { saveKey } from '$lib/ai/credential-service.js';
 
 	interface Props {
 		onNext: () => void;
@@ -23,20 +24,14 @@
 		errorMsg = '';
 		successMsg = '';
 		try {
-			const res = await fetch('/api/settings/ai-key', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ providerId: 'openrouter', apiKey: apiKey.trim(), action: 'save' }),
-			});
-			if (res.ok) {
-				successMsg = 'API key saved.';
-				onNext();
-			} else {
-				const data = (await res.json()) as { error?: { message?: string } };
-				errorMsg = data.error?.message ?? 'Failed to save key. Please try again.';
-			}
-		} catch {
-			errorMsg = 'Could not reach the server. Please try again.';
+			await saveKey('openrouter', apiKey.trim());
+			successMsg = 'API key saved.';
+			onNext();
+		} catch (err) {
+			errorMsg =
+				err instanceof Error && err.message
+					? err.message
+					: 'Failed to save key. Please try again.';
 		} finally {
 			saving = false;
 		}

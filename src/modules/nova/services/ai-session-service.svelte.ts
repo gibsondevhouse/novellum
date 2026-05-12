@@ -21,8 +21,27 @@ export class AiSessionStore {
 	error = $state<string | null>(null);
 	/** True once the first hydrate() call has settled. */
 	checked = $state<boolean>(false);
+	#listenerAttached = false;
+	#listener: ((event: Event) => void) | null = null;
+
+	constructor() {
+		this.#ensureKeyChangeListener();
+	}
+
+	#ensureKeyChangeListener(): void {
+		if (this.#listenerAttached) return;
+		if (typeof window === 'undefined') return;
+		this.#listener = (event: Event) => {
+			const detail = (event as CustomEvent<{ providerId?: string }>).detail;
+			const provider = detail?.providerId ?? this.providerId;
+			void this.hydrate(provider);
+		};
+		window.addEventListener('novellum:ai-key-changed', this.#listener);
+		this.#listenerAttached = true;
+	}
 
 	async hydrate(provider = 'openrouter'): Promise<void> {
+		this.#ensureKeyChangeListener();
 		this.loading = true;
 		this.error = null;
 		try {
@@ -51,6 +70,11 @@ export class AiSessionStore {
 		this.loading = false;
 		this.error = null;
 		this.checked = false;
+		if (this.#listener && typeof window !== 'undefined') {
+			window.removeEventListener('novellum:ai-key-changed', this.#listener);
+		}
+		this.#listener = null;
+		this.#listenerAttached = false;
 	}
 }
 

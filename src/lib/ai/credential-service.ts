@@ -61,6 +61,18 @@ export async function getStatus(
 	return readJson<ProviderStatus>(res);
 }
 
+/**
+ * Broadcast that the stored credential set changed so other modules
+ * (notably the Nova copilot's `aiSession` store) can re-hydrate their
+ * cached status without a page reload. Safe to no-op on the server.
+ */
+function notifyKeyChanged(providerId: string, action: 'save' | 'delete'): void {
+	if (typeof window === 'undefined') return;
+	window.dispatchEvent(
+		new CustomEvent('novellum:ai-key-changed', { detail: { providerId, action } }),
+	);
+}
+
 export async function saveKey(
 	providerId: string,
 	apiKey: string,
@@ -72,7 +84,9 @@ export async function saveKey(
 		headers: { 'content-type': 'application/json' },
 		body: JSON.stringify({ providerId, apiKey, action: 'save' }),
 	});
-	return readJson<ProviderStatus>(res);
+	const status = await readJson<ProviderStatus>(res);
+	notifyKeyChanged(providerId, 'save');
+	return status;
 }
 
 export async function deleteKey(
@@ -86,6 +100,7 @@ export async function deleteKey(
 		body: JSON.stringify({ providerId, action: 'delete' }),
 	});
 	await readJson<{ ok: true }>(res);
+	notifyKeyChanged(providerId, 'delete');
 }
 
 export async function testKey(

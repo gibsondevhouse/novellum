@@ -198,6 +198,15 @@
 			stopResize(false);
 		};
 	});
+
+	// Re-check key status every time the panel transitions to open.
+	// Covers the "save key → open Nova" path where mount-time hydrate
+	// already ran before the credential existed.
+	$effect(() => {
+		if (novaPanel.isOpen) {
+			void aiSession.hydrate();
+		}
+	});
 </script>
 
 {#if novaPanel.isOpen}
