@@ -42,3 +42,24 @@ export function extractSignalTerms(text: string): string[] {
 		.filter((token) => token.length >= 4)
 		.slice(0, 5);
 }
+
+/**
+ * Maps a warn-severity live signal to a targeted Nova prompt the writer
+ * can send with one click. References the scene goal when present so
+ * Nova gives concrete, scene-specific guidance rather than generic advice.
+ */
+export function signalToNovaPrompt(signal: string, sceneGoal: string): string {
+	const goalCtx = sceneGoal.trim() ? ` The scene goal is: "${sceneGoal.trim()}".` : '';
+	switch (signal) {
+		case 'Low tension detected in recent paragraphs.':
+			return `My recent paragraphs feel low on tension.${goalCtx} Suggest 2–3 specific ways to raise tension without discarding what's already on the page.`;
+		case 'No clear conflict present yet.':
+			return `I'm past the opening of my scene and there's no clear conflict yet.${goalCtx} How should I introduce it now in a way that feels natural rather than forced?`;
+		case 'No turning point detected yet.':
+			return `My scene is nearing its target length but I haven't written a turning point.${goalCtx} Suggest a concrete turning point that fits what's already on the page.`;
+		case 'Scene may be drifting from its goal.':
+			return `My scene seems to be drifting.${goalCtx} What's likely missing, and what's the smallest change that gets it back on track?`;
+		default:
+			return signal;
+	}
+}

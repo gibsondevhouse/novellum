@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { novaPanel } from '$modules/nova';
+	import { sceneIntent } from '$lib/stores/scene-intent.svelte.js';
 	import { editorState } from '../stores/editor.svelte.js';
 	import * as autosaveService from '../services/autosave-service.js';
 	import ManuscriptEditorPane from './ManuscriptEditorPane.svelte';
@@ -20,6 +21,7 @@
 	import SceneNavigator from './SceneNavigator.svelte';
 	import SceneContextPanel from './SceneContextPanel.svelte';
 	import SceneCompassPanel from './SceneCompassPanel.svelte';
+	import SceneSignalNudge from './SceneSignalNudge.svelte';
 	import { useSceneSignals } from '../services/scene-signals.svelte.js';
 	import { countWords } from '../services/scene-analysis-utils.js';
 	import type { OutcomeType, SceneLengthEstimate, SceneDefinition } from '../services/scene-signals.svelte.js';
@@ -116,6 +118,38 @@
 
 	const { activeWordCount, sceneTargetWords, sceneProgress, pacingHint, liveSignals, progressFlags, sceneCompassRows } = signals;
 
+	$effect(() => {
+		const sceneId = editorState.activeSceneId;
+		if (!sceneId) {
+			sceneIntent.clear();
+			return;
+		}
+		sceneIntent.set({
+			sceneId,
+			quickGoal: quickIntent.goal,
+			quickObstacle: quickIntent.obstacle,
+			quickOutcome: quickIntent.outcome,
+			sceneGoal: sceneDefinition.sceneGoal,
+			immediateObstacle: sceneDefinition.immediateObstacle,
+			tensionSource: sceneDefinition.tensionSource,
+			turningPoint: sceneDefinition.turningPoint,
+			outcome: sceneDefinition.outcome,
+			startState: sceneDefinition.startState,
+			endState: sceneDefinition.endState,
+			liveSignals: signals.liveSignals,
+			progressFlags: signals.progressFlags,
+			pacingHint: signals.pacingHint,
+			wordCount: signals.activeWordCount,
+			targetWords: signals.sceneTargetWords,
+		});
+	});
+
+	$effect(() => {
+		return () => {
+			sceneIntent.clear();
+		};
+	});
+
 	const totalCurrentWords = $derived.by(() => {
 		return data.scenes.reduce(
 			(sum: number, scene: Scene) => sum + countWords(scene.content ?? ''),
@@ -188,42 +222,44 @@
 			// Reconcile with SQLite-canonical store (clarity is shared with the outliner).
 			const pid = scene.projectId;
 			const sid = scene.id;
-			void getProjectMetadata<Partial<SceneDefinition> | null>(
-				pid,
-				'scene',
-				sid,
-				'clarity',
-				null,
-			).then((remote) => {
-				if (!remote || sid !== currentSceneId) return;
-				sceneDefinition = {
-					sceneGoal: remote.sceneGoal ?? sceneDefinition.sceneGoal,
-					immediateObstacle: remote.immediateObstacle ?? sceneDefinition.immediateObstacle,
-					tensionSource: remote.tensionSource ?? sceneDefinition.tensionSource,
-					turningPoint: remote.turningPoint ?? sceneDefinition.turningPoint,
-					outcome: (remote.outcome as OutcomeType) ?? sceneDefinition.outcome,
-					startState: remote.startState ?? sceneDefinition.startState,
-					endState: remote.endState ?? sceneDefinition.endState,
-					draftStatus: remote.draftStatus ?? sceneDefinition.draftStatus,
-					lengthEstimate:
-						(remote.lengthEstimate as SceneLengthEstimate) ?? sceneDefinition.lengthEstimate,
-				};
-			});
-			void getProjectMetadata<Partial<QuickIntent> | null>(
-				pid,
-				'scene',
-				sid,
-				'quickIntent',
-				null,
-			).then((remote) => {
-				if (!remote || sid !== currentSceneId) return;
-				quickIntent = {
-					goal: remote.goal ?? quickIntent.goal,
-					obstacle: remote.obstacle ?? quickIntent.obstacle,
-					outcome: (remote.outcome as OutcomeType) ?? quickIntent.outcome,
-				};
-				// Phase 4: removed localStorage.setItem cache write
-			});
+			void (async () => {
+				const clarity = await getProjectMetadata<Partial<SceneDefinition> | null>(
+					pid, 'scene', sid, 'clarity', null,
+				);
+				if (sid !== currentSceneId) return;
+				if (clarity) {
+					sceneDefinition = {
+						sceneGoal: clarity.sceneGoal ?? sceneDefinition.sceneGoal,
+						immediateObstacle: clarity.immediateObstacle ?? sceneDefinition.immediateObstacle,
+						tensionSource: clarity.tensionSource ?? sceneDefinition.tensionSource,
+						turningPoint: clarity.turningPoint ?? sceneDefinition.turningPoint,
+						outcome: (clarity.outcome as OutcomeType) ?? sceneDefinition.outcome,
+						startState: clarity.startState ?? sceneDefinition.startState,
+						endState: clarity.endState ?? sceneDefinition.endState,
+						draftStatus: clarity.draftStatus ?? sceneDefinition.draftStatus,
+						lengthEstimate: (clarity.lengthEstimate as SceneLengthEstimate) ?? sceneDefinition.lengthEstimate,
+					};
+				}
+				const savedIntent = await getProjectMetadata<Partial<QuickIntent> | null>(
+					pid, 'scene', sid, 'quickIntent', null,
+				);
+				if (sid !== currentSceneId) return;
+				if (savedIntent) {
+					quickIntent = {
+						goal: savedIntent.goal ?? quickIntent.goal,
+						obstacle: savedIntent.obstacle ?? quickIntent.obstacle,
+						outcome: (savedIntent.outcome as OutcomeType) ?? quickIntent.outcome,
+					};
+				} else if (sceneDefinition.sceneGoal) {
+					// Auto-seed Quick Intent from scene definition when none is saved yet.
+					quickIntent = {
+						goal: sceneDefinition.sceneGoal,
+						obstacle: sceneDefinition.immediateObstacle,
+						outcome: sceneDefinition.outcome,
+					};
+					void setProjectMetadata<QuickIntent>(pid, 'scene', sid, 'quickIntent', quickIntent);
+				}
+			})();
 		}
 	});
 
@@ -401,6 +437,13 @@
 				onClose={() => editorPreferences.setMode('writing')}
 			/>
 		{/if}
+
+		<SceneSignalNudge
+			signals={liveSignals}
+			sceneGoal={quickIntent.goal || sceneDefinition.sceneGoal}
+			sceneId={editorState.activeSceneId}
+		/>
+
 		<footer class="editor-footer" aria-label="Writing progress">
 			<div class="progress-block">
 				<span>Scene progress</span>
@@ -487,6 +530,7 @@
 	}
 
 	.editor-area {
+		position: relative;
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;

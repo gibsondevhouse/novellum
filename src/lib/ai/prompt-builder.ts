@@ -7,6 +7,46 @@ import {
 	NOVA_IDENTITY_BLOCK,
 } from './constants.js';
 
+function serializeSceneIntent(intent: NonNullable<AiContext['sceneIntent']>): string[] {
+	const lines: string[] = [];
+	const goal = intent.quickGoal.trim() || intent.sceneGoal.trim();
+	const obstacle = intent.quickObstacle.trim() || intent.immediateObstacle.trim();
+	const outcome = intent.quickOutcome.trim() || intent.outcome.trim();
+
+	const intentLines: string[] = [];
+	if (goal) intentLines.push(`- Goal: ${goal}`);
+	if (obstacle) intentLines.push(`- Obstacle: ${obstacle}`);
+	if (intent.tensionSource.trim()) intentLines.push(`- Tension source: ${intent.tensionSource.trim()}`);
+	if (intent.turningPoint.trim()) intentLines.push(`- Planned turning point: ${intent.turningPoint.trim()}`);
+	if (outcome) intentLines.push(`- Intended outcome: ${outcome}`);
+	if (intent.startState.trim() && intent.endState.trim()) {
+		intentLines.push(`- State change: ${intent.startState.trim()} -> ${intent.endState.trim()}`);
+	}
+
+	if (intentLines.length > 0) {
+		lines.push('\nSCENE INTENT (writer-defined direction for this scene):');
+		lines.push(...intentLines);
+	}
+
+	if (intent.liveSignals.length > 0) {
+		lines.push('\nLIVE WRITING SIGNALS (computed from current draft):');
+		intent.liveSignals.forEach((sig) => lines.push(`- ${sig}`));
+	}
+
+	if (intent.progressFlags.length > 0) {
+		lines.push('\nPROGRESS FLAGS:');
+		intent.progressFlags.forEach((flag) => lines.push(`- ${flag}`));
+	}
+
+	if (intent.targetWords > 0) {
+		lines.push(
+			`\nDRAFT PROGRESS: ${intent.wordCount} of ${intent.targetWords} words (pacing read: ${intent.pacingHint || 'unknown'})`,
+		);
+	}
+
+	return lines;
+}
+
 function serializeContext(ctx: AiContext): string {
 	const lines: string[] = [];
 
@@ -14,6 +54,10 @@ function serializeContext(ctx: AiContext): string {
 		lines.push(`ACTIVE SCENE: "${ctx.scene.title}"`);
 		if (ctx.scene.summary) lines.push(`Summary: ${ctx.scene.summary}`);
 		if (ctx.scene.content) lines.push(`Content:\n${ctx.scene.content}`);
+	}
+
+	if (ctx.sceneIntent) {
+		lines.push(...serializeSceneIntent(ctx.sceneIntent));
 	}
 
 	if (ctx.adjacentScenes.length > 0) {
@@ -86,6 +130,12 @@ export function buildPrompt(task: AiTask, ctx: AiContext): string {
 		'Do not explain reasoning unless explicitly requested.',
 		...(CONSTRAINTS_BY_TYPE[task.taskType] ?? []),
 	];
+
+	if (ctx.sceneIntent) {
+		constraints.push(
+			'Honor the writer-defined SCENE INTENT (goal, obstacle, turning point, outcome) when suggesting prose, plot moves, or revisions. Treat LIVE WRITING SIGNALS as observations the writer has not yet addressed — surface them when relevant rather than restating them verbatim.',
+		);
+	}
 
 	let contextBody = serializeContext(ctx);
 
