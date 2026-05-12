@@ -41,6 +41,7 @@ export default defineConfig({
 			$modules: resolve(__dirname, 'src/modules'),
 			'$app/state': resolve(__dirname, 'tests/__mocks__/app-state.ts'),
 			'$app/navigation': resolve(__dirname, 'tests/__mocks__/app-navigation.ts'),
+			'$app/environment': resolve(__dirname, 'tests/__mocks__/app-environment.ts'),
 		},
 		conditions: ['browser'],
 	},

@@ -1,4 +1,29 @@
-import DOMPurify from 'isomorphic-dompurify';
+import { browser } from '$app/environment';
+
+// `isomorphic-dompurify` transitively loads `jsdom` on Node, which now
+// requires() ESM-only deps (`@exodus/bytes`). Inside the packaged Tauri
+// sidecar (Node 22.11 without `require(esm)`) that throws ERR_REQUIRE_ESM
+// at module-load time, taking down any server route that touches this
+// file via SSR. The browser is the only context where output is ever
+// injected as raw HTML, so we lazy-load DOMPurify there and skip it on
+// the server (parseMarkdown already HTML-escapes the input).
+type DomPurifyLike = { sanitize(input: string): string };
+let domPurify: DomPurifyLike | null = null;
+let domPurifyLoading: Promise<DomPurifyLike | null> | null = null;
+
+async function loadDomPurify(): Promise<DomPurifyLike | null> {
+	if (!browser) return null;
+	if (domPurify) return domPurify;
+	if (!domPurifyLoading) {
+		domPurifyLoading = import('isomorphic-dompurify')
+			.then((mod) => {
+				domPurify = mod.default as DomPurifyLike;
+				return domPurify;
+			})
+			.catch(() => null);
+	}
+	return domPurifyLoading;
+}
 
 export function escapeHtml(unsafe: string): string {
 	return unsafe
@@ -39,6 +64,13 @@ export function parseMarkdown(md: string): string {
 	return html;
 }
 
+// Kick off DOMPurify loading eagerly in the browser so the first
+// sanitized render usually catches it; parseMarkdown's output is
+// already entity-escaped with a controlled tag whitelist, so the
+// pre-load window is safe.
+if (browser) void loadDomPurify();
+
 export function safeHtml(raw: string): string {
-	return DOMPurify.sanitize(parseMarkdown(raw));
+	const html = parseMarkdown(raw);
+	return domPurify ? domPurify.sanitize(html) : html;
 }
