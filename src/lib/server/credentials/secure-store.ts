@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile, rename, chmod, stat } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
+import { homedir } from 'node:os';
 import { resolveAppDataDir } from '$lib/server/app-data/path.js';
 
 /**
@@ -46,8 +47,49 @@ function resolveStoreDirectory(override?: string): string {
 export function createFileSystemSecureStore(options: { appDataDir?: string } = {}): SecureStore {
 	const dir = resolveStoreDirectory(options.appDataDir);
 	const filePath = join(dir, 'credentials.json');
+	// Legacy location used by dev builds and pre-stage-008 V0 installs.
+	// On first read of a fresh desktop install we one-shot copy it into
+	// the OS-conventional location so users don't lose their saved API
+	// key when they move from `pnpm dev` to a packaged DMG.
+	const legacyFilePath = join(homedir(), '.novellum', 'credentials.json');
+	let migrationAttempted = false;
+
+	async function migrateLegacyIfNeeded(): Promise<void> {
+		if (migrationAttempted) return;
+		migrationAttempted = true;
+		// Never migrate in test mode — the legacy path is a real user
+		// directory and would leak credentials into unit-test fixtures.
+		if (process.env.VITEST === 'true' || process.env.NODE_ENV === 'test') return;
+		// Never migrate when we ARE the legacy location (dev mode).
+		if (filePath === legacyFilePath) return;
+		try {
+			await stat(filePath);
+			return; // destination already populated — nothing to do
+		} catch (err) {
+			if ((err as NodeJS.ErrnoException).code !== 'ENOENT') return;
+		}
+		let raw: string;
+		try {
+			raw = await readFile(legacyFilePath, 'utf8');
+		} catch {
+			return; // no legacy file — clean first run
+		}
+		try {
+			await mkdir(dirname(filePath), { recursive: true });
+			const tmp = `${filePath}.tmp-${process.pid}-${Date.now()}`;
+			await writeFile(tmp, raw, 'utf8');
+			if (process.platform !== 'win32') {
+				await chmod(tmp, 0o600);
+			}
+			await rename(tmp, filePath);
+		} catch {
+			// Migration is best-effort; if the new location is unwritable
+			// the user can re-enter the key from Settings. Never throw.
+		}
+	}
 
 	async function readAll(): Promise<FileStoreShape> {
+		await migrateLegacyIfNeeded();
 		try {
 			const raw = await readFile(filePath, 'utf8');
 			const parsed = JSON.parse(raw) as unknown;

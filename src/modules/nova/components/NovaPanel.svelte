@@ -10,6 +10,7 @@
 	import { novaPanel } from '../stores/nova-panel.svelte.js';
 	import { novaSession } from '../stores/nova-session.svelte.js';
 	import { aiSession } from '../services/ai-session-service.svelte.js';
+	import { sendNovaChat } from '../services/chat-service.js';
 	import { classifyNovaError } from '../utils/classify-nova-error.js';
 	import EmptyStatePanel from '$lib/components/ui/EmptyStatePanel.svelte';
 	import ContextDisclosurePill from './ContextDisclosurePill.svelte';
@@ -58,6 +59,20 @@
 		return null;
 	});
 	const novaErrorType = $derived(novaError ? classifyNovaError(novaError) : null);
+
+	function handleRetry(): void {
+		// Pop the failed assistant turn, re-run the AI pipeline against the
+		// last user prompt without duplicating it in the message log.
+		const lastUser = novaSession.removeFailedAssistantTurn();
+		if (!lastUser) return;
+		void sendNovaChat({
+			prompt: lastUser.content,
+			projectId,
+			activeSceneId,
+			activeChapterId,
+			skipUserAppend: true,
+		});
+	}
 
 	function clampPanelWidth(next: number): number {
 		if (!Number.isFinite(next)) return PANEL_DEFAULT_WIDTH;
@@ -273,7 +288,7 @@
 						{messages}
 						{novaError}
 						{novaErrorType}
-						onRetry={() => novaSession.clear()}
+						onRetry={handleRetry}
 					/>
 				{/if}
 			{/if}

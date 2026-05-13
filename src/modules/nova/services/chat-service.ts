@@ -29,6 +29,12 @@ export interface SendChatInput {
 	projectId: string | null;
 	activeSceneId: string | null;
 	activeChapterId: string | null;
+	/**
+	 * When true, the user prompt is assumed to already be in the message
+	 * log (e.g. a retry after a failed assistant turn) and a duplicate
+	 * user message is NOT appended.
+	 */
+	skipUserAppend?: boolean;
 }
 
 /**
@@ -52,7 +58,9 @@ export async function sendNovaChat(input: SendChatInput): Promise<void> {
 	const trimmed = input.prompt.trim();
 	if (!trimmed || novaSession.isStreaming) return;
 
-	novaSession.append({ role: 'user', content: trimmed, status: 'complete' });
+	if (!input.skipUserAppend) {
+		novaSession.append({ role: 'user', content: trimmed, status: 'complete' });
+	}
 
 	// 2026-05-13 (plan-025): the no-scene branch used to route to a
 	// dedicated 'brainstorm' task. That TaskType was cut from the V1

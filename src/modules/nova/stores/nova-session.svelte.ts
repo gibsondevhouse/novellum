@@ -75,13 +75,10 @@ class NovaSessionStore {
 	appendDelta(id: string, delta: string): void {
 		const idx = this.messages.findIndex((m) => m.id === id);
 		if (idx === -1) return;
-		const current = this.messages[idx];
-		const next: NovaMessage = { ...current, content: current.content + delta };
-		this.messages = [
-			...this.messages.slice(0, idx),
-			next,
-			...this.messages.slice(idx + 1),
-		];
+		// Svelte 5 runes track property writes on items inside a $state array,
+		// so we mutate in place. Previously we rebuilt the entire array on
+		// every SSE delta which caused N^2 DOM re-renders on long replies.
+		this.messages[idx].content += delta;
 	}
 
 	endStream(id: string): void {
@@ -129,6 +126,23 @@ class NovaSessionStore {
 		this.controllers.clear();
 		this.messages = [];
 		this.activeStreamId = null;
+	}
+
+	/**
+	 * Removes the trailing failed assistant turn (status === 'error') so a
+	 * retry can run without duplicating the user prompt. Returns the user
+	 * message that preceded the error, or null if no error/user pair was
+	 * found. Used by NovaPanel's "Try again" button.
+	 */
+	removeFailedAssistantTurn(): NovaMessage | null {
+		const lastIdx = this.messages.length - 1;
+		if (lastIdx < 0) return null;
+		const tail = this.messages[lastIdx];
+		if (tail.status !== 'error') return null;
+		// Drop the failed assistant message; keep history & last user prompt.
+		this.messages = this.messages.slice(0, lastIdx);
+		const userIdx = this.messages.findLastIndex((m) => m.role === 'user');
+		return userIdx === -1 ? null : this.messages[userIdx];
 	}
 
 	/** Test hook — returns the controller's signal so consumers (and

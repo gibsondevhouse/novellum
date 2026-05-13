@@ -149,12 +149,12 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 
 	if (isProxyShape(body)) {
-		return handleProxy(body);
+		return handleProxy(body, request.signal);
 	}
-	return handleTask(body as TaskBody);
+	return handleTask(body as TaskBody, request.signal);
 };
 
-async function handleProxy(body: ProxyBody): Promise<Response> {
+async function handleProxy(body: ProxyBody, signal: AbortSignal): Promise<Response> {
 	const requestedModel = body.model as string;
 	const messages = body.messages as CompletionMessage[];
 	const wantStream = body.stream === true;
@@ -175,6 +175,7 @@ async function handleProxy(body: ProxyBody): Promise<Response> {
 			model,
 			messages,
 			maxTokens: MAX_OUTPUT_TOKENS,
+			signal,
 		})[Symbol.asyncIterator]();
 
 		// Peek the first chunk so pre-stream auth/rate-limit failures can be
@@ -260,6 +261,7 @@ async function handleProxy(body: ProxyBody): Promise<Response> {
 			model,
 			messages,
 			maxTokens: MAX_OUTPUT_TOKENS,
+			signal,
 		});
 		return json({
 			text: result.content,
@@ -275,7 +277,7 @@ async function handleProxy(body: ProxyBody): Promise<Response> {
 	}
 }
 
-async function handleTask(body: TaskBody): Promise<Response> {
+async function handleTask(body: TaskBody, signal: AbortSignal): Promise<Response> {
 	if (!body?.action || typeof body.action !== 'string') {
 		error(400, 'Missing or invalid "action" field');
 	}
@@ -327,6 +329,7 @@ async function handleTask(body: TaskBody): Promise<Response> {
 			model,
 			messages: [{ role: 'user', content: prompt }],
 			maxTokens: MAX_OUTPUT_TOKENS,
+			signal,
 		});
 		return json({ content: result.content });
 	} catch (err) {

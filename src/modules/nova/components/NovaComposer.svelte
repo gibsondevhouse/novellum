@@ -187,6 +187,7 @@
 				bind:value={selectedMode}
 				aria-label="Copilot chat mode"
 				title={`${selectedModeMeta.label} mode`}
+				disabled={isStreaming}
 			>
 				{#each CHAT_MODE_OPTIONS as option (option.value)}
 					<option value={option.value}>{option.shortLabel}</option>
