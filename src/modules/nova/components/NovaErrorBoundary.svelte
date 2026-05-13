@@ -42,8 +42,38 @@
 	};
 
 	const copy = $derived(errorType ? ERROR_COPY[errorType] : null);
+	// Show the raw provider/transport error for `unknown` so we surface
+	// real failure context instead of just "An unexpected error occurred".
+	const rawDetail = $derived(errorType === 'unknown' && error ? error : null);
 </script>
 
 {#if error && copy}
 	<ErrorNotice title={copy.title} message={copy.message} retry={onRetry} />
+	{#if rawDetail}
+		<details class="nova-error-details">
+			<summary>Technical detail</summary>
+			<pre>{rawDetail}</pre>
+		</details>
+	{/if}
 {/if}
+
+<style>
+	.nova-error-details {
+		margin-top: var(--space-2);
+		font-size: var(--text-xs);
+		color: var(--color-text-secondary);
+	}
+	.nova-error-details summary {
+		cursor: pointer;
+		user-select: none;
+	}
+	.nova-error-details pre {
+		margin: var(--space-1) 0 0;
+		padding: var(--space-2);
+		background: var(--color-surface-overlay);
+		border: 1px solid var(--color-border-default);
+		border-radius: var(--radius-sm);
+		white-space: pre-wrap;
+		word-break: break-word;
+	}
+</style>
