@@ -30,11 +30,10 @@ export const GET: RequestHandler = async () => {
 	const dbInfo = describeDatabaseLocation();
 	const dirInfo = describeAppDataLocation();
 
-	// `:memory:` has no filesystem location; prefer the app-data dir
-	// for the free-space probe so the answer is still useful in test
-	// mode.
-	const probe = dbInfo.databasePath === ':memory:' ? dirInfo.appDataDir : dirInfo.appDataDir;
-	const diskSpace = await readDiskSpace(probe);
+	// `:memory:` has no filesystem location; the app-data dir is the
+	// useful probe in every mode (its parent volume is what fills up
+	// when projects, backups, and snapshots grow).
+	const diskSpace = await readDiskSpace(dirInfo.appDataDir);
 
 	return json({
 		mode: dirInfo.mode,
