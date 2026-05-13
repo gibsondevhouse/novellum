@@ -26,7 +26,8 @@ export type TaskType =
 	| 'rewrite'
 	| 'continuity_check'
 	| 'edit'
-	| 'style_check';
+	| 'style_check'
+	| 'chat';
 
 export type EditMode = 'developmental' | 'line_edit' | 'proofread';
 

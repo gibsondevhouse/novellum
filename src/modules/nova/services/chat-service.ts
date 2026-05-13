@@ -62,12 +62,14 @@ export async function sendNovaChat(input: SendChatInput): Promise<void> {
 		novaSession.append({ role: 'user', content: trimmed, status: 'complete' });
 	}
 
-	// 2026-05-13 (plan-025): the no-scene branch used to route to a
-	// dedicated 'brainstorm' task. That TaskType was cut from the V1
-	// surface; the resolver now falls through to the 'continue' default
-	// which preserves chat-style responses for prompts without scene
-	// context.
-	const action = 'continue';
+	// Nova is a chat-first surface: the user is having a working
+	// conversation with the AI about their novel, not asking it to
+	// continue prose. The 'chat' task gives the model a conversational
+	// role + plain-text output and prevents the "match existing tone,
+	// continue the narrative" framing from the 'continue' task, which
+	// caused the model to hallucinate manuscript text in response to
+	// brainstorming prompts.
+	const action = 'chat';
 	const uiCtx: UiContext = {
 		activeProjectId: input.projectId,
 		activeSceneId: input.activeSceneId,
@@ -112,10 +114,34 @@ export async function sendNovaChat(input: SendChatInput): Promise<void> {
 	const streaming = novaSession.beginStream('nova');
 	const signal = novaSession.getSignal(streaming.id);
 
+	// Reconstruct chat history so multi-turn brainstorming has memory.
+	// We include only completed user/nova turns (skip tool-call / system /
+	// errored messages) and cap the tail to keep the prompt bounded.
+	const HISTORY_TURN_LIMIT = 20;
+	const history = novaSession.messages
+		.filter(
+			(m) =>
+				(m.role === 'user' || m.role === 'nova') &&
+				m.status === 'complete' &&
+				m.content.trim().length > 0,
+		)
+		// Drop the in-flight assistant message (status would be 'streaming',
+		// already filtered) and the freshly-appended user turn — we add it
+		// explicitly below as the final user message.
+		.slice(-HISTORY_TURN_LIMIT);
+
+	const historyMessages = history
+		.slice(0, -1) // exclude the trailing user prompt; appended below
+		.map((m) => ({
+			role: (m.role === 'nova' ? 'assistant' : 'user') as 'assistant' | 'user',
+			content: m.content,
+		}));
+
 	const payload: AIRequestPayload & { tools?: ToolDefinition[] } = {
 		model: getSelectedModel(),
 		messages: [
 			{ role: 'system', content: systemPrompt },
+			...historyMessages,
 			{ role: 'user', content: trimmed },
 		],
 	};

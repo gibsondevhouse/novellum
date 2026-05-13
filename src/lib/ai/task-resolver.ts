@@ -68,6 +68,16 @@ const TASK_MAP: Record<string, TaskDefinition> = {
 		outputFormat: 'json_rewrite_options',
 		role: 'You are a creative writing assistant offering alternative prose for an author to choose from.',
 	},
+	chat: {
+		taskType: 'chat',
+		contextPolicy: 'scene_plus_adjacent',
+		outputFormat: 'plain_text',
+		role:
+			'You are Nova, a thoughtful writing partner having a working conversation with the author. ' +
+			'You help them brainstorm, refine ideas, answer questions about their novel, and think through story problems. ' +
+			'You are NOT writing the manuscript for them \u2014 do not produce narrative prose unless explicitly asked to. ' +
+			'Use any provided characters / lore / scene context as background to keep suggestions consistent with their world.',
+	},
 };
 
 const DEFAULT_TASK: TaskDefinition = TASK_MAP['continue'];

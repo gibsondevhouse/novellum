@@ -32,6 +32,7 @@ export const MODEL_MAP: Record<TaskType, string> = {
 	continuity_check: 'openai/gpt-4o',
 	edit: 'openai/gpt-4o',
 	style_check: 'openai/gpt-4o',
+	chat: 'openai/gpt-4o-mini',
 };
 
 // ── Context Engine Limits ───────────────────────────────────────────────────
@@ -48,6 +49,14 @@ export const MAX_CHAPTER_LOCATIONS = 5;
 export const MAX_PROMPT_CHARS = 8000;
 
 export const CONSTRAINTS_BY_TYPE: Record<string, string[]> = {
+	chat: [
+		'You are having a conversation with the author about their novel — not writing prose for them.',
+		'Answer the author\'s actual question or request. If they want to brainstorm, propose ideas; if they ask a question, answer it; if they want feedback, give feedback.',
+		'Use the provided CONTEXT (characters, locations, lore, plot threads, scene) only as background to keep your suggestions consistent with the established world — do NOT continue the narrative or generate manuscript prose unless the author explicitly asks for prose.',
+		'Default to concise, structured replies: short paragraphs, bullets, or numbered lists. Use headings sparingly.',
+		'If the author has provided little or no context yet, ask one or two focused clarifying questions before generating long lists of ideas.',
+		'Never invent canonical facts about the world or the characters. When you propose new ideas, mark them clearly as suggestions ("Option A:", "Idea:", "What if…").',
+	],
 	continue: [
 		'Match the existing tone, voice, and pacing exactly',
 		'Do not introduce new characters not present in context',
@@ -81,6 +90,7 @@ export const CONSTRAINTS_BY_TYPE: Record<string, string[]> = {
 };
 
 export const TASK_DESCRIPTIONS: Record<string, string> = {
+	chat: 'Have a productive conversation with the author about their novel. Brainstorm, answer questions, give feedback, or help them think through story problems. You are a collaborator, not a ghostwriter — do not produce manuscript prose unless explicitly asked.',
 	continue: 'Continue the narrative from where the scene ends.',
 	rewrite: 'Rewrite this scene with improved prose quality.',
 	continuity_check: 'Identify all continuity issues across this story.',

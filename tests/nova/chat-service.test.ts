@@ -159,10 +159,12 @@ describe('sendNovaChat', () => {
 		expect(last?.content).toBe('Once upon');
 	});
 
-	it('routes to the continue task when no scene is active', async () => {
-		// plan-025: the no-scene branch previously routed to a dedicated
-		// `brainstorm` task. That TaskType was cut from the V1 surface; the
-		// chat-service now falls through to the `continue` system prompt.
+	it('routes to the chat task when sending a Nova message', async () => {
+		// 2026-05-13: Nova is a chat-first surface. Sending a message must
+		// route through the dedicated `chat` task (conversational role,
+		// plain-text output) rather than `continue` (narrative-continuation
+		// role, prose output), otherwise the model hallucinates manuscript
+		// text in response to brainstorming prompts.
 		streamCompleteMock.mockReturnValueOnce(yieldChunks(['ok']));
 
 		await sendNovaChat({
@@ -174,9 +176,9 @@ describe('sendNovaChat', () => {
 
 		expect(streamCompleteMock).toHaveBeenCalledTimes(1);
 		const [payload] = streamCompleteMock.mock.calls[0];
-		expect(payload.messages[0].content.toLowerCase()).toContain(
-			'narrative continuation',
-		);
+		const systemPrompt = payload.messages[0].content.toLowerCase();
+		expect(systemPrompt).toContain('working conversation');
+		expect(systemPrompt).not.toContain('narrative continuation');
 	});
 
 	describe('agentic flag — tools field on the OpenRouter payload', () => {
