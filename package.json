@@ -26,9 +26,11 @@
 		"tauri": "tauri",
 		"version:sync": "node scripts/sync-tauri-version.mjs",
 		"fetch:node": "node scripts/fetch-node.mjs",
+		"smoke:built": "node scripts/smoke-built-server.mjs",
 		"desktop:dev": "tauri dev",
 		"predesktop:build": "node scripts/sync-tauri-version.mjs && node scripts/fetch-node.mjs",
 		"desktop:build": "tauri build",
+		"postdesktop:build": "pnpm smoke:built",
 		"predesktop:preview": "node scripts/sync-tauri-version.mjs && node scripts/fetch-node.mjs",
 		"desktop:preview": "tauri build --debug",
 		"changelog": "node scripts/generate-changelog.mjs"
