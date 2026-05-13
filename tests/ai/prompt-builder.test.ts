@@ -4,7 +4,7 @@ import { NOVA_IDENTITY_BLOCK } from '../../src/lib/ai/constants.js';
 import type { AiTask, AiContext } from '../../src/lib/ai/types.js';
 
 const task: AiTask = {
-	taskType: 'draft',
+	taskType: 'continue',
 	role: 'You are a literary fiction drafter.',
 	targetEntityId: 'scene-1',
 	contextPolicy: 'scene_only',

@@ -8,24 +8,6 @@ interface TaskDefinition {
 }
 
 const TASK_MAP: Record<string, TaskDefinition> = {
-	brainstorm: {
-		taskType: 'brainstorm',
-		contextPolicy: 'scene_plus_adjacent',
-		outputFormat: 'bullet_list',
-		role: 'You are a creative brainstorming assistant for fiction writing.',
-	},
-	outline: {
-		taskType: 'outline',
-		contextPolicy: 'outline_scope',
-		outputFormat: 'structured_beats',
-		role: 'You are a story structure expert specializing in scene and chapter outlines.',
-	},
-	draft: {
-		taskType: 'draft',
-		contextPolicy: 'scene_only',
-		outputFormat: 'prose',
-		role: 'You are a literary fiction drafter. Write vivid, grounded prose.',
-	},
 	continue: {
 		taskType: 'continue',
 		contextPolicy: 'scene_plus_adjacent',
@@ -55,18 +37,6 @@ const TASK_MAP: Record<string, TaskDefinition> = {
 		contextPolicy: 'chapter_scope',
 		outputFormat: 'json_issue_list',
 		role: 'You are a story continuity analyst reviewing a manuscript chapter for logical inconsistencies.',
-	},
-	summarize_scene: {
-		taskType: 'summarize',
-		contextPolicy: 'scene_only',
-		outputFormat: 'plain_text',
-		role: 'You are a narrative editor creating concise summaries of fiction.',
-	},
-	summarize_chapter: {
-		taskType: 'summarize',
-		contextPolicy: 'chapter_scope',
-		outputFormat: 'plain_text',
-		role: 'You are a narrative editor creating concise summaries of fiction.',
 	},
 	edit_developmental: {
 		taskType: 'edit',

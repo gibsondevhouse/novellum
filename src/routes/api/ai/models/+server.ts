@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createCredentialService } from '$lib/server/credentials/credential-service.js';
@@ -9,9 +10,19 @@ const CACHE_TTL_MS = 60 * 1000;
 interface CacheEntry {
 	models: AiModel[];
 	fetchedAt: number;
+	/**
+	 * SHA-256 of the API key the cache was filled with. Keyed cache so
+	 * rotating the credential naturally misses the cache — no explicit
+	 * invalidation on save needed.
+	 */
+	keyHash: string;
 }
 
 const cache = new Map<string, CacheEntry>();
+
+function hashKey(apiKey: string): string {
+	return createHash('sha256').update(apiKey).digest('hex');
+}
 
 /** Test hook — clears the in-memory model cache. */
 export function __clearModelsCacheForTests() {
@@ -34,16 +45,17 @@ export const GET: RequestHandler = async ({ url }) => {
 		);
 	}
 
+	const keyHash = hashKey(apiKey);
 	const cached = cache.get(providerId);
 	const now = Date.now();
-	if (cached && now - cached.fetchedAt < CACHE_TTL_MS) {
+	if (cached && cached.keyHash === keyHash && now - cached.fetchedAt < CACHE_TTL_MS) {
 		return json({ models: cached.models, cached: true });
 	}
 
 	try {
 		const provider = createOpenRouterProvider();
 		const models = await provider.listModels(apiKey);
-		cache.set(providerId, { models, fetchedAt: now });
+		cache.set(providerId, { models, fetchedAt: now, keyHash });
 		return json({ models, cached: false });
 	} catch (err) {
 		const raw = err instanceof Error ? err.message : 'unknown';

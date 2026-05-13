@@ -693,7 +693,7 @@
 		gap: var(--space-1);
 		padding: 3px 10px;
 		background: var(--color-nova-blue);
-		color: #fff;
+		color: var(--color-text-on-accent);
 		border: none;
 		border-radius: var(--radius-sm);
 		font-size: var(--text-xs);

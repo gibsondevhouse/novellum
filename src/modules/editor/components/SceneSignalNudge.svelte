@@ -11,6 +11,7 @@
 -->
 <script lang="ts">
 	import { fly } from 'svelte/transition';
+	import { SvelteSet } from 'svelte/reactivity';
 	import { novaPanel } from '$modules/nova';
 	import { signalToNovaPrompt } from '../services/scene-analysis-utils.js';
 
@@ -32,11 +33,11 @@
 
 	let { signals, sceneGoal, sceneId }: Props = $props();
 
-	let dismissed = $state(new Set<string>());
+	const dismissed = new SvelteSet<string>();
 
 	$effect(() => {
 		void sceneId;
-		dismissed = new Set();
+		dismissed.clear();
 	});
 
 	const visibleNudges = $derived(
@@ -44,9 +45,7 @@
 	);
 
 	function dismiss(signal: string): void {
-		const next = new Set(dismissed);
-		next.add(signal);
-		dismissed = next;
+		dismissed.add(signal);
 	}
 
 	function askNova(signal: string): void {
@@ -105,7 +104,7 @@
 		padding: var(--space-2) var(--space-3);
 		background: color-mix(in srgb, var(--color-surface-elevated, #fff) 96%, transparent);
 		border: 1px solid var(--color-border-default);
-		border-left: 3px solid hsl(38 90% 55%);
+		border-left: 3px solid hsl(38deg 90% 55%);
 		border-radius: var(--radius-md);
 		box-shadow: var(--shadow-md);
 		backdrop-filter: blur(10px);
@@ -114,7 +113,7 @@
 
 	.nudge-warn-icon {
 		flex-shrink: 0;
-		color: hsl(38 90% 50%);
+		color: hsl(38deg 90% 50%);
 	}
 
 	.nudge-text {

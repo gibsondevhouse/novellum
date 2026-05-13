@@ -18,6 +18,9 @@
  *   - GET  /api/settings/ai-status    — credential service loads in this runtime
  *   - POST /api/settings/ai-key       — action=test with no creds → 400 path
  *   - POST /api/ai (NOVELLUM_AI_MOCK) — Nova proxy + SSR closure compiles
+ *   - POST /api/local-files/normalize — scratchpad/world-building module bundles
+ *   - GET  /api/ai/models             — model list route compiles (no creds → 401)
+ *   - GET  /api/settings/storage-location — app-data path + statfs work
  *
  * Runtime considerations:
  *   - Uses a temp `XDG_DATA_HOME` so the filesystem credential store
@@ -220,6 +223,34 @@ async function main() {
 		});
 		expect(res.status === 200, `status ${res.status}`);
 		expect(typeof body?.text === 'string', `unexpected body ${JSON.stringify(body)}`);
+	});
+
+	await probe('POST /api/local-files/normalize → 200 + normalized path', async () => {
+		const { res, body } = await fetchJson('/api/local-files/normalize', {
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({ path: 'scratchpads/characters/foo.md' }),
+		});
+		expect(res.status === 200, `status ${res.status}`);
+		expect(typeof body?.path === 'string', `unexpected body ${JSON.stringify(body)}`);
+	});
+
+	await probe('GET /api/ai/models (no creds) → 401 no_credentials', async () => {
+		const { res, body } = await fetchJson('/api/ai/models?providerId=openrouter');
+		expect(res.status === 401, `status ${res.status}`);
+		expect(
+			body?.error?.code === 'no_credentials',
+			`unexpected body ${JSON.stringify(body)}`,
+		);
+	});
+
+	await probe('GET /api/settings/storage-location → 200 + appDataDirectory in tmp', async () => {
+		const { res, body } = await fetchJson('/api/settings/storage-location');
+		expect(res.status === 200, `status ${res.status}`);
+		expect(
+			typeof body?.appDataDirectory === 'string' && body.appDataDirectory.length > 0,
+			`unexpected body ${JSON.stringify(body)}`,
+		);
 	});
 
 	if (failures > 0) {

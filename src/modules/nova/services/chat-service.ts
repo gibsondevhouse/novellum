@@ -54,7 +54,12 @@ export async function sendNovaChat(input: SendChatInput): Promise<void> {
 
 	novaSession.append({ role: 'user', content: trimmed, status: 'complete' });
 
-	const action = input.activeSceneId ? 'continue' : 'brainstorm';
+	// 2026-05-13 (plan-025): the no-scene branch used to route to a
+	// dedicated 'brainstorm' task. That TaskType was cut from the V1
+	// surface; the resolver now falls through to the 'continue' default
+	// which preserves chat-style responses for prompts without scene
+	// context.
+	const action = 'continue';
 	const uiCtx: UiContext = {
 		activeProjectId: input.projectId,
 		activeSceneId: input.activeSceneId,

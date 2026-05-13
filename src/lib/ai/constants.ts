@@ -27,13 +27,9 @@ export const NOVA_IDENTITY_BLOCK =
 export const DEFAULT_MODEL = 'openai/gpt-4o-mini';
 
 export const MODEL_MAP: Record<TaskType, string> = {
-	brainstorm: 'openai/gpt-4o-mini',
-	outline: 'openai/gpt-4o-mini',
-	draft: 'openai/gpt-4o-mini',
 	continue: 'openai/gpt-4o-mini',
 	rewrite: 'openai/gpt-4o',
 	continuity_check: 'openai/gpt-4o',
-	summarize: 'openai/gpt-4o-mini',
 	edit: 'openai/gpt-4o',
 	style_check: 'openai/gpt-4o',
 };

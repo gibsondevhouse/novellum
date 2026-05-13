@@ -9,16 +9,16 @@ const ctx = {
 };
 
 describe('task-resolver', () => {
-	it('resolves "brainstorm" action', () => {
-		const task = resolveTask('brainstorm', ctx);
-		expect(task.taskType).toBe('brainstorm');
+	it('resolves "continue" action', () => {
+		const task = resolveTask('continue', ctx);
+		expect(task.taskType).toBe('continue');
 		expect(task.contextPolicy).toBe('scene_plus_adjacent');
-		expect(task.outputFormat).toBe('bullet_list');
+		expect(task.outputFormat).toBe('prose');
 	});
 
-	it('resolves "draft" action', () => {
-		const task = resolveTask('draft', ctx);
-		expect(task.taskType).toBe('draft');
+	it('resolves "rewrite" action', () => {
+		const task = resolveTask('rewrite', ctx);
+		expect(task.taskType).toBe('rewrite');
 		expect(task.contextPolicy).toBe('scene_only');
 	});
 
@@ -36,5 +36,15 @@ describe('task-resolver', () => {
 	it('falls back to "continue" for unknown actions', () => {
 		const task = resolveTask('unknown_action', ctx);
 		expect(task.taskType).toBe('continue');
+	});
+
+	it('falls back to "continue" for cut TaskTypes (brainstorm/outline/draft/summarize)', () => {
+		// plan-025: these actions were removed from the V1 surface.
+		// They now fall through to the DEFAULT_TASK rather than
+		// producing a structured prompt for a runtime agent that does
+		// not exist.
+		for (const action of ['brainstorm', 'outline', 'draft', 'summarize_scene']) {
+			expect(resolveTask(action, ctx).taskType).toBe('continue');
+		}
 	});
 });

@@ -46,15 +46,6 @@
 				pressed: true,
 				onSelect: noop,
 			},
-			{
-				kind: 'button',
-				id: 'find',
-				label: 'Find & Replace (coming soon)',
-				icon: '⌕',
-				disabled: true,
-				title: 'Find & Replace — coming soon',
-				onSelect: noop,
-			},
 		],
 	}}
 />

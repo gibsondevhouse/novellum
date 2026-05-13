@@ -22,13 +22,9 @@ export type ContextPolicy =
 	| 'outline_scope';
 
 export type TaskType =
-	| 'brainstorm'
-	| 'outline'
-	| 'draft'
 	| 'continue'
 	| 'rewrite'
 	| 'continuity_check'
-	| 'summarize'
 	| 'edit'
 	| 'style_check';
 

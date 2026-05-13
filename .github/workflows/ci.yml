@@ -65,3 +65,6 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Smoke-test built server
+        run: pnpm smoke:built

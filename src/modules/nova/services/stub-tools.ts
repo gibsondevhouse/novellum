@@ -1,72 +1,27 @@
 /**
- * Stub tool handlers for Nova's four planned agentic tools.
+ * Agentic tool stub slots.
  *
- * These slots are registered so the tool registry is populated for
- * incremental implementation. Real handlers replace these one-by-one
- * as each integration lands. Tools are only advertised to the model
- * when PUBLIC_NOVELLUM_NOVA_AGENTIC is enabled (default: off).
+ * Originally these slots populated the Nova tool registry with four
+ * `not-yet-supported` placeholders (worldbuilding.create-character,
+ * worldbuilding.update-location, continuity.scan-scene,
+ * outline.suggest-beat) so the agentic surface area could be exercised
+ * end-to-end before the real handlers landed.
+ *
+ * 2026-05-13: the four runtime agents that backed these tools
+ * (BrainstormAgent / OutlineAgent / DraftAgent / SummaryAgent) were
+ * cut from the V1 surface — see plan-025 + agents-map.md. The stub
+ * tools were cut with them.
+ *
+ * The exports are retained as a no-op + empty list so the module
+ * barrel in `src/modules/nova/index.ts` and any consumer that imports
+ * these symbols continues to compile. Re-introduce real tool stubs
+ * here if/when a future plan ships agentic handlers.
  */
 
-import type { ToolDefinition, ToolHandler } from '../types.js';
-import { registerTool } from './tool-registry.js';
+import type { ToolDefinition } from '../types.js';
 
-function notYetSupported(toolId: string): ToolHandler {
-	return async () => ({
-		status: 'not-yet-supported',
-		output: null,
-		error: `Tool '${toolId}' is not yet implemented.`,
-	});
-}
-
-export const STUB_TOOLS: ToolDefinition[] = [
-	{
-		id: 'worldbuilding.create-character',
-		description: 'Create a character entry in the project world bible.',
-		inputSchema: {
-			type: 'object',
-			required: ['name'],
-			properties: {
-				name: { type: 'string' },
-				role: { type: 'string' },
-				summary: { type: 'string' },
-			},
-		},
-	},
-	{
-		id: 'worldbuilding.update-location',
-		description: 'Patch fields on an existing location.',
-		inputSchema: {
-			type: 'object',
-			required: ['locationId', 'patch'],
-			properties: {
-				locationId: { type: 'string' },
-				patch: { type: 'object' },
-			},
-		},
-	},
-	{
-		id: 'continuity.scan-scene',
-		description: 'Run a continuity check on the named scene.',
-		inputSchema: {
-			type: 'object',
-			required: ['sceneId'],
-			properties: { sceneId: { type: 'string' } },
-		},
-	},
-	{
-		id: 'outline.suggest-beat',
-		description: 'Suggest a new beat under the named chapter.',
-		inputSchema: {
-			type: 'object',
-			required: ['chapterId'],
-			properties: {
-				chapterId: { type: 'string' },
-				afterBeatId: { type: 'string' },
-			},
-		},
-	},
-];
+export const STUB_TOOLS: ToolDefinition[] = [];
 
 export function registerStubTools(): void {
-	for (const def of STUB_TOOLS) registerTool(def, notYetSupported(def.id));
+	// Intentionally empty — see file header.
 }

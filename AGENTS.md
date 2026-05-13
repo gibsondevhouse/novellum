@@ -1,6 +1,6 @@
 # Novellum Agent Ecosystem
 
-> Last verified: 2026-05-10
+> Last verified: 2026-05-13
 
 Novellum is built around a dual-layer agent architecture. Rather than relying on a single general-purpose AI, the system delegates tasks to specialized, focused agents.
 
@@ -55,10 +55,8 @@ Status legend: **Shipped** = available in the app today. **Planned** = scoped, n
 | **EditAgent** | Shipped | Improves clarity, flow, and prose quality. | Sentence refinement, developmental editing. | Line edit suggestions. |
 | **RewriteAgent** | Shipped | Provides alternative versions of existing text. | Adjusting pacing, shifting tone. | Multiple text options. |
 | **StyleAgent** | Shipped | Ensures stylistic consistency. | Tone alignment, voice consistency checks. | Rewrite suggestions based on tone. |
-| **BrainstormAgent** | Planned | Generates creative ideas based on minimal input. | Loglines, new character concepts, scene hooks. | List of structured ideas. |
-| **OutlineAgent** | Planned | Generates or refines structured outlines. | Creating initial acts/chapters, pacing improvements. | Hierarchical narrative nodes. |
-| **DraftAgent** | Planned | Generates narrative prose. | Writing new scenes, filling narrative gaps. | Narrative text block. |
-| **SummaryAgent** | Planned | Condenses content into structured summaries. | Auto-generating chapter recaps. | Concise summary strings. |
+
+> **Cut from V1 (2026-05-13, plan-025):** `BrainstormAgent`, `OutlineAgent`, `DraftAgent`, and `SummaryAgent` were previously listed as Planned. They were never wired to a parser and have been removed from the V1 task-resolver surface. Re-introducing any of them is a new feature plan, not a follow-up.
 
 Shipped agents live under `src/lib/ai/<agent>-agent.ts`. See [dev-docs/03-ai/agents-map.md](./dev-docs/03-ai/agents-map.md) for the canonical breakdown.
 

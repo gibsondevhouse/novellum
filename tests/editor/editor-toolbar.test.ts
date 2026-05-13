@@ -93,18 +93,10 @@ describe('EditorToolbar.svelte', () => {
 		expect(target.querySelector('[aria-label="Insert table"]')).not.toBeNull();
 		// Tools group
 		expect(target.querySelector('[aria-label="Spellcheck"]')).not.toBeNull();
-		const findBtn = Array.from(target.querySelectorAll('button')).find(
-			(b) => b.getAttribute('aria-label') === 'Find & Replace',
-		) as HTMLButtonElement | undefined;
-		expect(findBtn).toBeDefined();
 		// View
 		expect(target.querySelector('[aria-label="View in Reader"]')).not.toBeNull();
 
-		// Find & Replace stub is disabled
-		expect(findBtn!.disabled).toBe(true);
-		expect(findBtn!.title).toMatch(/coming soon/i);
-
-		// Dividers between groups (4 groups → 4 dividers in items list)
+		// Dividers between groups (3 groups → at least 3 dividers in items list)
 		expect(target.querySelectorAll('[role="separator"]').length).toBeGreaterThanOrEqual(3);
 
 		unmount(cmp);

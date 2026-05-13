@@ -42,8 +42,8 @@ import { setNovaAgenticFlag } from '$modules/nova/services/feature-flags.js';
 import {
 	clearTools,
 	listTools,
+	registerTool,
 } from '$modules/nova/services/tool-registry.js';
-import { registerStubTools } from '$modules/nova/services/stub-tools.js';
 
 async function* yieldChunks(chunks: string[]): AsyncGenerator<string> {
 	for (const chunk of chunks) yield chunk;
@@ -159,7 +159,10 @@ describe('sendNovaChat', () => {
 		expect(last?.content).toBe('Once upon');
 	});
 
-	it('falls back to brainstorm task when no scene is active', async () => {
+	it('routes to the continue task when no scene is active', async () => {
+		// plan-025: the no-scene branch previously routed to a dedicated
+		// `brainstorm` task. That TaskType was cut from the V1 surface; the
+		// chat-service now falls through to the `continue` system prompt.
 		streamCompleteMock.mockReturnValueOnce(yieldChunks(['ok']));
 
 		await sendNovaChat({
@@ -171,19 +174,31 @@ describe('sendNovaChat', () => {
 
 		expect(streamCompleteMock).toHaveBeenCalledTimes(1);
 		const [payload] = streamCompleteMock.mock.calls[0];
-		// system prompt should mention brainstorming role
-		expect(payload.messages[0].content.toLowerCase()).toContain('brainstorm');
+		expect(payload.messages[0].content.toLowerCase()).toContain(
+			'narrative continuation',
+		);
 	});
 
 	describe('agentic flag — tools field on the OpenRouter payload', () => {
 		beforeEach(() => {
 			clearTools();
-			registerStubTools();
+			// plan-025: the four agentic stub tools were cut. Register a
+			// fake tool inline so we can still assert the `tools` field is
+			// populated when the agentic flag is on.
+			registerTool(
+				{
+					id: 'test.fake-tool',
+					description: 'Inline tool used only by this test.',
+					inputSchema: { type: 'object', properties: {} },
+				},
+				async () => ({ status: 'success', output: null }),
+			);
 			setNovaAgenticFlag(null);
 		});
 
 		afterAll(() => {
 			setNovaAgenticFlag(null);
+			clearTools();
 		});
 
 		it('omits the tools field when the agentic flag is off (default)', async () => {
@@ -211,12 +226,7 @@ describe('sendNovaChat', () => {
 			expect(Array.isArray(payload.tools)).toBe(true);
 			expect(payload.tools).toHaveLength(listTools().length);
 			const ids = (payload.tools as { id: string }[]).map((t) => t.id).sort();
-			expect(ids).toEqual([
-				'continuity.scan-scene',
-				'outline.suggest-beat',
-				'worldbuilding.create-character',
-				'worldbuilding.update-location',
-			]);
+			expect(ids).toEqual(['test.fake-tool']);
 		});
 	});
 });

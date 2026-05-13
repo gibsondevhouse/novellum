@@ -4,6 +4,4 @@
 
 {#if featureFlags.labsEnabled}
 	<p>Story Bible is in Labs preview.</p>
-{:else}
-	<p>Story Bible is coming in a future update. Enable Labs in Settings → AI to preview.</p>
 {/if}

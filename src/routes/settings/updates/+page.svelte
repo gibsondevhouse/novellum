@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import SurfaceCard from '$lib/components/ui/SurfaceCard.svelte';
-	import SecondaryButton from '$lib/components/ui/SecondaryButton.svelte';
 
 	let version = $state<string | null>(null);
 
@@ -32,16 +31,19 @@
 				<p class="updates__body">You are running Novellum {version}.</p>
 			{/if}
 			<p class="updates__body">
-				Novellum is distributed as a standalone desktop app. Updates are delivered as new
-				releases.
+				Novellum is distributed as a standalone desktop app. New releases are published on
+				GitHub — download the latest installer to update.
 			</p>
-			<!-- TODO: Tauri updater integration in a future plan -->
-			<SecondaryButton
-				disabled
-				title="Auto-update not yet available"
-			>
-				Check for updates
-			</SecondaryButton>
+			<p class="updates__body">
+				<a
+					class="updates__link"
+					href="https://github.com/gibsondevhouse/novellum/releases"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					View releases on GitHub
+				</a>
+			</p>
 		</SurfaceCard>
 	</section>
 </div>

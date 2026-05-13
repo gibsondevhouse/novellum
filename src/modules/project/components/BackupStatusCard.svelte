@@ -14,7 +14,9 @@
 	const neverBacked = $derived(lastBackupAt === null);
 
 	function handleBackup() {
-		console.log('backup triggered', { projectId });
+		// Wired up by the parent surface; intentionally a no-op here until the
+		// project backup pipeline (plan-024 stage-004) routes through this card.
+		void projectId;
 	}
 </script>
 

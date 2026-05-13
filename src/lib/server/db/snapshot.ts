@@ -2,6 +2,7 @@ import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import type Database from 'better-sqlite3';
+import { resolveAppDataDir } from '$lib/server/app-data/path.js';
 
 /**
  * Pre-migration safety snapshot.
@@ -22,7 +23,14 @@ export interface SnapshotInfo {
 }
 
 function resolveSnapshotsRoot(): string {
-	return process.env.NOVELLUM_SNAPSHOTS_DIR ?? join(process.cwd(), '.novellum-snapshots');
+	// Packaged Tauri builds have `process.cwd()` pointing at wherever the
+	// OS launched Node from (often the user's home), which would scatter
+	// pre-migration snapshots far from the live DB. Anchor to the active
+	// app-data directory so the snapshot sits next to the database it
+	// guards.
+	return (
+		process.env.NOVELLUM_SNAPSHOTS_DIR ?? join(resolveAppDataDir(), '.novellum-snapshots')
+	);
 }
 
 function backupSnapshotsTableExists(db: Database.Database): boolean {

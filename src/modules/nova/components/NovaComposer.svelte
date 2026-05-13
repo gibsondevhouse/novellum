@@ -8,14 +8,13 @@
 	import { novaPanel } from '../stores/nova-panel.svelte.js';
 	import { sendNovaChat } from '../services/chat-service.js';
 
-	type NovaChatMode = 'chat' | 'scribe' | 'research';
+	type NovaChatMode = 'chat' | 'scribe';
 
 	type ChatModeOption = {
 		value: NovaChatMode;
 		label: string;
 		shortLabel: string;
 		description: string;
-		comingSoon?: boolean;
 	};
 
 	type StagedAttachment = {
@@ -39,13 +38,6 @@
 			shortLabel: 'S',
 			description: 'Agentic writing copilot for concrete drafting tasks.',
 		},
-		{
-			value: 'research',
-			label: 'Research',
-			shortLabel: 'R',
-			description: 'Web-layer story research and citations.',
-			comingSoon: true,
-		},
 	];
 
 	interface Props {
@@ -62,17 +54,15 @@
 	let attachmentInputEl = $state<HTMLInputElement | null>(null);
 
 	const isStreaming = $derived(novaSession.isStreaming);
-	const isResearchMode = $derived(selectedMode === 'research');
 	const selectedModeMeta = $derived.by(
 		() => CHAT_MODE_OPTIONS.find((option) => option.value === selectedMode) ?? CHAT_MODE_OPTIONS[0],
 	);
 	const composerPlaceholder = $derived.by(() => {
 		if (isStreaming) return 'Copilot is responding…';
 		if (selectedMode === 'chat') return 'Brainstorm, ask questions, or explore story ideas…';
-		if (selectedMode === 'scribe') return 'Give Scribe a concrete task (outline, draft, revise, or analyze)…';
-		return 'Research mode is coming soon: web-backed narrative research.';
+		return 'Give Scribe a concrete task (outline, draft, revise, or analyze)…';
 	});
-	const canSubmit = $derived(draft.trim().length > 0 && !isStreaming && !isResearchMode);
+	const canSubmit = $derived(draft.trim().length > 0 && !isStreaming);
 
 	$effect(() => {
 		const pending = novaPanel.pendingPrompt;
@@ -151,7 +141,7 @@
 
 	async function submitDraft() {
 		const value = draft.trim();
-		if (!value || isStreaming || isResearchMode) return;
+		if (!value || isStreaming) return;
 		draft = '';
 		await sendNovaChat({
 			prompt: buildModePrompt(value),
@@ -222,7 +212,7 @@
 			placeholder={composerPlaceholder}
 			rows="3"
 			aria-label="Ask Copilot"
-			disabled={isStreaming || isResearchMode}
+			disabled={isStreaming}
 		></textarea>
 
 		{#if isStreaming}
@@ -268,12 +258,6 @@
 				</li>
 			{/each}
 		</ul>
-	{/if}
-
-	{#if isResearchMode}
-		<p class="nova-mode-notice" role="status">
-			Research mode is coming soon with a dedicated web research layer.
-		</p>
 	{/if}
 </form>
 
@@ -502,16 +486,5 @@
 
 	.nova-attachment-chip__remove:hover {
 		color: var(--color-text-primary);
-	}
-
-	.nova-mode-notice {
-		margin: 0;
-		padding: var(--space-2);
-		font-size: var(--text-xs);
-		line-height: var(--leading-relaxed);
-		border-radius: var(--radius-md);
-		border: 1px solid var(--color-border-default);
-		background: var(--color-surface-overlay);
-		color: var(--color-text-secondary);
 	}
 </style>

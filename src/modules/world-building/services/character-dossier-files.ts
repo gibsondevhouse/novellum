@@ -1,8 +1,23 @@
 import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { resolveAppDataDir } from '$lib/server/app-data/path.js';
 
-const WORKSPACE_ROOT = process.cwd();
-const SCRATCHPAD_ROOT = path.join(WORKSPACE_ROOT, '.novellum', 'scratchpads', 'characters');
+/**
+ * Root for dossier assets (character scratchpads + per-project images).
+ *
+ * Resolved at module load via `resolveAppDataDir()` so packaged Tauri
+ * builds, where `process.cwd()` is wherever the OS launched Node from
+ * (often the user's home), still land under the OS-conventional app
+ * data directory. In dev this is `~/.novellum`; in tests it's a temp
+ * dir under `os.tmpdir()`; in the packaged app it's
+ * `~/Library/Application Support/Novellum` (or platform equivalent).
+ *
+ * The relative paths returned to callers are still stable within a
+ * given environment, so DB rows that reference scratchpad/image paths
+ * keep resolving across restarts in the same install.
+ */
+const WORKSPACE_ROOT = resolveAppDataDir();
+const SCRATCHPAD_ROOT = path.join(WORKSPACE_ROOT, 'scratchpads', 'characters');
 const IMAGE_EXTENSIONS = new Set(['.avif', '.gif', '.jpeg', '.jpg', '.png', '.svg', '.webp']);
 
 function resolveWorkspacePath(filePath: string): string {
