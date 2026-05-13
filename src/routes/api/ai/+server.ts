@@ -31,6 +31,17 @@ const openRouterProvider = createOpenRouterProvider();
 
 const MOCK_ENABLED = () => process.env.NOVELLUM_AI_MOCK === '1';
 
+/**
+ * Server-side cap on output tokens. Belt-and-braces protection so a
+ * runaway model, a malformed prompt, or a future bug can't bill the
+ * user's credentials for unbounded completion. 2 000 tokens covers
+ * every shipped task: ~600 for `continue` prose, ~800 for `rewrite`
+ * options, ~2 000 for `continuity_check` JSON arrays on large stories.
+ * The proxy clamps any incoming `max_tokens` to this ceiling but
+ * always sends at least this much when the client omits it.
+ */
+const MAX_OUTPUT_TOKENS = 2000;
+
 interface ResolvedProvider {
 	provider: AiProvider;
 	apiKey: string;
@@ -160,7 +171,11 @@ async function handleProxy(body: ProxyBody): Promise<Response> {
 	const model = modelOverride ?? requestedModel;
 
 	if (wantStream) {
-		const iterator = provider.stream(apiKey, { model, messages })[Symbol.asyncIterator]();
+		const iterator = provider.stream(apiKey, {
+			model,
+			messages,
+			maxTokens: MAX_OUTPUT_TOKENS,
+		})[Symbol.asyncIterator]();
 
 		// Peek the first chunk so pre-stream auth/rate-limit failures can be
 		// surfaced as a real HTTP error response (with the right status code
@@ -241,7 +256,11 @@ async function handleProxy(body: ProxyBody): Promise<Response> {
 	}
 
 	try {
-		const result = await provider.complete(apiKey, { model, messages });
+		const result = await provider.complete(apiKey, {
+			model,
+			messages,
+			maxTokens: MAX_OUTPUT_TOKENS,
+		});
 		return json({
 			text: result.content,
 			model: result.model,
@@ -307,6 +326,7 @@ async function handleTask(body: TaskBody): Promise<Response> {
 		const result = await provider.complete(apiKey, {
 			model,
 			messages: [{ role: 'user', content: prompt }],
+			maxTokens: MAX_OUTPUT_TOKENS,
 		});
 		return json({ content: result.content });
 	} catch (err) {

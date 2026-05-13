@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
+	import { onDestroy, untrack } from 'svelte';
 	import type { Character, CharacterRelationship } from '$lib/db/domain-types';
 	import { translator } from '$lib/i18n';
 	import { DestructiveButton } from '$lib/components/ui/index.js';
@@ -254,6 +254,59 @@
 		}
 	}
 
+	// Debounced field-save scheduler. Each (entity, field) pair gets its own
+	// timer so different fields don't cancel each other. Typing fast in one
+	// field collapses N keystrokes into 1 PUT after the user pauses. Tab-out
+	// or window-close flushes any pending saves so nothing is lost.
+	const SAVE_DEBOUNCE_MS = 600;
+	interface PendingSave {
+		timer: ReturnType<typeof setTimeout>;
+		op: () => Promise<void>;
+		errorMessage: string;
+	}
+	// Plain Map is intentional: this is a non-reactive cache of in-flight
+	// save timers. Reactivity would re-run on every set/delete for no gain.
+	// eslint-disable-next-line svelte/prefer-svelte-reactivity
+	const pendingSaves: Map<string, PendingSave> = new Map();
+
+	function scheduleSave(
+		key: string,
+		operation: () => Promise<void>,
+		errorMessage: string,
+	): void {
+		const existing = pendingSaves.get(key);
+		if (existing) clearTimeout(existing.timer);
+		const timer = setTimeout(() => {
+			pendingSaves.delete(key);
+			void runWithPersistenceFeedback(operation, errorMessage);
+		}, SAVE_DEBOUNCE_MS);
+		pendingSaves.set(key, { timer, op: operation, errorMessage });
+	}
+
+	function flushPendingSaves(): void {
+		if (pendingSaves.size === 0) return;
+		const entries = Array.from(pendingSaves.values());
+		pendingSaves.clear();
+		for (const entry of entries) {
+			clearTimeout(entry.timer);
+			void runWithPersistenceFeedback(entry.op, entry.errorMessage);
+		}
+	}
+
+	if (typeof window !== 'undefined') {
+		const handleBeforeUnload = () => flushPendingSaves();
+		const handleVisibility = () => {
+			if (document.visibilityState === 'hidden') flushPendingSaves();
+		};
+		window.addEventListener('beforeunload', handleBeforeUnload);
+		document.addEventListener('visibilitychange', handleVisibility);
+		onDestroy(() => {
+			window.removeEventListener('beforeunload', handleBeforeUnload);
+			document.removeEventListener('visibilitychange', handleVisibility);
+			flushPendingSaves();
+		});
+	}
+
 	$effect(() => {
 		const nextMap = buildCharacterMap(data.characters, data.relationships);
 		characterRecords = nextMap;
@@ -261,6 +314,14 @@
 		if (!currentSelection || !nextMap[currentSelection]) {
 			selectedCharacterId = data.characters[0]?.id ?? Object.keys(nextMap)[0] ?? null;
 		}
+	});
+
+	// Flush pending debounced saves whenever the selected character changes,
+	// so switching dossiers never strands keystrokes typed in the previous one.
+	$effect(() => {
+		// Tracked: selectedCharacterId. We don't read it, just depend on it.
+		void selectedCharacterId;
+		untrack(() => flushPendingSaves());
 	});
 
 	const characterOptions = $derived.by<CharacterOption[]>(() =>
@@ -434,7 +495,11 @@
 			persistCharacterPhotos();
 		}
 
-		void runWithPersistenceFeedback(
+		// Debounce text-field saves so a fast typist doesn't fire one PUT
+		// per keystroke. Persists are idempotent (full-field overwrite), so
+		// collapsing intermediate states is safe.
+		scheduleSave(
+			`char:${activeCharacterId}:${field}`,
 			() => persistCharacterField(activeCharacterId, field, nextCharacter),
 			'Could not save character changes.',
 		);
@@ -543,7 +608,8 @@
 			description: relationshipToPersist.notes ?? '',
 		};
 
-		void runWithPersistenceFeedback(
+		scheduleSave(
+			`rel:${relationshipToPersist.id}:${field}`,
 			() => updateRelationship(relationshipToPersist.id, relationshipChanges).then(() => undefined),
 			'Could not save relationship changes.',
 		);
