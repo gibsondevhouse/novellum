@@ -112,7 +112,7 @@
 	});
 
 	function handleNewProject() {
-		goto('/books?create=1');
+		goto('/projects?create=1');
 	}
 
 	function handleWorldBuildingSelect(id: string) {

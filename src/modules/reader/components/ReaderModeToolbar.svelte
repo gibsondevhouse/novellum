@@ -21,10 +21,10 @@
 	}
 </script>
 
-<div class="reader-toolbar">
-	<div class="reader-toolbar__left">
-		<a class="reader-toolbar__back" href="/books?library=1">Back to Library</a>
-	</div>
+	<div class="reader-toolbar">
+		<div class="reader-toolbar__left">
+			<a class="reader-toolbar__back" href="/projects">Back to Projects</a>
+		</div>
 
 	<div class="reader-toolbar__center">
 		<PillNav

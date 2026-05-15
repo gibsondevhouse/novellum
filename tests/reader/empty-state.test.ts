@@ -37,8 +37,8 @@ describe('ReaderExperience — empty state', () => {
 		expect(source).toMatch(/\{#if !isReadable\}[\s\S]*<EmptyStatePanel/);
 	});
 
-	it('offers a CTA to the project hub and a CTA back to the library', () => {
+	it('offers a CTA to the project hub and a CTA back to projects', () => {
 		expect(source).toContain('/projects/${project.id}');
-		expect(source).toContain("goto('/books')");
+		expect(source).toContain("goto('/projects')");
 	});
 });

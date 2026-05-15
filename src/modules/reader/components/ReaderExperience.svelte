@@ -44,17 +44,17 @@
 
 {#if !isReadable}
 	<div class="reader-empty-wrap">
-		<EmptyStatePanel
-			title="No story to read yet"
-			description="This book doesn’t have any written scenes yet. Open the outline to plan it, or pick another book from your library."
-		>
-			{#snippet actions()}
-				<PrimaryButton onclick={() => goto(`/projects/${project.id}`)}>
-					Open project hub
-				</PrimaryButton>
-				<SecondaryButton onclick={() => goto('/books')}>Pick another book</SecondaryButton>
-			{/snippet}
-		</EmptyStatePanel>
+			<EmptyStatePanel
+				title="No story to read yet"
+				description="This book doesn’t have any written scenes yet. Open the outline to plan it, or pick another book from your library."
+			>
+				{#snippet actions()}
+					<PrimaryButton onclick={() => goto(`/projects/${project.id}`)}>
+						Open project hub
+					</PrimaryButton>
+					<SecondaryButton onclick={() => goto('/projects')}>Pick another project</SecondaryButton>
+				{/snippet}
+			</EmptyStatePanel>
 	</div>
 {:else}
 	<div class="reader-experience">

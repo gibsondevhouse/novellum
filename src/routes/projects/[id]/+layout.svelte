@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { browser } from '$app/environment';
 	import { page } from '$app/state';
 	import { onMount, setContext } from 'svelte';
 	import type { Project } from '$lib/db/domain-types';
@@ -9,6 +10,7 @@
 	import SurfacePanel from '$lib/components/ui/SurfacePanel.svelte';
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	import SectionHeader from '$lib/components/ui/SectionHeader.svelte';
+	import { persistLastProjectId } from '$lib/navigation-state.js';
 
 	let { data, children } = $props<{ data: { project: Project }; children: () => void }>();
 
@@ -26,6 +28,11 @@
 	});
 
 	const project = $derived(data.project);
+
+	$effect(() => {
+		if (!browser) return;
+		void persistLastProjectId(project.id);
+	});
 
 	$effect(() => {
 		const exportFlag = page.url.searchParams.get('export');

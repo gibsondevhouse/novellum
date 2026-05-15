@@ -1,14 +1,26 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { page } from '$app/state';
 	import { browser } from '$app/environment';
+	import { page } from '$app/state';
 	import SidebarSection from './SidebarSection.svelte';
 	import SidebarItem from './SidebarItem.svelte';
-	import { getPreference, setPreference } from '$lib/preferences.js';
+	import { resolveLastProjectId } from '$lib/navigation-state.js';
+	import { resolveProjectSidebarActiveState } from '$lib/sidebar-navigation.js';
 
-	const PREF_KEY = 'app.lastProjectId';
-
-    let base = $state<string | null>(null);
+	let base = $state<string | null>(null);
+	let refreshToken = 0;
+	let activeState = $derived.by(() => {
+		if (!base) {
+			return {
+				hub: false,
+				editor: false,
+				outline: false,
+				worldbuilding: false,
+				aiAssistant: false,
+			};
+		}
+		return resolveProjectSidebarActiveState(base, page.url.pathname, page.url.searchParams);
+	});
 
 	function withExportFlag(search: string): string {
 		const raw = search.startsWith('?') ? search.slice(1) : search;
@@ -18,6 +30,13 @@
 			.filter((entry) => !entry.startsWith('export='));
 		filtered.push('export=1');
 		return `?${filtered.join('&')}`;
+	}
+
+	async function refreshFromCache(): Promise<void> {
+		const token = ++refreshToken;
+		const resolved = await resolveLastProjectId();
+		if (token !== refreshToken) return;
+		base = resolved.id ? `/projects/${resolved.id}` : null;
 	}
 
 	function openLastProjectExport(): void {
@@ -31,41 +50,27 @@
 	}
 
 	$effect(() => {
-			if (!browser) {
-				base = null;
-				return;
-			}
+		if (!browser) {
+			base = null;
+			return;
+		}
 
-			const currentId = page.params.id;
-			const isProjectRoute = page.url.pathname.startsWith('/projects/');
+		const currentId = page.params.id;
+		const isProjectRoute = page.url.pathname.startsWith('/projects/');
+		if (isProjectRoute && currentId && currentId !== 'undefined') {
+			base = `/projects/${currentId}`;
+			return;
+		}
 
-			if (isProjectRoute && currentId && currentId !== 'undefined') {
-				localStorage.setItem('novellum_last_project_id', currentId);
-				void setPreference(PREF_KEY, currentId);
-				base = `/projects/${currentId}`;
-			} else {
-				const storedId = localStorage.getItem('novellum_last_project_id');
-				if (storedId) {
-					base = `/projects/${storedId}`;
-				} else {
-					base = null;
-					// Reconcile from SQLite-canonical store when local cache is empty.
-					void getPreference<string | null>(PREF_KEY, null).then((remote) => {
-						if (remote) {
-							localStorage.setItem('novellum_last_project_id', remote);
-							base = `/projects/${remote}`;
-						}
-					});
-				}
-			}
-		});
+		void refreshFromCache();
+	});
 </script>
 
 {#if base}
 	<hr class="sidebar-divider" />
 
-	<SidebarSection label="LAST PROJECT" collapsible>
-		<SidebarItem href={base} label="Hub">
+		<SidebarSection label="LAST PROJECT" collapsible>
+			<SidebarItem href={base} label="Hub" active={activeState.hub}>
 			{#snippet icon()}
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -85,7 +90,7 @@
 				</svg>
 			{/snippet}
 		</SidebarItem>
-		<SidebarItem href="{base}/editor" label="Editor">
+			<SidebarItem href="{base}/editor" label="Editor" active={activeState.editor}>
 			{#snippet icon()}
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -103,7 +108,7 @@
 				</svg>
 			{/snippet}
 		</SidebarItem>
-		<SidebarItem href="{base}/outline" label="Outline">
+			<SidebarItem href="{base}/outline" label="Outline" active={activeState.outline}>
 			{#snippet icon()}
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -124,7 +129,11 @@
 				</svg>
 			{/snippet}
 		</SidebarItem>
-		<SidebarItem href="{base}/world-building" label="Worldbuilding">
+			<SidebarItem
+				href="{base}/world-building"
+				label="Worldbuilding"
+				active={activeState.worldbuilding}
+			>
 			{#snippet icon()}
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -145,7 +154,11 @@
 				</svg>
 			{/snippet}
 		</SidebarItem>
-		<SidebarItem href="{base}/editor?panel=ai" label="AI Assistant">
+			<SidebarItem
+				href="{base}/editor?panel=ai"
+				label="AI Assistant"
+				active={activeState.aiAssistant}
+			>
 			{#snippet icon()}
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -189,26 +202,6 @@
 			</span>
 			<span class="sidebar-export-btn__label">Export</span>
 		</button>
-		<SidebarItem href="/settings" label="Settings">
-			{#snippet icon()}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="1em"
-					height="1em"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<circle cx="12" cy="12" r="3"></circle>
-					<path
-						d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
-					></path>
-				</svg>
-			{/snippet}
-		</SidebarItem>
 	</SidebarSection>
 {/if}
 

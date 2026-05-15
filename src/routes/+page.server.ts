@@ -49,7 +49,18 @@ export const load: ServerLoad = async ({ url }) => {
 		} catch {
 			/* swallow — best-effort, fall back to library */
 		}
-		if (target) throw redirect(307, `/books/${target}`);
+		if (target) {
+			let exists = false;
+			try {
+				const row = db
+					.prepare('SELECT id FROM projects WHERE id = $id LIMIT 1')
+					.get({ id: target }) as ProjectRow | undefined;
+				exists = Boolean(row?.id);
+			} catch {
+				/* swallow — best-effort, fall back to library */
+			}
+			if (exists) throw redirect(307, `/books/${target}`);
+		}
 		return {};
 	}
 

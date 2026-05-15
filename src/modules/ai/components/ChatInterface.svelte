@@ -11,8 +11,8 @@
 	import type { NovaContextPlan, NovaContextResponsePayload, NovaSessionContextItem } from '$modules/ai/types.js';
 	import { requestNovaContext, toNovaContextRequestPayload } from '../services/nova-context.js';
 	import { planNovaContext } from '../services/nova-context-planner.js';
+	import { buildNovaModePrompt, type NovaPromptMode } from '../services/nova-prompt-mode.js';
 	import PromptInput from './PromptInput.svelte';
-	import QuickLinks from './QuickLinks.svelte';
 	import SuggestionChips from './SuggestionChips.svelte';
 
 	interface Message {
@@ -21,22 +21,27 @@
 	}
 
 	const suggestions = [
-		{ label: 'Character arc', prompt: 'Help me develop a compelling character arc. Ask me about the character I have in mind.' },
-		{ label: 'Scene draft', prompt: 'Help me draft a scene. Ask me about the setting, characters involved, and what needs to happen.' },
-		{ label: 'Plot structure', prompt: 'I need help structuring my plot. Let me describe where I am in the story.' },
-	];
-
-	const quickLinks = [
-		{ label: 'Projects', href: '/projects', icon: 'book' as const },
-		{ label: 'Images', href: '/images', icon: 'list' as const },
-		{ label: 'Settings', href: '/settings', icon: 'settings' as const },
-		{ label: 'Styles', href: '/styles', icon: 'code' as const },
+		{
+			label: 'Character arc',
+			prompt:
+				'Design a complete character arc for my protagonist. Ask only the minimum clarifying questions first, then propose the arc in concrete stages.',
+		},
+		{
+			label: 'Scene draft',
+			prompt:
+				'Draft a full scene from this direction, including clear emotional turn and forward momentum. Ask clarifying questions only if blocked.',
+		},
+		{
+			label: 'Plot structure',
+			prompt:
+				'Build a structured plot map from this concept with act-level beats, turning points, and escalation logic.',
+		},
 	];
 
 	let messages = $state<Message[]>([]);
 	let promptValue = $state('');
 	let isStreaming = $state(false);
-	let activeMode = $state<'writing' | 'revision' | 'structure'>('writing');
+	let activeMode = $state<NovaPromptMode>('writing');
 	let sessionContextItems = $state<NovaSessionContextItem[]>([]);
 	let contextWarnings = $state<string[]>([]);
 	let projectPickerOpen = $state(false);
@@ -181,12 +186,13 @@
 	async function handleSubmit(text: string) {
 		if (!text.trim() || isStreaming) return;
 
-		const contextPlan = planNovaContext(text.trim(), sessionContextItems, messages);
+		const userPrompt = text.trim();
+		const contextPlan = planNovaContext(userPrompt, sessionContextItems, messages);
 
 		let contextResponse: NovaContextResponsePayload | null = null;
 		if (contextPlan.mode !== 'off') {
 			try {
-				contextResponse = await resolveAttachedContext(text.trim(), contextPlan);
+				contextResponse = await resolveAttachedContext(userPrompt, contextPlan);
 			} catch (error) {
 				const message = error instanceof Error ? error.message : 'Unknown error while assembling context.';
 				pushWarnings([`Attached context failed: ${message}`]);
@@ -194,7 +200,7 @@
 			}
 		}
 
-		const nextConversation = [...messages, { role: 'user', content: text.trim() } as const];
+		const nextConversation = [...messages, { role: 'user', content: userPrompt } as const];
 		messages = nextConversation;
 		promptValue = '';
 		isStreaming = true;
@@ -203,6 +209,13 @@
 		const payloadMessages: AIRequestPayload['messages'] = nextConversation
 			.map((message) => ({ role: message.role, content: message.content }))
 			.filter((message) => message.content);
+		const modeScopedPrompt = buildNovaModePrompt(userPrompt, activeMode);
+		if (payloadMessages.length > 0 && modeScopedPrompt) {
+			payloadMessages[payloadMessages.length - 1] = {
+				role: 'user',
+				content: modeScopedPrompt,
+			};
+		}
 
 		if (contextPlan.mode !== 'off' && contextResponse?.contextText) {
 			payloadMessages.unshift({
@@ -271,22 +284,22 @@
 				onsubmit={handleSubmit}
 			/>
 		</div>
-	{:else}
-		<!-- ─── Empty / agent landing state ─── -->
-		<div class="nova-empty">
-			<div class="nova-empty__workspace">
-				<section class="nova-empty__composer" aria-label="Start a Nova chat">
-					<PromptInput
-						bind:value={promptValue}
-						placeholder="Ask Nova to draft, revise, or reason through your story ..."
-						disabled={isStreaming}
-						contextItems={sessionContextItems}
-						{contextWarnings}
-						onremovecontext={removeContextItem}
-						onrequestprojectpicker={openProjectPicker}
-						onfilesselected={handleContextFilesSelected}
-						onsubmit={handleSubmit}
-					/>
+		{:else}
+			<!-- ─── Empty / agent landing state ─── -->
+			<div class="nova-empty">
+				<div class="nova-empty__workspace">
+					<section class="nova-empty__composer" aria-label="Start a Nova chat">
+						<PromptInput
+							bind:value={promptValue}
+							placeholder="Direct Nova in natural language. Nova writes, revises, and structures."
+							disabled={isStreaming}
+							contextItems={sessionContextItems}
+							{contextWarnings}
+							onremovecontext={removeContextItem}
+							onrequestprojectpicker={openProjectPicker}
+							onfilesselected={handleContextFilesSelected}
+							onsubmit={handleSubmit}
+						/>
 
 					<div
 						class="nova-empty__mode-row"
@@ -319,25 +332,20 @@
 						>Structure</button>
 					</div>
 
-					<div class="nova-empty__suggestion-row">
-						<span class="nova-empty__suggestion-label">Try Nova</span>
-						<SuggestionChips {suggestions} onselect={handleSubmit} />
-					</div>
-				</section>
-
-				<div class="nova-empty__utility-row">
-					<QuickLinks label="Quick access" links={quickLinks} />
+						<div class="nova-empty__suggestion-row">
+							<SuggestionChips label="Director prompts" {suggestions} onselect={handleSubmit} />
+						</div>
+					</section>
 				</div>
-			</div>
 
-			<footer class="nova-empty__footer">
-				<span>AI-assisted writing</span>
-				<span>·</span>
-				<span>Use suggestions with care</span>
-			</footer>
-		</div>
-	{/if}
-</div>
+				<footer class="nova-empty__footer">
+					<span>You direct</span>
+					<span>·</span>
+					<span>Nova drafts, revises, and structures</span>
+				</footer>
+			</div>
+			{/if}
+	</div>
 
 {#if projectPickerOpen}
 	<div
@@ -476,21 +484,7 @@
 		gap: var(--space-2);
 	}
 
-	.nova-empty__suggestion-label {
-		font-size: var(--text-xs);
-		letter-spacing: var(--tracking-wide);
-		text-transform: uppercase;
-		color: var(--color-text-muted);
-	}
-
-	.nova-empty__utility-row {
-		width: 100%;
-		max-width: 680px;
-		display: flex;
-		justify-content: center;
-	}
-
-	.nova-empty__footer {
+		.nova-empty__footer {
 		padding: var(--space-3) var(--space-6) var(--space-5);
 		display: flex;
 		justify-content: center;

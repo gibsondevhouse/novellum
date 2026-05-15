@@ -1,5 +1,6 @@
 <script lang="ts">
 	import SurfaceCard from '$lib/components/ui/SurfaceCard.svelte';
+	import SettingsMarkdownDocument from '$lib/components/settings/SettingsMarkdownDocument.svelte';
 	import eulaText from '../../../../EULA.md?raw';
 	import noticeText from '../../../../NOTICE.md?raw';
 </script>
@@ -20,7 +21,7 @@
 			End User License Agreement
 		</h2>
 		<SurfaceCard variant="flat">
-			<pre class="legal__doc">{eulaText}</pre>
+			<SettingsMarkdownDocument content={eulaText} label="End user license agreement" />
 		</SurfaceCard>
 	</section>
 
@@ -29,7 +30,7 @@
 			Third-Party Notices
 		</h2>
 		<SurfaceCard variant="flat">
-			<pre class="legal__doc">{noticeText}</pre>
+			<SettingsMarkdownDocument content={noticeText} label="Third-party notices" />
 		</SurfaceCard>
 	</section>
 </div>
@@ -66,11 +67,4 @@
 		margin: 0;
 	}
 
-	.legal__doc {
-		font: var(--font-body-sm);
-		color: var(--color-text-primary);
-		white-space: pre-wrap;
-		overflow-wrap: break-word;
-		margin: 0;
-	}
 </style>

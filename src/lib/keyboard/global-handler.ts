@@ -92,9 +92,9 @@ function runAction(actionId: string): void {
 			void goto('/settings');
 			return;
 		case 'new-project':
-			// `/books?create=1` is the existing entry point used by the
-			// header "+" button; the books page auto-opens the dialog.
-			void goto('/books?create=1');
+			// `/projects?create=1` is the entry point used by the header "+"
+			// button; the projects page auto-opens the create dialog.
+			void goto('/projects?create=1');
 			return;
 		case 'toggle-sidebar':
 			sidebar.toggle();

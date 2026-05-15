@@ -1,25 +1,16 @@
 <script lang="ts">
-	import { page } from '$app/state';
-	import SidebarSection from './SidebarSection.svelte';
-	import SidebarItem from './SidebarItem.svelte';
-	import ActiveProjectSection from './ActiveProjectSection.svelte';
 	import { sidebar } from '$lib/stores/sidebar.svelte.js';
+	import ActiveProjectSection from './ActiveProjectSection.svelte';
+	import SidebarPrimaryNav from './sidebar/SidebarPrimaryNav.svelte';
+	import SidebarProjectSearch from './sidebar/SidebarProjectSearch.svelte';
+	import SidebarSettingsNav from './sidebar/SidebarSettingsNav.svelte';
+	import SidebarFooterLinks from './sidebar/SidebarFooterLinks.svelte';
 
-	let searchQuery = $state('');
+	const collapsed = $derived(sidebar.collapsed);
 
-	let collapsed = $derived(sidebar.collapsed);
-
-	function toggleSidebar() {
+	function toggleSidebar(): void {
 		sidebar.toggle();
 	}
-
-	let isHomeActive = $derived(page.url.pathname === '/');
-	let isBooksActive = $derived(page.url.pathname.startsWith('/books'));
-	let isNovaActive = $derived(page.url.pathname === '/nova');
-	let isImagesActive = $derived(page.url.pathname.startsWith('/images'));
-	let isProjectsActive = $derived(page.url.pathname === '/projects');
-	let isStylesActive = $derived(page.url.pathname === '/styles');
-	let isSettingsActive = $derived(page.url.pathname.startsWith('/settings'));
 </script>
 
 <aside class="app-sidebar" class:collapsed aria-label="Navigation">
@@ -48,191 +39,18 @@
 	</button>
 
 	{#if !collapsed}
-		<div class="sidebar-search">
-			<svg
-				class="sidebar-search__icon"
-				xmlns="http://www.w3.org/2000/svg"
-				width="14"
-				height="14"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<circle cx="11" cy="11" r="8"></circle>
-				<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-			</svg>
-			<input
-				class="sidebar-search__input"
-				type="search"
-				placeholder="Search projects..."
-				bind:value={searchQuery}
-				aria-label="Search projects"
-			/>
-		</div>
+		<SidebarProjectSearch />
 	{/if}
 
 	<nav id="sidebar-nav-content" class="sidebar-scroll" aria-label="Primary navigation links">
-		<SidebarSection>
-			<SidebarItem href="/?home=1" label="Home" active={isHomeActive}>
-			{#snippet icon()}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="1em"
-					height="1em"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-					<polyline points="9 22 9 12 15 12 15 22"></polyline>
-				</svg>
-			{/snippet}
-			</SidebarItem>
-			<SidebarItem href="/books" label="Reader" active={isBooksActive}>
-			{#snippet icon()}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="1em"
-					height="1em"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-					<path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-				</svg>
-			{/snippet}
-			</SidebarItem>
-			<SidebarItem href="/nova" label="Nova" active={isNovaActive}>
-			{#snippet icon()}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="1em"
-					height="1em"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<polygon
-						points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-					></polygon>
-				</svg>
-			{/snippet}
-			</SidebarItem>
-			<SidebarItem href="/images" label="Images" active={isImagesActive}>
-			{#snippet icon()}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="1em"
-					height="1em"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-					<circle cx="8.5" cy="8.5" r="1.5"></circle>
-					<polyline points="21 15 16 10 5 21"></polyline>
-				</svg>
-			{/snippet}
-			</SidebarItem>
-			<SidebarItem href="/styles" label="Styles" active={isStylesActive}>
-			{#snippet icon()}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="1em"
-					height="1em"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
-				</svg>
-			{/snippet}
-			</SidebarItem>
-			<SidebarItem href="/projects" label="Projects" active={isProjectsActive}>
-			{#snippet icon()}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="1em"
-					height="1em"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<rect x="3" y="3" width="7" height="7"></rect>
-					<rect x="14" y="3" width="7" height="7"></rect>
-					<rect x="14" y="14" width="7" height="7"></rect>
-					<rect x="3" y="14" width="7" height="7"></rect>
-				</svg>
-			{/snippet}
-			</SidebarItem>
-		</SidebarSection>
-
+		<SidebarPrimaryNav />
 		<ActiveProjectSection />
-
 		<hr class="sidebar-divider" />
-
-		<SidebarSection>
-			<SidebarItem href="/settings" label="Settings" active={isSettingsActive}>
-			{#snippet icon()}
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="1em"
-					height="1em"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<circle cx="12" cy="12" r="3"></circle>
-					<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-				</svg>
-			{/snippet}
-			</SidebarItem>
-		</SidebarSection>
+		<SidebarSettingsNav />
 	</nav>
 
 	{#if !collapsed}
-		<div class="sidebar-bottom">
-			<a href="/nova" class="sidebar-bottom__link" aria-label="Nova AI Help">
-				<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-				</svg>
-				<span>Nova</span>
-			</a>
-			<span class="sidebar-bottom__separator">·</span>
-			<a href="/settings/about" class="sidebar-bottom__link" aria-label="About and Help">
-				<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<circle cx="12" cy="12" r="10"></circle>
-					<path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-					<line x1="12" y1="17" x2="12.01" y2="17"></line>
-				</svg>
-				<span>About</span>
-			</a>
-		</div>
+		<SidebarFooterLinks />
 	{/if}
 </aside>
 
@@ -290,13 +108,19 @@
 
 	.app-sidebar.collapsed :global(.sidebar-item__label),
 	.app-sidebar.collapsed :global(.sidebar-section__label),
-	.app-sidebar.collapsed :global(.sidebar-item__lock) {
+	.app-sidebar.collapsed :global(.sidebar-item__lock),
+	.app-sidebar.collapsed :global(.sidebar-export-btn__label) {
 		display: none;
 	}
-	
-	.app-sidebar.collapsed :global(.sidebar-item) {
+
+	.app-sidebar.collapsed :global(.sidebar-item),
+	.app-sidebar.collapsed :global(.sidebar-export-btn) {
 		justify-content: center;
 		padding: var(--space-2) 0;
+	}
+
+	.app-sidebar.collapsed :global(.sidebar-search-results) {
+		display: none;
 	}
 
 	.sidebar-divider {
@@ -305,81 +129,13 @@
 		margin: var(--space-3) var(--space-3);
 	}
 
-	.sidebar-search {
-		display: flex;
-		align-items: center;
-		gap: var(--space-2);
-		padding: var(--space-2) var(--space-3);
-		margin: var(--space-1) var(--space-2);
-		background-color: var(--color-surface-raised);
-		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-md);
-	}
-
-	.sidebar-search__icon {
-		color: var(--color-text-muted);
-		flex-shrink: 0;
-	}
-
-	.sidebar-search__input {
-		background: none;
-		border: none;
-		color: var(--color-text-primary);
-		font-size: var(--text-sm);
-		width: 100%;
-		outline: none;
-	}
-
-	.sidebar-search__input::placeholder {
-		color: var(--color-text-muted);
-	}
-
-	.sidebar-search__input:focus-visible {
-		outline: 2px solid var(--color-border-focus);
-		outline-offset: 2px;
-		border-radius: var(--radius-sm);
-	}
-
-	.sidebar-bottom {
-		margin-top: auto;
-		padding: var(--space-3);
-		border-top: 1px solid var(--color-border-default);
-		display: flex;
-		align-items: center;
-		gap: var(--space-2);
-	}
-
-	.sidebar-bottom__link {
-		display: flex;
-		align-items: center;
-		gap: var(--space-1);
-		color: var(--color-text-muted);
-		font-size: var(--text-xs);
-		text-decoration: none;
-		transition: color var(--duration-fast) var(--ease-standard);
-	}
-
-	.sidebar-bottom__link:hover {
-		color: var(--color-text-primary);
-	}
-
-	.sidebar-bottom__link:focus-visible {
-		outline: 2px solid var(--color-border-focus);
-		outline-offset: 2px;
-		border-radius: var(--radius-sm);
-	}
-
-	.sidebar-bottom__separator {
-		color: var(--color-text-muted);
-		font-size: var(--text-xs);
-	}
-
 	@media (max-width: 900px) {
 		.app-sidebar {
 			width: var(--sidebar-collapsed-width);
 		}
 
-		.sidebar-search {
+		:global(.sidebar-search),
+		:global(.sidebar-search-results) {
 			display: none;
 		}
 	}

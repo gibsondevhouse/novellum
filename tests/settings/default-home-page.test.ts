@@ -1,8 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 const getServerPreference = vi.fn();
-const dbGet = vi.fn();
-const prepare = vi.fn(() => ({ get: dbGet }));
+const dbGetBySql = vi.fn();
+const prepare = vi.fn((sql: string) => ({
+	get: (params?: unknown) => dbGetBySql(sql, params),
+}));
 
 vi.mock('$lib/server/db/index.js', () => ({
 	db: { prepare },
@@ -16,7 +18,7 @@ vi.mock('$app/environment', () => ({ dev: false }));
 
 beforeEach(() => {
 	getServerPreference.mockReset();
-	dbGet.mockReset();
+	dbGetBySql.mockReset();
 	prepare.mockClear();
 	vi.resetModules();
 });
@@ -59,13 +61,34 @@ describe('+page.server.ts (root) — Default Home Page redirect', () => {
 				return { mode: 'classic', lastBookId: 'book-123', pageIndex: {} };
 			return undefined;
 		});
+		dbGetBySql.mockImplementation((sql: string) => {
+			if (sql.includes('WHERE id = $id')) return { id: 'book-123' };
+			return undefined;
+		});
 
 		try {
 			await callLoad();
 			throw new Error('expected redirect');
 		} catch (err) {
 			expectRedirect(err, 307, '/books/book-123');
+			expect(prepare).toHaveBeenCalledWith('SELECT id FROM projects WHERE id = $id LIMIT 1');
 		}
+	});
+
+	it("returns {} when 'last-read' resolves a stale id", async () => {
+		getServerPreference.mockImplementation((key: string) => {
+			if (key === 'app.defaults.homePage') return 'last-read';
+			if (key === 'app.readerMode')
+				return { mode: 'classic', lastBookId: 'book-missing', pageIndex: {} };
+			return undefined;
+		});
+		dbGetBySql.mockImplementation((sql: string) => {
+			if (sql.includes('WHERE id = $id')) return undefined;
+			return undefined;
+		});
+
+		const out = await callLoad();
+		expect(out).toEqual({});
 	});
 
 	it("returns {} when 'last-read' has no lastBookId", async () => {
@@ -101,7 +124,10 @@ describe('+page.server.ts (root) — Default Home Page redirect', () => {
 		getServerPreference.mockImplementation((key: string) =>
 			key === 'app.defaults.homePage' ? 'last-project' : undefined,
 		);
-		dbGet.mockReturnValue({ id: 'proj-42' });
+		dbGetBySql.mockImplementation((sql: string) => {
+			if (sql.includes('lastOpenedAt')) return { id: 'proj-42' };
+			return undefined;
+		});
 
 		try {
 			await callLoad();
@@ -118,7 +144,22 @@ describe('+page.server.ts (root) — Default Home Page redirect', () => {
 		getServerPreference.mockImplementation((key: string) =>
 			key === 'app.defaults.homePage' ? 'last-project' : undefined,
 		);
-		dbGet.mockReturnValue(undefined);
+		dbGetBySql.mockImplementation(() => undefined);
+		const out = await callLoad();
+		expect(out).toEqual({});
+	});
+
+	it("returns {} when last-read validation lookup throws", async () => {
+		getServerPreference.mockImplementation((key: string) => {
+			if (key === 'app.defaults.homePage') return 'last-read';
+			if (key === 'app.readerMode')
+				return { mode: 'classic', lastBookId: 'book-123', pageIndex: {} };
+			return undefined;
+		});
+		dbGetBySql.mockImplementation((sql: string) => {
+			if (sql.includes('WHERE id = $id')) throw new Error('db down');
+			return undefined;
+		});
 		const out = await callLoad();
 		expect(out).toEqual({});
 	});
@@ -127,8 +168,11 @@ describe('+page.server.ts (root) — Default Home Page redirect', () => {
 		getServerPreference.mockImplementation((key: string) =>
 			key === 'app.defaults.homePage' ? 'last-project' : undefined,
 		);
-		dbGet.mockImplementation(() => {
-			throw new Error('db down');
+		dbGetBySql.mockImplementation((sql: string) => {
+			if (sql.includes('lastOpenedAt')) {
+				throw new Error('db down');
+			}
+			return undefined;
 		});
 		const out = await callLoad();
 		expect(out).toEqual({});

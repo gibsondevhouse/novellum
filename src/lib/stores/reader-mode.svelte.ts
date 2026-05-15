@@ -1,9 +1,10 @@
-import { getPreference, setPreference } from '$lib/preferences.js';
+import {
+	readReaderNavigationState,
+	readReaderPreferenceState,
+	writeReaderNavigationState,
+} from '$lib/navigation-state.js';
 
 export type ReaderMode = 'classic' | 'book' | 'fullscreen';
-
-const STORAGE_KEY = 'novellum:reader';
-const PREF_KEY = 'app.readerMode';
 
 interface PersistedReaderState {
 	mode: ReaderMode;
@@ -11,41 +12,26 @@ interface PersistedReaderState {
 	pageIndex: Record<string, number>;
 }
 
-function readStorage(): Partial<PersistedReaderState> {
-	if (typeof localStorage === 'undefined') return {};
-	try {
-		return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}');
-	} catch {
-		return {};
-	}
-}
-
 function writeStorage(): void {
-	if (typeof localStorage === 'undefined') return;
 	const state: PersistedReaderState = {
 		mode: getReaderMode(),
 		lastBookId: getLastReadBookId(),
 		pageIndex: getPageIndexMap(),
 	};
-	try {
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-	} catch {
-		// storage unavailable
-	}
-	void setPreference(PREF_KEY, state);
+	void writeReaderNavigationState(state);
 }
 
-const saved = readStorage();
+const saved = readReaderNavigationState();
 
-let mode: ReaderMode = $state(saved.mode ?? 'classic');
+let mode: ReaderMode = $state((saved.mode as ReaderMode | undefined) ?? 'classic');
 let lastBookId: string | null = $state(saved.lastBookId ?? null);
 let pageIndexMap: Record<string, number> = $state(saved.pageIndex ?? {});
 
 // Reconcile cached value with SQLite-canonical value on first browser run.
 if (typeof window !== 'undefined') {
-	void getPreference<PersistedReaderState | null>(PREF_KEY, null).then((remote) => {
+	void readReaderPreferenceState().then((remote) => {
 		if (!remote) return;
-		if (remote.mode && remote.mode !== mode) mode = remote.mode;
+		if (remote.mode && remote.mode !== mode) mode = remote.mode as ReaderMode;
 		if (remote.lastBookId !== undefined && remote.lastBookId !== lastBookId) {
 			lastBookId = remote.lastBookId;
 		}

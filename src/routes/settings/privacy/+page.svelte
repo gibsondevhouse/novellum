@@ -1,5 +1,6 @@
 <script lang="ts">
 	import SurfaceCard from '$lib/components/ui/SurfaceCard.svelte';
+	import SettingsMarkdownDocument from '$lib/components/settings/SettingsMarkdownDocument.svelte';
 	import privacyText from '../../../../PRIVACY.md?raw';
 </script>
 
@@ -16,7 +17,10 @@
 	<section class="privacy__section" aria-labelledby="privacy-policy-heading">
 		<h2 id="privacy-policy-heading" class="privacy__heading">Privacy Policy</h2>
 		<SurfaceCard variant="flat">
-			<pre class="privacy__doc">{privacyText}</pre>
+			<SettingsMarkdownDocument
+				content={privacyText}
+				label="Privacy policy document"
+			/>
 		</SurfaceCard>
 	</section>
 </div>
@@ -53,11 +57,4 @@
 		margin: 0;
 	}
 
-	.privacy__doc {
-		font: var(--font-body-sm);
-		color: var(--color-text-primary);
-		white-space: pre-wrap;
-		overflow-wrap: break-word;
-		margin: 0;
-	}
 </style>
