@@ -33,11 +33,25 @@ async function waitForStableRender(page: import('@playwright/test').Page) {
 	await page.waitForTimeout(500);
 }
 
-async function dismissOnboardingIfVisible(page: import('@playwright/test').Page) {
-	const getStartedButton = page.getByRole('button', { name: 'Get Started' });
-	const visible = await getStartedButton.isVisible().catch(() => false);
-	if (!visible) return;
-	await getStartedButton.click();
+async function ensureOnboardingComplete(request: import('@playwright/test').APIRequestContext) {
+	for (const key of ['app.onboarding.completed', 'app.seenOnboarding']) {
+		const response = await request.put(`/api/db/preferences/${key}`, {
+			data: { value: true },
+		});
+		expect(response.ok()).toBe(true);
+	}
+}
+
+async function openNovaContextMenu(page: import('@playwright/test').Page) {
+	await page.goto('/nova');
+	await waitForStableRender(page);
+	const contextButton = page.getByRole('button', {
+		name: /add project|file context|context/i,
+	});
+	await expect(contextButton).toBeVisible({ timeout: 10000 });
+	await expect(contextButton).toBeEnabled({ timeout: 10000 });
+	await contextButton.click();
+	await expect(page.getByRole('menu')).toBeVisible({ timeout: 5000 });
 	await page.waitForTimeout(150);
 }
 
@@ -70,6 +84,10 @@ async function createMajorArc(
 }
 
 test.describe('Visual Regression — Route Family Baselines', () => {
+	test.beforeEach(async ({ request }) => {
+		await ensureOnboardingComplete(request);
+	});
+
 	test.beforeAll(async ({ browser }) => {
 		// Verify dev server is accessible
 		const context = await browser.newContext();
@@ -147,24 +165,17 @@ test.describe('Visual Regression — Route Family Baselines', () => {
 	});
 
 	test('Nova context menu open — full page', async ({ page }) => {
-		await page.goto('/nova');
-		await waitForStableRender(page);
-		await dismissOnboardingIfVisible(page);
-		await page.getByRole('button', { name: 'Add project or file context' }).click();
-		await page.waitForTimeout(150);
+		await openNovaContextMenu(page);
 		await expect(page).toHaveScreenshot('nova-context-menu-open.png');
 	});
 
 	test('Nova with attached project chip — full page', async ({ page, request }) => {
 		const projectId = await createVisualProject(request, `Visual Nova Context ${Date.now()}`);
 		try {
-			await page.goto('/nova');
-			await waitForStableRender(page);
-			await dismissOnboardingIfVisible(page);
-			await page.getByRole('button', { name: 'Add project or file context' }).click();
-			await page.getByRole('menuitem', { name: 'Add Project' }).click();
-			await page.getByRole('button', { name: 'Attach', exact: false }).first().click();
-			await page.getByRole('button', { name: 'Done' }).click();
+			await openNovaContextMenu(page);
+			await page.getByRole('menuitem', { name: /add project/i }).click();
+			await page.getByRole('button', { name: /attach/i }).first().click();
+			await page.getByRole('button', { name: /^done$/i }).click();
 			await page.waitForTimeout(200);
 			await expect(page).toHaveScreenshot('nova-context-chip-project.png');
 		} finally {
