@@ -339,12 +339,12 @@
 	.editor-host {
 		flex: 1;
 		outline: none;
-		font-family: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
+		font-family: var(--editor-prose-font);
 		font-size: var(--editor-font-size);
 		line-height: var(--editor-line-height);
 		letter-spacing: 0.005em;
 		color: var(--color-text-primary);
-		caret-color: var(--color-nova-blue);
+		caret-color: var(--color-candle);
 	}
 
 	:global(.editor-host .manuscript-canvas) {
@@ -375,10 +375,10 @@
 
 	:global(.editor-host .manuscript-canvas h1),
 	:global(.editor-host .manuscript-canvas h2) {
-		font-family: var(--font-sans);
-		font-weight: 700;
-		line-height: 1.3;
-		letter-spacing: -0.01em;
+		font-family: var(--font-display);
+		font-weight: var(--font-weight-normal);
+		line-height: 1.2;
+		letter-spacing: var(--tracking-tight);
 		margin: 1.8em 0 0.6em;
 		color: var(--color-text-primary);
 	}

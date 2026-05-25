@@ -201,7 +201,7 @@
 	}
 
 	.nova-error-hint a {
-		color: var(--color-nova-blue);
+		color: var(--color-candle);
 		text-decoration: underline;
 	}
 

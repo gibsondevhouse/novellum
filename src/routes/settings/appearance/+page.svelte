@@ -112,8 +112,9 @@
 
 	.appearance__title {
 		margin: 0;
+		font-family: var(--font-display);
 		font-size: var(--text-2xl);
-		font-weight: var(--font-weight-semibold);
+		font-weight: var(--font-weight-normal);
 		color: var(--color-text-primary);
 		letter-spacing: var(--tracking-tight);
 	}
@@ -126,11 +127,11 @@
 
 	.appearance__heading {
 		margin: 0;
-		font-size: var(--text-sm);
+		font-size: 9px;
 		font-weight: var(--font-weight-semibold);
 		text-transform: uppercase;
-		letter-spacing: var(--tracking-wide);
-		color: var(--color-text-secondary);
+		letter-spacing: 0.18em;
+		color: var(--color-brass);
 	}
 
 	.picker {
@@ -176,14 +177,14 @@
 	}
 
 	.picker__pill:focus-visible {
-		outline: 2px solid var(--color-nova-blue);
+		outline: 2px solid var(--color-border-focus);
 		outline-offset: 2px;
 	}
 
 	.picker__pill--active {
-		background-color: var(--color-surface-overlay);
-		border-color: var(--color-border-default);
-		color: var(--color-text-primary);
+		background-color: color-mix(in srgb, var(--color-candle) 14%, var(--color-surface-overlay));
+		border-color: color-mix(in srgb, var(--color-brass) 35%, var(--color-border-default));
+		color: var(--color-candle);
 	}
 
 	.picker__pill-label {

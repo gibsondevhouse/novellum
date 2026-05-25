@@ -282,7 +282,7 @@
 		inset: -20% -10% auto;
 		height: 480px;
 		background:
-			radial-gradient(circle at 20% 30%, color-mix(in srgb, var(--color-nova-blue) 20%, transparent), transparent 42%),
+			radial-gradient(circle at 20% 30%, color-mix(in srgb, var(--color-candle) 14%, transparent), transparent 42%),
 			radial-gradient(circle at 75% 10%, color-mix(in srgb, var(--color-teal) 14%, transparent), transparent 38%);
 		pointer-events: none;
 	}
@@ -391,8 +391,8 @@
 		justify-content: center;
 		padding: var(--space-2) var(--space-4);
 		border-radius: var(--radius-md);
-		border: 1px solid color-mix(in srgb, var(--color-nova-blue) 45%, var(--color-border-default));
-		background: color-mix(in srgb, var(--color-nova-blue) 18%, transparent);
+		border: 1px solid color-mix(in srgb, var(--color-brass) 45%, var(--color-border-default));
+		background: color-mix(in srgb, var(--color-candle) 14%, transparent);
 		color: var(--color-text-primary);
 		text-decoration: none;
 		font-size: var(--text-sm);
@@ -402,7 +402,7 @@
 	.domain-tile__cta:hover,
 	.domain-tile__cta:focus-visible {
 		outline: none;
-		background: color-mix(in srgb, var(--color-nova-blue) 26%, transparent);
+		background: color-mix(in srgb, var(--color-candle) 22%, transparent);
 		border-color: var(--color-border-focus);
 	}
 
@@ -468,7 +468,7 @@
 		font-weight: var(--font-weight-semibold);
 		line-height: 1;
 		letter-spacing: var(--tracking-tight);
-		color: color-mix(in srgb, var(--color-nova-blue) 75%, white 25%);
+		color: var(--color-brass);
 	}
 
 	.lane-heading h2 {
@@ -554,7 +554,7 @@
 	}
 
 	.lane-entry a {
-		color: var(--color-nova-blue);
+		color: var(--color-candle);
 		font-weight: var(--font-weight-semibold);
 		text-decoration: none;
 	}

@@ -43,6 +43,8 @@
                                 </div>
                         {/if}
 
+                        <span class="cover-foil" aria-hidden="true"></span>
+
                         <div class="cover-overlay">
                                 <span class={`status-badge ${getStatusClass(project.status)}`}>
                                         {formatStatus(project.status)}
@@ -116,8 +118,10 @@
         }
 
         :global(.cover-button:hover) .cover-image {
-                box-shadow: var(--shadow-md);
-                border-color: var(--color-border-strong);
+                box-shadow:
+                        var(--shadow-md),
+                        0 0 24px color-mix(in srgb, var(--color-candle) 18%, transparent);
+                border-color: color-mix(in srgb, var(--color-brass) 45%, var(--color-border-strong));
         }
 
         :global(.cover-button:active) .cover-image {
@@ -137,8 +141,32 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background: linear-gradient(135deg, var(--color-surface-elevated) 0%, var(--color-surface-base) 100%);
+                background:
+                        linear-gradient(
+                                135deg,
+                                color-mix(in srgb, var(--color-brass) 18%, var(--color-surface-elevated)) 0%,
+                                var(--color-surface-base) 100%
+                        );
                 padding: var(--space-4);
+        }
+
+        .cover-foil {
+                position: absolute;
+                inset: 0;
+                pointer-events: none;
+                background:
+                        radial-gradient(
+                                circle at 22% 18%,
+                                color-mix(in srgb, var(--color-candle) 22%, transparent) 0%,
+                                transparent 50%
+                        ),
+                        linear-gradient(
+                                125deg,
+                                color-mix(in srgb, var(--color-candle) 10%, transparent),
+                                transparent 55%
+                        );
+                mix-blend-mode: screen;
+                opacity: 0.7;
         }
 
         .placeholder-title {
@@ -185,9 +213,9 @@
         }
 
         .status-drafting {
-                background-color: color-mix(in srgb, var(--color-teal) 15%, transparent);
-                color: var(--color-teal);
-                border-color: color-mix(in srgb, var(--color-teal) 30%, transparent);
+                background-color: color-mix(in srgb, var(--color-candle) 18%, transparent);
+                color: var(--color-candle);
+                border-color: color-mix(in srgb, var(--color-candle) 40%, transparent);
         }
 
         .card-footer {
@@ -215,7 +243,10 @@
 
         .book-meta {
                 font-family: var(--font-sans);
-                font-size: var(--text-xs);
+                font-size: 9px;
+                font-weight: var(--font-weight-semibold);
+                letter-spacing: 0.18em;
+                text-transform: uppercase;
                 color: var(--color-text-muted);
                 margin: 0;
                 white-space: nowrap;

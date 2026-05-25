@@ -78,7 +78,7 @@
 	}
 
 	.settings-markdown__content :global(code) {
-		font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+		font-family: var(--font-mono);
 		font-size: 0.9em;
 	}
 </style>

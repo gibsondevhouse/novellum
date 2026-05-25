@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Accents</title>
+<link rel="stylesheet" href="_preview.css">
+<style>
+	.accents { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); }
+	.accent {
+		border-radius: var(--radius-md);
+		padding: var(--space-3);
+		height: 140px;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		border: 1px solid var(--border-default);
+	}
+	.accent__chip { height: 56px; border-radius: var(--radius-sm); }
+	.a-nova .accent__chip { background: var(--accent-nova-blue); }
+	.a-teal .accent__chip { background: var(--accent-teal); }
+	.a-ai   .accent__chip { background: var(--accent-ai-tint); border: 1px solid var(--border-subtle); }
+	.accent__row { display: flex; justify-content: space-between; align-items: baseline; }
+	.accent__name { font-size: 11px; font-weight: var(--w-semibold); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg1); }
+	.accent__use  { font-size: 10px; color: var(--fg3); }
+	.accent__value { font-family: var(--mono); font-size: 10px; color: var(--fg2); }
+</style>
+</head><body>
+<div class="accents">
+	<div class="accent a-nova">
+		<div class="accent__chip"></div>
+		<div>
+			<div class="accent__row"><span class="accent__name">nova-blue</span><span class="accent__use">primary action</span></div>
+			<span class="accent__value">#3b82f6</span>
+		</div>
+	</div>
+	<div class="accent a-teal">
+		<div class="accent__chip"></div>
+		<div>
+			<div class="accent__row"><span class="accent__name">teal</span><span class="accent__use">links · genre pill</span></div>
+			<span class="accent__value">#06b6d4</span>
+		</div>
+	</div>
+	<div class="accent a-ai">
+		<div class="accent__chip"></div>
+		<div>
+			<div class="accent__row"><span class="accent__name">ai-tint</span><span class="accent__use">AI surfaces</span></div>
+			<span class="accent__value">rgba(99,102,241,.08)</span>
+		</div>
+	</div>
+</div>
+</body></html>

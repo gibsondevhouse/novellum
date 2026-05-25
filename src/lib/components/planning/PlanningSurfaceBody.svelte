@@ -34,12 +34,11 @@
 	}
 
 	:global(.planning-context-label) {
-		font-size: var(--text-xs);
-		font-weight: var(--font-weight-semibold);
+		font-size: 9px;
+		font-weight: 600;
 		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		color: var(--ps-accent, var(--color-teal));
-		opacity: 0.7;
+		letter-spacing: 0.18em;
+		color: var(--ps-accent, var(--color-brass));
 		flex-shrink: 0;
 	}
 

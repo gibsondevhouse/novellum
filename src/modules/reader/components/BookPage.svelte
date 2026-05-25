@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { ReaderPage } from '$modules/reader/reader-pages.js';
+	import Ornament from '$lib/components/ui/Ornament.svelte';
+	import DropCap from '$lib/components/ui/DropCap.svelte';
 
 	interface Props {
 		page: ReaderPage | null;
@@ -10,12 +12,27 @@
 	const tocLines = $derived(
 		page?.type === 'toc' && page.content ? page.content.split('\n').filter(Boolean) : [],
 	);
+
+	const dropCapLetter = $derived(
+		page?.type === 'scene' && page.isChapterOpener && page.content
+			? page.content.trimStart().charAt(0)
+			: '',
+	);
+	const dropCapRemainder = $derived(
+		page?.type === 'scene' && page.isChapterOpener && page.content
+			? page.content.trimStart().slice(1)
+			: '',
+	);
 </script>
 
 <article
 	class="book-page book-page--{page?.type ?? 'blank'}"
 	aria-label={page ? page.title ?? page.chapterTitle ?? page.sceneTitle ?? 'Page' : 'Blank page'}
 >
+	<span class="book-page__vignette" aria-hidden="true"></span>
+	{#if page?.type === 'chapter-title'}
+		<span class="book-page__ribbon" aria-hidden="true"></span>
+	{/if}
 	{#if !page}
 		<div class="book-page__blank" aria-hidden="true"></div>
 	{:else if page.type === 'cover'}
@@ -51,13 +68,20 @@
 				<p class="book-page__eyebrow">{page.subtitle}</p>
 			{/if}
 			<h2 class="book-page__chapter-title">{page.title ?? ''}</h2>
+			<Ornament class="book-page__chapter-ornament" />
 		</div>
 	{:else if page.type === 'scene'}
 		<div class="book-page__scene">
 			{#if page.sceneTitle}
 				<p class="book-page__scene-title" aria-hidden="true">{page.sceneTitle}</p>
 			{/if}
-			<div class="book-page__scene-body">{page.content ?? ''}</div>
+			{#if page.isChapterOpener && dropCapLetter}
+				<div class="book-page__scene-body book-page__scene-body--opener">
+					<DropCap letter={dropCapLetter} />{dropCapRemainder}
+				</div>
+			{:else}
+				<div class="book-page__scene-body">{page.content ?? ''}</div>
+			{/if}
 		</div>
 	{:else if page.type === 'empty-scene' || page.type === 'empty-chapter'}
 		<div class="book-page__empty">
@@ -90,11 +114,40 @@
                         var(--reader-page-padding-block-start)
                         var(--reader-page-padding-inline)
                         var(--reader-page-padding-block-end);
-                background: var(--color-surface-base);
-                color: var(--color-text-primary);
-                border: 1px solid var(--color-border-subtle);
+                background: var(--color-parchment);
+                color: var(--color-ink);
+                /* Locally rebind text tokens so all descendants render in ink
+                   on the parchment surface without per-rule overrides. */
+                --color-text-primary: var(--color-ink);
+                --color-text-secondary: var(--color-ink-soft);
+                --color-text-muted: var(--color-ink-mute);
+                border: 1px solid var(--color-parchment-deep);
                 border-radius: var(--radius-lg);
+		overflow: hidden;
 		flex: 1;
+	}
+
+	.book-page__vignette {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		background:
+			radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--color-candle) 10%, transparent), transparent 60%),
+			radial-gradient(circle at 50% 100%, color-mix(in srgb, var(--color-candle-deep) 18%, transparent), transparent 55%);
+		mix-blend-mode: multiply;
+		opacity: 0.55;
+	}
+
+	.book-page__ribbon {
+		position: absolute;
+		top: -2px;
+		right: var(--space-6);
+		width: 16px;
+		height: 64px;
+		background: var(--color-ember);
+		clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+		box-shadow: var(--shadow-sm);
+		pointer-events: none;
 	}
 
 	.book-page__cover-image {
@@ -109,7 +162,7 @@
 		display: grid;
 		place-items: center;
 		padding: var(--space-8);
-		background: var(--color-surface-overlay);
+		background: var(--color-parchment-edge);
 	}
 
 	.book-page__cover-title {
@@ -289,7 +342,10 @@
 		left: 0;
 		right: 0;
 		text-align: center;
-		font-size: var(--text-xs);
-		color: var(--color-text-muted);
+		font-family: var(--font-display);
+		font-style: italic;
+		font-size: var(--text-sm);
+		color: var(--color-brass);
+		letter-spacing: 0.04em;
 	}
 </style>

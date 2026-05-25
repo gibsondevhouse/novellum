@@ -157,14 +157,37 @@
 	}
 
 	.hero-banner {
+		position: relative;
 		display: flex;
 		gap: var(--space-8);
 		background-color: var(--color-surface-raised);
+		background-image: radial-gradient(
+			ellipse 60% 60% at 18% 38%,
+			color-mix(in srgb, var(--color-candle) 14%, transparent) 0%,
+			transparent 70%
+		);
 		border-radius: var(--radius-xl);
 		padding: var(--space-8);
 		border: 1px solid var(--color-border);
 		align-items: center;
 		box-shadow: var(--shadow-sm);
+		overflow: hidden;
+	}
+
+	.hero-banner::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 12%;
+		bottom: 12%;
+		width: 2px;
+		background: linear-gradient(
+			to bottom,
+			transparent,
+			color-mix(in srgb, var(--color-candle-dim) 55%, transparent),
+			transparent
+		);
+		pointer-events: none;
 	}
 
 	.hero-content {
@@ -175,12 +198,12 @@
 	}
 
 	.hero-label {
-		font-size: var(--text-sm);
+		font-size: 9px;
 		text-transform: uppercase;
-		letter-spacing: var(--tracking-wide);
-		color: var(--color-nova-blue);
+		letter-spacing: 0.18em;
+		color: var(--color-candle);
 		margin: 0 0 var(--space-2) 0;
-		font-weight: var(--font-weight-bold);
+		font-weight: var(--font-weight-semibold);
 	}
 
 	.hero-title {

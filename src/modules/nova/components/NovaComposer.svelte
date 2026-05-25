@@ -401,9 +401,9 @@
 	}
 
 	.nova-action-send {
-		background: var(--color-nova-blue);
-		border-color: var(--color-nova-blue);
-		color: var(--color-text-on-dark);
+		background: var(--color-candle);
+		border-color: color-mix(in srgb, var(--color-brass) 70%, var(--color-candle));
+		color: var(--color-ink);
 	}
 
 	.nova-action-send:disabled {

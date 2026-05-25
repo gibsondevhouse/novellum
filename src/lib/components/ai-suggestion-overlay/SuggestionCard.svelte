@@ -98,8 +98,8 @@
 	}
 
 	.mode-badge--proofread {
-		background-color: color-mix(in srgb, var(--color-nova-blue) 15%, transparent);
-		color: var(--color-nova-blue);
+		background-color: color-mix(in srgb, var(--color-candle) 15%, transparent);
+		color: var(--color-candle);
 	}
 
 	.diff-block {
@@ -171,13 +171,13 @@
 	}
 
 	.btn--primary {
-		background-color: var(--color-nova-blue);
-		color: var(--color-text-on-dark);
-		border-color: var(--color-nova-blue);
+		background-color: var(--color-candle);
+		color: var(--color-ink);
+		border-color: color-mix(in srgb, var(--color-brass) 70%, var(--color-candle));
 	}
 
 	.btn--primary:hover {
-		background-color: color-mix(in srgb, var(--color-nova-blue) 85%, white);
+		background-color: color-mix(in srgb, var(--color-candle) 88%, var(--color-brass));
 	}
 
 	.btn--secondary {

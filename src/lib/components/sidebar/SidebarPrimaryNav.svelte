@@ -79,7 +79,7 @@
 		</svg>
 	{/snippet}
 	</SidebarItem>
-	<SidebarItem href="/nova" label="Nova" active={isNovaActive}>
+	<SidebarItem href="/nova" label="Muse" active={isNovaActive}>
 	{#snippet icon()}
 		<svg
 			xmlns="http://www.w3.org/2000/svg"

@@ -64,9 +64,10 @@
 	}
 
 	.page-header__eyebrow {
-		font-size: var(--text-xs);
+		font-size: 9px;
+		font-weight: var(--font-weight-semibold);
 		text-transform: uppercase;
-		letter-spacing: var(--tracking-wide);
+		letter-spacing: 0.18em;
 		color: var(--color-text-muted);
 	}
 

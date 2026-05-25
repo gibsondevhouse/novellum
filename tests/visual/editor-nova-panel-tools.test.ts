@@ -53,7 +53,7 @@ test.describe('Visual Regression — Editor Nova tool-call / tool-result (plan-0
 			await page.goto(`/projects/${projectId}/editor`);
 			await waitForStableRender(page);
 
-			const novaToggle = page.getByRole('button', { name: 'Nova' });
+			const novaToggle = page.getByRole('button', { name: 'Nova', exact: true });
 			await novaToggle.click();
 			await page.waitForSelector('aside[aria-label="Nova copilot"]');
 

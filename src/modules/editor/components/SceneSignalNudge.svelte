@@ -145,12 +145,12 @@
 	}
 
 	.nudge-btn--nova {
-		color: var(--color-nova-blue);
-		border-color: color-mix(in srgb, var(--color-nova-blue) 30%, transparent);
+		color: var(--color-candle);
+		border-color: color-mix(in srgb, var(--color-brass) 35%, transparent);
 	}
 
 	.nudge-btn--nova:hover {
-		background: color-mix(in srgb, var(--color-nova-blue) 10%, transparent);
+		background: color-mix(in srgb, var(--color-candle) 12%, transparent);
 	}
 
 	.nudge-btn--dismiss {

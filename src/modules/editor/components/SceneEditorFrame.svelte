@@ -57,7 +57,7 @@
 		font-size: var(--text-base);
 		line-height: var(--leading-relaxed);
 		color: var(--color-text-primary);
-		caret-color: var(--color-nova-blue);
+		caret-color: var(--color-candle);
 	}
 
 	:global(.prose-editor .ProseMirror p) {

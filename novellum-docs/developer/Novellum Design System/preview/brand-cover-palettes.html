@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Cover palettes</title>
+<link rel="stylesheet" href="_preview.css">
+<style>
+	.grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--space-3); }
+	.cover {
+		position: relative;
+		aspect-ratio: 3 / 4;
+		border-radius: var(--radius-md);
+		overflow: hidden;
+		display: flex; align-items: center; justify-content: center;
+		border: 1px solid var(--border-subtle);
+	}
+	.cover::after {
+		content: '';
+		position: absolute; inset: 0;
+		background:
+			radial-gradient(circle at 22% 18%, color-mix(in srgb, white 26%, transparent) 0%, transparent 45%),
+			linear-gradient(125deg, color-mix(in srgb, white 12%, transparent), transparent 55%);
+		mix-blend-mode: screen;
+		pointer-events: none;
+	}
+	.initial {
+		position: relative;
+		font-family: var(--serif-display);
+		font-size: 40px;
+		color: color-mix(in srgb, white 88%, var(--fg1));
+		text-shadow: 0 2px 12px rgba(0,0,0,0.45);
+	}
+	.spine {
+		position: absolute;
+		bottom: 6px; left: 6px; right: 6px;
+		font-size: 9px;
+		font-weight: 500;
+		letter-spacing: var(--tracking-wide);
+		color: color-mix(in srgb, white 80%, var(--fg1));
+		text-transform: uppercase;
+		opacity: 0.85;
+		text-align: left;
+	}
+	.p1 { background: linear-gradient(160deg, #1f2937, #4f46e5); }
+	.p2 { background: linear-gradient(160deg, #3f2a1d, #b45309); }
+	.p3 { background: linear-gradient(160deg, #102a43, #0ea5e9); }
+	.p4 { background: linear-gradient(160deg, #2b1a3a, #9333ea); }
+	.p5 { background: linear-gradient(160deg, #1f3a2e, #10b981); }
+	.p6 { background: linear-gradient(160deg, #3a1f2a, #fb7185); }
+</style>
+</head><body>
+<div class="grid">
+	<div class="cover p1"><span class="initial">M</span><span class="spine">Mariner's Glass</span></div>
+	<div class="cover p2"><span class="initial">A</span><span class="spine">Amber Roads</span></div>
+	<div class="cover p3"><span class="initial">F</span><span class="spine">Foundry Sea</span></div>
+	<div class="cover p4"><span class="initial">V</span><span class="spine">Vellum &amp; Bone</span></div>
+	<div class="cover p5"><span class="initial">M</span><span class="spine">Moss Garden</span></div>
+	<div class="cover p6"><span class="initial">Q</span><span class="spine">Quartz Hour</span></div>
+</div>
+</body></html>

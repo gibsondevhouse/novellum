@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Buttons</title>
+<link rel="stylesheet" href="_preview.css">
+<style>
+	.col { display: grid; gap: var(--space-4); }
+	.group { display: flex; gap: var(--space-3); align-items: center; flex-wrap: wrap; }
+	.tag { font-family: var(--mono); font-size: 11px; color: var(--fg3); text-transform: uppercase; letter-spacing: var(--tracking-wide); }
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: var(--space-2) var(--space-4);
+		border-radius: var(--radius-sm);
+		font-family: var(--sans);
+		font-size: var(--text-sm);
+		font-weight: var(--w-medium);
+		cursor: pointer;
+		border: 1px solid transparent;
+		transition: opacity var(--dur-fast) var(--ease-standard), background-color var(--dur-fast) var(--ease-standard);
+	}
+	.btn--primary {
+		background: var(--accent-nova-blue);
+		color: #fff;
+		border-color: var(--accent-nova-blue);
+	}
+	.btn--ghost {
+		background: transparent;
+		color: var(--fg2);
+		border-color: var(--border-default);
+	}
+	.btn--danger {
+		background: var(--state-error);
+		color: #fff;
+		border-color: var(--state-error);
+	}
+	.btn--sm {
+		padding: 6px var(--space-3);
+		font-size: 12px;
+	}
+	.btn--xs {
+		padding: 2px var(--space-2);
+		font-size: 12px;
+	}
+	.btn--disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+	.btn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+</style>
+</head><body>
+<div class="col">
+	<div>
+		<div class="tag" style="margin-bottom: var(--space-2);">Hierarchy</div>
+		<div class="group">
+			<button class="btn btn--primary">Open Manuscript</button>
+			<button class="btn btn--ghost">Open Library</button>
+			<button class="btn btn--danger">Delete Project</button>
+			<button class="btn btn--primary btn--disabled">Disabled</button>
+		</div>
+	</div>
+	<div>
+		<div class="tag" style="margin-bottom: var(--space-2);">Sizes</div>
+		<div class="group">
+			<button class="btn btn--primary">Default</button>
+			<button class="btn btn--primary btn--sm">Small</button>
+			<button class="btn btn--primary btn--xs">Extra small</button>
+		</div>
+	</div>
+</div>
+</body></html>

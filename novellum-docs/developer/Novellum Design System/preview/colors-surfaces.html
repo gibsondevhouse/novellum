@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Surfaces</title>
+<link rel="stylesheet" href="_preview.css">
+<style>
+	.surfaces { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--space-2); }
+	.surface {
+		border-radius: var(--radius-md);
+		border: 1px solid var(--border-default);
+		height: 140px;
+		padding: var(--space-3);
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+		gap: 2px;
+	}
+	.surface__name { font-size: 11px; font-weight: var(--w-semibold); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg1); }
+	.surface__value { font-family: var(--mono); font-size: 10px; color: var(--fg2); }
+	.s-base     { background: var(--surface-base); }
+	.s-ground   { background: var(--surface-ground); }
+	.s-raised   { background: var(--surface-raised); }
+	.s-overlay  { background: var(--surface-overlay); }
+	.s-elevated { background: var(--surface-elevated); }
+	.s-hover    { background: var(--surface-hover); }
+</style>
+</head><body>
+<div class="surfaces">
+	<div class="surface s-base"><span class="surface__name">base</span><span class="surface__value">#0a0a0a</span></div>
+	<div class="surface s-ground"><span class="surface__name">ground</span><span class="surface__value">#111111</span></div>
+	<div class="surface s-raised"><span class="surface__name">raised</span><span class="surface__value">#191917</span></div>
+	<div class="surface s-overlay"><span class="surface__name">overlay</span><span class="surface__value">#222222</span></div>
+	<div class="surface s-elevated"><span class="surface__name">elevated</span><span class="surface__value">#2c2c2c</span></div>
+	<div class="surface s-hover"><span class="surface__name">hover</span><span class="surface__value">#262626</span></div>
+</div>
+</body></html>

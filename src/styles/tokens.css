@@ -1,16 +1,21 @@
 /* =============================================================================
    Novellum Design System — CSS Custom Properties (tokens.css)
    Single source of truth for all visual constants.
+
+   v2 (author-first) is the source of truth as of plan-026. Surfaces are warm
+   umber near-black; Crimson Pro joins the type stack for editorial prose;
+   candle/brass accents sit alongside Nova-Blue/Teal; per-project mood slots
+   are reserved but not yet wired by any consumer.
    ============================================================================= */
 
 :root {
-	/* ── Surface Layers (luminance hierarchy) ── */
-	--color-surface-base: #0a0a0a; /* absolute background              */
-	--color-surface-ground: #111111; /* sidebar, navigation rail         */
-	--color-surface-raised: #191917; /* primary content panels           */
-	--color-surface-overlay: #222222; /* cards, floating panels           */
-	--color-surface-elevated: #2c2c2c; /* hover states, highlighted rows   */
-	--color-surface-hover: #262626; /* new hover standard               */
+	/* ── Surface Layers (luminance hierarchy, warm umber per v2) ── */
+	--color-surface-base: #0f0d0a; /* absolute background              */
+	--color-surface-ground: #181410; /* sidebar, navigation rail         */
+	--color-surface-raised: #221d17; /* primary content panels           */
+	--color-surface-overlay: #2c241c; /* cards, floating panels           */
+	--color-surface-elevated: #382e23; /* hover states, highlighted rows   */
+	--color-surface-hover: #2a2218; /* new hover standard               */
 	--color-surface-glass: rgba(255, 255, 255, 0.04); /* frosted-glass overlays           */
 
 	/* ── Legacy surface aliases (backwards compat) ── */
@@ -20,15 +25,28 @@
 	/* ── Semantic shorthand aliases (stage-008 design-system freeze) ── */
 	--color-surface: var(--color-surface-raised);
 	--color-text: var(--color-text-primary);
-	--color-info: #3b82f6; /* same as --color-nova-blue */
+	--color-info: #3b82f6; /* genuine semantic info — kept blue */
 
 	/* ── Accents ── */
-	--color-nova-blue: #3b82f6; /* primary action / interactive        */
-	--color-nova-blue-hsl: 217 91% 60%;
+	/* `--color-nova-blue` now aliases the v2 candle accent (plan-026).
+	   Every existing consumer (focus rings, AI surfaces, scene rows, hub
+	   progress, settings selectors, chat interface, world-building panels)
+	   inherits the warm palette without per-file edits. The token name is
+	   retained for backwards compatibility and is removed by Phase 6. */
+	--color-nova-blue: var(--color-candle);
+	--color-nova-blue-hsl: var(--color-candle-hsl);
 	--color-teal: #06b6d4; /* AI indicators / secondary accent    */
 	--color-teal-hsl: 188 95% 43%;
-	--color-ai-tint: rgba(99, 102, 241, 0.08); /* AI-context panel surface            */
+	--color-ai-tint: color-mix(in srgb, var(--color-candle) 8%, transparent); /* AI-context panel surface */
 	--color-selection: rgba(245, 240, 235, 0.08); /* editorial selection / active row    */
+
+	/* ── Editorial accents (v2 candle + brass family) ── */
+	--color-candle: #f0bb70; /* warm candle accent — drop caps, ribbons, nib initials */
+	--color-candle-hsl: 34 80% 69%;
+	--color-candle-dim: #c89a5b;
+	--color-candle-deep: #8a6634;
+	--color-brass: #b8924a; /* brass — heavier editorial accent */
+	--color-ember: #b04444; /* bookmark ribbon / muted save dot */
 
 	/* ── Text ── */
 	--color-text-primary: #e5e5e5;
@@ -42,7 +60,7 @@
 	--color-border-default: rgba(255, 255, 255, 0.08); /* standard dividers                */
 	--color-border-subtle: rgba(255, 255, 255, 0.04); /* intra-panel hairlines            */
 	--color-border-strong: rgba(255, 255, 255, 0.16); /* emphasis borders, separators     */
-	--color-border-focus: rgba(59, 130, 246, 0.6); /* keyboard focus rings             */
+	--color-border-focus: rgba(240, 187, 112, 0.6); /* keyboard focus rings — candle */
 
 	/* ── Legacy border alias ── */
 	--color-border: var(--color-border-default);
@@ -75,14 +93,38 @@
 	--color-danger-soft: rgba(224, 49, 49, 0.08);
 
 	/* ── Theme compatibility aliases (Tailwind / bits-ui hsl vars) ── */
-	--color-surface-base-hsl: 0 0% 4%;
-	--color-surface-ground-hsl: 0 0% 7%;
-	--color-surface-raised-hsl: 60 4% 9%;
-	--color-surface-overlay-hsl: 0 0% 13%;
-	--color-surface-elevated-hsl: 0 0% 17%;
+	--color-surface-base-hsl: 36 20% 5%;
+	--color-surface-ground-hsl: 25 17% 8%;
+	--color-surface-raised-hsl: 33 21% 11%;
+	--color-surface-overlay-hsl: 30 22% 14%;
+	--color-surface-elevated-hsl: 30 23% 18%;
 	--color-border-default-hsl: 0 0% 100%;
 	--color-border-subtle-hsl: 0 0% 100%;
 	--color-border-focus-hsl: var(--color-nova-blue-hsl);
+
+	/* ── Parchment / ink (v2 editorial surfaces) ─────────────────────────
+	   Used by the Page (editor) and Room (reader) immersive surfaces in
+	   both dark and light themes. Parchment is a fixed surface colour —
+	   it does not flip with the dark/light toggle, because the editorial
+	   pages are themselves "objects" in the workspace.
+	*/
+	--color-parchment: #f1e9d8;
+	--color-parchment-edge: #e7ddc8;
+	--color-parchment-deep: #ebe1cc;
+	--color-ink: #1f1a14;
+	--color-ink-soft: #4a3e2e;
+	--color-ink-mute: #7a6b54;
+
+	/* ── Per-project mood (v2 reserved slots) ────────────────────────────
+	   Defaults are neutral; project metadata may override these on the
+	   document root via JS to tint sidebar rail, header breath bar, page
+	   tint and Muse nib. No consumer writes these yet — slots are
+	   reserved so future mood wiring is purely additive (plan-026).
+	*/
+	--mood-ink: var(--color-surface-raised);
+	--mood-wash: var(--color-surface-ground);
+	--mood-warm: var(--color-candle-dim);
+	--mood-accent: var(--color-nova-blue);
 
 	/* ── Semantic aliases (compat) ── */
 	--color-semantic-error-fg: var(--color-error-on-dark);
@@ -103,6 +145,7 @@
 	/* ── Typography ── */
 	--font-sans: 'Inter', system-ui, sans-serif;
 	--font-display: 'DM Serif Display', Georgia, serif;
+	--font-prose: 'Crimson Pro', 'Iowan Old Style', Georgia, serif; /* editorial body serif (v2) */
 	--font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
 	/* UI scale */
@@ -140,8 +183,9 @@
 	--prose-inset: var(--space-6); /* horizontal prose padding       */
 
 	/* ── Layout ── */
-	--sidebar-width: 220px;
-	--sidebar-collapsed-width: 64px;
+	--sidebar-width: 208px;
+	--sidebar-collapsed-width: 56px;
+	--header-height: 52px;
 	--panel-width: 280px;
 	--panel-padding: var(--space-4);
 
@@ -217,7 +261,7 @@
 	--reader-page-padding-block-end: var(--space-12); /* 48px */
 	--reader-page-padding-inline: var(--space-8); /* 32px */
 	--reader-measure-max: 68ch;
-	--reader-prose-font: var(--font-display);
+	--reader-prose-font: var(--font-prose); /* v2: Crimson Pro for the Room */
 	--reader-prose-size: var(--text-lg); /* 18px */
 	--reader-prose-leading: var(--leading-relaxed); /* 1.75 */
 	--reader-prose-tracking: var(--tracking-normal);
@@ -235,6 +279,7 @@
 	--editor-page-surface: var(--color-surface-raised);
 	--editor-page-shadow: var(--shadow-sm);
 	--editor-page-radius: var(--radius-md);
+	--editor-prose-font: var(--font-prose); /* v2: Crimson Pro for the Page */
 
 	/* ── Editor typography (plan-022 stage-002) ──────────────────────────
 	   User-controllable editor text size and line spacing. Bound on
@@ -285,10 +330,10 @@
 	--color-border-default: rgba(0, 0, 0, 0.12);
 	--color-border-subtle: rgba(0, 0, 0, 0.06);
 	--color-border-strong: rgba(0, 0, 0, 0.2);
-	--color-border-focus: rgba(59, 130, 246, 0.6);
+	--color-border-focus: rgba(240, 187, 112, 0.6);
 
 	/* ── Tints / state surfaces ── */
-	--color-ai-tint: rgba(99, 102, 241, 0.08);
+	--color-ai-tint: color-mix(in srgb, var(--color-candle) 10%, transparent);
 	--color-selection: rgba(59, 130, 246, 0.12);
 	--color-success-bg: rgba(34, 197, 94, 0.18);
 	--color-success-fg: #166534;

@@ -77,7 +77,7 @@
 	}
 
 	const accentColor = $derived(
-		selection.type === 'chapter' ? 'var(--color-teal)' : 'var(--color-nova-blue)',
+		selection.type === 'chapter' ? 'var(--color-teal)' : 'var(--color-candle)',
 	);
 
 	const typeLabel = $derived(selection.type === 'chapter' ? 'Chapter' : 'Scene');
@@ -197,7 +197,7 @@
 	}
 
 	.type-badge--scene {
-		color: var(--color-nova-blue);
+		color: var(--color-candle);
 	}
 
 	:global(.close-btn) {
@@ -243,9 +243,9 @@
 	}
 
 	.btn-editor:hover {
-		border-color: var(--color-nova-blue);
-		color: var(--color-nova-blue);
-		background: color-mix(in srgb, var(--color-nova-blue) 6%, transparent);
+		border-color: color-mix(in srgb, var(--color-brass) 45%, var(--color-border-default));
+		color: var(--color-candle);
+		background: color-mix(in srgb, var(--color-candle) 8%, transparent);
 	}
 
 	.btn-editor:focus-visible {

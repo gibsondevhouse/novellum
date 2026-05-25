@@ -121,7 +121,7 @@
 		flex-direction: column;
 		height: 100%;
 		background:
-			radial-gradient(circle at 8% 8%, color-mix(in srgb, var(--color-nova-blue) 8%, transparent), transparent 36%),
+			radial-gradient(circle at 8% 8%, color-mix(in srgb, var(--color-candle) 6%, transparent), transparent 36%),
 			var(--color-surface-raised);
 		border: 1px solid var(--color-border-subtle);
 		border-radius: var(--radius-xl);
@@ -180,7 +180,7 @@
 	}
 
 	.btn-history:hover {
-		background: color-mix(in srgb, var(--color-nova-blue) 16%, transparent);
+		background: color-mix(in srgb, var(--color-candle) 14%, transparent);
 	}
 
 	.editor-body {

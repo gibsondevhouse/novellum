@@ -392,7 +392,7 @@
 	}
 
 	.status-badge.migrating {
-		color: var(--color-nova-blue);
+		color: var(--color-info);
 	}
 
 	.status-badge.done {

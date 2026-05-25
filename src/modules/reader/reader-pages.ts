@@ -20,6 +20,12 @@ export interface ReaderPage {
 	content?: string;
 	imageUrl?: string;
 	pageNumber?: number;
+	/**
+	 * True when this page renders the opening prose of a chapter — the first
+	 * chunk of the first scene. Used by the v2 reader surface to render a
+	 * decorative drop-cap on the opening paragraph.
+	 */
+	isChapterOpener?: boolean;
 }
 
 export interface ReaderInputScene {
@@ -349,6 +355,7 @@ export function buildReaderPages(
 					chapterTitle,
 					sceneTitle,
 					content: chunk,
+					isChapterOpener: sceneIndex === 0 && chunkIndex === 0,
 				});
 			});
 		});

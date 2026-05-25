@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Empty state</title>
+<link rel="stylesheet" href="_preview.css">
+<style>
+	body { padding: var(--space-10) var(--space-6); }
+	.empty {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		gap: var(--space-3);
+		max-width: 480px;
+		margin: 0 auto;
+	}
+	.empty__title {
+		font-family: var(--serif-display);
+		font-size: 26px;
+		font-weight: 400;
+		letter-spacing: var(--tracking-tight);
+		line-height: 1.2;
+		color: var(--fg1);
+	}
+	.empty__desc {
+		font-size: 14px;
+		color: var(--fg2);
+		line-height: 1.6;
+	}
+	.btn {
+		display: inline-flex; align-items: center; gap: 6px;
+		padding: var(--space-2) var(--space-4);
+		border-radius: var(--radius-sm);
+		font-size: var(--text-sm);
+		font-weight: var(--w-medium);
+		background: var(--accent-nova-blue);
+		color: white;
+		border: 1px solid var(--accent-nova-blue);
+		cursor: pointer;
+		margin-top: var(--space-2);
+	}
+</style>
+</head><body>
+<div class="empty">
+	<div class="empty__title">Your library is ready for its first manuscript</div>
+	<div class="empty__desc">Create a project to seed your shelf, then return here to continue reading and track progress across drafts.</div>
+	<button class="btn">+ &nbsp;New project</button>
+</div>
+</body></html>

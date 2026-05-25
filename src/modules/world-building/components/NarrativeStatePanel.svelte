@@ -128,7 +128,7 @@
 
 	.input-inline:focus {
 		outline: none;
-		border-color: color-mix(in srgb, var(--color-nova-blue) 45%, var(--color-border-default));
+		border-color: color-mix(in srgb, var(--color-border-focus) 70%, var(--color-border-default));
 		background: color-mix(in srgb, var(--color-surface-overlay) 35%, transparent);
 	}
 

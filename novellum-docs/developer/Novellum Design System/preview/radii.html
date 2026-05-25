@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Radii</title>
+<link rel="stylesheet" href="_preview.css">
+<style>
+	.radii { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--space-2); }
+	.tile {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--space-2);
+	}
+	.shape {
+		width: 64px;
+		height: 64px;
+		background: var(--surface-overlay);
+		border: 1px solid var(--border-default);
+	}
+	.r-xs   { border-radius: var(--radius-xs); }
+	.r-sm   { border-radius: var(--radius-sm); }
+	.r-md   { border-radius: var(--radius-md); }
+	.r-lg   { border-radius: var(--radius-lg); }
+	.r-xl   { border-radius: var(--radius-xl); }
+	.r-2xl  { border-radius: var(--radius-2xl); }
+	.r-full { border-radius: var(--radius-full); }
+	.label { font-family: var(--mono); font-size: 10px; color: var(--fg3); text-transform: uppercase; letter-spacing: var(--tracking-wide); }
+	.value { font-family: var(--mono); font-size: 10px; color: var(--fg2); }
+</style>
+</head><body>
+<div class="radii">
+	<div class="tile"><div class="shape r-xs"></div>  <div class="label">xs</div>  <div class="value">2px</div></div>
+	<div class="tile"><div class="shape r-sm"></div>  <div class="label">sm</div>  <div class="value">4px</div></div>
+	<div class="tile"><div class="shape r-md"></div>  <div class="label">md</div>  <div class="value">6px</div></div>
+	<div class="tile"><div class="shape r-lg"></div>  <div class="label">lg</div>  <div class="value">10px</div></div>
+	<div class="tile"><div class="shape r-xl"></div>  <div class="label">xl</div>  <div class="value">16px</div></div>
+	<div class="tile"><div class="shape r-2xl"></div> <div class="label">2xl</div> <div class="value">24px</div></div>
+	<div class="tile"><div class="shape r-full"></div><div class="label">full</div><div class="value">9999</div></div>
+</div>
+</body></html>

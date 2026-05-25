@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Display type</title>
+<link rel="stylesheet" href="_preview.css">
+<style>
+	body { padding: var(--space-8); }
+	.specimen {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3);
+	}
+	.display-line {
+		font-family: var(--serif-display);
+		font-weight: 400;
+		color: var(--fg1);
+		line-height: 1.05;
+		letter-spacing: var(--tracking-tight);
+		margin: 0;
+	}
+	.size-6xl { font-size: 60px; }
+	.size-5xl { font-size: 48px; }
+	.size-4xl { font-size: 36px; }
+	.italic { font-style: italic; }
+	.meta { font-family: var(--mono); font-size: 11px; color: var(--fg3); }
+</style>
+</head><body>
+<div class="specimen">
+	<p class="display-line size-6xl">A serious writing instrument.</p>
+	<p class="display-line size-5xl italic">A leather-bound notebook, on a deep-walnut desk.</p>
+	<p class="display-line size-4xl">Continue the manuscript.</p>
+	<div class="meta">DM Serif Display · 60 / 48 / 36 · regular · tracking-tight</div>
+</div>
+</body></html>

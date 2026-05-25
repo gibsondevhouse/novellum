@@ -314,7 +314,7 @@
 		display: flex;
 		flex-direction: column;
 		background: var(--color-surface-ground);
-		border-left: 1px solid var(--nova-panel-border);
+		border-left: 1px solid color-mix(in srgb, var(--color-brass) 30%, var(--nova-panel-border));
 		box-shadow: var(--nova-panel-shadow);
 		z-index: 50;
 		color: var(--color-text-primary);
@@ -344,7 +344,7 @@
 		width: 2px;
 		height: 56px;
 		border-radius: var(--radius-full);
-		background: var(--color-border-strong);
+		background: var(--color-candle);
 		opacity: 0;
 		transition: opacity var(--duration-fast) var(--ease-standard);
 	}

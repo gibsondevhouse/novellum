@@ -63,9 +63,11 @@
 	}
 
 	.pill-nav__btn.active {
-		background: var(--color-surface-hover);
-		color: var(--color-text-primary);
-		box-shadow: var(--shadow-sm);
+		background: color-mix(in srgb, var(--color-candle) 14%, var(--color-surface-elevated));
+		color: var(--color-candle);
+		box-shadow:
+			var(--shadow-sm),
+			inset 0 0 0 1px color-mix(in srgb, var(--color-brass) 25%, transparent);
 	}
 
 	.pill-nav__btn.unassigned {

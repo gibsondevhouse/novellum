@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Logo</title>
+<link rel="stylesheet" href="_preview.css">
+<style>
+	body { padding: 0; }
+	.row { display: grid; grid-template-columns: 1fr 1fr; min-height: 280px; }
+	.cell { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: var(--space-3); padding: var(--space-6); position: relative; }
+	.cell.dark { background: var(--surface-base); }
+	.cell.light { background: #f5f3ee; color: #1a1a1a; }
+	.cell img { width: 160px; height: auto; display: block; }
+	.wordmark {
+		font-family: var(--serif-display);
+		font-size: 32px;
+		letter-spacing: var(--tracking-tight);
+	}
+	.cell.dark .wordmark { color: #f5f3ee; }
+	.cell.light .wordmark { color: #1a1a1a; }
+	.tag { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: var(--tracking-wide); }
+	.cell.dark .tag { color: var(--fg3); }
+	.cell.light .tag { color: #6b7280; }
+</style>
+</head><body>
+<div class="row">
+	<div class="cell dark">
+		<img src="../assets/nvlm-logo.png" alt="Novellum">
+		<div class="wordmark">Novellum</div>
+		<div class="tag">on surface-base</div>
+	</div>
+	<div class="cell light">
+		<img src="../assets/nvlm-logo.png" alt="Novellum">
+		<div class="wordmark">Novellum</div>
+		<div class="tag">on parchment</div>
+	</div>
+</div>
+</body></html>

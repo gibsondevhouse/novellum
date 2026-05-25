@@ -584,7 +584,7 @@
 
 	.meter-fill {
 		height: 100%;
-		background: color-mix(in srgb, var(--color-nova-blue) 72%, white);
+		background: color-mix(in srgb, var(--color-candle) 72%, var(--color-brass));
 	}
 
 	.meter-fill.session {

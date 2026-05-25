@@ -1,0 +1,365 @@
+/* =============================================================================
+   Novellum — colors_and_type.css
+   Author-facing color + typography tokens, pulled from the production system
+   in novellum/src/styles/tokens.css. Two layers:
+     (1) base tokens — raw, named (--surface-base, --serif-display, …)
+     (2) semantic tokens — role-bound (--h1, --code, --p, --button-bg, …)
+   Import once at the root of any prototype.
+   ============================================================================= */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   FONTS — load Inter (sans), DM Serif Display (display), JetBrains Mono (mono)
+   ───────────────────────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+	/* ── SURFACES (luminance hierarchy, dark mode default) ────────────────── */
+	--surface-base:     #0a0a0a;  /* root <html> background           */
+	--surface-ground:   #111111;  /* sidebar, nav rail                */
+	--surface-raised:   #191917;  /* primary content panels (warm)    */
+	--surface-overlay:  #222222;  /* cards, floating panels           */
+	--surface-elevated: #2c2c2c;  /* hover, highlighted rows          */
+	--surface-hover:    #262626;  /* default hover wash               */
+	--surface-glass:    rgba(255, 255, 255, 0.04);
+
+	/* ── FOREGROUND / TEXT ────────────────────────────────────────────────── */
+	--fg1: #e5e5e5;  /* primary text                                  */
+	--fg2: #9ca3af;  /* secondary text — captions, meta, labels       */
+	--fg3: #6b7280;  /* muted / disabled / eyebrow                    */
+	--fg-on-accent: #ffffff;
+
+	/* ── ACCENTS ──────────────────────────────────────────────────────────── */
+	--accent-nova-blue: #3b82f6;  /* primary action, interactive       */
+	--accent-teal:      #06b6d4;  /* AI / secondary accent             */
+	--accent-ai-tint:   rgba(99, 102, 241, 0.08);
+
+	/* ── BORDERS (rgba — breathable hairlines, never opaque) ──────────────── */
+	--border-subtle:   rgba(255, 255, 255, 0.04);
+	--border-default:  rgba(255, 255, 255, 0.08);
+	--border-strong:   rgba(255, 255, 255, 0.16);
+	--border-focus:    rgba(59, 130, 246, 0.60);
+
+	/* ── STATE ────────────────────────────────────────────────────────────── */
+	--state-success: #22c55e;
+	--state-warning: #f59e0b;
+	--state-error:   #ef4444;
+	--state-info:    #3b82f6;
+
+	--state-success-bg: rgba(34, 197, 94, 0.15);
+	--state-warning-bg: rgba(250, 204, 21, 0.15);
+	--state-error-bg:   rgba(239, 68, 68, 0.15);
+
+	/* ── SELECTION / TINTS ────────────────────────────────────────────────── */
+	--selection-wash: rgba(245, 240, 235, 0.08);  /* editorial selection */
+	--scrim:          rgba(0, 0, 0, 0.5);
+
+	/* ── TYPE FAMILIES ────────────────────────────────────────────────────── */
+	--sans:          'Inter', system-ui, sans-serif;
+	--serif-display: 'DM Serif Display', Georgia, serif;
+	--mono:          'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+
+	/* ── UI TYPE SCALE ────────────────────────────────────────────────────── */
+	--text-xs:   0.75rem;   /* 12px — chips, meta, eyebrow              */
+	--text-sm:   0.875rem;  /* 14px — secondary body, labels, buttons   */
+	--text-base: 1rem;      /* 16px — body                              */
+	--text-lg:   1.125rem;  /* 18px — emphasised body, reader prose     */
+	--text-xl:   1.25rem;   /* 20px — h3                                */
+	--text-2xl:  1.5rem;    /* 24px — h2                                */
+	--text-3xl:  1.875rem;  /* 30px — h1                                */
+
+	/* ── EDITORIAL / DISPLAY SCALE ────────────────────────────────────────── */
+	--text-4xl: 2.25rem;    /* 36px — workspace heroes        */
+	--text-5xl: 3rem;       /* 48px — library / landing       */
+	--text-6xl: 3.75rem;    /* 60px — title slides, splash    */
+
+	/* ── WEIGHTS / LEADING / TRACKING ─────────────────────────────────────── */
+	--w-regular:  400;
+	--w-medium:   500;
+	--w-semibold: 600;
+	--w-bold:     700;
+
+	--leading-tight:    1.25;
+	--leading-normal:   1.5;
+	--leading-relaxed:  1.75;
+
+	--tracking-tight:   -0.03em;
+	--tracking-normal:  0em;
+	--tracking-wide:    0.04em;
+	--tracking-widest:  0.12em;
+
+	/* ─────────────────────────────────────────────────────────────────────
+	   SEMANTIC TYPOGRAPHY ROLES
+	   Use these to style real headings/body/code. Each role bundles
+	   family + size + weight + leading + tracking into one variable group.
+	   ───────────────────────────────────────────────────────────────────── */
+
+	/* Display — title slides, hero splash */
+	--display-font:    var(--serif-display);
+	--display-size:    var(--text-6xl);
+	--display-weight:  var(--w-regular);
+	--display-leading: var(--leading-tight);
+	--display-track:   var(--tracking-tight);
+
+	/* H1 — page titles (DM Serif Display, regular weight, tight leading) */
+	--h1-font:    var(--serif-display);
+	--h1-size:    var(--text-3xl);
+	--h1-weight:  var(--w-regular);
+	--h1-leading: var(--leading-tight);
+	--h1-track:   var(--tracking-tight);
+
+	/* H2 — section headings */
+	--h2-font:    var(--sans);
+	--h2-size:    var(--text-2xl);
+	--h2-weight:  var(--w-semibold);
+	--h2-leading: var(--leading-tight);
+	--h2-track:   var(--tracking-normal);
+
+	/* H3 — subsections, card titles */
+	--h3-font:    var(--sans);
+	--h3-size:    var(--text-xl);
+	--h3-weight:  var(--w-semibold);
+	--h3-leading: var(--leading-tight);
+	--h3-track:   var(--tracking-normal);
+
+	/* H4 — minor headings */
+	--h4-font:    var(--sans);
+	--h4-size:    var(--text-lg);
+	--h4-weight:  var(--w-medium);
+	--h4-leading: var(--leading-normal);
+
+	/* Body (p) — paragraphs */
+	--p-font:    var(--sans);
+	--p-size:    var(--text-base);
+	--p-weight:  var(--w-regular);
+	--p-leading: var(--leading-relaxed);
+	--p-color:   var(--fg1);
+
+	/* Body-small — supporting copy, descriptions */
+	--p-sm-size:    var(--text-sm);
+	--p-sm-color:   var(--fg2);
+	--p-sm-leading: var(--leading-normal);
+
+	/* Eyebrow — uppercase, wide-tracking section label */
+	--eyebrow-font:    var(--sans);
+	--eyebrow-size:    var(--text-xs);
+	--eyebrow-weight:  var(--w-semibold);
+	--eyebrow-track:   var(--tracking-wide);
+	--eyebrow-case:    uppercase;
+	--eyebrow-color:   var(--fg3);
+
+	/* Logline — italic serif used for synopsis copy on library cards */
+	--logline-font:    var(--serif-display);
+	--logline-style:   italic;
+	--logline-size:    var(--text-lg);
+	--logline-leading: var(--leading-relaxed);
+	--logline-color:   var(--fg2);
+
+	/* Reader prose — long-form reading surface (book + classic views) */
+	--reader-font:    var(--serif-display);
+	--reader-size:    var(--text-lg);   /* 18px */
+	--reader-leading: var(--leading-relaxed);
+	--reader-measure: 68ch;
+
+	/* Editor prose — manuscript editor (tighter than reader) */
+	--editor-font:    var(--sans);
+	--editor-size:    var(--text-base);
+	--editor-leading: var(--leading-relaxed);
+	--editor-measure: 65ch;
+
+	/* Code / mono */
+	--code-font:    var(--mono);
+	--code-size:    var(--text-sm);
+	--code-weight:  var(--w-regular);
+	--code-leading: var(--leading-normal);
+
+	/* Button label */
+	--button-font:   var(--sans);
+	--button-size:   var(--text-sm);
+	--button-weight: var(--w-medium);
+
+	/* ── SPACING (4px base grid) — included so this file is self-contained ── */
+	--space-1:  4px;
+	--space-2:  8px;
+	--space-3:  12px;
+	--space-4:  16px;
+	--space-5:  20px;
+	--space-6:  24px;
+	--space-8:  32px;
+	--space-10: 40px;
+	--space-12: 48px;
+	--space-16: 64px;
+
+	/* ── RADII ─────────────────────────────────────────────────────────────── */
+	--radius-xs:   2px;
+	--radius-sm:   4px;
+	--radius-md:   6px;
+	--radius-lg:   10px;
+	--radius-xl:   16px;
+	--radius-2xl:  24px;
+	--radius-full: 9999px;
+
+	/* ── SHADOWS (dark-surface tuned — deeper than light-mode shadows) ────── */
+	--shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.5);
+	--shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
+	--shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.4);
+	--shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
+	--shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.7), 0 4px 16px rgba(0, 0, 0, 0.5);
+
+	/* ── FOCUS ─────────────────────────────────────────────────────────────── */
+	--focus-ring: 0 0 0 2px var(--border-focus);
+
+	/* ── MOTION ────────────────────────────────────────────────────────────── */
+	--dur-instant: 80ms;
+	--dur-fast:    100ms;
+	--dur-base:    150ms;
+	--dur-enter:   200ms;
+	--dur-slow:    250ms;
+	--dur-page:    320ms;
+
+	--ease-standard:   cubic-bezier(0.4, 0, 0.2, 1);
+	--ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+	--ease-exit:       cubic-bezier(0.4, 0, 1, 1);
+	--ease-editorial:  cubic-bezier(0.16, 1, 0.3, 1); /* spring-like panel settle */
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   LIGHT MODE OVERRIDES
+   Activated by `<html data-theme="light">`. Parchment-toned surfaces;
+   accents/spacing/type inherit from :root.
+   ───────────────────────────────────────────────────────────────────────────── */
+:root[data-theme='light'] {
+	--surface-base:     #f5f3ee;  /* parchment */
+	--surface-ground:   #efece5;
+	--surface-raised:   #ffffff;
+	--surface-overlay:  #f9f7f2;
+	--surface-elevated: #ffffff;
+	--surface-hover:    #ebe7df;
+	--surface-glass:    rgba(0, 0, 0, 0.04);
+
+	--fg1: #1a1a1a;
+	--fg2: #4b5563;
+	--fg3: #6b7280;
+
+	--border-subtle:  rgba(0, 0, 0, 0.06);
+	--border-default: rgba(0, 0, 0, 0.12);
+	--border-strong:  rgba(0, 0, 0, 0.20);
+
+	--selection-wash: rgba(59, 130, 246, 0.12);
+	--scrim:          rgba(0, 0, 0, 0.35);
+
+	--shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.06);
+	--shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+	--shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.06);
+	--shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.10), 0 2px 8px rgba(0, 0, 0, 0.06);
+	--shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.14), 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   BASE ELEMENT STYLING — applies the semantic roles
+   ───────────────────────────────────────────────────────────────────────────── */
+html {
+	font-family: var(--sans);
+	font-size: var(--text-base);
+	line-height: var(--leading-normal);
+	color: var(--fg1);
+	background-color: var(--surface-base);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-feature-settings: 'ss01', 'tnum', 'calt';
+}
+
+body { margin: 0; padding: 0; }
+
+h1 {
+	font-family: var(--h1-font);
+	font-size:   var(--h1-size);
+	font-weight: var(--h1-weight);
+	line-height: var(--h1-leading);
+	letter-spacing: var(--h1-track);
+	margin: 0;
+}
+h2 {
+	font-family: var(--h2-font);
+	font-size:   var(--h2-size);
+	font-weight: var(--h2-weight);
+	line-height: var(--h2-leading);
+	margin: 0;
+}
+h3 {
+	font-family: var(--h3-font);
+	font-size:   var(--h3-size);
+	font-weight: var(--h3-weight);
+	line-height: var(--h3-leading);
+	margin: 0;
+}
+h4 {
+	font-family: var(--h4-font);
+	font-size:   var(--h4-size);
+	font-weight: var(--h4-weight);
+	line-height: var(--h4-leading);
+	margin: 0;
+}
+p {
+	font-family: var(--p-font);
+	font-size:   var(--p-size);
+	line-height: var(--p-leading);
+	color: var(--p-color);
+	margin: 0;
+}
+code, pre, kbd, samp {
+	font-family: var(--code-font);
+	font-size:   var(--code-size);
+}
+a {
+	color: var(--accent-teal);
+	text-decoration: none;
+}
+a:hover { text-decoration: underline; }
+
+:focus-visible {
+	outline: 2px solid var(--border-focus);
+	outline-offset: 2px;
+}
+
+/* ─── Utility classes for semantic roles ───────────────────────────────────── */
+.eyebrow {
+	font-family: var(--eyebrow-font);
+	font-size: var(--eyebrow-size);
+	font-weight: var(--eyebrow-weight);
+	letter-spacing: var(--eyebrow-track);
+	text-transform: var(--eyebrow-case);
+	color: var(--eyebrow-color);
+}
+.display {
+	font-family: var(--display-font);
+	font-size: var(--display-size);
+	font-weight: var(--display-weight);
+	line-height: var(--display-leading);
+	letter-spacing: var(--display-track);
+}
+.logline {
+	font-family: var(--logline-font);
+	font-style: var(--logline-style);
+	font-size: var(--logline-size);
+	line-height: var(--logline-leading);
+	color: var(--logline-color);
+}
+.body-sm {
+	font-size: var(--p-sm-size);
+	color: var(--p-sm-color);
+	line-height: var(--p-sm-leading);
+}
+
+/* ─── Keyframe used across the app: enter motion ──────────────────────────── */
+@keyframes novellum-enter {
+	from { opacity: 0; transform: translateY(4px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*, *::before, *::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}

@@ -39,9 +39,9 @@
 		display: inline-flex;
 		align-items: center;
 		font-size: var(--text-xs);
-		color: var(--color-text-secondary);
-		background: color-mix(in srgb, var(--color-nova-blue) 12%, transparent);
-		border: 1px solid color-mix(in srgb, var(--color-nova-blue) 30%, transparent);
+		color: var(--color-candle);
+		background: color-mix(in srgb, var(--color-candle) 12%, transparent);
+		border: 1px solid color-mix(in srgb, var(--color-brass) 30%, transparent);
 		border-radius: var(--radius-full, 9999px);
 		padding: 1px var(--space-2);
 	}

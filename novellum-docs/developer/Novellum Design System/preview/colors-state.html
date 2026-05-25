@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>State</title>
+<link rel="stylesheet" href="_preview.css">
+<style>
+	.states { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-2); }
+	.state {
+		border-radius: var(--radius-md);
+		padding: var(--space-3);
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+		border: 1px solid var(--border-default);
+		background: var(--surface-overlay);
+	}
+	.chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 2px var(--space-2);
+		border-radius: var(--radius-full);
+		font-size: 11px;
+		font-weight: var(--w-medium);
+		align-self: flex-start;
+	}
+	.chip .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+	.chip.success { color: var(--state-success); background: var(--state-success-bg); border: 1px solid color-mix(in srgb, var(--state-success) 30%, transparent); }
+	.chip.warning { color: var(--state-warning); background: var(--state-warning-bg); border: 1px solid color-mix(in srgb, var(--state-warning) 30%, transparent); }
+	.chip.error   { color: var(--state-error);   background: var(--state-error-bg);   border: 1px solid color-mix(in srgb, var(--state-error) 30%, transparent); }
+	.chip.info    { color: var(--state-info);    background: rgba(59,130,246,0.15);    border: 1px solid color-mix(in srgb, var(--state-info) 30%, transparent); }
+	.label { font-size: 11px; color: var(--fg3); text-transform: uppercase; letter-spacing: var(--tracking-wide); font-weight: var(--w-semibold); }
+	.hex { font-family: var(--mono); font-size: 11px; color: var(--fg2); }
+</style>
+</head><body>
+<div class="states">
+	<div class="state">
+		<span class="chip success"><span class="dot"></span>Success</span>
+		<div><div class="label">success</div><div class="hex">#22c55e</div></div>
+	</div>
+	<div class="state">
+		<span class="chip warning"><span class="dot"></span>Warning</span>
+		<div><div class="label">warning</div><div class="hex">#f59e0b</div></div>
+	</div>
+	<div class="state">
+		<span class="chip error"><span class="dot"></span>Error</span>
+		<div><div class="label">error</div><div class="hex">#ef4444</div></div>
+	</div>
+	<div class="state">
+		<span class="chip info"><span class="dot"></span>Info</span>
+		<div><div class="label">info</div><div class="hex">#3b82f6</div></div>
+	</div>
+</div>
+</body></html>

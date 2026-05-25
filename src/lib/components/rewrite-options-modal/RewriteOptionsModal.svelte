@@ -198,8 +198,9 @@
 	}
 
 	.btn--primary {
-		background: var(--color-nova-blue);
-		color: var(--color-text-on-dark);
+		background: var(--color-candle);
+		color: var(--color-ink);
+		border: 1px solid color-mix(in srgb, var(--color-brass) 70%, var(--color-candle));
 		align-self: flex-start;
 	}
 

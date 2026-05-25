@@ -39,10 +39,21 @@
 		if (readerBookTitle) return readerBookTitle;
 		if (projectTitle) return projectTitle;
 		if (isSettingsRoute) return 'Settings';
-		if (isNovaRoute) return 'Nova';
+		if (isNovaRoute) return 'Muse';
 		if (isBooksRoute) return 'Books';
 		if (isImagesRoute) return 'Images';
 		return 'Novellum';
+	});
+
+	let displayEyebrow = $derived.by(() => {
+		if (isReaderRoute) return 'The Room';
+		if (isEditorRoute) return 'The Page';
+		if (isProjectRoute) return 'Workshop';
+		if (isSettingsRoute) return 'Preferences';
+		if (isNovaRoute) return 'The Muse';
+		if (isBooksRoute) return 'Library';
+		if (isImagesRoute) return 'Assets';
+		return '';
 	});
 
 	let editorChapters = $state<Chapter[]>([]);
@@ -156,7 +167,12 @@
 						</svg>
 					</span>
 				{/if}
-				<span class="header-context__title" title={displayTitle}>{displayTitle}</span>
+				<div class="header-context__stack">
+					{#if displayEyebrow}
+						<span class="header-context__eyebrow">{displayEyebrow}</span>
+					{/if}
+					<span class="header-context__title" title={displayTitle}>{displayTitle}</span>
+				</div>
 			</div>
 		{/if}
 	</div>
@@ -271,17 +287,33 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		height: 48px;
+		height: var(--header-height);
 		padding-top: 0;
 		padding-bottom: 0;
-		padding-left: var(--space-4);
-		padding-right: var(--space-4);
+		padding-left: var(--space-6);
+		padding-right: var(--space-6);
 		background-color: var(--color-surface-base);
 		border-bottom: 1px solid var(--color-border-subtle);
 		flex-shrink: 0;
 		position: sticky;
 		top: 0;
 		z-index: 20;
+	}
+
+	.app-header::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: -1px;
+		height: 1px;
+		background: linear-gradient(
+			90deg,
+			transparent 0%,
+			color-mix(in srgb, var(--color-candle-dim) 30%, transparent) 50%,
+			transparent 100%
+		);
+		pointer-events: none;
 	}
 
 	.header-left {
@@ -303,13 +335,32 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: var(--color-text-secondary);
+		color: var(--color-brass);
 		flex-shrink: 0;
 	}
 
+	.header-context__stack {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		min-width: 0;
+		line-height: 1.1;
+	}
+
+	.header-context__eyebrow {
+		font-family: var(--font-sans);
+		font-size: 9px;
+		font-weight: var(--font-weight-semibold);
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--color-text-muted);
+	}
+
 	.header-context__title {
-		font-size: var(--text-sm);
-		font-weight: var(--font-weight-medium);
+		font-family: var(--font-display);
+		font-size: var(--text-lg);
+		font-weight: var(--font-weight-normal);
+		letter-spacing: var(--tracking-tight);
 		color: var(--color-text-primary);
 		max-width: clamp(140px, 28vw, 420px);
 		white-space: nowrap;

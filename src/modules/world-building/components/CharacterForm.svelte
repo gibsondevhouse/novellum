@@ -253,7 +253,7 @@
 
 	.text-field__control:focus {
 		outline: none;
-		border-color: var(--color-nova-blue);
+		border-color: var(--color-border-focus);
 	}
 
 	.form-actions {

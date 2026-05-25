@@ -655,7 +655,7 @@ line-clamp: 3;
 	.form-input:focus, .form-textarea:focus {
 		outline: none;
 		border-color: var(--color-nova-blue);
-		box-shadow: 0 0 0 4px var(--color-nova-blue-10), inset 0 2px 4px rgba(0, 0, 0, 0.02);
+		box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-candle) 24%, transparent), inset 0 2px 4px rgba(0, 0, 0, 0.02);
 		background: var(--color-surface-overlay);
 	}
 

@@ -16,7 +16,10 @@
 <section class="collection-row" aria-label={title}>
         {#if title}
                 <div class="row-header">
-                        <h2 class="collection-title">{title}</h2>
+                        <div class="row-header__stack">
+                                <p class="collection-eyebrow">Shelf</p>
+                                <h2 class="collection-title">{title}</h2>
+                        </div>
                 </div>
         {/if}
 
@@ -45,6 +48,22 @@
                 align-items: center;
                 justify-content: space-between;
                 padding-inline: var(--space-6);
+        }
+
+        .row-header__stack {
+                display: flex;
+                flex-direction: column;
+                gap: var(--space-1);
+        }
+
+        .collection-eyebrow {
+                font-family: var(--font-sans);
+                font-size: 9px;
+                font-weight: var(--font-weight-semibold);
+                letter-spacing: 0.18em;
+                text-transform: uppercase;
+                color: var(--color-brass);
+                margin: 0;
         }
 
         .collection-title {

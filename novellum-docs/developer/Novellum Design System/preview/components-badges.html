@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Badges</title>
+<link rel="stylesheet" href="_preview.css">
+<style>
+	.col { display: grid; gap: var(--space-4); }
+	.section-label { font-family: var(--mono); font-size: 11px; color: var(--fg3); text-transform: uppercase; letter-spacing: var(--tracking-wide); margin-bottom: var(--space-2); display: block; }
+	.row { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+
+	.status {
+		display: inline-flex;
+		align-items: center;
+		padding: 2px var(--space-2);
+		border-radius: var(--radius-full);
+		font-size: var(--text-xs);
+		font-weight: var(--w-medium);
+		line-height: 1.5;
+	}
+	.status--success { background: color-mix(in srgb, var(--state-success) 15%, transparent); color: var(--state-success); border: 1px solid color-mix(in srgb, var(--state-success) 30%, transparent); }
+	.status--warning { background: color-mix(in srgb, var(--state-warning) 15%, transparent); color: var(--state-warning); border: 1px solid color-mix(in srgb, var(--state-warning) 30%, transparent); }
+	.status--error   { background: color-mix(in srgb, var(--state-error)   15%, transparent); color: var(--state-error);   border: 1px solid color-mix(in srgb, var(--state-error) 30%, transparent); }
+	.status--info    { background: color-mix(in srgb, var(--state-info)    15%, transparent); color: var(--state-info);    border: 1px solid color-mix(in srgb, var(--state-info) 30%, transparent); }
+	.status--neutral { background: color-mix(in srgb, var(--fg3) 15%, transparent); color: var(--fg3); border: 1px solid color-mix(in srgb, var(--fg3) 30%, transparent); }
+
+	.genre {
+		display: inline-flex;
+		align-items: center;
+		padding: var(--space-1) var(--space-2);
+		border-radius: var(--radius-full);
+		font-size: var(--text-xs);
+		font-weight: var(--w-semibold);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+		background: color-mix(in srgb, var(--accent-teal) 14%, transparent);
+		border: 1px solid color-mix(in srgb, var(--accent-teal) 28%, transparent);
+		color: color-mix(in srgb, var(--accent-teal) 78%, white 22%);
+	}
+	.genre--muted {
+		background: color-mix(in srgb, var(--surface-elevated) 85%, transparent);
+		border-color: var(--border-subtle);
+		color: var(--fg3);
+	}
+
+	.pill {
+		border: 1px solid var(--border-default);
+		background: transparent;
+		color: var(--fg3);
+		border-radius: var(--radius-full);
+		padding: 4px 12px;
+		font-size: var(--text-xs);
+		font-weight: var(--w-semibold);
+		letter-spacing: var(--tracking-wide);
+		cursor: pointer;
+		white-space: nowrap;
+	}
+	.pill.active {
+		background: color-mix(in srgb, var(--surface-hover) 88%, transparent);
+		color: var(--fg1);
+		border-color: color-mix(in srgb, var(--border-strong) 80%, transparent);
+	}
+</style>
+</head><body>
+<div class="col">
+	<div>
+		<span class="section-label">Status badges</span>
+		<div class="row">
+			<span class="status status--success">Saved</span>
+			<span class="status status--warning">Draft</span>
+			<span class="status status--error">Conflict</span>
+			<span class="status status--info">Nova</span>
+			<span class="status status--neutral">Archived</span>
+		</div>
+	</div>
+	<div>
+		<span class="section-label">Genre pills (teal-tinted)</span>
+		<div class="row">
+			<span class="genre">Literary</span>
+			<span class="genre">Mystery</span>
+			<span class="genre">Speculative</span>
+			<span class="genre genre--muted">Unclassified</span>
+		</div>
+	</div>
+	<div>
+		<span class="section-label">PillNav (chapter selection)</span>
+		<div class="row">
+			<button class="pill active">CH 1</button>
+			<button class="pill">CH 2</button>
+			<button class="pill">CH 3</button>
+			<button class="pill">CH 4</button>
+			<button class="pill">CH 5</button>
+		</div>
+	</div>
+</div>
+</body></html>

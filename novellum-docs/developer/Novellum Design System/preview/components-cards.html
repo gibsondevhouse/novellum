@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Cards</title>
+<link rel="stylesheet" href="_preview.css">
+<style>
+	.col { display: grid; gap: var(--space-4); }
+	.row { display: grid; grid-template-columns: 220px 1fr; gap: var(--space-3); }
+	.section-label { font-family: var(--mono); font-size: 11px; color: var(--fg3); text-transform: uppercase; letter-spacing: var(--tracking-wide); margin-bottom: var(--space-2); display: block; }
+
+	/* Default card */
+	.card {
+		background: var(--surface-overlay);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-md);
+		padding: var(--space-4);
+		box-shadow: var(--shadow-xs);
+		display: grid;
+		gap: var(--space-2);
+	}
+	.card h3 { font-size: 16px; font-weight: 600; }
+	.card p  { font-size: 13px; color: var(--fg2); line-height: 1.5; }
+
+	/* Library hero card */
+	.hero {
+		grid-column: 1 / -1;
+		background: linear-gradient(145deg, var(--surface-raised) 0%, var(--surface-overlay) 100%);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-md);
+		padding: var(--space-5);
+		display: grid;
+		grid-template-columns: 128px 1fr;
+		gap: var(--space-5);
+		box-shadow: var(--shadow-sm);
+	}
+	.cover {
+		position: relative;
+		border-radius: var(--radius-md);
+		overflow: hidden;
+		background: linear-gradient(160deg, #102a43, #0ea5e9);
+		min-height: 160px;
+		display: flex; align-items: center; justify-content: center;
+	}
+	.cover::after {
+		content: '';
+		position: absolute; inset: 0;
+		background:
+			radial-gradient(circle at 22% 18%, color-mix(in srgb, white 26%, transparent) 0%, transparent 45%),
+			linear-gradient(125deg, color-mix(in srgb, white 12%, transparent), transparent 55%);
+		mix-blend-mode: screen;
+		pointer-events: none;
+	}
+	.initial { position: relative; font-family: var(--serif-display); font-size: 56px; color: color-mix(in srgb, white 88%, var(--fg1)); text-shadow: 0 2px 18px rgba(0,0,0,0.5); }
+	.spine { position: absolute; bottom: 10px; left: 10px; right: 10px; font-size: 10px; font-weight: 500; letter-spacing: var(--tracking-wide); color: color-mix(in srgb, white 80%, var(--fg1)); text-transform: uppercase; opacity: 0.85; }
+	.hero__content { display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+	.hero__genres { display: flex; gap: 6px; }
+	.hero__title { font-family: var(--serif-display); font-size: 26px; font-weight: 400; letter-spacing: var(--tracking-tight); }
+	.hero__logline { font-family: var(--serif-display); font-style: italic; font-size: 15px; color: var(--fg2); line-height: 1.6; }
+	.hero__meta { font-size: 11px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg3); }
+	.genre-pill {
+		padding: 2px 8px;
+		border-radius: var(--radius-full);
+		font-size: 10px;
+		font-weight: 600;
+		letter-spacing: var(--tracking-wide);
+		text-transform: uppercase;
+		background: color-mix(in srgb, var(--accent-teal) 14%, transparent);
+		border: 1px solid color-mix(in srgb, var(--accent-teal) 28%, transparent);
+		color: color-mix(in srgb, var(--accent-teal) 78%, white 22%);
+	}
+
+	/* AI / Nova card */
+	.ai {
+		background: var(--accent-ai-tint);
+		border: 1px solid var(--border-default);
+		border-radius: var(--radius-md);
+		padding: var(--space-3);
+		box-shadow: var(--shadow-lg);
+		display: grid;
+		gap: 6px;
+	}
+	.ai__label { font-size: 11px; color: color-mix(in srgb, var(--accent-nova-blue) 70%, white 30%); font-weight: 600; text-transform: uppercase; letter-spacing: var(--tracking-wide); }
+	.ai__body { font-size: 13px; color: var(--fg1); line-height: 1.6; }
+</style>
+</head><body>
+<div class="col">
+	<div class="hero">
+		<div class="cover"><span class="initial">M</span><span class="spine">The Mariner's Glass</span></div>
+		<div class="hero__content">
+			<div class="hero__genres"><span class="genre-pill">Literary</span><span class="genre-pill">Mystery</span></div>
+			<div class="hero__title">The Mariner's Glass</div>
+			<div class="hero__logline">A retired cartographer is summoned back to sea by a letter that should never have reached her.</div>
+			<div class="hero__meta">Updated May 12, 2026</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="card">
+			<h3>Default surface card</h3>
+			<p>Overlay surface, default border, radius-md, shadow-xs.</p>
+		</div>
+		<div class="ai">
+			<div class="ai__label">Nova suggestion</div>
+			<div class="ai__body">Chapter 3 introduces Halia in a fog bank. Consider reinforcing the visual motif in Chapter 7.</div>
+		</div>
+	</div>
+</div>
+</body></html>

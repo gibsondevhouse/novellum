@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Ornament from '$lib/components/ui/Ornament.svelte';
+	import DropCap from '$lib/components/ui/DropCap.svelte';
 	import {
 		extractReadableText,
 		type ReaderInputChapter,
@@ -90,6 +92,7 @@
 					<h2 class="reader-chapter-title" id="chapter-{chapter.id}">
 						{chapter.title || `Untitled Chapter ${chapterIndex + 1}`}
 					</h2>
+					<Ornament class="reader-chapter-ornament" />
 
 					{#if chapter.scenes.length === 0}
 						<p class="reader-scene-empty">No scenes in this chapter yet.</p>
@@ -100,7 +103,13 @@
 									{scene.title || `Scene ${sceneIndex + 1}`}
 								</h3>
 								{#if scene.readable}
-									<p class="reader-scene-content">{scene.readable}</p>
+									{#if sceneIndex === 0}
+										<p class="reader-scene-content reader-scene-content--opener">
+											<DropCap letter={scene.readable.trimStart().charAt(0)} />{scene.readable.trimStart().slice(1)}
+										</p>
+									{:else}
+										<p class="reader-scene-content">{scene.readable}</p>
+									{/if}
 								{:else}
 									<p class="reader-scene-empty">This scene has no written content yet.</p>
 								{/if}
@@ -124,6 +133,14 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-8);
+		background: var(--color-parchment);
+		color: var(--color-ink);
+		/* Locally rebind text tokens so the parchment surface reads with ink. */
+		--color-text-primary: var(--color-ink);
+		--color-text-secondary: var(--color-ink-soft);
+		--color-text-muted: var(--color-ink-mute);
+		--color-border-subtle: var(--color-parchment-deep);
+		border-radius: var(--radius-lg);
 	}
 
 	.reader-header-shell {
@@ -237,8 +254,8 @@
 		flex-direction: column;
 		gap: var(--space-3);
 		padding: var(--space-5) var(--space-6);
-		background: var(--color-surface-raised);
-		border: 1px solid var(--color-border-subtle);
+		background: color-mix(in srgb, var(--color-parchment) 60%, var(--color-parchment-edge));
+		border: 1px solid var(--color-parchment-deep);
 		border-radius: var(--radius-md);
 	}
 

@@ -208,7 +208,7 @@
 <style>
 	.sidebar-divider {
 		border: none;
-		border-top: 1px solid var(--color-border-default);
+		border-top: 1px solid color-mix(in srgb, var(--color-brass) 35%, var(--color-border-default));
 		margin: var(--space-3) var(--space-3);
 	}
 

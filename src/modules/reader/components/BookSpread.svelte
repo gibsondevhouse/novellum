@@ -43,10 +43,10 @@
 		background: linear-gradient(
 			to right,
 			transparent,
-			var(--color-border-default) 20%,
-			var(--color-border-default) 80%,
+			color-mix(in srgb, var(--color-parchment-deep) 70%, var(--color-brass)) 20%,
+			color-mix(in srgb, var(--color-parchment-deep) 70%, var(--color-brass)) 80%,
 			transparent
 		);
-		opacity: 0.6;
+		opacity: 0.7;
 	}
 </style>

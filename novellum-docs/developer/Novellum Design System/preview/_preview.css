@@ -1,0 +1,71 @@
+/* Shared preview-card chrome for the Design System tab.
+   Each card is a 700px-wide vignette on the Novellum dark surface.
+   No titles or framing — just the swatches/specimens. */
+
+@import url('../colors_and_type.css');
+
+* { box-sizing: border-box; }
+
+html, body {
+	margin: 0;
+	padding: 0;
+	background: var(--surface-base);
+	color: var(--fg1);
+	font-family: var(--sans);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+body {
+	padding: var(--space-6);
+	min-height: 100vh;
+}
+
+.card-grid {
+	display: grid;
+	gap: var(--space-3);
+}
+
+.row {
+	display: flex;
+	gap: var(--space-3);
+	align-items: stretch;
+}
+
+.swatch {
+	border-radius: var(--radius-md);
+	border: 1px solid var(--border-default);
+	padding: var(--space-3);
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-1);
+	min-width: 0;
+}
+
+.swatch__chip {
+	height: 56px;
+	border-radius: var(--radius-sm);
+	border: 1px solid var(--border-subtle);
+}
+
+.swatch__name {
+	font-size: 11px;
+	font-weight: var(--w-semibold);
+	letter-spacing: var(--tracking-wide);
+	text-transform: uppercase;
+	color: var(--fg3);
+}
+
+.swatch__value {
+	font-family: var(--mono);
+	font-size: 11px;
+	color: var(--fg2);
+}
+
+.note {
+	font-size: var(--text-xs);
+	color: var(--fg3);
+	letter-spacing: var(--tracking-wide);
+	text-transform: uppercase;
+	font-weight: var(--w-semibold);
+}

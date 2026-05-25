@@ -260,14 +260,14 @@
 	}
 
 	.picker__pill:focus-visible {
-		outline: 2px solid var(--color-nova-blue);
+		outline: 2px solid var(--color-border-focus);
 		outline-offset: 2px;
 	}
 
 	.picker__pill--active {
-		background-color: var(--color-surface-overlay);
-		border-color: var(--color-border-default);
-		color: var(--color-text-primary);
+		background-color: color-mix(in srgb, var(--color-candle) 14%, var(--color-surface-overlay));
+		border-color: color-mix(in srgb, var(--color-brass) 35%, var(--color-border-default));
+		color: var(--color-candle);
 	}
 
 	.picker__pill:disabled {

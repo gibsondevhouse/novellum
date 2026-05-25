@@ -1,0 +1,11 @@
+{
+  "_description": "The six gradient pairs Novellum uses to generate book covers. From novellum/src/modules/project/constants.ts. Used with 160deg linear-gradient + a foil overlay + a serif initial letter.",
+  "palettes": [
+    { "name": "indigo-night",  "a": "#1f2937", "b": "#4f46e5" },
+    { "name": "amber-walnut",  "a": "#3f2a1d", "b": "#b45309" },
+    { "name": "cyan-deep",     "a": "#102a43", "b": "#0ea5e9" },
+    { "name": "violet-vellum", "a": "#2b1a3a", "b": "#9333ea" },
+    { "name": "emerald-moss",  "a": "#1f3a2e", "b": "#10b981" },
+    { "name": "rose-quartz",   "a": "#3a1f2a", "b": "#fb7185" }
+  ]
+}

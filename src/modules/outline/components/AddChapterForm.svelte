@@ -79,7 +79,7 @@
 	}
 	.add-input:focus {
 		outline: none;
-		border-color: var(--color-nova-blue);
+		border-color: var(--color-border-focus);
 	}
 	:global(.btn-submit) {
 		white-space: nowrap;

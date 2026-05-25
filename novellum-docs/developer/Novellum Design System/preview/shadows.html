@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Shadows</title>
+<link rel="stylesheet" href="_preview.css">
+<style>
+	body { padding: var(--space-8) var(--space-6); }
+	.shadows { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-4); }
+	.tile {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--space-3);
+	}
+	.card {
+		width: 96px;
+		height: 64px;
+		background: var(--surface-overlay);
+		border-radius: var(--radius-md);
+		border: 1px solid var(--border-default);
+	}
+	.sh-xs { box-shadow: var(--shadow-xs); }
+	.sh-sm { box-shadow: var(--shadow-sm); }
+	.sh-md { box-shadow: var(--shadow-md); }
+	.sh-lg { box-shadow: var(--shadow-lg); }
+	.sh-xl { box-shadow: var(--shadow-xl); }
+	.label { font-family: var(--mono); font-size: 11px; color: var(--fg3); text-transform: uppercase; letter-spacing: var(--tracking-wide); }
+</style>
+</head><body>
+<div class="shadows">
+	<div class="tile"><div class="card sh-xs"></div><div class="label">xs</div></div>
+	<div class="tile"><div class="card sh-sm"></div><div class="label">sm</div></div>
+	<div class="tile"><div class="card sh-md"></div><div class="label">md</div></div>
+	<div class="tile"><div class="card sh-lg"></div><div class="label">lg</div></div>
+	<div class="tile"><div class="card sh-xl"></div><div class="label">xl</div></div>
+</div>
+</body></html>
