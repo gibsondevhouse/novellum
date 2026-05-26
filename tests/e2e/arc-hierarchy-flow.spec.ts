@@ -18,6 +18,23 @@ async function createProject(request: APIRequestContext, title: string): Promise
 	return payload.id;
 }
 
+async function setOnboardingCompleted(
+	request: APIRequestContext,
+	completed: boolean,
+): Promise<void> {
+	const response = completed
+		? await request.put('/api/db/preferences/app.onboarding.completed', {
+				data: { value: true },
+			})
+		: await request.delete('/api/db/preferences/app.onboarding.completed');
+	expect(response.ok()).toBe(true);
+}
+
+async function deleteProject(request: APIRequestContext, projectId: string): Promise<void> {
+	const response = await request.delete(`/api/db/projects/${projectId}`);
+	expect(response.ok()).toBe(true);
+}
+
 async function createArc(
 	request: APIRequestContext,
 	projectId: string,
@@ -106,39 +123,52 @@ async function createScene(
 
 test.describe('Arc → Act → Chapter → Scene hierarchy flow', () => {
 	test('navigates the full hierarchy and persists across reload', async ({ page, request }) => {
+		await setOnboardingCompleted(request, true);
 		const projectId = await createProject(request, `E2E Hierarchy ${Date.now()}`);
-		const arcId = await createArc(request, projectId, 'The Departure');
-		const actId = await createAct(request, projectId, arcId, 'Act One');
-		const chapterId = await createChapter(request, projectId, actId, 'Chapter 1');
-		await createScene(request, projectId, chapterId, 'Opening');
+		try {
+			const arcId = await createArc(request, projectId, 'The Departure');
+			const actId = await createAct(request, projectId, arcId, 'Act One');
+			const chapterId = await createChapter(request, projectId, actId, 'Chapter 1');
+			await createScene(request, projectId, chapterId, 'Opening');
 
-		// Arcs index
-		await page.goto(`/projects/${projectId}/arcs`);
-		await expect(page.getByText('The Departure', { exact: false })).toBeVisible();
+			// Arcs index
+			await page.goto(`/projects/${projectId}/arcs`);
+			await expect(page.getByText('The Departure', { exact: false })).toBeVisible();
 
-		// Arc detail
-		await page.goto(`/projects/${projectId}/arcs/${arcId}`);
-		await expect(page.getByText('Act One', { exact: false })).toBeVisible();
+			// Arc detail
+			await page.goto(`/projects/${projectId}/arcs/${arcId}`);
+			await expect(page.getByText('Act One', { exact: false })).toBeVisible();
 
-		// Act detail
-		await page.goto(`/projects/${projectId}/arcs/${arcId}/acts/${actId}`);
-		await expect(page.getByText('Chapter 1', { exact: false })).toBeVisible();
+			// Act detail
+			await page.goto(`/projects/${projectId}/arcs/${arcId}/acts/${actId}`);
+			await expect(page.getByText('Chapter 1', { exact: false })).toBeVisible();
 
-		// Chapter detail
-		await page.goto(`/projects/${projectId}/arcs/${arcId}/acts/${actId}/chapters/${chapterId}`);
-		await expect(page.getByText('Opening', { exact: false })).toBeVisible();
+			// Chapter detail
+			await page.goto(`/projects/${projectId}/arcs/${arcId}/acts/${actId}/chapters/${chapterId}`);
+			await expect(page.getByText('Opening', { exact: false })).toBeVisible();
 
-		// Reload and re-verify chapter detail still shows the scene
-		await page.reload();
-		await expect(page.getByText('Opening', { exact: false })).toBeVisible();
+			// Reload and re-verify chapter detail still shows the scene
+			await page.reload();
+			await expect(page.getByText('Opening', { exact: false })).toBeVisible();
+		} finally {
+			await deleteProject(request, projectId);
+		}
 	});
 
 	test('returns 404 for an arc that does not belong to the project', async ({ page, request }) => {
+		await setOnboardingCompleted(request, true);
 		const projectA = await createProject(request, `E2E Project A ${Date.now()}`);
 		const projectB = await createProject(request, `E2E Project B ${Date.now()}`);
-		const arcId = await createArc(request, projectA, 'Foreign Arc');
+		try {
+			const arcId = await createArc(request, projectA, 'Foreign Arc');
 
-		const response = await page.goto(`/projects/${projectB}/arcs/${arcId}`);
-		expect(response?.status()).toBe(404);
+			await page.goto(`/projects/${projectB}/arcs/${arcId}`);
+			const alert = page.getByRole('alert');
+			await expect(alert).toContainText('404');
+			await expect(alert).toContainText('Arc not found');
+		} finally {
+			await deleteProject(request, projectA);
+			await deleteProject(request, projectB);
+		}
 	});
 });

@@ -1,48 +1,89 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type APIRequestContext } from '@playwright/test';
+
+async function setOnboardingCompleted(request: APIRequestContext): Promise<void> {
+	const response = await request.put('/api/db/preferences/app.onboarding.completed', {
+		data: { value: true },
+	});
+	expect(response.ok()).toBe(true);
+}
+
+async function createProject(request: APIRequestContext, title: string): Promise<string> {
+	const response = await request.post('/api/db/projects', {
+		data: { title, targetWordCount: 80000 },
+	});
+	expect(response.ok()).toBe(true);
+	const payload = (await response.json()) as { id: string };
+	return payload.id;
+}
+
+async function createChapter(
+	request: APIRequestContext,
+	projectId: string,
+	title: string,
+): Promise<string> {
+	const response = await request.post('/api/db/chapters', {
+		data: {
+			projectId,
+			title,
+			summary: '',
+			order: 0,
+			wordCount: 0,
+		},
+	});
+	expect(response.ok()).toBe(true);
+	const payload = (await response.json()) as { id: string };
+	return payload.id;
+}
+
+async function createScene(
+	request: APIRequestContext,
+	projectId: string,
+	chapterId: string,
+	title: string,
+): Promise<string> {
+	const response = await request.post('/api/db/scenes', {
+		data: {
+			projectId,
+			chapterId,
+			title,
+			summary: '',
+			order: 0,
+			wordCount: 0,
+			content: '',
+		},
+	});
+	expect(response.ok()).toBe(true);
+	const payload = (await response.json()) as { id: string };
+	return payload.id;
+}
+
+async function deleteProject(request: APIRequestContext, projectId: string): Promise<void> {
+	const response = await request.delete(`/api/db/projects/${projectId}`);
+	expect(response.ok()).toBe(true);
+}
 
 test.describe('Project lifecycle', () => {
-	test('creates a project, opens the editor, and navigates to export', async ({ page }) => {
-		await page.goto('/');
+	test('creates a project, opens the editor, and navigates to export', async ({ page, request }) => {
+		await setOnboardingCompleted(request);
+		const projectId = await createProject(request, `E2E Test Novel ${Date.now()}`);
+		try {
+			const chapterId = await createChapter(request, projectId, 'Chapter 1');
+			const sceneId = await createScene(request, projectId, chapterId, 'Opening Scene');
 
-		// Create a new project.
-		const newProjectButton = page.getByRole('button', { name: /new project/i });
-		await newProjectButton.click();
+			await page.goto(`/projects/${projectId}/editor/${sceneId}`);
+			const editorArea = page.locator('[contenteditable="true"]').first();
+			await editorArea.click();
+			await page.keyboard.type('Once upon a time in a workspace far away.');
 
-		// Fill in the project title.
-		const titleInput = page.getByLabel(/title/i);
-		await titleInput.fill('E2E Test Novel');
-		await page.getByRole('button', { name: /create|save/i }).click();
+			await expect(page.locator('.save-status')).toContainText(/saving|saved|retrying/i, {
+				timeout: 7000,
+			});
 
-		// Should be in the project hub or editor.
-		await expect(page).toHaveURL(/projects\//);
-
-		// Open the editor (navigate to it if in hub).
-		const editorLink = page.getByRole('link', { name: /editor|write/i });
-		if ((await editorLink.count()) > 0) {
-			await editorLink.click();
+			await page.goto(`/projects/${projectId}`);
+			await page.getByRole('button', { name: /export manuscript/i }).click();
+			await expect(page.getByRole('dialog', { name: /export json options/i })).toBeVisible();
+		} finally {
+			await deleteProject(request, projectId);
 		}
-
-		// Type into the editor.
-		const editorArea = page.locator('[contenteditable="true"]').first();
-		await editorArea.click();
-		await page.keyboard.type('Once upon a time in a workspace far away.');
-
-		// Autosave indicator should appear (saved / autosaved / check).
-		await expect(
-			page
-				.getByText(/saved|autosaved/i)
-				.or(page.locator('[data-testid="autosave-status"]'))
-		).toBeVisible({ timeout: 5000 });
-
-		// Navigate to export.
-		const exportLink = page
-			.getByRole('button', { name: /export/i })
-			.or(page.getByRole('link', { name: /export/i }));
-		await exportLink.click();
-		await expect(
-			page
-				.getByRole('dialog')
-				.or(page.locator('[data-testid="export-modal"]'))
-		).toBeVisible();
 	});
 });

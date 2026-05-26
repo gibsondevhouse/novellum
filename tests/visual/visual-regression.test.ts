@@ -69,6 +69,13 @@ async function createMajorArc(
 	expect(response.ok()).toBe(true);
 }
 
+async function ensureOnboardingCompleted(request: import('@playwright/test').APIRequestContext) {
+	const response = await request.put('/api/db/preferences/app.onboarding.completed', {
+		data: { value: true },
+	});
+	expect(response.ok()).toBe(true);
+}
+
 test.describe('Visual Regression — Route Family Baselines', () => {
 	test.beforeAll(async ({ browser }) => {
 		// Verify dev server is accessible
@@ -85,6 +92,10 @@ test.describe('Visual Regression — Route Family Baselines', () => {
 		} finally {
 			await context.close();
 		}
+	});
+
+	test.beforeEach(async ({ request }) => {
+		await ensureOnboardingCompleted(request);
 	});
 
 	/*

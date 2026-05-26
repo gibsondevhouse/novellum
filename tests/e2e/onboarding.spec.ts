@@ -1,24 +1,33 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type APIRequestContext } from '@playwright/test';
+
+async function deleteProject(request: APIRequestContext, projectId: string): Promise<void> {
+	const response = await request.delete(`/api/db/projects/${projectId}`);
+	expect(response.ok()).toBe(true);
+}
 
 test.describe('Onboarding flow', () => {
-	test('navigates through all steps and ends at /', async ({ page }) => {
-		// Force onboarding by navigating directly to /onboarding.
-		await page.goto('/onboarding');
-		await expect(page).toHaveURL(/onboarding/);
+	test('navigates through all steps and ends at project hub', async ({ page, request }) => {
+		let createdProjectId: string | null = null;
+		try {
+			await page.goto('/onboarding');
+			await expect(page).toHaveURL(/onboarding/);
 
-		// Step through each onboarding step until the final completion action.
-		const continueButton = page.getByRole('button', { name: /continue|next|get started/i });
+			await page.getByRole('button', { name: /get started/i }).click();
+			await page.getByRole('button', { name: /got it/i }).click();
+			await page.getByRole('button', { name: /^continue$/i }).click();
+			await page.getByRole('button', { name: /i understand/i }).click();
+			await page.getByRole('button', { name: /skip for now/i }).click();
 
-		// Step through all steps until no more continue buttons or redirect occurs.
-		let steps = 0;
-		while ((await continueButton.count()) > 0 && steps < 10) {
-			await continueButton.click();
-			steps++;
-			// If redirect happened, break.
-			if (!page.url().includes('onboarding')) break;
+			await page.getByLabel(/project title/i).fill(`Onboarding E2E ${Date.now()}`);
+			await page.getByRole('button', { name: /create project/i }).click();
+
+			await expect(page).toHaveURL(/\/projects\/[^/]+/);
+			const match = page.url().match(/\/projects\/([^/?#]+)/);
+			createdProjectId = match?.[1] ?? null;
+		} finally {
+			if (createdProjectId) {
+				await deleteProject(request, createdProjectId);
+			}
 		}
-
-		// After completing onboarding, should be at root or /projects.
-		await expect(page).not.toHaveURL(/onboarding/);
 	});
 });

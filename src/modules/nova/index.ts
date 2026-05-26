@@ -12,8 +12,21 @@
  */
 
 import { registerStubTools } from './services/stub-tools.js';
+import { novaSession } from './stores/nova-session.svelte.js';
 
 registerStubTools();
+
+/**
+ * Playwright-only hook:
+ * visual regression tests need to seed tool-call/tool-result rows, but
+ * preview mode does not expose `/src/*` dynamic imports. Expose a tiny
+ * window bridge so tests can write via the real session store.
+ */
+if (typeof window !== 'undefined') {
+	(window as Window & {
+		__NOVELLUM_NOVA_TEST__?: { session: typeof novaSession };
+	}).__NOVELLUM_NOVA_TEST__ = { session: novaSession };
+}
 
 export { default as NovaPanel } from './components/NovaPanel.svelte';
 export { default as ContextDisclosurePill } from './components/ContextDisclosurePill.svelte';
