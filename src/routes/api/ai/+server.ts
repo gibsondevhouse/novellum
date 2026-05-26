@@ -304,10 +304,14 @@ async function handleTask(body: TaskBody, signal: AbortSignal): Promise<Response
 	const chatInstructions = db
 		.prepare(`SELECT * FROM chat_instructions WHERE projectId = ?`)
 		.all(body.projectId) as ChatInstruction[];
+	const templates = db
+		.prepare(`SELECT * FROM templates WHERE projectId = ?`)
+		.all(body.projectId) as Array<{ type: string; content: string }>;
 
 	if (writingStyles.length > 0) ctx.writingStyles = writingStyles;
 	if (systemPrompts.length > 0) ctx.systemPrompts = systemPrompts;
 	if (chatInstructions.length > 0) ctx.chatInstructions = chatInstructions;
+	if (templates.length > 0) ctx.templates = templates;
 
 	const prompt = buildPrompt(task, ctx);
 	const defaultModel = selectModel(task.taskType);

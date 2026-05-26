@@ -2,6 +2,7 @@ import type { Migration } from './migration-runner.js';
 import { migration0001 } from './migrations/0001_baseline.js';
 import { migration0002 } from './migrations/0002_add_backup_metadata.js';
 import { migration0003 } from './migrations/0003_scene_snapshot_metadata.js';
+import { migration0004 } from './migrations/0004_pipeline_entities.js';
 
 /**
  * Ordered list of versioned migrations applied to the SQLite database at boot.
@@ -13,4 +14,5 @@ export const MIGRATION_REGISTRY: readonly Migration[] = [
 	migration0001,
 	migration0002,
 	migration0003,
+	migration0004,
 ];

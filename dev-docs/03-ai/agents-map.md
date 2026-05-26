@@ -1,8 +1,11 @@
 # Agents Map
 
-> Last verified: 2026-05-13
+> Last verified: 2026-05-27
 
 Authoritative status of all Novellum runtime agents. Anchored to [src/lib/ai/](../../src/lib/ai/).
+The V1.1 staged pipeline (`vibe-worldbuild` / `vibe-author`) is
+documented separately below — those are pipeline *stages*, not runtime
+agents.
 
 ## Shipped (4)
 
@@ -32,6 +35,46 @@ agent" checklist below.
 4. **Wire the resolver.** Map the TaskType to the agent in [task-resolver.ts](../../src/lib/ai/task-resolver.ts).
 5. **Add tests.** A parser test under [tests/ai/](../../tests/ai/) covering happy path and at least one malformed response.
 6. **Update docs.** Promote the entry to "Shipped" in this file with the same date you ship.
+
+## Pipeline stages (V1.1)
+
+Distinct from the runtime agents above. Pipeline stages are stateful,
+gated by reviewer checkpoints, and persist artifacts in
+`project_metadata` (scope `'pipeline'`). Schema version: **`1.0.0`**.
+
+### `vibe-worldbuild` family (shipped — plan-027 stage-002)
+
+| Stage key | Output format | Canon projection |
+| --- | --- | --- |
+| `vibe-worldbuild.premise` | `json_worldbuild_premise` | None — artifact only. |
+| `vibe-worldbuild.worldspec` | `json_worldbuild_worldspec` | None — artifact only. |
+| `vibe-worldbuild.research` | `json_worldbuild_research_briefs` | None — deferred to `lore_entries` per ADR-0027. |
+| `vibe-worldbuild.populated-world-bible` | `json_worldbuild_populated_bible` | Atomic insert into `characters`, `factions`, `locations`, `themes`, `glossary_terms`, `lore_entries`, `plot_threads`, `timeline_events`. |
+
+Checkpoint lifecycle: `draft → review → accepted | rejected`. Rejected
+checkpoints preserve their `reason`; re-upserting the same id resets
+the record to `draft`. See [pipeline.md](./pipeline.md) for HTTP surface
+and contract details.
+
+### `vibe-author` family (shipped — plan-027 stage-003)
+
+| Stage key | Output format | Canon projection |
+| --- | --- | --- |
+| `vibe-author.premise` | `json_author_premise` | None — artifact only. |
+| `vibe-author.outline` | `json_author_outline` | None — artifact only. |
+| `vibe-author.scene-draft` | `json_author_scene_draft` | None — surfaced via [`NovaSceneDraftCard`](../../src/modules/nova/components/NovaSceneDraftCard.svelte). Accept emits the envelope; the manuscript is never auto-mutated. |
+| `vibe-author.revision-pack` | `json_author_revision_pack` | None — surfaced via [`NovaRevisionPackCard`](../../src/modules/nova/components/NovaRevisionPackCard.svelte) with per-issue Acknowledge. |
+
+Delivery surface:
+
+- Runner: [`runAuthorPipelineTask`](../../src/modules/nova/services/author-pipeline-runner.ts) — resolves the task, builds RAG context, calls OpenRouter, parses the response, attaches a `NovaArtifact` to the originating Nova message.
+- Cards: [`NovaSceneDraftCard`](../../src/modules/nova/components/NovaSceneDraftCard.svelte) and [`NovaRevisionPackCard`](../../src/modules/nova/components/NovaRevisionPackCard.svelte) render parsed envelopes with explicit user-driven controls only.
+- Review gates: persisted via the shared `/api/db/project-metadata/{projectId}/pipeline/vibe-author/{key}/{id}` lifecycle (`upsert | review | accept | reject`). End-to-end coverage lives in [`tests/e2e/vibe-author-review-gates.spec.ts`](../../tests/e2e/vibe-author-review-gates.spec.ts).
+
+Author-in-the-loop guarantee: every accept path emits a typed callback;
+no card component imports the editor store or calls `insertText` /
+`applyEdit`. The contract is enforced by source-string tests under
+[`tests/ai/pipeline/`](../../tests/ai/pipeline/).
 
 ## Cross-references
 

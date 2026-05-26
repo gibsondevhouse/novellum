@@ -2,12 +2,12 @@
 title: Scope and Extend Entities
 slug: part-001-scope-and-extend-entities
 part_number: 1
-status: draft
+status: complete
 owner: Backend Agent
 assigned_to: Backend Agent
 phase: phase-003-schema-extension-scope
-started_at: ~
-completed_at: ~
+started_at: 2026-05-26T12:10:00Z
+completed_at: 2026-05-26T18:00:00Z
 estimated_duration: 3d
 ---
 

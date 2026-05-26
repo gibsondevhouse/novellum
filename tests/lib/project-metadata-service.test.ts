@@ -75,9 +75,13 @@ describe('project-metadata-service', () => {
 		setProjectMetadata('p1', 'scene', 's1', 'clarity', 'A');
 		setProjectMetadata('p1', 'scene', 's2', 'clarity', 'B');
 		setProjectMetadata('p1', 'chapter', 's1', 'clarity', 'C');
+		setProjectMetadata('p1', 'pipeline', 'vibe-worldbuild', 'artifact-1', { lifecycle: 'draft' });
 		expect(getProjectMetadata('p1', 'scene', 's1', 'clarity')).toBe('A');
 		expect(getProjectMetadata('p1', 'scene', 's2', 'clarity')).toBe('B');
 		expect(getProjectMetadata('p1', 'chapter', 's1', 'clarity')).toBe('C');
+		expect(getProjectMetadata('p1', 'pipeline', 'vibe-worldbuild', 'artifact-1')).toEqual({
+			lifecycle: 'draft',
+		});
 	});
 
 	it('lists all keys for an owner', () => {

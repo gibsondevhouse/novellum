@@ -2,12 +2,12 @@
 title: Implement Worldbuild Checkpoints
 slug: part-001-implement-worldbuild-checkpoints
 part_number: 1
-status: draft
+status: complete
 owner: AI Agent
 assigned_to: AI Agent
 phase: phase-002-worldbuild-checkpoint-flow
-started_at: ~
-completed_at: ~
+started_at: 2026-05-26T19:00:00Z
+completed_at: 2026-05-26T20:15:00Z
 estimated_duration: 3d
 ---
 

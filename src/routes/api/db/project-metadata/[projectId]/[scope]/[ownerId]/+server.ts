@@ -5,7 +5,7 @@ import {
 } from '$lib/server/project-metadata/project-metadata-service.js';
 import type { RequestHandler } from './$types';
 
-const ALLOWED: ReadonlySet<MetadataScope> = new Set(['scene', 'chapter', 'project']);
+const ALLOWED: ReadonlySet<MetadataScope> = new Set(['scene', 'chapter', 'project', 'pipeline']);
 
 export const GET: RequestHandler = async ({ params }) => {
 	const { projectId, scope, ownerId } = params;

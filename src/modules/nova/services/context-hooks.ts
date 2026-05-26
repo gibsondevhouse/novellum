@@ -10,6 +10,9 @@
 
 import { buildContext } from '$lib/ai/context-engine.js';
 import { resolveTask } from '$lib/ai/task-resolver.js';
+import type { WorldbuildCheckpointRecord } from '$lib/ai/pipeline/checkpoint-contract.js';
+import { WORLDBUILD_CHECKPOINT_OWNER_ID } from '$lib/ai/pipeline/checkpoint-contract.js';
+import { listProjectMetadata } from '$lib/project-metadata.js';
 import type { RagContextRequest, RagContextResult } from '../types.js';
 
 export async function buildRagContext(
@@ -49,4 +52,25 @@ export async function buildRagContext(
 		includedScopes,
 		warnings: [],
 	};
+}
+
+function isCheckpointRecord(value: unknown): value is WorldbuildCheckpointRecord {
+	if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+	const record = value as Partial<WorldbuildCheckpointRecord>;
+	return (
+		typeof record.id === 'string' &&
+		typeof record.lifecycle === 'string' &&
+		typeof record.updatedAt === 'string' &&
+		typeof record.taskKey === 'string'
+	);
+}
+
+export async function listAcceptedWorldbuildCheckpointContext(
+	projectId: string,
+): Promise<WorldbuildCheckpointRecord[]> {
+	const data = await listProjectMetadata(projectId, 'pipeline', WORLDBUILD_CHECKPOINT_OWNER_ID);
+	return Object.values(data)
+		.filter((value): value is WorldbuildCheckpointRecord => isCheckpointRecord(value))
+		.filter((record) => record.lifecycle === 'accepted')
+		.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }

@@ -7,6 +7,10 @@ import { getChaptersByProjectId } from '$modules/project/services/chapter-reposi
 import { getScenesByProjectId } from '$modules/editor/services/scene-repository.js';
 import { getBeatsByProjectId } from '$modules/editor/services/beat-repository.js';
 import { getStagesByProjectId } from '$modules/editor/services/stage-repository.js';
+import {
+	normalizeSevenLayerOutline,
+	type SevenLayerOutline,
+} from './seven-layer-outline.js';
 
 export interface OutlineData {
 	arcs: Arc[];
@@ -37,4 +41,23 @@ export async function getOutlineData(projectId: string): Promise<OutlineData> {
 	}));
 
 	return { arcs, acts, milestones, chapters, scenes, characters, beats, stages };
+}
+
+/**
+ * Returns a deterministically-sorted, normalized seven-layer outline
+ * for a project. Suitable for AI context assembly (`vibe-author` task
+ * family) and pipeline artifact hierarchy semantics. All seven buckets
+ * are always present; empty layers are represented as `[]`.
+ */
+export async function getSevenLayerOutline(projectId: string): Promise<SevenLayerOutline> {
+	const [arcs, acts, milestones, chapters, scenes, beats, stages] = await Promise.all([
+		getArcsByProjectId(projectId),
+		getActsByProjectId(projectId),
+		getMilestonesByProjectId(projectId),
+		getChaptersByProjectId(projectId),
+		getScenesByProjectId(projectId),
+		getBeatsByProjectId(projectId),
+		getStagesByProjectId(projectId),
+	]);
+	return normalizeSevenLayerOutline({ arcs, acts, milestones, chapters, scenes, beats, stages });
 }

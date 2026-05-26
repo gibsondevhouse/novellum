@@ -7,6 +7,8 @@
 	import { safeHtml } from '$lib/ai/markdown.js';
 	import type { NovaMessage } from '../types.js';
 	import NovaErrorBoundary from './NovaErrorBoundary.svelte';
+	import NovaSceneDraftCard from './NovaSceneDraftCard.svelte';
+	import NovaRevisionPackCard from './NovaRevisionPackCard.svelte';
 	import { classifyNovaError } from '../utils/classify-nova-error.js';
 
 	interface Props {
@@ -88,6 +90,12 @@
 							<p class="nova-error-hint">
 								<a href="/settings">Settings → AI providers</a>
 							</p>
+						{/if}
+					{:else if message.artifact}
+						{#if message.artifact.kind === 'author-scene-draft'}
+							<NovaSceneDraftCard envelope={message.artifact.envelope} />
+						{:else if message.artifact.kind === 'author-revision-pack'}
+							<NovaRevisionPackCard envelope={message.artifact.envelope} />
 						{/if}
 					{:else if message.content === '' && message.status === 'streaming'}
 						<span class="nova-typing" aria-label="Nova is typing">

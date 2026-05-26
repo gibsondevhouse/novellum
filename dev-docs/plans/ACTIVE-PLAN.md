@@ -6,13 +6,22 @@
 
 ## Current
 
-- **Plan:** [plan-027-v1.1-scoping](./plan-027-v1.1-scoping/plan.md)
-- **Status:** `draft`
-- **Next action owner:** Planner Agent — begin
-  `stage-001-pipeline-foundation/phase-001-orchestrator-contract/part-001-define-pipeline-contract`.
+- **Plan:** _none — awaiting next assignment._
+- **Status:** idle
+- **Next action owner:** Planner Agent — pick the next plan from
+  [MASTER-PLAN.md](./MASTER-PLAN.md) and update this pointer.
 
 ## Recently completed
 
+- [plan-027-v1.1-scoping](./plan-027-v1.1-scoping/plan.md) —
+  V1.1 Fiction Pipeline Scoping & Delivery. Closed 2026-05-27 with
+  all three stages complete (pipeline-foundation, vibe-worldbuild,
+  vibe-author) and all 6 plan-level quality gates green. Stage-003
+  phase-003 part-003 (Author E2E and Doc Sync) shipped the
+  `vibe-author-review-gates.spec.ts` Playwright spec and reconciled
+  `dev-docs/03-ai/pipeline.md` + `dev-docs/03-ai/agents-map.md` with
+  the shipped author surface. Final vitest baseline: 177 files / 1156
+  tests passing; token guard 324 files / 0 violations.
 - [plan-024-v1-final-mile](./archive/plan-024-v1-final-mile/plan.md) —
   V1 DoD closure & release engineering. Closed 2026-05-26 with 47/47 DoD
   items satisfied. Three stages (release-engineering, ollama+shortcuts,

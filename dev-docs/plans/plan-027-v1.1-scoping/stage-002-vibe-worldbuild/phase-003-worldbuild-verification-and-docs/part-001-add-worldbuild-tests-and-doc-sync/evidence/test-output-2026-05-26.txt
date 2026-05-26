@@ -1,0 +1,201 @@
+
+> novellum@0.0.1 test /Users/gibdevlite/Dev/novellum
+> vitest run
+
+9:39:27 AM [vite-plugin-svelte] invalid plugin options "hot" in inline config
+{ hot: false }
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.4 [39m[90m/Users/gibdevlite/Dev/novellum[39m
+
+ [32m✓[39m tests/portability/backup-failure-modes.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 68[2mms[22m[39m
+ [32m✓[39m tests/portability/backup-roundtrip.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 103[2mms[22m[39m
+ [32m✓[39m tests/onboarding/onboarding-flow.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 426[2mms[22m[39m
+ [32m✓[39m tests/lib/model-selection-store.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 469[2mms[22m[39m
+     [33m[2m✓[22m[39m initialises to the default model when no preference is stored [33m 432[2mms[22m[39m
+ [32m✓[39m tests/settings/settings-export-defaults.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 459[2mms[22m[39m
+     [33m[2m✓[22m[39m exposes the canonical defaults before hydration [33m 404[2mms[22m[39m
+ [32m✓[39m tests/settings/appearance-store.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 495[2mms[22m[39m
+     [33m[2m✓[22m[39m exposes the canonical defaults before hydration [33m 431[2mms[22m[39m
+ [32m✓[39m tests/lib/feature-flags.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 509[2mms[22m[39m
+     [33m[2m✓[22m[39m default labsEnabled is false before hydrate [33m 431[2mms[22m[39m
+ [32m✓[39m tests/settings/defaults-store.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 524[2mms[22m[39m
+     [33m[2m✓[22m[39m exposes the canonical defaults before hydration [33m 430[2mms[22m[39m
+ [32m✓[39m tests/onboarding/onboarding-store.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 527[2mms[22m[39m
+     [33m[2m✓[22m[39m starts with completed=false and currentStep=0 before any action [33m 403[2mms[22m[39m
+ [32m✓[39m tests/export/docx-driver.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 108[2mms[22m[39m
+ [32m✓[39m src/modules/export/services/__tests__/zip-import-parse.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 298[2mms[22m[39m
+ [32m✓[39m tests/backup/corrupt-backup.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 89[2mms[22m[39m
+ [32m✓[39m tests/export/epub-driver.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 68[2mms[22m[39m
+ [32m✓[39m tests/backup/project-backup.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 102[2mms[22m[39m
+ [32m✓[39m tests/routes/api-restore-project.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 127[2mms[22m[39m
+ [32m✓[39m tests/lib/legacy-dexie-boundaries.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 395[2mms[22m[39m
+     [33m[2m✓[22m[39m only allowlisted modules import from $lib/legacy/dexie [33m 312[2mms[22m[39m
+ [32m✓[39m tests/settings/settings-shortcuts-page.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 151[2mms[22m[39m
+ [32m✓[39m tests/lib/credential-localstorage-boundary.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 768[2mms[22m[39m
+     [33m[2m✓[22m[39m only the credential-service migration helper references the legacy localStorage key [33m 415[2mms[22m[39m
+     [33m[2m✓[22m[39m no source file calls localStorage.{get,set,remove}Item for the legacy key (string-form) [33m 352[2mms[22m[39m
+ [32m✓[39m tests/settings/defaults-page.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 136[2mms[22m[39m
+ [32m✓[39m tests/server/credential-service.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 37[2mms[22m[39m
+ [32m✓[39m tests/ai/credential-redaction-exit-gate.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 139[2mms[22m[39m
+ [32m✓[39m tests/settings/openrouter-panel.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 49[2mms[22m[39m
+ [32m✓[39m tests/editor/editor-toolbar.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 94[2mms[22m[39m
+ [32m✓[39m tests/backup/project-restore.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 149[2mms[22m[39m
+[90mstderr[2m | tests/editor/manuscript-editor-pane.geometry.test.ts[2m > [22m[2mManuscriptEditorPane — page geometry (plan-023 stage-001)[2m > [22m[2mdoes not render an in-canvas Scene title input
+[22m[39m[tiptap warn]: Duplicate extension names found: ['underline']. This can lead to issues.
+
+[90mstderr[2m | tests/editor/manuscript-editor-pane.geometry.test.ts[2m > [22m[2mManuscriptEditorPane — page geometry (plan-023 stage-001)[2m > [22m[2mrenders the page surface as .editor-page (not the legacy .editor-column)
+[22m[39m[tiptap warn]: Duplicate extension names found: ['underline']. This can lead to issues.
+
+ [32m✓[39m tests/editor/manuscript-editor-pane.geometry.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 139[2mms[22m[39m
+ [32m✓[39m tests/lib/ui-primitives.test.ts [2m([22m[2m25 tests[22m[2m)[22m[32m 43[2mms[22m[39m
+ [32m✓[39m tests/routes/api-backup.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 93[2mms[22m[39m
+ [32m✓[39m tests/nova/nova-panel-error.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 64[2mms[22m[39m
+ [32m✓[39m tests/settings/settings-ai-page.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 95[2mms[22m[39m
+ [32m✓[39m tests/settings/settings-layout.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 91[2mms[22m[39m
+ [32m✓[39m tests/lib/dexie-to-sqlite-migration.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 66[2mms[22m[39m
+ [32m✓[39m tests/routes/api-storage-location.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32m✓[39m tests/project/hub-status-cards.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 71[2mms[22m[39m
+ [32m✓[39m tests/editor/snapshot-restore.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 79[2mms[22m[39m
+ [32m✓[39m tests/nova/nova-panel.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 64[2mms[22m[39m
+ [32m✓[39m tests/reader/classic-reader-deep-link.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 67[2mms[22m[39m
+ [32m✓[39m src/modules/export/services/__tests__/snapshot-service.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 110[2mms[22m[39m
+ [32m✓[39m tests/routes/api-restore-preview.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 87[2mms[22m[39m
+ [32m✓[39m tests/nova/nova-panel-tools.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 89[2mms[22m[39m
+ [32m✓[39m src/modules/export/services/__tests__/zip-export.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 86[2mms[22m[39m
+ [32m✓[39m tests/components/sidebar-project-search.svelte.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 43[2mms[22m[39m
+ [32m✓[39m tests/lib/pill-toolbar.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 62[2mms[22m[39m
+ [32m✓[39m tests/settings/settings-data-page.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 61[2mms[22m[39m
+ [32m✓[39m tests/nova/nova-panel-chat.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 95[2mms[22m[39m
+ [32m✓[39m tests/sqlite/character-relationships-route-guardrails.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 38[2mms[22m[39m
+ [32m✓[39m tests/settings/appearance-page.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 73[2mms[22m[39m
+ [32m✓[39m tests/routes/api-ai-key.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 48[2mms[22m[39m
+ [32m✓[39m tests/settings/settings-backup-page.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 62[2mms[22m[39m
+ [32m✓[39m tests/sqlite/nova-context-route.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 31[2mms[22m[39m
+ [32m✓[39m tests/editor/snapshot-history-panel.svelte.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 44[2mms[22m[39m
+ [32m✓[39m tests/routes/api-ai-models.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 41[2mms[22m[39m
+ [32m✓[39m tests/backup/parse-backup.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 82[2mms[22m[39m
+ [32m✓[39m tests/sqlite/projects-route.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 36[2mms[22m[39m
+ [32m✓[39m tests/settings/settings-about-page.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 41[2mms[22m[39m
+ [32m✓[39m tests/sqlite/migrations/snapshot.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 47[2mms[22m[39m
+ [32m✓[39m tests/lib/keyboard/keymap-registry.test.ts [2m([22m[2m24 tests[22m[2m)[22m[32m 37[2mms[22m[39m
+ [32m✓[39m tests/assets/assets.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m tests/ai/credential-redaction.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m tests/editor/recovery-prompt.svelte.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 37[2mms[22m[39m
+ [32m✓[39m tests/settings/provider-coming-soon.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 38[2mms[22m[39m
+ [32m✓[39m tests/reader/reader-pages.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 34[2mms[22m[39m
+ [32m✓[39m tests/sqlite/individuals-migrations.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m tests/repositories/arc-repository.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m tests/reader/map-scene-to-page.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 38[2mms[22m[39m
+ [32m✓[39m tests/editor/save-status-component.svelte.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+ [32m✓[39m tests/backup/credential-exclusion.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 80[2mms[22m[39m
+ [32m✓[39m tests/editor/autosave.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m tests/sqlite/characters-route.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+ [32m✓[39m tests/settings/default-home-page.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+ [32m✓[39m tests/ai/utils.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m tests/nova/chat-service.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m tests/components/settings-markdown-document.svelte.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m tests/outline/story-planning-workspace.migration.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/ai/pipeline/checkpoint-flow.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m tests/ai/ollama-provider.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32m✓[39m tests/ai/ollama-launcher.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32m✓[39m tests/ai/openrouter.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m tests/sqlite/individuals-production-persistence.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m tests/editor/recovery-service.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/ai/pipeline/worldbuild-regression.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 45[2mms[22m[39m
+ [32m✓[39m tests/ai/credential-service.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m tests/lib/navigation-state.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m tests/repositories/beat-repository.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m tests/ai/nova-context.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 39[2mms[22m[39m
+ [32m✓[39m tests/sqlite/chapters-route.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 40[2mms[22m[39m
+ [32m✓[39m tests/ai/openrouter-provider.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+ [32m✓[39m tests/settings/ai-prompts-repositories.test.ts [2m([22m[2m22 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m tests/routes/books-resolver.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32m✓[39m tests/sqlite/scenes-route.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32m✓[39m tests/db/app-data-path.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m tests/sqlite/locations-route.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32m✓[39m tests/editor/editor-mode.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/nova/nova-session.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m tests/routes/project-metadata-pipeline-scope.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m tests/sqlite/migrations/idempotent.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/editor/autosave-failure.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+ [32m✓[39m tests/ai/provider-types.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m tests/settings/themeService.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32m✓[39m tests/routes/settings-migrate.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/backup/checksums.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/nova/ai-session-service.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m tests/repositories/act-repository.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m tests/ai/edit-agent.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m tests/sqlite/migrations/from-empty.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m tests/backup/table-registry.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m tests/reader/virtualization.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m tests/repositories/project-repository.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m tests/export/markdown-driver.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m tests/sqlite/migrations/runner.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m tests/sqlite/migrations/from-v1.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/lib/preferences-service.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/modules/export/services/__tests__/manifest-policy.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m tests/ai/continuity-agent.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/lib/project-metadata-service.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m tests/export/project-backup-client.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/ai/nova-context-planner.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m tests/editor/scene-metadata-service.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/nova/feature-flags.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m tests/repositories/hierarchy-store.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/ai/markdown.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m tests/sqlite/migrations/0004-pipeline-entities.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m tests/ai/pipeline/worldbuild-agent.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m tests/nova/nova-panel-store.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/sqlite/migrations/0003-snapshot-metadata.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m tests/export/manuscript-assembler.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m tests/ci/workflow-lint.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m tests/lib/keyring-store.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/nova/context-hooks.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m tests/lib/select-secure-store.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m tests/nova/tool-registry.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m tests/lib/i18n.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/ai/style-agent.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m tests/repositories/character-repository.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m tests/project/project-health-service.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m tests/backup/manifest.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m tests/ai/rewrite-agent.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m tests/routes/projects-hub-word-count.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/settings/api-settings.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/ai/pipeline/contracts.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m tests/editor/snapshot-prune.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/lib/version-and-updater.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/reader/page-geometry.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m tests/routes/worldbuilding-navigation.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/editor/autosave-result.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m tests/nova/stream-controller.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m tests/outline/outline-page-structure.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m tests/lib/platform.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m tests/reader/default-reader-view.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m tests/routes/individuals-relationship-flow.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/export/assembler.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/nova/classify-nova-error.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/lib/desktop.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m tests/repositories/scene-repository.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/components/chat-interface-agentic-empty-state.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m tests/db/db-path.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32m✓[39m tests/ai/prompt-builder.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m tests/sqlite/serialize.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m tests/nova/tool-router.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/lib/sidebar-navigation.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/ai/pipeline/prompt-library.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/lib/app-error.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m tests/editor/appearance-consumption.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/reader/empty-state.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/settings/document-markdown.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/ai/task-resolver.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m tests/ci/version.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m tests/reader/deep-link.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m tests/ai/nova-prompt-mode.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m tests/settings/settings-migrate-redirect.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 1[2mms[22m[39m
+ [32m✓[39m tests/settings/settings-redirect.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m tests/routes/projects-create-query.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 1[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m171 passed[39m[22m[90m (171)[39m
+[2m      Tests [22m [1m[32m1103 passed[39m[22m[90m (1103)[39m
+[2m   Start at [22m 09:39:27
+[2m   Duration [22m 17.59s[2m (transform 7.20s, setup 4.49s, import 14.22s, tests 9.71s, environment 98.35s)[22m
+

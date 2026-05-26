@@ -2,7 +2,7 @@
 title: Stage 002 - Vibe-Worldbuild
 slug: stage-002-vibe-worldbuild
 stage_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-027-v1.1-scoping
 phases:
@@ -11,6 +11,8 @@ phases:
   - phase-003-worldbuild-verification-and-docs
 estimated_duration: 9d
 risk_level: medium
+started_at: 2026-05-26T18:10:00Z
+completed_at: 2026-05-26T21:05:00Z
 ---
 
 ## Goal
@@ -21,9 +23,9 @@ Ship staged worldbuilding generation with explicit draft/review/accept behavior 
 
 | #   | Phase                                                                           | Status  | Est. Duration |
 | --- | ------------------------------------------------------------------------------- | ------- | ------------- |
-| 001 | [Worldbuild Task Surface](phase-001-worldbuild-task-surface/phase.md)           | `draft` | 3d            |
-| 002 | [Worldbuild Checkpoint Flow](phase-002-worldbuild-checkpoint-flow/phase.md)     | `draft` | 3d            |
-| 003 | [Worldbuild Verification and Docs](phase-003-worldbuild-verification-and-docs/phase.md) | `draft` | 3d      |
+| 001 | [Worldbuild Task Surface](phase-001-worldbuild-task-surface/phase.md)           | `complete` | 3d            |
+| 002 | [Worldbuild Checkpoint Flow](phase-002-worldbuild-checkpoint-flow/phase.md)     | `complete` | 3d            |
+| 003 | [Worldbuild Verification and Docs](phase-003-worldbuild-verification-and-docs/phase.md) | `complete` | 3d      |
 
 ## Entry Criteria
 

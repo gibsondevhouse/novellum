@@ -32,12 +32,19 @@ export { default as NovaPanel } from './components/NovaPanel.svelte';
 export { default as ContextDisclosurePill } from './components/ContextDisclosurePill.svelte';
 export { default as ModelPickerDropdown } from './components/ModelPickerDropdown.svelte';
 export { default as NovaErrorBoundary } from './components/NovaErrorBoundary.svelte';
+export { default as NovaSceneDraftCard } from './components/NovaSceneDraftCard.svelte';
+export { default as NovaRevisionPackCard } from './components/NovaRevisionPackCard.svelte';
 export { novaPanel } from './stores/nova-panel.svelte.js';
 export { novaSession } from './stores/nova-session.svelte.js';
 export type { ContextDisclosureState } from './stores/nova-session.svelte.js';
 export { aiSession, AiSessionStore } from './services/ai-session-service.svelte.js';
 export { buildRagContext } from './services/context-hooks.js';
 export { sendNovaChat, type SendChatInput } from './services/chat-service.js';
+export {
+	runAuthorPipelineTask,
+	type AuthorPipelineRunInput,
+	type AuthorPipelineRunResult,
+} from './services/author-pipeline-runner.js';
 export { dispatchTool } from './services/tool-router.js';
 export {
 	registerTool,
@@ -55,6 +62,7 @@ export {
 	type StreamController,
 } from './services/stream-controller.js';
 export type {
+	NovaArtifact,
 	NovaMessage,
 	NovaMessageStatus,
 	NovaRole,

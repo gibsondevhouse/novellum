@@ -2,12 +2,12 @@
 title: Add Worldbuild Tests and Doc Sync
 slug: part-001-add-worldbuild-tests-and-doc-sync
 part_number: 1
-status: draft
+status: complete
 owner: Reviewer Agent
 assigned_to: Reviewer Agent
 phase: phase-003-worldbuild-verification-and-docs
-started_at: ~
-completed_at: ~
+started_at: 2026-05-26T20:20:00Z
+completed_at: 2026-05-26T21:05:00Z
 estimated_duration: 3d
 ---
 

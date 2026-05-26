@@ -112,6 +112,7 @@ CREATE TABLE IF NOT EXISTS characters (
 	photoUrl TEXT NOT NULL DEFAULT '',
 	bio TEXT NOT NULL DEFAULT '',
 	faction TEXT NOT NULL DEFAULT '',
+	factionId TEXT,
 	anomalies TEXT NOT NULL DEFAULT '[]',
 	traits TEXT NOT NULL DEFAULT '[]',
 	goals TEXT NOT NULL DEFAULT '[]',
@@ -336,6 +337,40 @@ CREATE TABLE IF NOT EXISTS milestones (
 	updatedAt TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS factions (
+	id TEXT PRIMARY KEY,
+	projectId TEXT NOT NULL,
+	name TEXT NOT NULL,
+	type TEXT NOT NULL DEFAULT '',
+	description TEXT NOT NULL DEFAULT '',
+	mission TEXT NOT NULL DEFAULT '',
+	ideology TEXT NOT NULL DEFAULT '',
+	createdAt TEXT NOT NULL,
+	updatedAt TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS themes (
+	id TEXT PRIMARY KEY,
+	projectId TEXT NOT NULL,
+	title TEXT NOT NULL,
+	description TEXT NOT NULL DEFAULT '',
+	tensionPair TEXT NOT NULL DEFAULT '',
+	imagery TEXT NOT NULL DEFAULT '',
+	createdAt TEXT NOT NULL,
+	updatedAt TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS glossary_terms (
+	id TEXT PRIMARY KEY,
+	projectId TEXT NOT NULL,
+	term TEXT NOT NULL,
+	definition TEXT NOT NULL DEFAULT '',
+	pronunciation TEXT NOT NULL DEFAULT '',
+	category TEXT NOT NULL DEFAULT '',
+	createdAt TEXT NOT NULL,
+	updatedAt TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS app_preferences (
 	key TEXT PRIMARY KEY,
 	value TEXT NOT NULL,
@@ -395,6 +430,9 @@ CREATE INDEX IF NOT EXISTS idx_stages_beatId ON stages(beatId);
 CREATE INDEX IF NOT EXISTS idx_stages_projectId ON stages(projectId);
 CREATE INDEX IF NOT EXISTS idx_milestones_actId ON milestones(actId);
 CREATE INDEX IF NOT EXISTS idx_milestones_projectId ON milestones(projectId);
+CREATE INDEX IF NOT EXISTS idx_factions_projectId ON factions(projectId);
+CREATE INDEX IF NOT EXISTS idx_themes_projectId ON themes(projectId);
+CREATE INDEX IF NOT EXISTS idx_glossary_terms_projectId ON glossary_terms(projectId);
 CREATE INDEX IF NOT EXISTS idx_project_metadata_owner ON project_metadata(projectId, scope, ownerId);
 `;
 

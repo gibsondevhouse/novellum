@@ -112,6 +112,27 @@ export const BACKUP_TABLE_REGISTRY: readonly BackupTableEntry[] = [
 		reason: 'Story bible — timeline.',
 		projectIdColumn: 'projectId',
 	},
+	{
+		name: 'factions',
+		scope: 'project',
+		include: true,
+		reason: 'Story bible — factions.',
+		projectIdColumn: 'projectId',
+	},
+	{
+		name: 'themes',
+		scope: 'project',
+		include: true,
+		reason: 'Story bible — themes.',
+		projectIdColumn: 'projectId',
+	},
+	{
+		name: 'glossary_terms',
+		scope: 'project',
+		include: true,
+		reason: 'Story bible — glossary.',
+		projectIdColumn: 'projectId',
+	},
 	// --- consistency / analysis ---
 	{
 		name: 'consistency_issues',

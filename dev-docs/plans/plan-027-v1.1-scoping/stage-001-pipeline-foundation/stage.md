@@ -2,7 +2,7 @@
 title: Stage 001 - Pipeline Foundation
 slug: stage-001-pipeline-foundation
 stage_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-027-v1.1-scoping
 phases:
@@ -11,6 +11,7 @@ phases:
   - phase-003-schema-extension-scope
 estimated_duration: 7d
 risk_level: medium
+completed_at: 2026-05-26T18:00:00Z
 ---
 
 ## Goal
@@ -21,9 +22,9 @@ Define the execution contract and persistence foundation for staged fiction gene
 
 | #   | Phase                                                                        | Status  | Est. Duration |
 | --- | ---------------------------------------------------------------------------- | ------- | ------------- |
-| 001 | [Orchestrator Contract](phase-001-orchestrator-contract/phase.md)            | `draft` | 2d            |
-| 002 | [Prompt Library and Templates](phase-002-prompt-library-and-templates/phase.md) | `draft` | 2d            |
-| 003 | [Schema Extension Scope](phase-003-schema-extension-scope/phase.md)          | `draft` | 3d            |
+| 001 | [Orchestrator Contract](phase-001-orchestrator-contract/phase.md)            | `complete` | 2d            |
+| 002 | [Prompt Library and Templates](phase-002-prompt-library-and-templates/phase.md) | `complete` | 2d            |
+| 003 | [Schema Extension Scope](phase-003-schema-extension-scope/phase.md)          | `complete` | 3d            |
 
 ## Entry Criteria
 

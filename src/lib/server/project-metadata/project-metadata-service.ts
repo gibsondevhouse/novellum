@@ -4,14 +4,14 @@ import { db } from '$lib/server/db/index.js';
  * SQLite-canonical store for project-scoped planning sidecars.
  *
  * Holds JSON blobs keyed by (projectId, scope, ownerId, key). Scopes
- * are 'scene' | 'chapter' | 'project'. Used for:
+ * are 'scene' | 'chapter' | 'project' | 'pipeline'. Used for:
  *  - scene clarity / quick-intent / outline form fields
  *  - chapter clarity / outline form fields / beat lists
  *
  * Values are JSON-serialized strings; service handles encoding.
  */
 
-export type MetadataScope = 'scene' | 'chapter' | 'project';
+export type MetadataScope = 'scene' | 'chapter' | 'project' | 'pipeline';
 
 interface MetadataRow {
 	projectId: string;

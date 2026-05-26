@@ -7,7 +7,7 @@
  * to its OpenRouter fetch.
  */
 
-import type { NovaMessage, NovaMessageStatus, NovaRole } from '../types.js';
+import type { NovaArtifact, NovaMessage, NovaMessageStatus, NovaRole } from '../types.js';
 import {
 	createStreamController,
 	type StreamController,
@@ -113,6 +113,31 @@ class NovaSessionStore {
 				...this.messages.slice(idx + 1),
 			];
 		}
+		this.controllers.delete(id);
+		if (this.activeStreamId === id) {
+			this.activeStreamId = null;
+		}
+	}
+
+	/**
+	 * plan-027 stage-003 phase-003 part-001 — attach a parsed pipeline
+	 * artifact to a Nova message. Marks the message `complete` so the
+	 * stream-disposed accept/reject UI in `part-002` can render the
+	 * card. Manuscript content is never mutated here.
+	 */
+	attachArtifact(id: string, artifact: NovaArtifact): void {
+		const idx = this.messages.findIndex((m) => m.id === id);
+		if (idx === -1) return;
+		const next: NovaMessage = {
+			...this.messages[idx],
+			status: 'complete',
+			artifact,
+		};
+		this.messages = [
+			...this.messages.slice(0, idx),
+			next,
+			...this.messages.slice(idx + 1),
+		];
 		this.controllers.delete(id);
 		if (this.activeStreamId === id) {
 			this.activeStreamId = null;

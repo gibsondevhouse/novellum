@@ -1,0 +1,15 @@
+
+> novellum@0.0.1 test /Users/gibdevlite/Dev/novellum
+> vitest run
+
+7:21:25 AM [vite-plugin-svelte] invalid plugin options "hot" in inline config
+{ hot: false }
+
+ RUN  v4.1.4 /Users/gibdevlite/Dev/novellum
+
+
+ Test Files  167 passed (167)
+      Tests  1074 passed (1074)
+   Start at  07:21:25
+   Duration  17.23s (transform 6.85s, setup 4.81s, import 13.91s, tests 8.59s, environment 96.37s)
+

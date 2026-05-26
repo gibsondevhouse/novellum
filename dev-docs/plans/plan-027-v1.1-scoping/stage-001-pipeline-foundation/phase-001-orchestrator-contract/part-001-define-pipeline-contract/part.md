@@ -2,12 +2,12 @@
 title: Define Pipeline Contract
 slug: part-001-define-pipeline-contract
 part_number: 1
-status: draft
+status: complete
 owner: AI Agent
 assigned_to: AI Agent
 phase: phase-001-orchestrator-contract
-started_at: ~
-completed_at: ~
+started_at: 2026-05-26T07:00:00Z
+completed_at: 2026-05-26T10:00:00Z
 estimated_duration: 2d
 ---
 
@@ -51,10 +51,10 @@ Define and implement the baseline pipeline contract used by orchestrator/task-re
 
 ## Acceptance Criteria
 
-- [ ] Pipeline task catalog includes worldbuild + author stage families.
-- [ ] Orchestrator accepts typed stage requests and returns typed artifact envelopes.
-- [ ] Contract encodes 7-layer hierarchy semantics (including milestones and stages).
-- [ ] New tests verify stage routing, lifecycle defaults, and error handling.
+- [x] Pipeline task catalog includes worldbuild + author stage families.
+- [x] Orchestrator accepts typed stage requests and returns typed artifact envelopes.
+- [x] Contract encodes 7-layer hierarchy semantics (including milestones and stages).
+- [x] New tests verify stage routing, lifecycle defaults, and error handling.
 
 ## Edge Cases
 

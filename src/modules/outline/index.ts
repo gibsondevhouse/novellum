@@ -24,6 +24,16 @@ export {
 	removeArc,
 	reorderArcs,
 } from '$modules/project/services/arc-repository.js';
+export {
+	SEVEN_LAYER_HIERARCHY,
+	normalizeSevenLayerOutline,
+	filterOutlineByStageStatus,
+} from './services/seven-layer-outline.js';
+export type {
+	SevenLayerName,
+	SevenLayerOutline,
+	StageLifecycleStatus,
+} from './services/seven-layer-outline.js';
 
 // Components
 export { default as HierarchyNavigator } from './components/HierarchyNavigator.svelte';

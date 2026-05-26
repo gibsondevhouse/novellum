@@ -1,12 +1,10 @@
 # MASTER PLAN: Novellum Development
 
-> Last reconciled: 2026-05-26 (opened plan-027-v1.1-scoping for V1.1 fiction pipeline work)
+> Last reconciled: 2026-05-27 (plan-027 closed; all three stages complete)
 
 ## Active Plans
 
-- [plan-027-v1.1-scoping](./plan-027-v1.1-scoping/plan.md): V1.1 staged fiction
-  pipeline delivery plan covering pipeline foundation, Vibe-Worldbuild, and
-  Vibe-Author. 3 stages. Status: `draft` (opened 2026-05-26).
+_No active plan. See [ACTIVE-PLAN.md](./ACTIVE-PLAN.md)._
 
 ## Deferred to V1.1
 
@@ -16,6 +14,7 @@
 
 ## Completed Plans (Archived)
 
+- [plan-027-v1.1-scoping](./plan-027-v1.1-scoping/plan.md): V1.1 staged fiction pipeline delivery — pipeline foundation, Vibe-Worldbuild, Vibe-Author. 3 stages. Status: `complete` (closed 2026-05-27; 177 files / 1156 vitest tests; token guard 0 violations; Playwright review-gate coverage for both worldbuild and author surfaces).
 - [plan-024-v1-final-mile](./archive/plan-024-v1-final-mile/plan.md): V1 Definition-of-Done closure & release engineering. 6 stages. Status: `complete` (closed 2026-05-26, 47/47 DoD). Three non-DoD stages deferred to V1.1.
 - [plan-026-ui-v2-design-system](./archive/plan-026-ui-v2-design-system/plan.md): UI refactor adopting the Novellum v2 "author-first" design system as the source of visual truth. 6 stages. Status: `complete` (closed 2026-05-26).
 - [plan-025-functional-after-build](./archive/plan-025-functional-after-build/plan.md): V1 functional-after-build hardening. App-data path correctness inside the Tauri sidecar, cut 4 unimplemented agents from V1 surface, smoke harness extended 4 → 7 probes, `smoke:built` wired into CI. Status: `complete` (closed 2026-05-13).

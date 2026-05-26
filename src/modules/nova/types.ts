@@ -7,6 +7,10 @@
  * extend without renaming.
  */
 
+import type { AuthorSceneDraftPayload } from '$lib/ai/pipeline/author-agent.js';
+import type { AuthorRevisionPack } from '$lib/ai/pipeline/author-schemas.js';
+import type { PipelineArtifactEnvelope } from '$lib/ai/pipeline/contracts.js';
+
 export type NovaRole = 'user' | 'nova' | 'system' | 'tool-call' | 'tool-result';
 
 export type NovaMessageStatus =
@@ -26,7 +30,24 @@ export interface NovaMessage {
 	toolId?: string;
 	toolPayload?: unknown;
 	error?: string;
+	/**
+	 * plan-027 stage-003 phase-003 part-001 — populated by
+	 * `runAuthorPipelineTask` after `parseAuthorOutput` succeeds. UI
+	 * cards (`part-002`) branch on `artifact.kind` to render the
+	 * scene-draft or revision-pack envelope.
+	 */
+	artifact?: NovaArtifact;
 }
+
+/**
+ * plan-027 stage-003 phase-003 part-001 — discriminated union of
+ * pipeline artifacts attached to a Nova message. Today only the
+ * `vibe-author` scene-draft and revision-pack stages produce these;
+ * future families append additional `kind` variants.
+ */
+export type NovaArtifact =
+	| { kind: 'author-scene-draft'; envelope: PipelineArtifactEnvelope<AuthorSceneDraftPayload> }
+	| { kind: 'author-revision-pack'; envelope: PipelineArtifactEnvelope<AuthorRevisionPack> };
 
 /* ── Tool-call interfaces (stage-006 wires real dispatch) ───────────── */
 

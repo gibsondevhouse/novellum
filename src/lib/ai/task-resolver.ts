@@ -1,4 +1,5 @@
 import type { AiTask, ContextPolicy, TaskType, UiContext } from './types.js';
+import { resolvePipelineAction } from './pipeline/task-catalog.js';
 
 interface TaskDefinition {
 	taskType: TaskType;
@@ -82,7 +83,37 @@ const TASK_MAP: Record<string, TaskDefinition> = {
 
 const DEFAULT_TASK: TaskDefinition = TASK_MAP['continue'];
 
+function resolvePipelineTarget(action: string, uiCtx: UiContext): string | null {
+	switch (action) {
+		case 'project':
+			return uiCtx.activeProjectId;
+		case 'chapter':
+			return uiCtx.activeChapterId ?? uiCtx.activeProjectId;
+		case 'scene':
+			return uiCtx.activeSceneId ?? uiCtx.activeChapterId ?? uiCtx.activeProjectId;
+		default:
+			return uiCtx.activeSceneId ?? uiCtx.activeChapterId ?? uiCtx.activeProjectId;
+	}
+}
+
 export function resolveTask(action: string, uiCtx: UiContext): AiTask {
+	const pipelineTask = resolvePipelineAction(action);
+	if (pipelineTask) {
+		return {
+			taskType: 'pipeline',
+			role: pipelineTask.role,
+			targetEntityId: resolvePipelineTarget(pipelineTask.target, uiCtx),
+			contextPolicy: pipelineTask.contextPolicy,
+			outputFormat: pipelineTask.outputFormat,
+			instruction: uiCtx.instruction,
+			pipelineTask: {
+				key: pipelineTask.key,
+				family: pipelineTask.family,
+				stage: pipelineTask.stage,
+			},
+		};
+	}
+
 	const def = TASK_MAP[action] ?? DEFAULT_TASK;
 	const targetEntityId = uiCtx.activeSceneId ?? uiCtx.activeChapterId ?? uiCtx.activeProjectId;
 	return {
@@ -93,4 +124,12 @@ export function resolveTask(action: string, uiCtx: UiContext): AiTask {
 		outputFormat: def.outputFormat,
 		instruction: uiCtx.instruction,
 	};
+}
+
+export function isAuthorPipelineTask(task: AiTask): boolean {
+	return task.taskType === 'pipeline' && task.pipelineTask?.family === 'vibe-author';
+}
+
+export function isWorldbuildPipelineTask(task: AiTask): boolean {
+	return task.taskType === 'pipeline' && task.pipelineTask?.family === 'vibe-worldbuild';
 }

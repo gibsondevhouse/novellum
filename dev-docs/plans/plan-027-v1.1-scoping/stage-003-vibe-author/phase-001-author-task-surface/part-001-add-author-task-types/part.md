@@ -2,12 +2,12 @@
 title: Add Author Task Types
 slug: part-001-add-author-task-types
 part_number: 1
-status: draft
+status: complete
 owner: AI Agent
 assigned_to: AI Agent
 phase: phase-001-author-task-surface
-started_at: ~
-completed_at: ~
+started_at: 2026-05-26T21:15:00Z
+completed_at: 2026-05-26T22:25:00Z
 estimated_duration: 3d
 ---
 
@@ -53,10 +53,10 @@ Add task definitions and parser logic for author-stage artifacts, including scen
 
 ## Acceptance Criteria
 
-- [ ] Author task catalog covers premise, outline, scene draft, and revision pack.
-- [ ] Scene draft contract requires prose payload plus metadata sidecar.
-- [ ] Non-prose author stages reject malformed JSON with clear parse errors.
-- [ ] Tests cover schema validation and parser fallback behavior.
+- [x] Author task catalog covers premise, outline, scene draft, and revision pack.
+- [x] Scene draft contract requires prose payload plus metadata sidecar.
+- [x] Non-prose author stages reject malformed JSON with clear parse errors.
+- [x] Tests cover schema validation and parser fallback behavior.
 
 ## Edge Cases
 

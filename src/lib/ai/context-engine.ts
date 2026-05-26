@@ -1,13 +1,25 @@
 import { apiGet, ApiError } from '$lib/api-client.js';
 import type {
+	Act,
+	Arc,
 	Beat,
 	Chapter,
 	Character,
+	CharacterRelationship,
+	Faction,
+	GlossaryTerm,
 	Location,
 	LoreEntry,
+	Milestone,
 	PlotThread,
+	Project,
 	Scene,
+	Stage,
+	StoryFrame,
+	Theme,
+	TimelineEvent,
 } from '$lib/db/domain-types';
+import { normalizeSevenLayerOutline } from '$modules/outline/services/seven-layer-outline.js';
 import type { AiContext, AiTask, ContextPolicy } from './types.js';
 import {
 	MAX_CHARACTERS,
@@ -31,6 +43,13 @@ function emptyContext(policy: ContextPolicy): AiContext {
 		locations: [],
 		loreEntries: [],
 		plotThreads: [],
+		project: null,
+		storyFrames: [],
+		timelineEvents: [],
+		characterRelationships: [],
+		factions: [],
+		themes: [],
+		glossaryTerms: [],
 	};
 }
 
@@ -67,6 +86,19 @@ async function getScenesByChapterId(chapterId: string): Promise<Scene[]> {
 	return [...scenes].sort((a, b) => a.order - b.order);
 }
 
+async function buildOutlineHierarchy(projectId: string) {
+	const [arcs, acts, milestones, chapters, scenes, beats, stages] = await Promise.all([
+		apiGet<Arc[]>('/api/db/arcs', { projectId }),
+		apiGet<Act[]>('/api/db/acts', { projectId }),
+		apiGet<Milestone[]>('/api/db/milestones', { projectId }),
+		apiGet<Chapter[]>('/api/db/chapters', { projectId }),
+		apiGet<Scene[]>('/api/db/scenes', { projectId }),
+		apiGet<Beat[]>('/api/db/beats', { projectId }),
+		apiGet<Stage[]>('/api/db/stages', { projectId }),
+	]);
+	return normalizeSevenLayerOutline({ arcs, acts, milestones, chapters, scenes, beats, stages });
+}
+
 async function buildSceneOnlyData(sceneId: string) {
 	const scene = await getOrUndefined<Scene>(`/api/db/scenes/${sceneId}`);
 	if (!scene) return null;
@@ -94,6 +126,13 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 				locations: data.locations,
 				loreEntries: [],
 				plotThreads: [],
+				project: null,
+				storyFrames: [],
+				timelineEvents: [],
+				characterRelationships: [],
+				factions: [],
+				themes: [],
+				glossaryTerms: [],
 			};
 		}
 
@@ -126,21 +165,42 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 				locations: data.locations,
 				loreEntries: [],
 				plotThreads: [],
+				project: null,
+				storyFrames: [],
+				timelineEvents: [],
+				characterRelationships: [],
+				factions: [],
+				themes: [],
+				glossaryTerms: [],
 			};
 		}
 
 		case 'chapter_scope':
 		case 'outline_scope': {
+			const isAuthorFamily =
+				task.taskType === 'pipeline' && task.pipelineTask?.family === 'vibe-author';
 			// targetEntityId may be a scene id or chapter id — try scene first
 			let chapterId: string | null = null;
 			if (task.targetEntityId) {
 				const scene = await getOrUndefined<Scene>(`/api/db/scenes/${task.targetEntityId}`);
 				chapterId = scene ? scene.chapterId : task.targetEntityId;
 			}
-			if (!chapterId) return emptyContext(task.contextPolicy);
+
+			// outline_scope can run without a target (whole-project outline). For
+			// chapter_scope we still require a chapter to anchor against.
+			const includeHierarchy = task.contextPolicy === 'outline_scope' || isAuthorFamily;
+			const hierarchy = includeHierarchy ? await buildOutlineHierarchy(projectId) : undefined;
+
+			if (!chapterId) {
+				const empty = emptyContext(task.contextPolicy);
+				return hierarchy ? { ...empty, outlineHierarchy: hierarchy } : empty;
+			}
 
 			const chapter = await getOrUndefined<Chapter>(`/api/db/chapters/${chapterId}`);
-			if (!chapter) return emptyContext(task.contextPolicy);
+			if (!chapter) {
+				const empty = emptyContext(task.contextPolicy);
+				return hierarchy ? { ...empty, outlineHierarchy: hierarchy } : empty;
+			}
 
 			const rawScenes = await getScenesByChapterId(chapterId);
 			const scenes = rawScenes.map((s) => ({
@@ -170,10 +230,24 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 				locations,
 				loreEntries: [],
 				plotThreads: [],
+				project: null,
+				storyFrames: [],
+				timelineEvents: [],
+				characterRelationships: [],
+				factions: [],
+				themes: [],
+				glossaryTerms: [],
+				...(hierarchy ? { outlineHierarchy: hierarchy } : {}),
 			};
 		}
 
 		case 'continuity_scope': {
+			const includeWorldbuildContext =
+				task.taskType === 'pipeline' &&
+				(task.pipelineTask?.family === 'vibe-worldbuild' ||
+					task.pipelineTask?.family === 'vibe-author');
+			const includeOutlineHierarchy =
+				task.taskType === 'pipeline' && task.pipelineTask?.family === 'vibe-author';
 			const [chapters, rawScenes, characters, locations, loreEntries, plotThreads] =
 				await Promise.all([
 					apiGet<Chapter[]>('/api/db/chapters', { projectId }),
@@ -183,6 +257,38 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 					apiGet<LoreEntry[]>('/api/db/lore_entries', { projectId }),
 					apiGet<PlotThread[]>('/api/db/plot_threads', { projectId }),
 				]);
+
+			const [
+				project,
+				storyFrames,
+				timelineEvents,
+				characterRelationships,
+				factions,
+				themes,
+				glossaryTerms,
+			] = await Promise.all([
+				includeWorldbuildContext
+					? getOrUndefined<Project>(`/api/db/projects/${projectId}`)
+					: Promise.resolve(undefined),
+				includeWorldbuildContext
+					? apiGet<StoryFrame[]>('/api/db/story_frames', { projectId })
+					: Promise.resolve([]),
+				includeWorldbuildContext
+					? apiGet<TimelineEvent[]>('/api/db/timeline_events', { projectId })
+					: Promise.resolve([]),
+				includeWorldbuildContext
+					? apiGet<CharacterRelationship[]>('/api/db/character_relationships', { projectId })
+					: Promise.resolve([]),
+				includeWorldbuildContext
+					? apiGet<Faction[]>('/api/db/factions', { projectId })
+					: Promise.resolve([]),
+				includeWorldbuildContext
+					? apiGet<Theme[]>('/api/db/themes', { projectId })
+					: Promise.resolve([]),
+				includeWorldbuildContext
+					? apiGet<GlossaryTerm[]>('/api/db/glossary_terms', { projectId })
+					: Promise.resolve([]),
+			]);
 
 			const sortedChapters = [...chapters].sort((a, b) => a.order - b.order);
 			const chapterOrderMap = new Map(sortedChapters.map((c, i) => [c.id, i]));
@@ -215,6 +321,16 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 				locations,
 				loreEntries,
 				plotThreads,
+				project: project ?? null,
+				storyFrames,
+				timelineEvents,
+				characterRelationships,
+				factions,
+				themes,
+				glossaryTerms,
+				...(includeOutlineHierarchy
+					? { outlineHierarchy: await buildOutlineHierarchy(projectId) }
+					: {}),
 			};
 		}
 

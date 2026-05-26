@@ -1,0 +1,13 @@
+
+> novellum@0.0.1 test /Users/gibdevlite/Dev/novellum
+> vitest run
+
+
+ RUN  v4.1.4 /Users/gibdevlite/Dev/novellum
+
+
+ Test Files  170 passed (170)
+      Tests  1088 passed (1088)
+   Start at  08:11:07
+   Duration  18.01s (transform 7.48s, setup 5.07s, import 14.71s, tests 8.90s, environment 100.06s)
+

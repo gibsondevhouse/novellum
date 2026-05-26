@@ -5,9 +5,16 @@ import {
 	setProjectMetadata,
 	type MetadataScope,
 } from '$lib/server/project-metadata/project-metadata-service.js';
+import {
+	acceptWorldbuildCheckpoint,
+	rejectWorldbuildCheckpoint,
+	reviewWorldbuildCheckpoint,
+	upsertWorldbuildCheckpoint,
+	WorldbuildCheckpointError,
+} from '$lib/ai/pipeline/checkpoint-service.js';
 import type { RequestHandler } from './$types';
 
-const ALLOWED: ReadonlySet<MetadataScope> = new Set(['scene', 'chapter', 'project']);
+const ALLOWED: ReadonlySet<MetadataScope> = new Set(['scene', 'chapter', 'project', 'pipeline']);
 
 type ValidateOk = {
 	ok: true;
@@ -18,6 +25,18 @@ type ValidateOk = {
 };
 type ValidateErr = { ok: false; response: Response };
 
+type PipelineOperation = 'upsert' | 'review' | 'accept' | 'reject';
+
+interface PipelineMutationBody {
+	operation?: unknown;
+	value?: unknown;
+	reviewer?: unknown;
+	note?: unknown;
+	acceptedBy?: unknown;
+	rejectedBy?: unknown;
+	reason?: unknown;
+}
+
 function validate(params: Partial<Record<string, string>>): ValidateOk | ValidateErr {
 	const { projectId, scope, ownerId, key } = params;
 	if (!projectId || !scope || !ownerId || !key) {
@@ -27,6 +46,37 @@ function validate(params: Partial<Record<string, string>>): ValidateOk | Validat
 		return { ok: false, response: json({ error: 'invalid scope' }, { status: 400 }) };
 	}
 	return { ok: true, projectId, scope: scope as MetadataScope, ownerId, key };
+}
+
+function asOptionalString(value: unknown): string | undefined {
+	if (typeof value !== 'string') return undefined;
+	const trimmed = value.trim();
+	return trimmed.length > 0 ? trimmed : undefined;
+}
+
+function parsePipelineOperation(value: unknown): PipelineOperation {
+	if (typeof value !== 'string') return 'upsert';
+	if (value === 'upsert' || value === 'review' || value === 'accept' || value === 'reject') {
+		return value;
+	}
+	throw new WorldbuildCheckpointError(
+		'invalid_payload',
+		`Unsupported pipeline checkpoint operation: ${value}`,
+	);
+}
+
+function statusForCheckpointError(error: WorldbuildCheckpointError): number {
+	switch (error.code) {
+		case 'not_found':
+			return 404;
+		case 'invalid_transition':
+			return 409;
+		case 'invalid_version':
+		case 'invalid_payload':
+		case 'projection_failed':
+		default:
+			return 400;
+	}
 }
 
 export const GET: RequestHandler = async ({ params }) => {
@@ -40,12 +90,64 @@ export const GET: RequestHandler = async ({ params }) => {
 export const PUT: RequestHandler = async ({ params, request }) => {
 	const v = validate(params);
 	if (!v.ok) return v.response;
-	let body: { value: unknown };
+
+	let body: PipelineMutationBody;
 	try {
-		body = (await request.json()) as { value: unknown };
+		body = (await request.json()) as PipelineMutationBody;
 	} catch {
 		return json({ error: 'invalid json' }, { status: 400 });
 	}
+
+	if (v.scope === 'pipeline') {
+		try {
+			const operation = parsePipelineOperation(body.operation);
+
+			switch (operation) {
+				case 'upsert': {
+					if (body.value === undefined) {
+						return json({ error: 'value is required for upsert operation' }, { status: 400 });
+					}
+					const checkpoint = upsertWorldbuildCheckpoint(
+						v.projectId,
+						v.ownerId,
+						v.key,
+						body.value,
+					);
+					return json({ ok: true, checkpoint });
+				}
+				case 'review': {
+					const checkpoint = reviewWorldbuildCheckpoint(v.projectId, v.ownerId, v.key, {
+						reviewer: asOptionalString(body.reviewer),
+						note: asOptionalString(body.note),
+					});
+					return json({ ok: true, checkpoint });
+				}
+				case 'accept': {
+					const checkpoint = acceptWorldbuildCheckpoint(v.projectId, v.ownerId, v.key, {
+						acceptedBy: asOptionalString(body.acceptedBy),
+						note: asOptionalString(body.note),
+					});
+					return json({ ok: true, checkpoint });
+				}
+				case 'reject': {
+					const checkpoint = rejectWorldbuildCheckpoint(v.projectId, v.ownerId, v.key, {
+						rejectedBy: asOptionalString(body.rejectedBy),
+						reason: asOptionalString(body.reason) ?? '',
+					});
+					return json({ ok: true, checkpoint });
+				}
+			}
+		} catch (error) {
+			if (error instanceof WorldbuildCheckpointError) {
+				return json(
+					{ error: error.message, code: error.code },
+					{ status: statusForCheckpointError(error) },
+				);
+			}
+			throw error;
+		}
+	}
+
 	setProjectMetadata(v.projectId, v.scope, v.ownerId, v.key, body.value);
 	return json({ ok: true });
 };

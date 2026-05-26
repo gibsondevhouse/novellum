@@ -1,15 +1,26 @@
 // AI pipeline types — version 2
 
 import type {
+	Arc,
+	Act,
 	Beat,
 	Character,
+	CharacterRelationship,
 	Chapter,
+	Faction,
+	GlossaryTerm,
 	Location,
 	LoreEntry,
+	Milestone,
 	PlotThread,
+	Project,
 	Scene,
+	Stage,
+	StoryFrame,
 	SystemPrompt,
 	ChatInstruction,
+	Theme,
+	TimelineEvent,
 	WritingStyle
 } from '$lib/db/domain-types';
 import type { SceneIntentSnapshot } from '$lib/stores/scene-intent.svelte.js';
@@ -27,7 +38,8 @@ export type TaskType =
 	| 'continuity_check'
 	| 'edit'
 	| 'style_check'
-	| 'chat';
+	| 'chat'
+	| 'pipeline';
 
 export type EditMode = 'developmental' | 'line_edit' | 'proofread';
 
@@ -76,6 +88,13 @@ export interface AiTask {
 	contextPolicy: ContextPolicy;
 	outputFormat: string;
 	instruction?: string;
+	pipelineTask?: PipelineTaskReference;
+}
+
+export interface PipelineTaskReference {
+	key: string;
+	family: 'vibe-worldbuild' | 'vibe-author';
+	stage: string;
 }
 
 export interface AiContext {
@@ -88,9 +107,32 @@ export interface AiContext {
 	locations: Location[];
 	loreEntries: LoreEntry[];
 	plotThreads: PlotThread[];
+	project?: Project | null;
+	storyFrames?: StoryFrame[];
+	timelineEvents?: TimelineEvent[];
+	characterRelationships?: CharacterRelationship[];
+	factions?: Faction[];
+	themes?: Theme[];
+	glossaryTerms?: GlossaryTerm[];
 	systemPrompts?: SystemPrompt[];
 	chatInstructions?: ChatInstruction[];
 	writingStyles?: WritingStyle[];
+	templates?: Array<{ type: string; content: string }>;
+	/**
+	 * Seven-layer outline hierarchy (arcs → acts → milestones → chapters
+	 * → scenes → beats → stages). Populated for outline-scope and
+	 * vibe-author pipeline tasks so the model can reason across the whole
+	 * narrative structure. Optional so legacy task paths remain unchanged.
+	 */
+	outlineHierarchy?: {
+		arcs: Arc[];
+		acts: Act[];
+		milestones: Milestone[];
+		chapters: Chapter[];
+		scenes: Scene[];
+		beats: Beat[];
+		stages: Stage[];
+	};
 	/**
 	 * Writer-defined intent + live writing signals for the active scene.
 	 * Published by the editor through `$lib/stores/scene-intent`. Lets Nova

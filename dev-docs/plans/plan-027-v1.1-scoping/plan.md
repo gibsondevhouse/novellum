@@ -2,11 +2,12 @@
 title: V1.1 Fiction Pipeline Scoping and Delivery
 slug: plan-027-v1.1-scoping
 version: 1.0.0
-status: draft
+status: complete
 owner: Planner Agent
 created: 2026-05-26
-last_updated: 2026-05-26
+last_updated: 2026-05-27
 target_completion: 2026-07-08
+completed_at: 2026-05-27T11:05:00Z
 stages:
   - stage-001-pipeline-foundation
   - stage-002-vibe-worldbuild
@@ -45,18 +46,18 @@ Establish and ship Novellum's staged fiction pipeline for V1.1 with explicit rev
 
 | #   | Stage                                                      | Status  | Est. Duration |
 | --- | ---------------------------------------------------------- | ------- | ------------- |
-| 001 | [Pipeline Foundation](stage-001-pipeline-foundation/stage.md) | `draft` | 7d            |
-| 002 | [Vibe-Worldbuild](stage-002-vibe-worldbuild/stage.md)         | `draft` | 9d            |
-| 003 | [Vibe-Author](stage-003-vibe-author/stage.md)                 | `draft` | 10d           |
+| 001 | [Pipeline Foundation](stage-001-pipeline-foundation/stage.md) | `complete` | 7d            |
+| 002 | [Vibe-Worldbuild](stage-002-vibe-worldbuild/stage.md)         | `complete` | 9d            |
+| 003 | [Vibe-Author](stage-003-vibe-author/stage.md)                 | `complete` | 10d   |
 
 ## Quality Gates
 
-- [ ] **lint** — `pnpm lint` and `pnpm lint:css` clean
-- [ ] **typecheck** — `pnpm check` clean
-- [ ] **tests** — `pnpm test` clean
-- [ ] **boundaries** — no modular-boundary violations
-- [ ] **e2e** — staged pipeline acceptance flows pass in Playwright
-- [ ] **docs_sync** — architecture + AI pipeline docs reconciled
+- [x] **lint** — `pnpm lint` and `pnpm lint:css` clean
+- [x] **typecheck** — `pnpm check` clean
+- [x] **tests** — `pnpm test` clean
+- [x] **boundaries** — no modular-boundary violations
+- [x] **e2e** — staged pipeline acceptance flows pass in Playwright
+- [x] **docs_sync** — architecture + AI pipeline docs reconciled
 
 ## Risks & Mitigations
 

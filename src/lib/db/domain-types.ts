@@ -136,6 +136,7 @@ export interface Character {
 	photoUrl: string;
 	bio: string;
 	faction: string;
+	factionId?: string;
 	anomalies: string[];
 	traits: string[];
 	goals: string[];
@@ -143,6 +144,40 @@ export interface Character {
 	arcs: string[];
 	notes: string;
 	tags: string[];
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface Faction {
+	id: string;
+	projectId: string;
+	name: string;
+	type: string;
+	description: string;
+	mission: string;
+	ideology: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface Theme {
+	id: string;
+	projectId: string;
+	title: string;
+	description: string;
+	tensionPair: string;
+	imagery: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface GlossaryTerm {
+	id: string;
+	projectId: string;
+	term: string;
+	definition: string;
+	pronunciation: string;
+	category: string;
 	createdAt: string;
 	updatedAt: string;
 }

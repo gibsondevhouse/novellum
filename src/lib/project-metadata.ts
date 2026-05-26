@@ -1,3 +1,6 @@
+import type { WorldbuildCheckpointRecord } from '$lib/ai/pipeline/checkpoint-contract.js';
+import { WORLDBUILD_CHECKPOINT_OWNER_ID } from '$lib/ai/pipeline/checkpoint-contract.js';
+
 /**
  * Client wrapper for the SQLite-canonical project metadata store.
  *
@@ -7,7 +10,9 @@
  * SSR-safe: server-side calls return the default and skip fetch.
  */
 
-export type MetadataScope = 'scene' | 'chapter' | 'project';
+export type MetadataScope = 'scene' | 'chapter' | 'project' | 'pipeline';
+
+type PipelineOperation = 'upsert' | 'review' | 'accept' | 'reject';
 
 const BASE = '/api/db/project-metadata';
 
@@ -73,6 +78,68 @@ export async function setProjectMetadata<T>(
 	} catch {
 		/* swallow — best-effort */
 	}
+}
+
+async function mutatePipelineCheckpoint(
+	projectId: string,
+	ownerId: string,
+	checkpointId: string,
+	operation: PipelineOperation,
+	body: Record<string, unknown>,
+): Promise<WorldbuildCheckpointRecord> {
+	if (!isBrowser()) {
+		throw new Error('Pipeline checkpoint mutations require a browser context.');
+	}
+
+	const res = await fetch(url(projectId, 'pipeline', ownerId, checkpointId), {
+		method: 'PUT',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ operation, ...body }),
+	});
+
+	if (!res.ok) {
+		const payload = (await res.json().catch(() => ({}))) as { error?: string };
+		throw new Error(payload.error ?? `Pipeline checkpoint mutation failed: ${res.status}`);
+	}
+
+	const payload = (await res.json()) as { checkpoint: WorldbuildCheckpointRecord };
+	return payload.checkpoint;
+}
+
+export async function upsertWorldbuildCheckpoint(
+	projectId: string,
+	checkpointId: string,
+	value: unknown,
+	ownerId = WORLDBUILD_CHECKPOINT_OWNER_ID,
+): Promise<WorldbuildCheckpointRecord> {
+	return mutatePipelineCheckpoint(projectId, ownerId, checkpointId, 'upsert', { value });
+}
+
+export async function reviewWorldbuildCheckpoint(
+	projectId: string,
+	checkpointId: string,
+	input: { reviewer?: string; note?: string } = {},
+	ownerId = WORLDBUILD_CHECKPOINT_OWNER_ID,
+): Promise<WorldbuildCheckpointRecord> {
+	return mutatePipelineCheckpoint(projectId, ownerId, checkpointId, 'review', input);
+}
+
+export async function acceptWorldbuildCheckpoint(
+	projectId: string,
+	checkpointId: string,
+	input: { acceptedBy?: string; note?: string } = {},
+	ownerId = WORLDBUILD_CHECKPOINT_OWNER_ID,
+): Promise<WorldbuildCheckpointRecord> {
+	return mutatePipelineCheckpoint(projectId, ownerId, checkpointId, 'accept', input);
+}
+
+export async function rejectWorldbuildCheckpoint(
+	projectId: string,
+	checkpointId: string,
+	input: { rejectedBy?: string; reason: string },
+	ownerId = WORLDBUILD_CHECKPOINT_OWNER_ID,
+): Promise<WorldbuildCheckpointRecord> {
+	return mutatePipelineCheckpoint(projectId, ownerId, checkpointId, 'reject', input);
 }
 
 export async function deleteProjectMetadata(

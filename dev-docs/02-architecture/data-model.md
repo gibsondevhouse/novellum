@@ -1,10 +1,10 @@
 # Data Model
 
-> Last verified: 2026-05-07
+> Last verified: 2026-05-26
 
 The single source of truth is the SQLite schema in [src/lib/server/db/schema.ts](../../src/lib/server/db/schema.ts). The Dexie mirror in [src/lib/db/](../../src/lib/db/) (currently schema **v11**) is used **only** for `.novellum.zip` portability — never for live reads/writes.
 
-## Tables (16 shipped + auxiliary)
+## Tables (19 shipped + auxiliary)
 
 ### Core narrative entities
 
@@ -31,6 +31,9 @@ The single source of truth is the SQLite schema in [src/lib/server/db/schema.ts]
 | `lore_entries` | Archive. |
 | `plot_threads` | Threads. |
 | `timeline_events` | Chronicles. |
+| `factions` | Organizations and affiliations. |
+| `themes` | Narrative themes and motifs. |
+| `glossary_terms` | Terminology and lexicon. |
 
 ### AI / quality
 
@@ -53,7 +56,7 @@ The single source of truth is the SQLite schema in [src/lib/server/db/schema.ts]
 These are not in the "16 core" count but are first-class:
 
 - **`preferences`** — typed user preferences keyed by string. Foundation for [plan-022-settings-ia](../plans/plan-022-settings-ia/plan.md). REST under `/api/db/preferences/[key]`.
-- **`project_metadata`** — per-project flexible metadata (scoped by `projectId`/`scope`/`ownerId`/`key`). REST under `/api/db/project-metadata/...`.
+- **`project_metadata`** — per-project flexible metadata (scoped by `projectId`/`scope`/`ownerId`/`key`). REST under `/api/db/project-metadata/...`. Supported scopes: `'scene' | 'chapter' | 'project' | 'pipeline'`. The `'pipeline'` scope stores `WorldbuildCheckpointRecord` JSON keyed by checkpoint id (owner `'vibe-worldbuild'`); accepted populated-bible checkpoints atomically project into `factions`, `characters`, `locations`, `themes`, `glossary_terms`, `lore_entries`, `plot_threads`, and `timeline_events`. See [ADR-0027](./adr/adr-0027-pipeline-entity-scope.md) and [pipeline.md](../03-ai/pipeline.md).
 
 The complete count, including auxiliary tables, is **16 shipped narrative + AI tables + 5 auxiliary** (preferences, project-metadata, etc.) — see [schema.ts](../../src/lib/server/db/schema.ts) for the canonical list.
 
@@ -63,12 +66,22 @@ The complete count, including auxiliary tables, is **16 shipped narrative + AI t
 Project
 └── Arc           (arcs.projectId)            optional grouping
     └── Act       (acts.arcId, nullable)      acts with arcId=null → "unassigned"
-        └── Chapter (chapters.actId, nullable)
-            └── Scene (scenes.chapterId, nullable) → opens in editor
-                └── Beat (beats.sceneId)
+        └── Milestone (milestones.actId)      narrative beats anchoring chapters
+            └── Chapter (chapters.actId, nullable)
+                └── Scene (scenes.chapterId, nullable) → opens in editor
+                    └── Beat (beats.sceneId)
+                        └── Stage (stages.beatId, status: planned|in_progress|completed)
 ```
 
 `null` parent ID denotes **unassigned** content and is rendered explicitly in the workspace under a dedicated `unassigned` segment so orphaned content stays discoverable.
+
+### Seven-layer AI context traversal
+
+The full seven-layer narrative spine (`arcs → acts → milestones → chapters → scenes → beats → stages`) is normalized for AI consumption by [`normalizeSevenLayerOutline`](../../src/modules/outline/services/seven-layer-outline.ts). The helper deterministically sorts every layer by `order` then `title`, and resolves `Milestone.chapterIds` into canonical chapter order so model output stays stable across runs.
+
+- `AiContext.outlineHierarchy` is populated whenever the active pipeline task is in the `vibe-author` family OR the `contextPolicy` is `outline_scope`.
+- `filterOutlineByStageStatus` enforces the `Stage` lifecycle (`planned | in_progress | completed`) at retrieval time so author-stage tasks only see the slices they should act on.
+- `getSevenLayerOutline(projectId)` in [`outline-data-service.ts`](../../src/modules/outline/services/outline-data-service.ts) is the public traversal entry point for non-AI consumers (export, telemetry, etc.).
 
 ## Repositories
 

@@ -1,8 +1,11 @@
 # AI Pipeline
 
-> Last verified: 2026-05-07
+> Last verified: 2026-05-27
 
-Every AI feature in Novellum follows the same pipeline. The pipeline lives in [src/lib/ai/](../../src/lib/ai/) and is consumed by feature modules through orchestrator factories.
+Every AI feature in Novellum follows the same pipeline. The runtime
+agents (continuity / edit / rewrite / style) live in [src/lib/ai/](../../src/lib/ai/)
+and the V1.1 staged-pipeline scaffolding lives in [src/lib/ai/pipeline/](../../src/lib/ai/pipeline/).
+Both are consumed by feature modules through orchestrator factories.
 
 ## Pipeline diagram
 
@@ -67,6 +70,95 @@ The literal templates live in [src/lib/ai/constants.ts](../../src/lib/ai/constan
 | `rewrite-agent.ts` | RewriteAgent parser. |
 | `style-agent.ts` | StyleAgent parser. |
 | `index.ts` | Public barrel. |
+
+## Files in `src/lib/ai/pipeline/` (V1.1 staged pipeline)
+
+Introduced in plan-027-v1.1-scoping. The staged pipeline runs alongside
+the runtime agents — it does not replace them. It owns the multi-stage
+`vibe-worldbuild` and `vibe-author` families gated by reviewer
+checkpoints.
+
+| File | Purpose |
+| --- | --- |
+| `contracts.ts` | `OUTLINE_HIERARCHY` 7-tuple, `PipelineTaskContract`, `PipelineArtifactEnvelope<T>`, `createPipelineArtifactEnvelope()`. |
+| `task-catalog.ts` | `PIPELINE_TASK_KEYS`, `PIPELINE_TASK_CATALOG`, `PIPELINE_TASK_FAMILIES`, `resolvePipelineAction()`. |
+| `prompt-library.ts` / `prompt-library-seeds.ts` | Per-stage prompt scaffolds (ROLE / TASK / CONSTRAINTS / OUTPUT). |
+| `worldbuild-schemas.ts` | Zod schemas for the four `vibe-worldbuild.*` payloads (premise / worldspec / research / populated-bible). |
+| `worldbuild-agent.ts` | `parseWorldbuildOutput()`, `createWorldbuildArtifactFromModelOutput()`, populated-bible normalizer. |
+| `checkpoint-contract.ts` | `PIPELINE_CHECKPOINT_SCHEMA_VERSION='1.0.0'`, `WorldbuildCheckpointRecord`, lifecycle guards. |
+| `checkpoint-service.ts` | `createWorldbuildCheckpointService(database)` — `upsert / review / accept / reject / list / get`. All mutations atomic. |
+
+### vibe-worldbuild checkpoint flow
+
+Four pipeline tasks ship today (`vibe-worldbuild.premise`,
+`.worldspec`, `.research`, `.populated-world-bible`). Each artifact
+envelope is stored in `project_metadata` under scope `'pipeline'` with
+owner `'vibe-worldbuild'` and the artifact id as the key. The
+lifecycle is `draft → review → accepted | rejected`.
+
+Only `vibe-worldbuild.populated-world-bible` writes to canon. On
+`accept`, `checkpoint-service.ts` opens a single SQLite transaction and
+inserts into `factions`, `characters` (with `factionId` resolved by
+name match), `locations`, `themes`, `glossary_terms`, `lore_entries`,
+`plot_threads`, and `timeline_events`. A second `accept` on the same
+checkpoint is idempotent. `reject` requires a non-empty `reason` and
+preserves it on the record without touching canon.
+
+The HTTP surface is
+`/api/db/project-metadata/{projectId}/pipeline/{ownerId}/{key}` with a
+discriminated `operation` payload (`upsert | review | accept | reject`).
+The vibe-author family is scaffolded but not yet parser-wired; it ships
+in stage-003.
+
+### vibe-author review-gate flow
+
+Stage-003 phase-003 ships the author drafting + revision surface:
+
+- `src/lib/ai/pipeline/author-agent.ts` parses model output into
+  `AuthorSceneDraftPayload` (prose + sidecar) and the revision pack
+  schema.
+- `src/lib/ai/pipeline/author-schemas.ts` exposes the Zod schemas and
+  `AUTHOR_SEVERITY_ORDER` (`critical → high → medium → low`).
+- `src/modules/nova/services/author-pipeline-runner.ts` —
+  `runAuthorPipelineTask()` resolves the task, builds RAG context,
+  streams via `OpenRouterClient.complete`, parses the result, and
+  attaches a `NovaArtifact` to the Nova message via
+  `novaSession.attachArtifact()`. Result variants surface
+  `invalid_task | parse_failed | transport_failed | aborted` reasons.
+- `src/modules/nova/components/NovaSceneDraftCard.svelte` renders the
+  scene-draft envelope with explicit `Accept` / `Reject` / `Copy`
+  controls (Copy goes through `navigator.clipboard`).
+- `src/modules/nova/components/NovaRevisionPackCard.svelte` renders
+  the revision-pack envelope as a severity-sorted issue list with a
+  per-issue `Acknowledge` action.
+- `src/modules/nova/components/NovaMessageLog.svelte` branches on
+  `message.artifact?.kind` to pick the right card.
+
+The review-gate guardrail is enforced at three layers:
+
+1. **Component contract** — source-string tests
+   (`tests/ai/pipeline/scene-draft-sidecar.test.ts`,
+   `tests/ai/pipeline/revision-pack.test.ts`) forbid any
+   manuscript-write import (`insertText`, `applyEdit`,
+   `manuscriptStore`, `editorStore`).
+2. **Runner contract** — Vitest coverage
+   (`tests/nova/services/author-pipeline-runner.test.ts`) asserts the
+   runner only attaches an artifact; it never reaches into the editor.
+3. **HTTP contract** — Playwright spec
+   (`tests/e2e/vibe-author-review-gates.spec.ts`) drives
+   draft → review → accept for the scene-draft key and
+   draft → reject for the revision-pack key, then verifies that
+   `/api/db/scenes` and `/api/db/chapters` are still empty for the
+   project. Manuscript content is never auto-mutated by the
+   review-gate.
+
+`Accept` emits the parsed envelope to an `onAccept` callback so a
+later editor accept-pipeline can ledger the provenance (`taskKey`,
+`family`, `stage`, `model`, `createdAt`). That integration is out of
+scope for plan-027.
+
+See [ADR-0027](../02-architecture/adr/adr-0027-pipeline-entity-scope.md)
+for the V1.1 scope decision.
 
 ## Server boundary
 

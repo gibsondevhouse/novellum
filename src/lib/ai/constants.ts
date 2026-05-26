@@ -33,6 +33,7 @@ export const MODEL_MAP: Record<TaskType, string> = {
 	edit: 'openai/gpt-4o',
 	style_check: 'openai/gpt-4o',
 	chat: 'openai/gpt-4o-mini',
+	pipeline: 'openai/gpt-4o-mini',
 };
 
 // ── Context Engine Limits ───────────────────────────────────────────────────
@@ -112,4 +113,20 @@ export const OUTPUT_FORMAT_DESCRIPTIONS: Record<string, string> = {
 		'Return a JSON array of StyleDeviation objects with: spanStart, spanEnd, original, suggestion, reason.',
 	json_rewrite_options:
 		'Return a JSON array of exactly 3 rewrite option objects: [{"index":1,"text":"..."},{"index":2,"text":"..."},{"index":3,"text":"..."}]',
+	json_worldbuild_premise:
+		'Return a JSON object with fields: hook, genreBlend, readerPromise, coreConflict, worldPressure, tone, scope, nonNegotiables, openQuestions.',
+	json_worldbuild_worldspec:
+		'Return a JSON object with fields: realityMode, environment, powerOrder, socialOrder, scarcity, magicOrTechRules, taboos, ordinaryLifeBaseline, conflictEngines, aestheticAnchors, questionsForResearch.',
+	json_worldbuild_research_briefs:
+		'Return a JSON object containing an array `researchBriefs[]` with fields: question, whyItMatters, candidateAnswers, selectedRecommendation, confidence, sourceNote, canonImpact.',
+	json_worldbuild_populated_bible:
+		'Return a JSON object containing arrays: characters[], locations[], factions[], loreEntries[], timelineEvents[], themes[], glossary[], relationships[].',
+	json_author_premise:
+		'Return a JSON object with fields: protagonistId, externalGoal, internalNeed, antagonisticForce, stakes, dramaticQuestion, themeHypothesis, endingPolarity, scopeStatement.',
+	json_author_outline:
+		'Return a JSON object with nested arrays: arcs[], acts[], chapters[], scenes[], beats[]. Scenes must include povCharacterId, locationId, threadIds, goal, conflict, turn, outcome, and arcRefs.',
+	prose_plus_scene_sidecar:
+		'Respond with the scene prose first, followed by a fenced ---SIDECAR--- block containing a JSON object with: sceneId, assignedBeatIds, povCharacterId, locationId, characterIds, threadIds, factsIntroduced, continuityRisks, wordCountEstimate, draftStatus.',
+	json_author_revision_pack:
+		'Return a JSON object with an `issues[]` array. Each issue must have: severity, type, evidenceSpan, problemExplanation, minimalFix, deeperRewriteOption, requiresCanonDecision, relatedEntityIds, approvalChecklist.',
 };

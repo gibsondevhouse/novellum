@@ -1,6 +1,21 @@
 import type { ContextBundle, AIResponse } from './types.js';
 import { OpenRouterClient } from './openrouter.js';
 import { DEFAULT_MODEL } from './constants.js';
+import {
+	createPipelineArtifactEnvelope,
+	type PipelineArtifactEnvelope,
+	type PipelineRunRequest,
+} from './pipeline/contracts.js';
+import {
+	createWorldbuildArtifactFromModelOutput,
+	type WorldbuildArtifactBuildRequest,
+	type WorldbuildArtifactResult,
+} from './pipeline/worldbuild-agent.js';
+import {
+	createAuthorArtifactFromModelOutput,
+	type AuthorArtifactBuildRequest,
+	type AuthorArtifactResult,
+} from './pipeline/author-agent.js';
 
 export class Orchestrator {
 	private readonly client: OpenRouterClient;
@@ -22,5 +37,19 @@ export class Orchestrator {
 				{ role: 'user', content: context.userPrompt },
 			],
 		});
+	}
+
+	async runPipeline<TPayload>(
+		request: PipelineRunRequest<TPayload>,
+	): Promise<PipelineArtifactEnvelope<TPayload>> {
+		return createPipelineArtifactEnvelope(request);
+	}
+
+	runWorldbuildPipeline(request: WorldbuildArtifactBuildRequest): WorldbuildArtifactResult {
+		return createWorldbuildArtifactFromModelOutput(request);
+	}
+
+	runAuthorPipeline(request: AuthorArtifactBuildRequest): AuthorArtifactResult {
+		return createAuthorArtifactFromModelOutput(request);
 	}
 }

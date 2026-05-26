@@ -2,12 +2,12 @@
 title: Add Worldbuild Task Types
 slug: part-001-add-worldbuild-task-types
 part_number: 1
-status: draft
+status: complete
 owner: AI Agent
 assigned_to: AI Agent
 phase: phase-001-worldbuild-task-surface
-started_at: ~
-completed_at: ~
+started_at: 2026-05-26T18:10:00Z
+completed_at: 2026-05-26T18:52:04Z
 estimated_duration: 3d
 ---
 

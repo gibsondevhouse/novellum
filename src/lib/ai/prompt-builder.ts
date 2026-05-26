@@ -1,4 +1,5 @@
 import type { AiContext, AiTask } from './types.js';
+import { resolvePromptScaffold } from './pipeline/prompt-library.js';
 import {
 	MAX_PROMPT_CHARS,
 	CONSTRAINTS_BY_TYPE,
@@ -50,6 +51,21 @@ function serializeSceneIntent(intent: NonNullable<AiContext['sceneIntent']>): st
 function serializeContext(ctx: AiContext): string {
 	const lines: string[] = [];
 
+	if (ctx.project) {
+		lines.push(`PROJECT: "${ctx.project.title}"`);
+		if (ctx.project.genre) lines.push(`Genre: ${ctx.project.genre}`);
+		if (ctx.project.logline) lines.push(`Logline: ${ctx.project.logline}`);
+		if (ctx.project.synopsis) lines.push(`Synopsis: ${ctx.project.synopsis}`);
+	}
+
+	if (ctx.storyFrames && ctx.storyFrames.length > 0) {
+		lines.push('\nSTORY FRAMES:');
+		ctx.storyFrames.forEach((frame, index) => {
+			lines.push(`- Frame ${index + 1}: premise="${frame.premise}" theme="${frame.theme}"`);
+			if (frame.toneNotes) lines.push(`  Tone Notes: ${frame.toneNotes}`);
+		});
+	}
+
 	if (ctx.scene) {
 		lines.push(`ACTIVE SCENE: "${ctx.scene.title}"`);
 		if (ctx.scene.summary) lines.push(`Summary: ${ctx.scene.summary}`);
@@ -97,6 +113,43 @@ function serializeContext(ctx: AiContext): string {
 		ctx.plotThreads.forEach((t) => lines.push(`- [${t.status}] ${t.title}: ${t.description}`));
 	}
 
+	if (ctx.timelineEvents && ctx.timelineEvents.length > 0) {
+		lines.push('\nTIMELINE EVENTS:');
+		ctx.timelineEvents.forEach((event) =>
+			lines.push(`- ${event.title} (${event.date}): ${event.description}`),
+		);
+	}
+
+	if (ctx.characterRelationships && ctx.characterRelationships.length > 0) {
+		lines.push('\nCHARACTER RELATIONSHIPS:');
+		ctx.characterRelationships.forEach((relation) => {
+			lines.push(
+				`- ${relation.characterAId} <-> ${relation.characterBId} [${relation.type}]: ${relation.description}`,
+			);
+		});
+	}
+
+	if (ctx.factions && ctx.factions.length > 0) {
+		lines.push('\nFACTIONS:');
+		ctx.factions.forEach((faction) =>
+			lines.push(`- ${faction.name} (${faction.type}): ${faction.description}`),
+		);
+	}
+
+	if (ctx.themes && ctx.themes.length > 0) {
+		lines.push('\nTHEMES:');
+		ctx.themes.forEach((theme) =>
+			lines.push(`- ${theme.title}: ${theme.description} | Tension: ${theme.tensionPair}`),
+		);
+	}
+
+	if (ctx.glossaryTerms && ctx.glossaryTerms.length > 0) {
+		lines.push('\nGLOSSARY TERMS:');
+		ctx.glossaryTerms.forEach((term) =>
+			lines.push(`- ${term.term}: ${term.definition} (${term.category})`),
+		);
+	}
+
 	if (ctx.writingStyles && ctx.writingStyles.length > 0) {
 		lines.push('\nCUSTOM WRITING STYLES:');
 		ctx.writingStyles.forEach((ws) => {
@@ -123,6 +176,9 @@ function serializeContext(ctx: AiContext): string {
 }
 
 export function buildPrompt(task: AiTask, ctx: AiContext): string {
+	let role = task.role;
+	let taskDescription = TASK_DESCRIPTIONS[task.taskType] ?? 'Complete the requested task.';
+	let outputFormat = OUTPUT_FORMAT_DESCRIPTIONS[task.outputFormat] ?? task.outputFormat;
 	const constraints = [
 		'Do not invent facts outside the provided context unless explicitly instructed.',
 		'Preserve all named entities unless suggesting alternatives.',
@@ -130,6 +186,32 @@ export function buildPrompt(task: AiTask, ctx: AiContext): string {
 		'Do not explain reasoning unless explicitly requested.',
 		...(CONSTRAINTS_BY_TYPE[task.taskType] ?? []),
 	];
+
+	if (task.taskType === 'pipeline' && task.pipelineTask) {
+		const scaffold = resolvePromptScaffold(task.pipelineTask.key, ctx.templates ?? []);
+		role = scaffold.role;
+		taskDescription = scaffold.task;
+		outputFormat = OUTPUT_FORMAT_DESCRIPTIONS[scaffold.outputFormat] ?? scaffold.outputFormat;
+		constraints.push(...scaffold.constraints);
+		constraints.push(
+			'Return strict machine-readable output matching OUTPUT FORMAT. Do not prepend commentary.',
+		);
+		if (task.pipelineTask.family === 'vibe-worldbuild') {
+			constraints.push(
+				'All entities and claims are proposals only. Treat every output as draft artifacts pending explicit user acceptance.',
+			);
+		}
+		if (task.pipelineTask.family === 'vibe-author') {
+			constraints.push(
+				'Author-stage output is a proposal for the writer. Never imply manuscript edits will be auto-applied; the writer accepts or rejects every artifact.',
+			);
+			if (task.pipelineTask.stage === 'scene-draft') {
+				constraints.push(
+					'Emit the scene prose first, then append a fenced ```json sidecar block at the end of the response containing { sceneId, chapterId, povCharacterId, wordCount, usedCanonRefs, uncertainties, continuityRisks }. Do not include any text after the closing fence.',
+				);
+			}
+		}
+	}
 
 	if (ctx.sceneIntent) {
 		constraints.push(
@@ -140,8 +222,8 @@ export function buildPrompt(task: AiTask, ctx: AiContext): string {
 	let contextBody = serializeContext(ctx);
 
 	const headerParts = [
-		`## ROLE\n${NOVA_IDENTITY_BLOCK}\n\n${task.role}`,
-		`## TASK\n${TASK_DESCRIPTIONS[task.taskType] ?? 'Complete the requested task.'}`
+		`## ROLE\n${NOVA_IDENTITY_BLOCK}\n\n${role}`,
+		`## TASK\n${taskDescription}`
 	];
 
 	if (task.instruction) {
@@ -151,7 +233,7 @@ export function buildPrompt(task: AiTask, ctx: AiContext): string {
 	headerParts.push(
 		`## CONTEXT\n${contextBody}`,
 		`## CONSTRAINTS\n${constraints.map((c) => `- ${c}`).join('\n')}`,
-		`## OUTPUT FORMAT\n${OUTPUT_FORMAT_DESCRIPTIONS[task.outputFormat] ?? task.outputFormat}`
+		`## OUTPUT FORMAT\n${outputFormat}`
 	);
 
 	let prompt = headerParts.join('\n\n');
