@@ -38,8 +38,8 @@ export default defineConfig({
 
 	expect: {
 		toHaveScreenshot: {
-			/* 1% pixel tolerance for anti-aliasing and rendering variance */
-			maxDiffPixelRatio: 0.01,
+			/* 3% pixel tolerance — accommodates Linux CI vs macOS font rendering drift */
+			maxDiffPixelRatio: 0.03,
 			animations: 'disabled'
 		}
 	},
