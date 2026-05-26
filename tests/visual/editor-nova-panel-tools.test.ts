@@ -4,10 +4,9 @@ import { test, expect, type APIRequestContext, type Page } from '@playwright/tes
  * plan-023 stage-006 phase-004 — Editor Nova panel tool-call/tool-result baseline.
  *
  * Mounts the editor, opens the Nova panel, then seeds one tool-call +
- * one tool-result message via Vite's dev-server source import (the
- * Nova module is already loaded on the page; we reach into its
- * exported `novaSession` store via dynamic import to keep the test
- * deterministic and free of /api/ai mocking).
+ * one tool-result message via a runtime test hook exposed by the Nova
+ * module. This keeps the baseline deterministic without relying on
+ * `/src/*` imports that only exist in `pnpm dev`.
  */
 
 async function waitForStableRender(page: Page) {
@@ -57,26 +56,39 @@ test.describe('Visual Regression — Editor Nova tool-call / tool-result (plan-0
 			await novaToggle.click();
 			await page.waitForSelector('aside[aria-label="Nova copilot"]');
 
-			// Seed messages via the Nova module barrel. The dev server
-			// (Vite) serves source files at /src/*; the editor route
-			// already imported the module so this dynamic import resolves
-			// to the same singleton store.
 			await page.evaluate(async () => {
-				// @ts-expect-error -- resolved at runtime by the Vite dev server
-				const mod = await import('/src/modules/nova/index.ts');
-				mod.novaSession.clear();
-				mod.novaSession.append({
+				const hook = (
+					window as Window & {
+						__NOVELLUM_NOVA_TEST__?: {
+							session: {
+								clear: () => void;
+								append: (message: {
+									role: string;
+									content: string;
+									status?: string;
+									toolId?: string;
+									toolPayload?: unknown;
+								}) => void;
+							};
+						};
+					}
+				).__NOVELLUM_NOVA_TEST__;
+
+				if (!hook?.session) throw new Error('Nova test hook missing');
+
+				hook.session.clear();
+				hook.session.append({
 					role: 'user',
 					content: 'Add a new character named Aria.',
 					status: 'complete',
 				});
-				mod.novaSession.append({
+				hook.session.append({
 					role: 'tool-call',
 					content: '',
 					toolId: 'worldbuilding.create-character',
 					toolPayload: { name: 'Aria', role: 'protagonist', summary: 'A reluctant hero.' },
 				});
-				mod.novaSession.append({
+				hook.session.append({
 					role: 'tool-result',
 					content: '',
 					toolId: 'worldbuilding.create-character',
