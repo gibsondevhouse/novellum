@@ -1,0 +1,54 @@
+name: Visual Snapshots — Regenerate
+
+# Manually dispatched to regenerate Playwright visual baselines on the
+# Linux CI runner. macOS-generated baselines drift against Linux Chromium
+# font rendering, so periodic Linux-side regeneration is needed.
+#
+# Workflow:
+#  1. Trigger this workflow via `gh workflow run visual-snapshots.yml`.
+#  2. Download the `visual-snapshots-<run_id>` artifact.
+#  3. Unzip into tests/visual/__screenshots__/ overwriting the existing baselines.
+#  4. Commit + push.
+#  5. Re-run visual-tests.yml — it should be green.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  regenerate:
+    name: Regenerate baselines on Linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Svelte-Kit sync
+        run: pnpm svelte-kit sync
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Build app
+        run: pnpm build
+
+      - name: Regenerate snapshots
+        run: pnpm exec playwright test tests/visual/ --update-snapshots
+        continue-on-error: true
+
+      - name: Upload regenerated baselines
+        uses: actions/upload-artifact@v7
+        with:
+          name: visual-snapshots-${{ github.run_id }}
+          path: tests/visual/__screenshots__/
+          retention-days: 7

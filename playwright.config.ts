@@ -11,6 +11,7 @@ export default defineConfig({
 	testMatch: ['visual/**/*.test.ts', 'e2e/**/*.spec.ts'],
 	outputDir: './tests/visual/test-results',
 	snapshotPathTemplate: '{testDir}/visual/__screenshots__/{testFilePath}/{arg}{ext}',
+	globalSetup: './tests/global-setup.ts',
 
 	/* Fail fast — visual regression is not a large suite */
 	fullyParallel: false,
