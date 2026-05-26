@@ -6,9 +6,10 @@
 
 ## Current
 
-- **Plan:** _none — V1 ship gate closed 2026-05-26 (47/47 DoD)._
-- **Status:** Awaiting V1.1 scoping plan.
-- **Next action owner:** Planner Agent — open `plan-027-v1.1-scoping` when V1.1 work resumes.
+- **Plan:** [plan-027-v1.1-scoping](./plan-027-v1.1-scoping/plan.md)
+- **Status:** `draft`
+- **Next action owner:** Planner Agent — begin
+  `stage-001-pipeline-foundation/phase-001-orchestrator-contract/part-001-define-pipeline-contract`.
 
 ## Recently completed
 
@@ -33,10 +34,7 @@
 
 1. Read this file. The `Current` plan is the default target unless the
    user explicitly names a different slug.
-2. If `Current` is `none`, the agent should ask the user which V1.1
-   stream to start before scaffolding a new plan from
-   `_templates/plan.template.md`.
-3. Otherwise, open the plan's `plan.md` and find the first stage whose
+2. Open the current plan's `plan.md` and find the first stage whose
    `status` is not `complete`. That is the next stage to work on.
-4. Inside that stage, find the first phase (or, if phases are not yet
+3. Inside that stage, find the first phase (or, if phases are not yet
    populated, scaffold them from `_templates/phase.template.md`).

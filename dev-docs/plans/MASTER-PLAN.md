@@ -1,11 +1,12 @@
 # MASTER PLAN: Novellum Development
 
-> Last reconciled: 2026-05-26 (V1 ship-gate closeout sweep — 11 plans archived, ACTIVE-PLAN cleared pending V1.1 scoping)
+> Last reconciled: 2026-05-26 (opened plan-027-v1.1-scoping for V1.1 fiction pipeline work)
 
 ## Active Plans
 
-_None. V1 ship gate closed 2026-05-26 (47/47 DoD)._ Next action: open
-`plan-027-v1.1-scoping` when V1.1 work resumes. See [ACTIVE-PLAN.md](./ACTIVE-PLAN.md).
+- [plan-027-v1.1-scoping](./plan-027-v1.1-scoping/plan.md): V1.1 staged fiction
+  pipeline delivery plan covering pipeline foundation, Vibe-Worldbuild, and
+  Vibe-Author. 3 stages. Status: `draft` (opened 2026-05-26).
 
 ## Deferred to V1.1
 
