@@ -4,13 +4,57 @@ on:
   push:
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry-run: run validate only, skip Tauri matrix build and publish"
+        required: false
+        default: "true"
 
 permissions:
   contents: write
 
 jobs:
+  validate:
+    name: Validate (lint, check, test, web build)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install frontend deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Svelte-Kit sync
+        run: pnpm svelte-kit sync
+
+      - name: Type + Svelte check
+        run: pnpm check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Lint CSS
+        run: pnpm lint:css
+
+      - name: Test
+        run: pnpm test
+
+      - name: Web build
+        run: pnpm build
+
   build-tauri:
     name: Build Tauri app — ${{ matrix.platform }}
+    needs: validate
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     strategy:
       fail-fast: false
       matrix:
