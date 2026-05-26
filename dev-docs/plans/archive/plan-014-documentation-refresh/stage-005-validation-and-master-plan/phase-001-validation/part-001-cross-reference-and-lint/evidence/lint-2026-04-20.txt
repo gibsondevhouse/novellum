@@ -1,0 +1,6 @@
+$ pnpm run lint
+> novellum@0.0.1 lint <repo>
+> eslint .
+
+EXIT: 0
+Date: 2026-04-20

@@ -1,0 +1,45 @@
+> pnpm run check:tokens
+> novellum@0.0.1 check:tokens <repo>
+> node scripts/check-visual-tokens.mjs
+
+✗ Token enforcement: 18 violation(s) in 9 file(s)
+
+src/routes/projects/[id]/world-building/+page.svelte
+  L269  [RULE-T1] Hardcoded rgba() value — use a var(--color-*) token instead
+  L270  [RULE-T1] Hardcoded rgba() value — use a var(--color-*) token instead
+
+src/modules/ai/components/ChatInterface.svelte
+  L157  [RULE-T1] Hardcoded rgba() value — use a var(--color-*) token instead
+
+src/modules/bible/components/CharacterAssetLinker.svelte
+  L215  [RULE-T5] Raw box-shadow value — use var(--shadow-*) token instead
+
+src/modules/bible/components/CharacterScratchpad.svelte
+  L164  [RULE-T1] Hardcoded hex color "#b5ff3d" — use a var(--color-*) token instead
+  L200  [RULE-T5] Raw box-shadow value — use var(--shadow-*) token instead
+
+src/modules/bible/components/IndividualsDossier.svelte
+  L408  [RULE-T1] Hardcoded rgba() value — use a var(--color-*) token instead
+  L409  [RULE-T1] Hardcoded rgba() value — use a var(--color-*) token instead
+  L767  [RULE-T1] Hardcoded rgba() value — use a var(--color-*) token instead
+  L591  [RULE-T5] Raw box-shadow value — use var(--shadow-*) token instead
+
+src/modules/bible/components/IndividualsWorkspaceShell.svelte
+  L134  [RULE-T5] Raw box-shadow value — use var(--shadow-*) token instead
+
+src/modules/bible/components/RelationshipEditor.svelte
+  L186  [RULE-T1] Hardcoded hex color "#b5ff3d" — use a var(--color-*) token instead
+
+src/modules/bible/components/WorldBuildingTopSectionLanding.svelte
+  L89  [RULE-T1] Hardcoded rgba() value — use a var(--color-*) token instead
+  L90  [RULE-T1] Hardcoded rgba() value — use a var(--color-*) token instead
+
+src/modules/project/components/BookCoverCard.svelte
+  L180  [RULE-T1] Hardcoded rgba() value — use a var(--color-*) token instead
+  L184  [RULE-T1] Hardcoded rgba() value — use a var(--color-*) token instead
+  L185  [RULE-T1] Hardcoded hex color "#67e8f9" — use a var(--color-*) token instead
+  L186  [RULE-T1] Hardcoded rgba() value — use a var(--color-*) token instead
+
+18 total violation(s) found.
+Exit code: 1
+Captured: 2026-04-20

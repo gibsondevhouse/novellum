@@ -1,0 +1,29 @@
+Command: pnpm run check
+Date: 2026-04-21
+Stage: Stage-008 final verification gate
+
+Output:
+> novellum@0.0.1 check <repo>
+> svelte-check --tsconfig ./tsconfig.json
+
+Loading svelte-check in single-run mode...
+
+<repo>/src/modules/bible/components/CharacterDossierShell.svelte:5:3
+Warn: Using `<slot>` to render parent content is deprecated. Use `{@render ...}` tags instead
+https://svelte.dev/e/slot_element_deprecated (svelte)
+
+<repo>/src/modules/bible/components/CharacterDossierShell.svelte:8:3
+Warn: Using `<slot>` to render parent content is deprecated. Use `{@render ...}` tags instead
+https://svelte.dev/e/slot_element_deprecated (svelte)
+
+<repo>/src/routes/stories/+page.svelte:135:2
+Warn: Unused CSS selector ".create-story-panel"
+https://svelte.dev/e/css_unused_selector (svelte)
+
+====================================
+svelte-check found 0 errors and 3 warnings in 2 files
+
+Result: PASS — Zero TypeScript/Svelte errors.
+Warnings (3, non-blocking):
+  - CharacterDossierShell.svelte: 2x deprecated <slot> usage (pre-Svelte-5 component — known legacy pattern, not modified in plan-015)
+  - stories/+page.svelte: 1x unused CSS selector (pre-existing, out of plan-015 scope)

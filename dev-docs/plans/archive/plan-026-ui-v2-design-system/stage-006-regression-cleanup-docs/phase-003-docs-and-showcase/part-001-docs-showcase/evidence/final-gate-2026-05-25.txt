@@ -1,0 +1,31 @@
+Command:
+
+pnpm check:tokens && pnpm check && pnpm lint && pnpm lint:css && pnpm test && pnpm exec playwright test
+
+Result summary:
+
+- check:tokens: PASS (322 files, 0 violations)
+- check: PASS (0 errors, 0 warnings)
+- lint: PASS
+- lint:css: PASS
+- test (vitest): PASS (164 files, 1059 tests)
+- playwright (full e2e+visual): FAIL
+
+Failing specs:
+- tests/e2e/arc-hierarchy-flow.spec.ts (expected 404, got 200)
+- tests/e2e/hub-word-count.spec.ts (timeout waiting for create/save button)
+- tests/e2e/onboarding.spec.ts (still on /onboarding after flow)
+- tests/e2e/project-lifecycle.spec.ts (timeout waiting for create/save button)
+- tests/e2e/settings-ai-key.spec.ts (timeout waiting for save/apply button)
+- tests/visual/visual-regression.test.ts (home-library, books-shelf) after e2e mutation state
+
+---
+
+Follow-up rerun (after E2E stabilization + targeted visual regen):
+
+- check:tokens: PASS (322 files, 0 violations)
+- check: PASS (0 errors, 0 warnings)
+- lint: PASS
+- lint:css: PASS
+- test (vitest): PASS (164 files, 1059 tests)
+- playwright (full e2e+visual): PASS (27 passed)

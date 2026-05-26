@@ -1,0 +1,18 @@
+Gates run after token alias landed (2026-05-13 17:08):
+
+pnpm check:tokens
+✓ Token enforcement: 322 files scanned, 0 violations.
+
+pnpm check
+svelte-check found 0 errors and 0 warnings
+
+pnpm lint
+(no output — clean)
+
+pnpm lint:css
+(no output — clean)
+
+pnpm test
+ Test Files  164 passed (164)
+      Tests  1059 passed (1059)
+   Duration  16.94s

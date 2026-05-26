@@ -1,0 +1,45 @@
+Command: pnpm run test
+Date: 2026-04-21
+Stage: Stage-008 final verification gate
+
+Output (selected):
+> novellum@0.0.1 test <repo>
+> vitest run
+
+ ✓ tests/ai/brainstorm-agent.test.ts
+ ✓ tests/ai/continuity-agent.test.ts (7 tests)
+ ✓ tests/ai/draft-agent.test.ts
+ ✓ tests/ai/edit-agent.test.ts (15 tests)
+ ✓ tests/ai/outline-agent.test.ts
+ ✓ tests/ai/prompt-builder.test.ts (9 tests)
+ ✓ tests/ai/rewrite-agent.test.ts (6 tests)
+ ✓ tests/ai/style-agent.test.ts (9 tests)
+ ✓ tests/ai/summary-agent.test.ts (4 tests)
+ ✓ tests/ai/task-resolver.test.ts (5 tests)
+ ✓ tests/assets/assets.test.ts (2 tests)
+ ✓ tests/continuity/continuity-engine.test.ts
+ ✓ tests/editor/snapshot-prune.test.ts (1 test)
+ ✓ tests/export/assembler.test.ts (6 tests)
+ ✓ tests/outliner/outline-page-structure.test.ts (5 tests)
+ ✓ tests/outliner/story-planning-workspace.migration.test.ts (3 tests)
+ ✓ tests/portability/portability.test.ts
+ ✓ tests/repositories/arc-repository.test.ts (10 tests)
+ ✓ tests/repositories/beat-repository.test.ts (7 tests)
+ ✓ tests/repositories/project-repository.test.ts (6 tests)
+ ✓ tests/repositories/scene-repository.test.ts (7 tests)
+ ✓ tests/routes/redirects.test.ts (3 tests)
+ ✓ tests/settings/ai-prompts-repositories.test.ts (22 tests)
+ ✓ tests/settings/themeService.test.ts (5 tests)
+ ✓ tests/sqlite/chapters-route.test.ts (3 tests)
+ ✓ tests/sqlite/projects-route.test.ts (8 tests)
+ ✓ tests/sqlite/scenes-route.test.ts (4 tests)
+ ✓ tests/sqlite/serialize.test.ts (11 tests)
+ ✓ src/modules/export/services/__tests__/manifest-policy.test.ts (11 tests)
+ ✓ (workspace and other suites)
+
+ Test Files  34 passed (34)
+      Tests  241 passed (241)
+   Start at  22:59:19
+   Duration  3.41s
+
+Result: PASS — All 241 unit/integration tests pass across 34 test files.

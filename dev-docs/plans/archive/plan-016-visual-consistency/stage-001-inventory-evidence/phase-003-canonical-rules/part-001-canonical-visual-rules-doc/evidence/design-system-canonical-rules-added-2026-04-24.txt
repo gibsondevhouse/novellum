@@ -1,0 +1,23 @@
+Canonical rules appended to dev-docs/design-system.md on 2026-04-24.
+
+Section anchor:
+113:## Canonical Visual Rules (Stage 001 Contract)
+
+Category anchors included:
+117:### Page Shell
+124:### Page Header
+130:### Cards and Panels
+136:### Inspector Panels
+142:### Forms
+148:### Buttons
+154:### Tabs and Pills
+160:### Empty States
+166:### Workspace Hero Cards
+171:### Editor Surface
+176:### AI Assistant Surface
+181:### Metadata Rows
+186:### Entity Cards
+191:### Scroll Behavior
+196:### Archetype Preservation Rules
+205:### Tone Anchors (Empty / Loading / Error)
+211:### Follow-up Constraints

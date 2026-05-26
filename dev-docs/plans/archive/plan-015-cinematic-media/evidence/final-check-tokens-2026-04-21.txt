@@ -1,0 +1,11 @@
+Command: pnpm run check:tokens
+Date: 2026-04-21
+Stage: Stage-008 final verification gate
+
+Output:
+> novellum@0.0.1 check:tokens <repo>
+> node scripts/check-visual-tokens.mjs
+
+✓ Token enforcement: 199 files scanned, 0 violations.
+
+Result: PASS — Zero token violations across all 199 scanned files.

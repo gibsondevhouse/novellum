@@ -58,8 +58,9 @@ coverage/
 *.sqlite
 *.sqlite3
 
-# Local-only docs (the dev-docs/ tree is developer-private and not tracked)
-dev-docs/
+# dev-docs/ is tracked so external planning tools (e.g. the ChatGPT GitHub
+# connector) can see plans, roadmaps, and architecture notes. Keep secrets
+# and personal scratch out of this tree.
 
 # .github/ is tracked — CI/CD workflows are part of the shipped product.
 
