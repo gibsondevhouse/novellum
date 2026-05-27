@@ -1,0 +1,5 @@
+pnpm lint   — 0 errors
+pnpm lint:css — 0 errors
+pnpm check  — 1675 files, 0 errors, 0 warnings
+pnpm test   — 183 files / 1201 tests passing
+pnpm check:tokens — 324 files / 0 violations

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { OpenRouterClient } from '$lib/ai/openrouter.js';
 	import { safeHtml } from '$lib/ai/markdown.js';
 	import type { AIRequestPayload } from '$lib/ai/types.js';
@@ -6,6 +7,7 @@
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	import type { Project } from '$lib/db/domain-types';
 	import { apiGet } from '$lib/api-client.js';
+	import { resolveLastProjectId } from '$lib/navigation-state.js';
 	import { getSelectedModel } from '$lib/stores/model-selection.svelte.js';
 	import { isExplicitlyUnsupportedBinaryAttachment, isSupportedTextAttachment, NOVA_MAX_FILE_TEXT_CHARS } from '$lib/ai/context-files.js';
 	import type { NovaContextPlan, NovaContextResponsePayload, NovaSessionContextItem } from '$modules/ai/types.js';
@@ -14,6 +16,12 @@
 	import { buildNovaModePrompt, type NovaPromptMode } from '../services/nova-prompt-mode.js';
 	import PromptInput from './PromptInput.svelte';
 	import SuggestionChips from './SuggestionChips.svelte';
+
+	let {
+		autoAttachLastProject = true,
+	}: {
+		autoAttachLastProject?: boolean;
+	} = $props();
 
 	interface Message {
 		role: 'user' | 'assistant' | 'system';
@@ -57,6 +65,11 @@
 	);
 
 	const client = new OpenRouterClient();
+
+	onMount(() => {
+		if (!autoAttachLastProject) return;
+		void attachLastProjectContext();
+	});
 
 	function dedupeWarnings(warnings: string[]): string[] {
 		const unique: string[] = [];
@@ -167,6 +180,26 @@
 				label: project.title,
 			},
 		];
+	}
+
+	async function attachLastProjectContext(): Promise<void> {
+		if (sessionContextItems.some((item) => item.kind === 'project')) return;
+		const resolved = await resolveLastProjectId();
+		if (!resolved.id || (resolved.status !== 'valid' && resolved.status !== 'error')) return;
+		try {
+			const project = await apiGet<Project>(`/api/db/projects/${resolved.id}`);
+			sessionContextItems = [
+				...sessionContextItems,
+				{
+					id: `project:${project.id}`,
+					kind: 'project',
+					projectId: project.id,
+					label: project.title,
+				},
+			];
+		} catch {
+			pushWarnings(['Last project context could not be attached automatically.']);
+		}
 	}
 
 	async function resolveAttachedContext(

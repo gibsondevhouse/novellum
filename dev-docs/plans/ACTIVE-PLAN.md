@@ -6,13 +6,19 @@
 
 ## Current
 
-- **Plan:** _none — awaiting next assignment._
+- **Plan:** None active.
 - **Status:** idle
-- **Next action owner:** Planner Agent — pick the next plan from
-  [MASTER-PLAN.md](./MASTER-PLAN.md) and update this pointer.
+- **Next action owner:** User — select next plan from backlog or deferred
+  list.
 
 ## Recently completed
 
+- [plan-028-v1.1-hierarchical-pipeline-ui](./plan-028/plan.md) —
+  V1.1 Hierarchical Pipeline UI. Closed 2026-05-26 with all four stages
+  complete (outline hierarchy foundation, worldbuild stage run flow,
+  checkpoint review console, verification/doc sync) and all 7 plan-level
+  quality gates green. Final vitest baseline: 187 files / 1268 tests
+  passing; token guard 324 files / 0 violations.
 - [plan-027-v1.1-scoping](./plan-027-v1.1-scoping/plan.md) —
   V1.1 Fiction Pipeline Scoping & Delivery. Closed 2026-05-27 with
   all three stages complete (pipeline-foundation, vibe-worldbuild,

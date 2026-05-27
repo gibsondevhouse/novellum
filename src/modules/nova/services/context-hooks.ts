@@ -18,20 +18,28 @@ import type { RagContextRequest, RagContextResult } from '../types.js';
 export async function buildRagContext(
 	req: RagContextRequest,
 ): Promise<RagContextResult> {
-	if (!req.projectId || !req.activeSceneId) {
+	if (!req.projectId) {
 		return {
 			aiContext: null,
 			contextText: '',
 			includedScopes: [],
-			warnings: [
-				req.activeSceneId
-					? 'No project id provided.'
-					: 'No active scene; Nova will respond without scene context.',
-			],
+			warnings: ['No project id provided.'],
 		};
 	}
 
-	const task = resolveTask('continue', {
+	if (!req.activeSceneId && req.policy !== 'outline_scope') {
+		return {
+			aiContext: null,
+			contextText: '',
+			includedScopes: [],
+			warnings: ['No active scene; Nova will respond without scene context.'],
+		};
+	}
+
+	const action = req.policy === 'outline_scope'
+		? 'pipeline:vibe-author.outline'
+		: 'continue';
+	const task = resolveTask(action, {
 		activeProjectId: req.projectId,
 		activeSceneId: req.activeSceneId,
 		activeChapterId: null,
@@ -41,6 +49,9 @@ export async function buildRagContext(
 	const aiContext = await buildContext(task, req.projectId);
 
 	const includedScopes: string[] = [];
+	if (aiContext.project) includedScopes.push('project');
+	if (aiContext.storyFrames && aiContext.storyFrames.length > 0) includedScopes.push('story-frame');
+	if (aiContext.outlineHierarchy) includedScopes.push('outline');
 	if (aiContext.scene) includedScopes.push('scene');
 	if (aiContext.adjacentScenes.length > 0) includedScopes.push('adjacent-scenes');
 	if (aiContext.characters.length > 0) includedScopes.push('characters');
@@ -68,9 +79,17 @@ function isCheckpointRecord(value: unknown): value is WorldbuildCheckpointRecord
 export async function listAcceptedWorldbuildCheckpointContext(
 	projectId: string,
 ): Promise<WorldbuildCheckpointRecord[]> {
+	return listWorldbuildCheckpointsByLifecycle(projectId, ['accepted']);
+}
+
+export async function listWorldbuildCheckpointsByLifecycle(
+	projectId: string,
+	lifecycles: ReadonlyArray<WorldbuildCheckpointRecord['lifecycle']>,
+): Promise<WorldbuildCheckpointRecord[]> {
 	const data = await listProjectMetadata(projectId, 'pipeline', WORLDBUILD_CHECKPOINT_OWNER_ID);
+	const allowed = new Set(lifecycles);
 	return Object.values(data)
 		.filter((value): value is WorldbuildCheckpointRecord => isCheckpointRecord(value))
-		.filter((record) => record.lifecycle === 'accepted')
+		.filter((record) => allowed.has(record.lifecycle))
 		.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }

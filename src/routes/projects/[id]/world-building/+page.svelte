@@ -273,7 +273,8 @@
 <style>
 	.landing-shell {
 		position: relative;
-		overflow: hidden;
+		overflow-x: clip;
+		overflow-y: visible;
 	}
 
 	.landing-shell::before {
@@ -569,8 +570,8 @@
 		}
 
 		.hero-actions {
-			overflow-x: auto;
-			flex-wrap: nowrap;
+			overflow-x: visible;
+			flex-wrap: wrap;
 		}
 
 		.lane-heading {

@@ -8,7 +8,7 @@
  */
 
 import type { AuthorSceneDraftPayload } from '$lib/ai/pipeline/author-agent.js';
-import type { AuthorRevisionPack } from '$lib/ai/pipeline/author-schemas.js';
+import type { AuthorOutline, AuthorRevisionPack } from '$lib/ai/pipeline/author-schemas.js';
 import type { PipelineArtifactEnvelope } from '$lib/ai/pipeline/contracts.js';
 
 export type NovaRole = 'user' | 'nova' | 'system' | 'tool-call' | 'tool-result';
@@ -46,6 +46,7 @@ export interface NovaMessage {
  * future families append additional `kind` variants.
  */
 export type NovaArtifact =
+	| { kind: 'author-outline'; envelope: PipelineArtifactEnvelope<AuthorOutline> }
 	| { kind: 'author-scene-draft'; envelope: PipelineArtifactEnvelope<AuthorSceneDraftPayload> }
 	| { kind: 'author-revision-pack'; envelope: PipelineArtifactEnvelope<AuthorRevisionPack> };
 
@@ -96,7 +97,7 @@ export type ToolHandler = (
 
 import type { AiContext } from '$lib/ai/types.js';
 
-export type RagPolicy = 'scene_plus_adjacent' | 'scene_only' | 'project_summary';
+export type RagPolicy = 'scene_plus_adjacent' | 'scene_only' | 'project_summary' | 'outline_scope';
 
 export interface RagContextRequest {
 	projectId: string;

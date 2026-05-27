@@ -14,12 +14,17 @@
 	import { initLocale } from '$lib/i18n';
 	import { appearance } from '$lib/stores/appearance.svelte.js';
 	import { installGlobalShortcuts } from '$lib/keyboard/global-handler.js';
+	import { persistLastProjectId } from '$lib/navigation-state.js';
 
 	let { children } = $props();
 
 	const activeProjectId = $derived(page.params.id ?? null);
 	const activeSceneId = $derived(page.url.searchParams.get('sceneId'));
 	const activeChapterId = $derived(page.url.searchParams.get('chapterId'));
+
+	$effect(() => {
+		if (activeProjectId) void persistLastProjectId(activeProjectId);
+	});
 
 	onMount(() => {
 		initLocale();

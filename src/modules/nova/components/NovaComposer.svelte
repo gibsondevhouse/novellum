@@ -7,6 +7,8 @@
 	import { novaSession } from '../stores/nova-session.svelte.js';
 	import { novaPanel } from '../stores/nova-panel.svelte.js';
 	import { sendNovaChat } from '../services/chat-service.js';
+	import { runAuthorPipelineTask } from '../services/author-pipeline-runner.js';
+	import { PIPELINE_TASK_KEYS } from '$lib/ai/pipeline/task-catalog.js';
 
 	type NovaChatMode = 'chat' | 'scribe';
 
@@ -139,10 +141,41 @@
 		return `Scribe mode: act as an agentic writing copilot. Be concrete, structured, and action-oriented.\n\n${rawPrompt}`;
 	}
 
+	function isOutlineBuildRequest(rawPrompt: string): boolean {
+		return (
+			/\b(outline|story\s*structure|plot\s*map|chapter\s*plan|chapter\s*outline)\b/i.test(rawPrompt) &&
+			/\b(build|create|generate|draft|make|design|plan|structure)\b/i.test(rawPrompt)
+		);
+	}
+
 	async function submitDraft() {
 		const value = draft.trim();
 		if (!value || isStreaming) return;
 		draft = '';
+
+		if (selectedMode === 'scribe' && isOutlineBuildRequest(value)) {
+			if (!projectId) {
+				novaSession.append({ role: 'user', content: buildModePrompt(value), status: 'complete' });
+				const errorMessage = novaSession.append({
+					role: 'nova',
+					content: '',
+					status: 'error',
+				});
+				novaSession.fail(errorMessage.id, 'Open a project before asking Scribe to build an outline.');
+				return;
+			}
+
+			novaSession.append({ role: 'user', content: buildModePrompt(value), status: 'complete' });
+			await runAuthorPipelineTask({
+				taskKey: PIPELINE_TASK_KEYS.AUTHOR_OUTLINE,
+				projectId,
+				activeSceneId,
+				activeChapterId,
+				instruction: value,
+			});
+			return;
+		}
+
 		await sendNovaChat({
 			prompt: buildModePrompt(value),
 			projectId,

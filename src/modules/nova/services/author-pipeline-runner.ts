@@ -21,6 +21,7 @@ import {
 	createAuthorArtifactFromModelOutput,
 	isAuthorTaskKey,
 	type AuthorPayload,
+	type AuthorPayloadByTaskKey,
 	type AuthorTaskKey,
 } from '$lib/ai/pipeline/author-agent.js';
 import type { PipelineArtifactEnvelope } from '$lib/ai/pipeline/contracts.js';
@@ -70,6 +71,14 @@ function toNovaArtifact(
 	envelope: PipelineArtifactEnvelope<AuthorPayload>,
 	taskKey: AuthorTaskKey,
 ): NovaArtifact {
+	if (taskKey === 'vibe-author.outline') {
+		return {
+			kind: 'author-outline',
+			envelope: envelope as PipelineArtifactEnvelope<
+				AuthorPayloadByTaskKey['vibe-author.outline']
+			>,
+		};
+	}
 	if (taskKey === 'vibe-author.scene-draft') {
 		return {
 			kind: 'author-scene-draft',
@@ -86,12 +95,12 @@ function toNovaArtifact(
 			>,
 		};
 	}
-	// vibe-author.premise / vibe-author.outline currently have no UI
-	// surface in plan-027. Returning `null` here would force callers to
-	// branch; we throw instead so the runner can record an error.
+	// vibe-author.premise currently has no UI surface. Returning `null`
+	// here would force callers to branch; throw so the runner records
+	// a clear error.
 	throw new Error(
 		`Author task ${taskKey} has no Nova artifact surface yet. ` +
-			`Only scene-draft and revision-pack are wired in part-001.`,
+			`Only outline, scene-draft, and revision-pack are wired.`,
 	);
 }
 
@@ -134,7 +143,7 @@ export async function runAuthorPipelineTask(
 		const ragResult = await buildRagContext({
 			projectId: input.projectId ?? '',
 			activeSceneId: input.activeSceneId,
-			policy: 'scene_plus_adjacent',
+			policy: input.taskKey === 'vibe-author.outline' ? 'outline_scope' : 'scene_plus_adjacent',
 		});
 		if (ragResult.aiContext) aiContext = ragResult.aiContext;
 	} catch {

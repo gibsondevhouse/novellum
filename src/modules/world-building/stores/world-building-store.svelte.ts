@@ -1,4 +1,4 @@
-import type { WorldbuildCheckpointRecord } from '$lib/ai/pipeline/checkpoint-contract.js';
+import type { WorldbuildCheckpointRecord, CheckpointLifecycle } from '$lib/ai/pipeline/checkpoint-contract.js';
 import { WORLDBUILD_CHECKPOINT_OWNER_ID } from '$lib/ai/pipeline/checkpoint-contract.js';
 import {
 	acceptWorldbuildCheckpoint,
@@ -15,6 +15,10 @@ let selectedEntityId: string | null = $state(null);
 let isLoading: boolean = $state(false);
 let worldbuildCheckpoints: WorldbuildCheckpointRecord[] = $state([]);
 let checkpointError: string | null = $state(null);
+
+export type CheckpointQueueFilter = 'all' | 'pending' | 'accepted' | 'rejected';
+let checkpointQueueFilter: CheckpointQueueFilter = $state('all');
+let selectedReviewCheckpointId: string | null = $state(null);
 
 const hasSelection = $derived(selectedEntityId !== null);
 
@@ -148,4 +152,65 @@ export function getWorldbuildCheckpoints() {
 }
 export function getWorldbuildCheckpointError() {
 	return checkpointError;
+}
+
+export function getCheckpointsByLifecycle(
+	lifecycle: WorldbuildCheckpointRecord['lifecycle'],
+): WorldbuildCheckpointRecord[] {
+	return worldbuildCheckpoints.filter((c) => c.lifecycle === lifecycle);
+}
+
+export function getCheckpointById(
+	checkpointId: string,
+): WorldbuildCheckpointRecord | undefined {
+	return worldbuildCheckpoints.find((c) => c.id === checkpointId);
+}
+
+export function getLatestCheckpointByLifecycle(
+	lifecycle: WorldbuildCheckpointRecord['lifecycle'],
+): WorldbuildCheckpointRecord | undefined {
+	return worldbuildCheckpoints.find((c) => c.lifecycle === lifecycle);
+}
+
+const PENDING_LIFECYCLES: ReadonlySet<CheckpointLifecycle> = new Set(['draft', 'review']);
+
+export function setCheckpointQueueFilter(filter: CheckpointQueueFilter): void {
+	checkpointQueueFilter = filter;
+}
+
+export function getCheckpointQueueFilter(): CheckpointQueueFilter {
+	return checkpointQueueFilter;
+}
+
+export function setSelectedReviewCheckpoint(id: string | null): void {
+	selectedReviewCheckpointId = id;
+}
+
+export function getSelectedReviewCheckpointId(): string | null {
+	return selectedReviewCheckpointId;
+}
+
+export function getSelectedReviewCheckpoint(): WorldbuildCheckpointRecord | undefined {
+	if (!selectedReviewCheckpointId) return undefined;
+	return worldbuildCheckpoints.find((c) => c.id === selectedReviewCheckpointId);
+}
+
+export function getFilteredCheckpoints(): WorldbuildCheckpointRecord[] {
+	if (checkpointQueueFilter === 'all') return worldbuildCheckpoints;
+	if (checkpointQueueFilter === 'pending') {
+		return worldbuildCheckpoints.filter((c) => PENDING_LIFECYCLES.has(c.lifecycle));
+	}
+	return worldbuildCheckpoints.filter((c) => c.lifecycle === checkpointQueueFilter);
+}
+
+export function getCheckpointQueueCounts(): Record<CheckpointQueueFilter, number> {
+	let pending = 0;
+	let accepted = 0;
+	let rejected = 0;
+	for (const c of worldbuildCheckpoints) {
+		if (PENDING_LIFECYCLES.has(c.lifecycle)) pending++;
+		if (c.lifecycle === 'accepted') accepted++;
+		if (c.lifecycle === 'rejected') rejected++;
+	}
+	return { all: worldbuildCheckpoints.length, pending, accepted, rejected };
 }

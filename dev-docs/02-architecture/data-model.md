@@ -1,6 +1,6 @@
 # Data Model
 
-> Last verified: 2026-05-26
+> Last verified: 2026-05-26 (plan-028 UI shipped)
 
 The single source of truth is the SQLite schema in [src/lib/server/db/schema.ts](../../src/lib/server/db/schema.ts). The Dexie mirror in [src/lib/db/](../../src/lib/db/) (currently schema **v11**) is used **only** for `.novellum.zip` portability — never for live reads/writes.
 
@@ -18,7 +18,7 @@ The single source of truth is the SQLite schema in [src/lib/server/db/schema.ts]
 | `beats` | Sub-scene story beats. | `sceneId`, `position`, `summary`. |
 | `scene_snapshots` | Versioned scene snapshots for restore. | `sceneId`, `createdAt`, snapshot blob. |
 | `story_frames` | Per-project story frames / templates. | `projectId`, frame data. |
-| `stages` | Outline stages (above arcs in some flows). | `projectId`, `position`. |
+| `stages` | Outline stages (leaf of the seven-layer hierarchy: Arc → Act → Milestone → Chapter → Scene → Beat → Stage). Pipeline run targets. | `projectId`, `beatId`, `position`. |
 | `milestones` | Project milestones. | `projectId`, `dueDate`. |
 
 ### World-building entities

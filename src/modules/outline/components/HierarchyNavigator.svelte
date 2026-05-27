@@ -1,313 +1,313 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
-	import type { Chapter, Scene, StoryFrame, Act } from '$lib/db/domain-types';
-	import type { ChapterWithScenes } from '$modules/outline/types.js';
+	import type {
+		Act,
+		Arc,
+		Beat,
+		Chapter,
+		Milestone,
+		Scene,
+		Stage,
+	} from '$lib/db/domain-types';
+	import HierarchyBreadcrumb from '$modules/project/components/HierarchyBreadcrumb.svelte';
 	import {
-		createChapter,
-		removeChapter,
-		reorderChapters,
-	} from '$modules/project/services/chapter-repository.js';
-	import {
-		createScene,
-		removeScene,
-		reorderScenes,
-	} from '$modules/editor/services/scene-repository.js';
-	import { toggleChapter } from '$modules/outline/stores/outline-store.svelte.js';
-	import OutlineEmptyState from './OutlineEmptyState.svelte';
-	import AddChapterForm from './AddChapterForm.svelte';
-	import ActGroup from './ActGroup.svelte';
-	import ChapterGroup from './ChapterGroup.svelte';
+		buildSevenLayerNavigatorModel,
+		type SevenLayerNavigatorColumn,
+	} from '$modules/outline/services/pipeline-seven-layer-navigator.js';
+	import type {
+		PipelineHierarchyLayer,
+		PipelineHierarchyPath,
+	} from '$modules/outline/services/seven-layer-outline.js';
 
 	let {
-		storyFrame: _storyFrame,
+		arcs,
 		acts,
+		milestones,
 		chapters,
-		projectId,
+		scenes,
+		beats,
+		stages,
+		selectionPath,
+		onSelectArc,
+		onSelectAct,
+		onSelectMilestone,
 		onSelectChapter,
 		onSelectScene,
-		onSelectAct,
-		onAddAct,
-		onChaptersChange,
+		onSelectBeat,
+		onSelectStage,
+		onJumpToLayer,
 	} = $props<{
-		storyFrame: StoryFrame;
+		arcs: Arc[];
 		acts: Act[];
-		chapters: ChapterWithScenes[];
-		projectId: string;
-		onSelectChapter: (chapter: Chapter) => void;
-		onSelectScene: (scene: Scene) => void;
-		onSelectAct: (act: Act) => void;
-		onAddAct: (title: string) => void;
-		onChaptersChange: (chapters: ChapterWithScenes[]) => void;
+		milestones: Milestone[];
+		chapters: Chapter[];
+		scenes: Scene[];
+		beats: Beat[];
+		stages: Stage[];
+		selectionPath: PipelineHierarchyPath;
+		onSelectArc: (id: string | null) => void;
+		onSelectAct: (id: string | null) => void;
+		onSelectMilestone: (id: string | null) => void;
+		onSelectChapter: (id: string | null) => void;
+		onSelectScene: (id: string | null) => void;
+		onSelectBeat: (id: string | null) => void;
+		onSelectStage: (id: string | null) => void;
+		onJumpToLayer: (layer: PipelineHierarchyLayer) => void;
 	}>();
 
-	// eslint-disable-next-line svelte/prefer-writable-derived
-	let localChapters = $state<ChapterWithScenes[]>(untrack(() => chapters));
-	let addActActive = $state(false);
-	let dragId = $state<string | null>(null);
-	let dragOverIdx = $state<number | null>(null);
+	const model = $derived(
+		buildSevenLayerNavigatorModel({
+			path: selectionPath,
+			arcs,
+			acts,
+			milestones,
+			chapters,
+			scenes,
+			beats,
+			stages,
+		}),
+	);
 
-	$effect(() => {
-		localChapters = chapters;
-	});
+	const crumbs = $derived(
+		model.breadcrumbs.map((crumb, index) => ({
+			label: crumb.label,
+			onSelect:
+				index < model.breadcrumbs.length - 1
+					? () => {
+						onJumpToLayer(crumb.layer);
+					}
+					: undefined,
+		})),
+	);
 
-	const unassignedChapters = $derived(localChapters.filter((ch) => !ch.actId));
+	const hasAnyRows = $derived(model.columns.some((column) => column.items.length > 0));
 
-	function chaptersForAct(actId: string): ChapterWithScenes[] {
-		return localChapters.filter((ch) => ch.actId === actId);
-	}
-
-	async function handleAddChapter(actId: string, title: string) {
-		const ch = await createChapter({
-			projectId,
-			title,
-			order: localChapters.length,
-			summary: '',
-			wordCount: 0,
-			actId,
-		});
-		const next: ChapterWithScenes[] = [...localChapters, { ...ch, scenes: [] }];
-		localChapters = next;
-		onChaptersChange(next);
-		toggleChapter(ch.id);
-	}
-
-	async function handleAddScene(chapter: ChapterWithScenes, title: string) {
-		const s = await createScene({
-			chapterId: chapter.id,
-			projectId,
-			title,
-			summary: '',
-			content: '',
-			wordCount: 0,
-			notes: '',
-			order: chapter.scenes.length,
-			povCharacterId: null,
-			locationId: null,
-			timelineEventId: null,
-			characterIds: [],
-			locationIds: [],
-		});
-		const next = localChapters.map((ch) =>
-			ch.id === chapter.id ? { ...ch, scenes: [...ch.scenes, s] } : ch,
-		);
-		localChapters = next;
-		onChaptersChange(next);
-	}
-
-	async function handleDeleteScene(chapter: ChapterWithScenes, sceneId: string) {
-		await removeScene(sceneId);
-		const next = localChapters.map((ch) =>
-			ch.id === chapter.id ? { ...ch, scenes: ch.scenes.filter((s) => s.id !== sceneId) } : ch,
-		);
-		localChapters = next;
-		onChaptersChange(next);
-	}
-
-	async function handleReorderScenes(chapter: ChapterWithScenes, ids: string[]) {
-		await reorderScenes(chapter.id, ids);
-		const next = localChapters.map((ch) => {
-			if (ch.id !== chapter.id) return ch;
-			const ordered = ids.map((id) => ch.scenes.find((s) => s.id === id)!).filter(Boolean);
-			return { ...ch, scenes: ordered };
-		});
-		localChapters = next;
-		onChaptersChange(next);
-	}
-
-	async function handleMoveSceneToChapter(sceneId: string, fromChapterId: string, toChapterId: string, index: number) {
-		const fromChapter = localChapters.find((ch) => ch.id === fromChapterId);
-		const toChapter = localChapters.find((ch) => ch.id === toChapterId);
-		if (!fromChapter || !toChapter) return;
-
-		const sceneToMove = fromChapter.scenes.find((s) => s.id === sceneId);
-		if (!sceneToMove) return;
-
-		// Optimistic UI updates
-		const next = localChapters.map((ch) => {
-			if (ch.id === fromChapterId) {
-				return { ...ch, scenes: ch.scenes.filter((s) => s.id !== sceneId) };
-			}
-			if (ch.id === toChapterId) {
-				const updatedScene = { ...sceneToMove, chapterId: toChapterId };
-				const newScenes = [...ch.scenes];
-				newScenes.splice(index, 0, updatedScene);
-				return { ...ch, scenes: newScenes };
-			}
-			return ch;
-		});
-		localChapters = next;
-		onChaptersChange(next);
-
-		// Apply changes
-		const updatedToChapter = next.find((c) => c.id === toChapterId)!;
-		const updatedFromChapter = next.find((c) => c.id === fromChapterId)!;
-		
-		const { updateScene, reorderScenes } = await import('$modules/editor/services/scene-repository.js');
-		await updateScene(sceneId, { chapterId: toChapterId });
-		await Promise.all([
-			reorderScenes(fromChapterId, updatedFromChapter.scenes.map((s) => s.id)),
-			reorderScenes(toChapterId, updatedToChapter.scenes.map((s) => s.id))
-		]);
-	}
-
-	async function handleDeleteChapter(id: string) {
-		const ch = localChapters.find((c) => c.id === id);
-		if (ch) await Promise.all(ch.scenes.map((s) => removeScene(s.id)));
-		await removeChapter(id);
-		const next = localChapters.filter((c) => c.id !== id);
-		localChapters = next;
-		onChaptersChange(next);
-	}
-
-	function handleRenameChapter(id: string, title: string) {
-		const next = localChapters.map((c) => (c.id === id ? { ...c, title } : c));
-		localChapters = next;
-		onChaptersChange(next);
-	}
-
-	function onDragStart(e: DragEvent, id: string) {
-		dragId = id;
-		e.dataTransfer?.setData('text/plain', id);
-	}
-
-	async function onDrop(i: number) {
-		if (dragId === null) return;
-		const from = localChapters.findIndex((c) => c.id === dragId);
-		if (from === i) {
-			dragId = null;
-			dragOverIdx = null;
+	function handleSelect(layer: PipelineHierarchyLayer, id: string): void {
+		if (layer === 'arc') {
+			onSelectArc(id);
 			return;
 		}
-		const arr = [...localChapters];
-		const [item] = arr.splice(from, 1);
-		arr.splice(i, 0, item);
-		localChapters = arr;
-		onChaptersChange(arr);
-		await reorderChapters(
-			projectId,
-			arr.map((c) => c.id),
-		);
-		dragId = null;
-		dragOverIdx = null;
+		if (layer === 'act') {
+			onSelectAct(id);
+			return;
+		}
+		if (layer === 'milestone') {
+			onSelectMilestone(id);
+			return;
+		}
+		if (layer === 'chapter') {
+			onSelectChapter(id);
+			return;
+		}
+		if (layer === 'scene') {
+			onSelectScene(id);
+			return;
+		}
+		if (layer === 'beat') {
+			onSelectBeat(id);
+			return;
+		}
+		onSelectStage(id);
+	}
+
+	function itemKey(column: SevenLayerNavigatorColumn, rowId: string): string {
+		return `${column.layer}:${rowId}`;
 	}
 </script>
 
-<div class="hierarchy-navigator" role="tree" aria-label="Story outline">
-	{#if acts.length === 0 && localChapters.length === 0 && !addActActive}
-		<OutlineEmptyState onAddFirstAct={() => (addActActive = true)} />
-	{/if}
+<div class="hierarchy-navigator" aria-label="Pipeline hierarchy navigator">
+	<HierarchyBreadcrumb crumbs={crumbs} />
 
-	{#if acts.length > 0}
-		{#each acts as act (act.id)}
-			<ActGroup
-				{act}
-				chapters={chaptersForAct(act.id)}
-				selectedId={null}
-				{onSelectChapter}
-				{onSelectScene}
-				{onSelectAct}
-				onAddChapter={handleAddChapter}
-				onAddScene={handleAddScene}
-				onDeleteScene={handleDeleteScene}
-				onReorderScenes={handleReorderScenes}
-				onMoveScene={handleMoveSceneToChapter}
-			/>
-		{/each}
-		{#if unassignedChapters.length > 0}
-			<div class="unassigned-group">
-				<span class="unassigned-label">Unassigned</span>
-				{#each unassignedChapters as chapter (chapter.id)}
-					<ChapterGroup
-						{chapter}
-						selectedId={null}
-						{onSelectChapter}
-						{onSelectScene}
-						onDelete={handleDeleteChapter}
-						onRename={handleRenameChapter}
-						onAddScene={(title) => handleAddScene(chapter, title)}
-						onDeleteScene={(id) => handleDeleteScene(chapter, id)}
-						onReorderScenes={(ids) => handleReorderScenes(chapter, ids)}
-						onMoveScene={handleMoveSceneToChapter}
-						{onDragStart}
-					/>
-				{/each}
-			</div>
-		{/if}
-	{:else if localChapters.length > 0}
-		<div class="chapter-list" role="list">
-			{#each localChapters as chapter, i (chapter.id)}
-				<div
-					class="chapter-slot"
-					class:drag-over={dragOverIdx === i}
-					data-chapter-id={chapter.id}
-					role="listitem"
-					ondragover={(e) => {
-						e.preventDefault();
-						dragOverIdx = i;
-					}}
-					ondragleave={() => (dragOverIdx = null)}
-					ondrop={() => onDrop(i)}
-				>
-					<ChapterGroup
-						{chapter}
-						selectedId={null}
-						{onSelectChapter}
-						{onSelectScene}
-						onDelete={handleDeleteChapter}
-						onRename={handleRenameChapter}
-						onAddScene={(title) => handleAddScene(chapter, title)}
-						onDeleteScene={(id) => handleDeleteScene(chapter, id)}
-						onReorderScenes={(ids) => handleReorderScenes(chapter, ids)}
-						onMoveScene={handleMoveSceneToChapter}
-						{onDragStart}
-					/>
-				</div>
-			{/each}
+	{#if !hasAnyRows}
+		<div class="navigator-empty">
+			<h3>Outline hierarchy is empty</h3>
+			<p>Create an arc, then drill down layer by layer to build a complete Arc -> Stage path.</p>
 		</div>
 	{/if}
 
-	<div class="add-act-row">
-		<AddChapterForm
-			onAdd={onAddAct}
-			bind:active={addActActive}
-			entityLabel="Act"
-			placeholder="Act title..."
-		/>
+	<div class="navigator-columns" role="list" aria-label="Hierarchy layers">
+		{#each model.columns as column (column.layer)}
+			<section class="layer-column" role="listitem" data-layer={column.layer}>
+				<header class="layer-column__header">
+					<h4>{column.title}</h4>
+					{#if column.selectedId !== undefined}
+						<span class="layer-column__selection">Selected</span>
+					{/if}
+				</header>
+
+				{#if column.items.length > 0}
+					<ul class="layer-list" role="list" aria-label={column.title}>
+						{#each column.items as row (itemKey(column, row.id))}
+							<li>
+								<button
+									type="button"
+									class="layer-item"
+									class:is-selected={column.selectedId === row.id}
+									onclick={() => handleSelect(column.layer, row.id)}
+								>
+									<span class="layer-item__title">{row.label}</span>
+									{#if row.meta}
+										<span class="layer-item__meta">{row.meta}</span>
+									{/if}
+								</button>
+							</li>
+						{/each}
+					</ul>
+				{:else}
+					<div class="layer-empty">
+						<p class="layer-empty__title">{column.emptyTitle}</p>
+						<p class="layer-empty__hint">{column.emptyHint}</p>
+					</div>
+				{/if}
+			</section>
+		{/each}
 	</div>
 </div>
 
 <style>
 	.hierarchy-navigator {
-		display: flex;
-		flex-direction: column;
+		display: grid;
+		gap: var(--space-3);
+		container-type: inline-size;
 	}
 
-	.chapter-list {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.chapter-slot.drag-over {
-		outline: 2px solid var(--color-nova-blue);
-		outline-offset: 2px;
+	.navigator-empty {
+		padding: var(--space-4);
+		border: 1px dashed var(--color-border-subtle);
 		border-radius: var(--radius-md);
+		background: color-mix(in srgb, var(--color-surface-overlay) 68%, transparent);
 	}
 
-	.unassigned-group {
-		margin-top: var(--space-3);
+	.navigator-empty h3 {
+		margin: 0;
+		font-size: var(--text-sm);
 	}
 
-	.unassigned-label {
-		display: block;
+	.navigator-empty p {
+		margin: var(--space-2) 0 0;
 		font-size: var(--text-xs);
-		font-weight: var(--font-weight-semibold);
-		letter-spacing: 0.07em;
-		text-transform: uppercase;
 		color: var(--color-text-muted);
-		padding: var(--space-1) var(--space-2) var(--space-2);
 	}
 
-	.add-act-row {
-		margin-top: var(--space-5);
+	.navigator-columns {
+		display: grid;
+		grid-template-columns: repeat(7, minmax(12rem, 1fr));
+		gap: var(--space-3);
+		overflow-x: auto;
+		padding-bottom: var(--space-2);
+	}
+
+	.layer-column {
+		display: grid;
+		align-content: start;
+		gap: var(--space-2);
+		padding: var(--space-3);
+		border: 1px solid var(--color-border-subtle);
+		border-radius: var(--radius-md);
+		background: color-mix(in srgb, var(--color-surface-overlay) 82%, transparent);
+		min-height: 16rem;
+	}
+
+	.layer-column__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-2);
+	}
+
+	.layer-column__header h4 {
+		margin: 0;
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+		color: var(--color-text-muted);
+	}
+
+	.layer-column__selection {
+		font-size: 0.625rem;
+		color: var(--color-text-muted);
+		background: color-mix(in srgb, var(--color-teal) 18%, transparent);
+		border-radius: var(--radius-full, 9999px);
+		padding: 0 var(--space-2);
+		line-height: 1.4;
+	}
+
+	.layer-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: var(--space-2);
+	}
+
+	.layer-item {
+		width: 100%;
+		text-align: left;
+		display: grid;
+		gap: 0.15rem;
+		padding: var(--space-2) var(--space-2);
+		border: 1px solid color-mix(in srgb, var(--color-border-subtle) 88%, transparent);
+		border-radius: var(--radius-sm);
+		background: color-mix(in srgb, var(--color-bg-elevated) 64%, transparent);
+		cursor: pointer;
+		transition:
+			border-color var(--duration-fast) var(--ease-standard),
+			background var(--duration-fast) var(--ease-standard);
+	}
+
+	.layer-item:hover {
+		border-color: var(--color-border-default);
+		background: color-mix(in srgb, var(--color-bg-elevated) 76%, transparent);
+	}
+
+	.layer-item.is-selected {
+		border-color: color-mix(in srgb, var(--color-teal) 72%, var(--color-border-subtle));
+		background: color-mix(in srgb, var(--color-teal) 20%, transparent);
+	}
+
+	.layer-item__title {
+		font-size: var(--text-xs);
+		color: var(--color-text-primary);
+	}
+
+	.layer-item__meta {
+		font-size: 0.7rem;
+		color: var(--color-text-muted);
+	}
+
+	.layer-empty {
+		display: grid;
+		gap: var(--space-1);
+		padding: var(--space-2) var(--space-1);
+	}
+
+	.layer-empty__title {
+		margin: 0;
+		font-size: var(--text-xs);
+		color: var(--color-text-secondary);
+	}
+
+	.layer-empty__hint {
+		margin: 0;
+		font-size: 0.72rem;
+		color: var(--color-text-muted);
+		line-height: 1.4;
+	}
+
+	@media (max-width: 76rem) {
+		.navigator-columns {
+			grid-template-columns: repeat(7, minmax(11rem, 1fr));
+		}
+	}
+
+	@container (max-width: 42rem) {
+		.navigator-columns {
+			grid-template-columns: 1fr;
+			overflow-x: visible;
+			padding-bottom: 0;
+		}
+
+		.layer-column {
+			min-height: auto;
+		}
 	}
 </style>

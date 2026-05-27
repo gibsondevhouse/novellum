@@ -54,6 +54,10 @@ const EMPTY_AI_CONTEXT: AiContext = {
 	plotThreads: [],
 };
 
+function isOutlineContextRequest(prompt: string): boolean {
+	return /\b(outline|story\s*structure|plot\s*map|chapter\s*plan|chapter\s*outline)\b/i.test(prompt);
+}
+
 export async function sendNovaChat(input: SendChatInput): Promise<void> {
 	const trimmed = input.prompt.trim();
 	if (!trimmed || novaSession.isStreaming) return;
@@ -82,10 +86,13 @@ export async function sendNovaChat(input: SendChatInput): Promise<void> {
 	let aiContext: AiContext = EMPTY_AI_CONTEXT;
 	let ragResult: Awaited<ReturnType<typeof buildRagContext>> | null = null;
 	try {
+		const ragPolicy = isOutlineContextRequest(trimmed) && input.projectId
+			? 'outline_scope'
+			: 'scene_plus_adjacent';
 		ragResult = await buildRagContext({
 			projectId: input.projectId ?? '',
 			activeSceneId: input.activeSceneId,
-			policy: 'scene_plus_adjacent',
+			policy: ragPolicy,
 		});
 		if (ragResult.aiContext) aiContext = ragResult.aiContext;
 	} catch {

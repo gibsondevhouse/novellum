@@ -179,6 +179,7 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 		case 'outline_scope': {
 			const isAuthorFamily =
 				task.taskType === 'pipeline' && task.pipelineTask?.family === 'vibe-author';
+			const includeProjectContext = task.contextPolicy === 'outline_scope' || isAuthorFamily;
 			// targetEntityId may be a scene id or chapter id — try scene first
 			let chapterId: string | null = null;
 			if (task.targetEntityId) {
@@ -189,17 +190,40 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 			// outline_scope can run without a target (whole-project outline). For
 			// chapter_scope we still require a chapter to anchor against.
 			const includeHierarchy = task.contextPolicy === 'outline_scope' || isAuthorFamily;
-			const hierarchy = includeHierarchy ? await buildOutlineHierarchy(projectId) : undefined;
+			const [hierarchy, project, storyFrames, plotThreads] = await Promise.all([
+				includeHierarchy ? buildOutlineHierarchy(projectId) : Promise.resolve(undefined),
+				includeProjectContext
+					? getOrUndefined<Project>(`/api/db/projects/${projectId}`)
+					: Promise.resolve(undefined),
+				includeProjectContext
+					? apiGet<StoryFrame[]>('/api/db/story_frames', { projectId })
+					: Promise.resolve([]),
+				includeProjectContext
+					? apiGet<PlotThread[]>('/api/db/plot_threads', { projectId })
+					: Promise.resolve([]),
+			]);
 
 			if (!chapterId) {
 				const empty = emptyContext(task.contextPolicy);
-				return hierarchy ? { ...empty, outlineHierarchy: hierarchy } : empty;
+				return {
+					...empty,
+					project: project ?? null,
+					storyFrames,
+					plotThreads,
+					...(hierarchy ? { outlineHierarchy: hierarchy } : {}),
+				};
 			}
 
 			const chapter = await getOrUndefined<Chapter>(`/api/db/chapters/${chapterId}`);
 			if (!chapter) {
 				const empty = emptyContext(task.contextPolicy);
-				return hierarchy ? { ...empty, outlineHierarchy: hierarchy } : empty;
+				return {
+					...empty,
+					project: project ?? null,
+					storyFrames,
+					plotThreads,
+					...(hierarchy ? { outlineHierarchy: hierarchy } : {}),
+				};
 			}
 
 			const rawScenes = await getScenesByChapterId(chapterId);
@@ -229,9 +253,9 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 				characters,
 				locations,
 				loreEntries: [],
-				plotThreads: [],
-				project: null,
-				storyFrames: [],
+				plotThreads,
+				project: project ?? null,
+				storyFrames,
 				timelineEvents: [],
 				characterRelationships: [],
 				factions: [],

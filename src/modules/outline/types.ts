@@ -1,5 +1,9 @@
 // Outliner module public types
 import type { Chapter, Scene } from '$lib/db/domain-types';
+import type {
+	PipelineHierarchyLayer,
+	PipelineHierarchyPath,
+} from './services/seven-layer-outline.js';
 
 export type OutlineNodeId = number;
 
@@ -20,3 +24,7 @@ export type BeatFocus = {
 export type OutlineSelection =
 	| { type: 'chapter'; chapter: Chapter }
 	| { type: 'scene'; scene: Scene };
+
+export type { PipelineHierarchyLayer, PipelineHierarchyPath };
+
+export type PipelineHierarchyReadiness = 'empty' | 'partial' | 'ready';

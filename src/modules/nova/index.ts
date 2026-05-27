@@ -33,6 +33,7 @@ export { default as ContextDisclosurePill } from './components/ContextDisclosure
 export { default as ModelPickerDropdown } from './components/ModelPickerDropdown.svelte';
 export { default as NovaErrorBoundary } from './components/NovaErrorBoundary.svelte';
 export { default as NovaSceneDraftCard } from './components/NovaSceneDraftCard.svelte';
+export { default as NovaOutlineCard } from './components/NovaOutlineCard.svelte';
 export { default as NovaRevisionPackCard } from './components/NovaRevisionPackCard.svelte';
 export { novaPanel } from './stores/nova-panel.svelte.js';
 export { novaSession } from './stores/nova-session.svelte.js';

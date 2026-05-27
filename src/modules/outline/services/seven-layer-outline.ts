@@ -28,6 +28,44 @@ export const SEVEN_LAYER_HIERARCHY = [
 
 export type SevenLayerName = (typeof SEVEN_LAYER_HIERARCHY)[number];
 
+/**
+ * Canonical selection layers for the interactive UI path model.
+ * These are singular and mirror the plural data buckets above.
+ */
+export const PIPELINE_HIERARCHY_PATH_ORDER = [
+	'arc',
+	'act',
+	'milestone',
+	'chapter',
+	'scene',
+	'beat',
+	'stage',
+] as const;
+
+export type PipelineHierarchyLayer = (typeof PIPELINE_HIERARCHY_PATH_ORDER)[number];
+
+export interface PipelineHierarchyPath {
+	arcId: string | null | undefined;
+	actId: string | null | undefined;
+	milestoneId: string | null | undefined;
+	chapterId: string | null | undefined;
+	sceneId: string | null | undefined;
+	beatId: string | null | undefined;
+	stageId: string | null | undefined;
+}
+
+export function createEmptyPipelineHierarchyPath(): PipelineHierarchyPath {
+	return {
+		arcId: undefined,
+		actId: undefined,
+		milestoneId: undefined,
+		chapterId: undefined,
+		sceneId: undefined,
+		beatId: undefined,
+		stageId: undefined,
+	};
+}
+
 export interface SevenLayerOutline {
 	arcs: Arc[];
 	acts: Act[];

@@ -7,6 +7,7 @@
 	import { safeHtml } from '$lib/ai/markdown.js';
 	import type { NovaMessage } from '../types.js';
 	import NovaErrorBoundary from './NovaErrorBoundary.svelte';
+	import NovaOutlineCard from './NovaOutlineCard.svelte';
 	import NovaSceneDraftCard from './NovaSceneDraftCard.svelte';
 	import NovaRevisionPackCard from './NovaRevisionPackCard.svelte';
 	import { classifyNovaError } from '../utils/classify-nova-error.js';
@@ -92,7 +93,9 @@
 							</p>
 						{/if}
 					{:else if message.artifact}
-						{#if message.artifact.kind === 'author-scene-draft'}
+						{#if message.artifact.kind === 'author-outline'}
+							<NovaOutlineCard envelope={message.artifact.envelope} />
+						{:else if message.artifact.kind === 'author-scene-draft'}
 							<NovaSceneDraftCard envelope={message.artifact.envelope} />
 						{:else if message.artifact.kind === 'author-revision-pack'}
 							<NovaRevisionPackCard envelope={message.artifact.envelope} />

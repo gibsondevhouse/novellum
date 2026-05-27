@@ -113,6 +113,52 @@ function serializeContext(ctx: AiContext): string {
 		ctx.plotThreads.forEach((t) => lines.push(`- [${t.status}] ${t.title}: ${t.description}`));
 	}
 
+	if (ctx.outlineHierarchy) {
+		lines.push('\nOUTLINE HIERARCHY:');
+		lines.push(`Arcs: ${ctx.outlineHierarchy.arcs.length}`);
+		ctx.outlineHierarchy.arcs.forEach((arc) => {
+			lines.push(`- Arc ${arc.id}: ${arc.title}`);
+			if (arc.description) lines.push(`  Description: ${arc.description}`);
+			if (arc.purpose) lines.push(`  Purpose: ${arc.purpose}`);
+		});
+
+		lines.push(`Acts: ${ctx.outlineHierarchy.acts.length}`);
+		ctx.outlineHierarchy.acts.forEach((act) => {
+			lines.push(`- Act ${act.id} [arc=${act.arcId ?? 'unassigned'}]: ${act.title}`);
+			if (act.planningNotes) lines.push(`  Notes: ${act.planningNotes}`);
+		});
+
+		lines.push(`Milestones: ${ctx.outlineHierarchy.milestones.length}`);
+		ctx.outlineHierarchy.milestones.forEach((milestone) => {
+			lines.push(`- Milestone ${milestone.id} [act=${milestone.actId}]: ${milestone.title}`);
+			if (milestone.description) lines.push(`  Description: ${milestone.description}`);
+		});
+
+		lines.push(`Chapters: ${ctx.outlineHierarchy.chapters.length}`);
+		ctx.outlineHierarchy.chapters.forEach((chapter) => {
+			lines.push(`- Chapter ${chapter.id} [act=${chapter.actId ?? 'unassigned'}]: ${chapter.title}`);
+			if (chapter.summary) lines.push(`  Summary: ${chapter.summary}`);
+		});
+
+		lines.push(`Scenes: ${ctx.outlineHierarchy.scenes.length}`);
+		ctx.outlineHierarchy.scenes.forEach((scene) => {
+			lines.push(`- Scene ${scene.id} [chapter=${scene.chapterId}]: ${scene.title}`);
+			if (scene.summary) lines.push(`  Summary: ${scene.summary}`);
+		});
+
+		lines.push(`Beats: ${ctx.outlineHierarchy.beats.length}`);
+		ctx.outlineHierarchy.beats.forEach((beat) => {
+			lines.push(`- Beat ${beat.id} [scene=${beat.sceneId ?? 'unassigned'}]: ${beat.title}`);
+			if (beat.notes) lines.push(`  Notes: ${beat.notes}`);
+		});
+
+		lines.push(`Stages: ${ctx.outlineHierarchy.stages.length}`);
+		ctx.outlineHierarchy.stages.forEach((stage) => {
+			lines.push(`- Stage ${stage.id} [beat=${stage.beatId}]: ${stage.title} (${stage.status})`);
+			if (stage.description) lines.push(`  Description: ${stage.description}`);
+		});
+	}
+
 	if (ctx.timelineEvents && ctx.timelineEvents.length > 0) {
 		lines.push('\nTIMELINE EVENTS:');
 		ctx.timelineEvents.forEach((event) =>

@@ -4,6 +4,7 @@
 	interface Crumb {
 		label: string;
 		href?: string;
+		onSelect?: () => void;
 	}
 
 	interface Props {
@@ -18,7 +19,9 @@
 	<ol class="breadcrumb__list">
 		{#each crumbs as crumb, i (i)}
 			<li class="breadcrumb__item">
-				{#if crumb.href && i < crumbs.length - 1}
+				{#if crumb.onSelect && i < crumbs.length - 1}
+					<button type="button" class="breadcrumb__button" onclick={crumb.onSelect}>{crumb.label}</button>
+				{:else if crumb.href && i < crumbs.length - 1}
 					<a href={crumb.href} class="breadcrumb__link">{crumb.label}</a>
 				{:else}
 					<span class="breadcrumb__current" aria-current="page">{crumb.label}</span>
@@ -65,7 +68,18 @@
 		text-decoration: none;
 	}
 
-	.breadcrumb__link:hover {
+	.breadcrumb__button {
+		border: 0;
+		padding: 0;
+		background: none;
+		color: var(--color-text-secondary);
+		font: inherit;
+		cursor: pointer;
+		text-decoration: none;
+	}
+
+	.breadcrumb__link:hover,
+	.breadcrumb__button:hover {
 		color: var(--color-text-primary);
 		text-decoration: underline;
 	}

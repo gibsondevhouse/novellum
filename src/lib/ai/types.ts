@@ -97,6 +97,13 @@ export interface PipelineTaskReference {
 	stage: string;
 }
 
+export type PipelineRunState =
+	| 'idle'
+	| 'ready'
+	| 'running'
+	| 'completed_pending_checkpoint'
+	| 'failed';
+
 export interface AiContext {
 	policy: ContextPolicy;
 	scene: Scene | null;

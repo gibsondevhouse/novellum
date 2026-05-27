@@ -15,7 +15,10 @@
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const completeMock = vi.fn();
+const { completeMock, buildRagContextMock } = vi.hoisted(() => ({
+	completeMock: vi.fn(),
+	buildRagContextMock: vi.fn(),
+}));
 
 vi.mock('$lib/ai/openrouter.js', async () => {
 	const actual = await vi.importActual<typeof import('$lib/ai/openrouter.js')>(
@@ -37,12 +40,7 @@ vi.mock('$lib/stores/model-selection.svelte.js', () => ({
 }));
 
 vi.mock('$modules/nova/services/context-hooks.js', () => ({
-	buildRagContext: vi.fn().mockResolvedValue({
-		aiContext: null,
-		contextText: '',
-		includedScopes: [],
-		warnings: [],
-	}),
+	buildRagContext: buildRagContextMock,
 }));
 
 import { runAuthorPipelineTask } from '$modules/nova/services/author-pipeline-runner.js';
@@ -83,10 +81,61 @@ function buildRevisionPackRaw(): string {
 	});
 }
 
+function buildOutlineRaw(): string {
+	return JSON.stringify({
+		arcs: [{ id: 'arc-a', title: 'The first fracture' }],
+		acts: [{ id: 'act-a', title: 'Arrival' }],
+		milestones: [{ id: 'milestone-a', title: 'The vow breaks' }],
+		chapters: [{ id: 'chapter-a', title: 'Ash at the gate' }],
+		scenes: [{ id: 'scene-a', title: 'The impossible return' }],
+		beats: [{ id: 'beat-a', title: 'Refusal' }],
+	});
+}
+
 describe('runAuthorPipelineTask', () => {
 	beforeEach(() => {
 		completeMock.mockReset();
+		buildRagContextMock.mockReset();
+		buildRagContextMock.mockResolvedValue({
+			aiContext: null,
+			contextText: '',
+			includedScopes: [],
+			warnings: [],
+		});
 		novaSession.clear();
+	});
+
+	it('attaches an author-outline draft artifact with outline-scope context', async () => {
+		completeMock.mockResolvedValueOnce({
+			text: buildOutlineRaw(),
+			model: 'mock/model',
+			tokensUsed: 0,
+		});
+
+		const result = await runAuthorPipelineTask({
+			taskKey: 'vibe-author.outline',
+			projectId: 'p1',
+			activeSceneId: null,
+			activeChapterId: null,
+			instruction: 'Build a full outline.',
+		});
+
+		expect(result.ok).toBe(true);
+		if (!result.ok) throw new Error('expected success');
+
+		expect(buildRagContextMock).toHaveBeenCalledWith({
+			projectId: 'p1',
+			activeSceneId: null,
+			policy: 'outline_scope',
+		});
+
+		const message = novaSession.messages.find((m) => m.id === result.messageId);
+		expect(message?.status).toBe('complete');
+		expect(message?.artifact?.kind).toBe('author-outline');
+		if (message?.artifact?.kind !== 'author-outline') throw new Error('wrong kind');
+		expect(message.artifact.envelope.lifecycle).toBe('draft');
+		expect(message.artifact.envelope.payload.chapters).toHaveLength(1);
+		expect(message?.content).toBe('');
 	});
 
 	it('attaches an author-scene-draft artifact on parse success', async () => {

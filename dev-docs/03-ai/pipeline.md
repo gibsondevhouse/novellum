@@ -1,6 +1,6 @@
 # AI Pipeline
 
-> Last verified: 2026-05-27
+> Last verified: 2026-05-26 (plan-028 UI shipped)
 
 Every AI feature in Novellum follows the same pipeline. The runtime
 agents (continuity / edit / rewrite / style) live in [src/lib/ai/](../../src/lib/ai/)
@@ -159,6 +159,37 @@ scope for plan-027.
 
 See [ADR-0027](../02-architecture/adr/adr-0027-pipeline-entity-scope.md)
 for the V1.1 scope decision.
+
+### Outline-first worldbuild UI (plan-028)
+
+Plan-028 ships the hierarchical pipeline UI at `/projects/[id]/outline`.
+The outline page renders a seven-layer hierarchy navigator
+(Arc → Act → Milestone → Chapter → Scene → Beat → Stage) and a stage
+detail panel that drives the worldbuild run/review/decision workflow.
+
+**Run flow:** Stage selection + "Run Stage Pipeline" button →
+`worldbuild-pipeline-runner.ts` validates the `PipelineHierarchyPath`,
+sends task payload to `/api/ai`, parses via `createWorldbuildArtifactFromModelOutput`,
+stages result as a `draft` checkpoint via project-metadata API. Runtime
+states (`idle → ready → queued → running → completed_pending_checkpoint | failed`)
+are managed in `outline-store.svelte.ts`.
+
+**Review console:** The stage detail panel includes a checkpoint queue
+with lifecycle filters (all / pending / accepted / rejected), an
+artifact review detail panel (metadata grid, hierarchy references,
+collapsible payload viewer), and explicit accept/reject decision
+controls. Accept requires `review` lifecycle; reject requires a
+non-empty reason.
+
+**Canon safety:** No entity table writes occur during run or staging.
+Canon projection happens only when `checkpoint-service.ts` processes an
+`accept` operation on a `populated-world-bible` checkpoint. Source-contract
+tests enforce this guarantee (89 tests across 6 test files). E2E specs
+cover traversal, run/review/accept, reject/failure, and
+invalid-transition handling.
+
+**Deferred:** `vibe-author` UI parity is explicitly out of scope for
+plan-028.
 
 ## Server boundary
 

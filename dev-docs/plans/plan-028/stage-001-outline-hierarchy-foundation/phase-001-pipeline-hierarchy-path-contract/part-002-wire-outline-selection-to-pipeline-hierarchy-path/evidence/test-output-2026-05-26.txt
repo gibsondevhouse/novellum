@@ -1,0 +1,40 @@
+# Part-002 gate run — 2026-05-26
+
+$ pnpm lint
+
+> novellum@0.0.1 lint /Users/gibdevlite/Dev/novellum
+> eslint .
+
+
+$ pnpm lint:css
+
+> novellum@0.0.1 lint:css /Users/gibdevlite/Dev/novellum
+> stylelint "src/**/*.{css,svelte}"
+
+
+$ pnpm check
+
+> novellum@0.0.1 check /Users/gibdevlite/Dev/novellum
+> svelte-kit sync && svelte-check --tsconfig ./tsconfig.json
+
+Loading svelte-check in workspace: /Users/gibdevlite/Dev/novellum
+Getting Svelte diagnostics...
+
+svelte-check found 0 errors and 0 warnings
+
+$ pnpm test
+
+> novellum@0.0.1 test /Users/gibdevlite/Dev/novellum
+> vitest run
+
+12:10:44 PM [vite-plugin-svelte] invalid plugin options "hot" in inline config
+{ hot: false }
+
+ RUN  v4.1.4 /Users/gibdevlite/Dev/novellum
+
+
+ Test Files  179 passed (179)
+      Tests  1165 passed (1165)
+   Start at  12:10:44
+   Duration  18.99s (transform 7.77s, setup 5.46s, import 16.47s, tests 8.92s, environment 105.10s)
+

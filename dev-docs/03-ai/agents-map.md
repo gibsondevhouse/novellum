@@ -1,6 +1,6 @@
 # Agents Map
 
-> Last verified: 2026-05-27
+> Last verified: 2026-05-26 (plan-028 UI shipped)
 
 Authoritative status of all Novellum runtime agents. Anchored to [src/lib/ai/](../../src/lib/ai/).
 The V1.1 staged pipeline (`vibe-worldbuild` / `vibe-author`) is
@@ -42,7 +42,7 @@ Distinct from the runtime agents above. Pipeline stages are stateful,
 gated by reviewer checkpoints, and persist artifacts in
 `project_metadata` (scope `'pipeline'`). Schema version: **`1.0.0`**.
 
-### `vibe-worldbuild` family (shipped — plan-027 stage-002)
+### `vibe-worldbuild` family (shipped — plan-027 stage-002, UI — plan-028)
 
 | Stage key | Output format | Canon projection |
 | --- | --- | --- |
@@ -55,6 +55,16 @@ Checkpoint lifecycle: `draft → review → accepted | rejected`. Rejected
 checkpoints preserve their `reason`; re-upserting the same id resets
 the record to `draft`. See [pipeline.md](./pipeline.md) for HTTP surface
 and contract details.
+
+**Outline UI (plan-028):** The worldbuild run/review/decision workflow
+is surfaced at `/projects/[id]/outline` via a seven-layer hierarchy
+navigator and stage detail panel. The run adapter is
+[`worldbuild-pipeline-runner.ts`](../../src/modules/outline/services/worldbuild-pipeline-runner.ts);
+runtime state is managed in
+[`outline-store.svelte.ts`](../../src/modules/outline/stores/outline-store.svelte.ts).
+The checkpoint review console includes queue filters, artifact review
+detail, and explicit accept/reject controls. `vibe-author` UI parity
+is deferred.
 
 ### `vibe-author` family (shipped — plan-027 stage-003)
 

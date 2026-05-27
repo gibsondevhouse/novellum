@@ -1,10 +1,10 @@
 # MASTER PLAN: Novellum Development
 
-> Last reconciled: 2026-05-27 (plan-027 closed; all three stages complete)
+> Last reconciled: 2026-05-26 (plan-028 closed)
 
 ## Active Plans
 
-_No active plan. See [ACTIVE-PLAN.md](./ACTIVE-PLAN.md)._
+(none)
 
 ## Deferred to V1.1
 
@@ -14,6 +14,7 @@ _No active plan. See [ACTIVE-PLAN.md](./ACTIVE-PLAN.md)._
 
 ## Completed Plans (Archived)
 
+- [plan-028-v1.1-hierarchical-pipeline-ui](./plan-028/plan.md): Outline-first hierarchical pipeline UI — Arc → Stage traversal, worldbuild run flow, checkpoint review console, verification/doc sync. 4 stages, 10 parts. Status: `complete` (closed 2026-05-26; 187 files / 1268 vitest tests; token guard 0 violations; 7 Playwright e2e specs covering traversal, run, review, accept/reject, failure flows; docs reconciled with shipped behavior).
 - [plan-027-v1.1-scoping](./plan-027-v1.1-scoping/plan.md): V1.1 staged fiction pipeline delivery — pipeline foundation, Vibe-Worldbuild, Vibe-Author. 3 stages. Status: `complete` (closed 2026-05-27; 177 files / 1156 vitest tests; token guard 0 violations; Playwright review-gate coverage for both worldbuild and author surfaces).
 - [plan-024-v1-final-mile](./archive/plan-024-v1-final-mile/plan.md): V1 Definition-of-Done closure & release engineering. 6 stages. Status: `complete` (closed 2026-05-26, 47/47 DoD). Three non-DoD stages deferred to V1.1.
 - [plan-026-ui-v2-design-system](./archive/plan-026-ui-v2-design-system/plan.md): UI refactor adopting the Novellum v2 "author-first" design system as the source of visual truth. 6 stages. Status: `complete` (closed 2026-05-26).

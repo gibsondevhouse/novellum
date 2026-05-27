@@ -5,6 +5,7 @@
 		hero,
 		sidebar,
 		main,
+		mainHeader,
 		sidebarLabel = 'Workspace selector',
 		mainLabel = 'Workspace detail',
 		class: className = '',
@@ -12,6 +13,7 @@
 		hero?: Snippet;
 		sidebar?: Snippet;
 		main: Snippet;
+		mainHeader?: Snippet;
 		sidebarLabel?: string;
 		mainLabel?: string;
 		class?: string;
@@ -31,7 +33,10 @@
 		{/if}
 
 		<section class="workspace-shell__main" aria-label={mainLabel}>
-			{@render main()}
+			{#if mainHeader}
+				<div class="workspace-shell__main-header">{@render mainHeader()}</div>
+			{/if}
+			<div class="workspace-shell__main-content">{@render main()}</div>
 		</section>
 	</div>
 </div>
@@ -56,24 +61,25 @@
 		grid-template-columns: minmax(280px, 340px) 1fr;
 		gap: var(--space-4);
 		padding: 0 var(--space-2) var(--space-1);
-		height: calc(100vh - var(--header-height, 64px));
-		overflow: hidden;
+		min-height: min(42rem, calc(100vh - var(--header-height, 64px) - var(--space-5)));
+		overflow: visible;
 		box-sizing: border-box;
-		min-height: 0;
 	}
 
 	.workspace-shell__sidebar {
+		position: sticky;
+		top: var(--space-3);
 		display: flex;
 		flex-direction: column;
 		border-right: 1px solid var(--color-border-default);
 		padding-right: var(--space-4);
-		height: 100%;
+		max-height: calc(100vh - var(--header-height, 64px) - var(--space-6));
 		overflow: hidden;
 		min-height: 0;
 	}
 
 	.workspace-shell__sidebar-scroll {
-		height: 100%;
+		max-height: inherit;
 		overflow-y: auto;
 		overflow-x: hidden;
 		overscroll-behavior: contain;
@@ -82,11 +88,53 @@
 	}
 
 	.workspace-shell__body--split .workspace-shell__main {
-		display: flex;
-		justify-content: center;
-		align-items: flex-start;
-		height: 100%;
-		overflow: hidden;
+		display: grid;
+		grid-template-rows: auto minmax(0, auto);
+		overflow: visible;
 		min-height: 0;
+		padding-right: var(--space-2);
+	}
+
+	.workspace-shell__main-header {
+		position: sticky;
+		top: 0;
+		z-index: 2;
+		background: color-mix(in srgb, var(--color-surface-base) 86%, transparent);
+		backdrop-filter: blur(3px);
+	}
+
+	.workspace-shell__main-content {
+		overflow-y: visible;
+		overflow-x: hidden;
+		overscroll-behavior: contain;
+		min-height: 0;
+		padding: var(--space-3) 0 var(--space-3);
+	}
+
+	@media (max-width: 56rem) {
+		.workspace-shell__body--split {
+			grid-template-columns: 1fr;
+			min-height: 0;
+			overflow: visible;
+		}
+
+		.workspace-shell__sidebar {
+			position: static;
+			max-height: none;
+			border-right: 0;
+			border-bottom: 1px solid var(--color-border-default);
+			padding-right: 0;
+			padding-bottom: var(--space-4);
+		}
+
+		.workspace-shell__sidebar-scroll {
+			max-height: none;
+			overflow: visible;
+			padding-right: 0;
+		}
+
+		.workspace-shell__body--split .workspace-shell__main {
+			padding-right: 0;
+		}
 	}
 </style>

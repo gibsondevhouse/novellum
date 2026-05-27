@@ -107,9 +107,11 @@
 
 <style>
 	.library-hub {
+		width: min(100%, 1100px);
 		max-width: 1100px;
 		margin: 0 auto;
-		padding: var(--space-10) 0;
+		padding: var(--space-10) var(--space-4);
+		box-sizing: border-box;
 	}
 
 	.library-collections {
@@ -192,6 +194,7 @@
 
 	.hero-content {
 		flex: 1;
+		min-width: 0;
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-4);
@@ -259,7 +262,17 @@
 
 	.hero-cover {
 		flex-shrink: 0;
-		width: 160px;
+		width: min(160px, 32%);
+	}
+
+	@media (max-width: 960px) {
+		.hero-banner {
+			flex-wrap: wrap;
+		}
+
+		.hero-cover {
+			width: min(160px, 100%);
+		}
 	}
 
 	@media (max-width: 768px) {
