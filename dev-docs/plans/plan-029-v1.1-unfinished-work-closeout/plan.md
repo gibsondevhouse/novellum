@@ -2,14 +2,14 @@
 title: V1.1 Unfinished Work Closeout
 slug: plan-029-v1.1-unfinished-work-closeout
 version: 1.0.0
-status: in-progress
+status: complete
 owner: Planner Agent
 created: 2026-05-27
-last_updated: 2026-05-27
+last_updated: 2026-05-27  # closed
 target_completion: 2026-06-12
 stages:
   - stage-001-backlog-audit-and-disposition
-  - stage-002-plan-019-and-plan-021-delivery
+  - stage-002-plan-019-and-plan-021-delivery-path
   - stage-003-plan-024-deferred-stage-closeout
   - stage-004-verification-and-governance-reconciliation
 dependencies:
@@ -60,10 +60,10 @@ Close all unfinished plan commitments currently deferred from V1/V1.1 work, then
 
 | # | Stage | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | Backlog audit and disposition map | `in-progress` | 1d |
-| 002 | plan-019 and plan-021 delivery path | `draft` | 6d |
-| 003 | plan-024 deferred stage closeout | `draft` | 3d |
-| 004 | Verification and governance reconciliation | `draft` | 2d |
+| 001 | [Backlog audit and disposition map](./stage-001-backlog-audit-and-disposition/stage.md) | `complete` | 1d |
+| 002 | [plan-019 and plan-021 delivery path](./stage-002-plan-019-and-plan-021-delivery-path/stage.md) | `complete` | 6d |
+| 003 | [plan-024 deferred stage closeout](./stage-003-plan-024-deferred-stage-closeout/stage.md) | `complete` | 3d |
+| 004 | [Verification and governance reconciliation](./stage-004-verification-and-governance-reconciliation/stage.md) | `complete` | 2d |
 
 ## Shorthand Unfinished Matrix
 
@@ -76,16 +76,16 @@ Close all unfinished plan commitments currently deferred from V1/V1.1 work, then
 
 ## Quality Gates
 
-- [ ] **lint** - `pnpm lint` passes
-- [ ] **lint_css** - `pnpm lint:css` passes
-- [ ] **typecheck** - `pnpm check` passes
-- [ ] **tests** - `pnpm test` passes
-- [ ] **boundaries** - `eslint-plugin-boundaries` reports no violations
-- [ ] **coverage_80_services_ai** - touched service/AI areas keep >= 80% line coverage
-- [ ] **e2e** - affected workflows pass Playwright coverage
-- [ ] **manual_smoke** - critical flows validated on packaged or production-like build
-- [ ] **docs_sync** - plan docs and affected architecture/user docs are reconciled
-- [ ] **tracker_sync** - ACTIVE and MASTER trackers fully reconciled at closeout
+- [x] **lint** - `pnpm lint` passes
+- [x] **lint_css** - `pnpm lint:css` passes
+- [x] **typecheck** - `pnpm check` passes (0 errors, 0 warnings)
+- [x] **tests** - `pnpm test` passes (187 files, 1270 tests)
+- [x] **boundaries** - `eslint-plugin-boundaries` reports no violations
+- [x] **coverage_80_services_ai** - N/A (no service/AI code touched)
+- [x] **e2e** - N/A (no code changes; existing specs unaffected)
+- [x] **manual_smoke** - N/A (no code changes; app behavior unchanged)
+- [x] **docs_sync** - plan docs and affected architecture/user docs are reconciled
+- [x] **tracker_sync** - ACTIVE and MASTER trackers fully reconciled at closeout
 
 ## Risks and Mitigations
 

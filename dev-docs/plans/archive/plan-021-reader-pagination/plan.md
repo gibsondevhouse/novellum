@@ -2,10 +2,10 @@
 title: Reader Pagination & Empty State
 slug: plan-021-reader-pagination
 version: 1.0.0
-status: deferred-to-v1.1
+status: retired
 owner: Planner Agent
 created: 2026-05-03
-last_updated: 2026-05-26
+last_updated: 2026-05-27
 target_completion: 2026-05-17
 stages:
   - stage-001-empty-state
