@@ -6,10 +6,10 @@
 
 ## Current
 
-- **Plan:** None active.
-- **Status:** idle
-- **Next action owner:** User — select next plan from backlog or deferred
-  list.
+- **Plan:** [plan-029-v1.1-unfinished-work-closeout](./plan-029-v1.1-unfinished-work-closeout/plan.md)
+- **Status:** in-progress
+- **Next action owner:** Planner Agent — run closeout stage-001 backlog
+  disposition and execution mapping.
 
 ## Recently completed
 

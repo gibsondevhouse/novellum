@@ -1,10 +1,10 @@
 # MASTER PLAN: Novellum Development
 
-> Last reconciled: 2026-05-26 (plan-028 closed)
+> Last reconciled: 2026-05-27 (plan-029 activated)
 
 ## Active Plans
 
-(none)
+- [plan-029-v1.1-unfinished-work-closeout](./plan-029-v1.1-unfinished-work-closeout/plan.md) — Unified closeout umbrella for unfinished deferred work (`plan-019`, `plan-021`, and deferred stages from `plan-024`) plus tracker reconciliation.
 
 ## Deferred to V1.1
 
