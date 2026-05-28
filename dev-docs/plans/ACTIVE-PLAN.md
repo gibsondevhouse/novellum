@@ -6,10 +6,16 @@
 
 ## Current
 
-No active plan. All deferred V1/V1.1 commitments are resolved.
+- No active plan.
 
 ## Recently completed
 
+- [plan-030-nova-production-refactor](./plan-030-nova-production-refactor/plan.md) —
+  Nova Production Refactor. Closed 2026-05-28 with all 4 stages complete.
+  Quality gates: `pnpm run check`, `pnpm run lint`, `pnpm run lint:css`,
+  and `pnpm run test` passed (`190` files / `1299` tests). Full
+  `pnpm run test:visual` reported existing cross-surface snapshot drift;
+  targeted Nova visual specs were run as substitution (`2` passed, `3` skipped).
 - [plan-029-v1.1-unfinished-work-closeout](./plan-029-v1.1-unfinished-work-closeout/plan.md) —
   V1.1 Unfinished Work Closeout. Closed 2026-05-27 with all 4 stages
   complete. Retired plan-019 (naming consistency — superseded by organic

@@ -4,6 +4,7 @@
 import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
 
 const streamCompleteMock = vi.fn();
+const buildRagContextMock = vi.fn();
 
 vi.mock('$lib/ai/openrouter.js', async () => {
 	const actual = await vi.importActual<typeof import('$lib/ai/openrouter.js')>(
@@ -28,13 +29,15 @@ vi.mock('$lib/stores/model-selection.svelte.js', () => ({
 }));
 
 vi.mock('$modules/nova/services/context-hooks.js', () => ({
-	buildRagContext: vi.fn().mockResolvedValue({
+	buildRagContext: (...args: unknown[]) => buildRagContextMock(...args),
+}));
+
+buildRagContextMock.mockResolvedValue({
 		aiContext: null,
 		contextText: '',
 		includedScopes: [],
 		warnings: [],
-	}),
-}));
+});
 
 import { sendNovaChat } from '$modules/nova/services/chat-service.js';
 import { novaSession } from '$modules/nova/stores/nova-session.svelte.js';
@@ -52,6 +55,13 @@ async function* yieldChunks(chunks: string[]): AsyncGenerator<string> {
 describe('sendNovaChat', () => {
 	beforeEach(() => {
 		streamCompleteMock.mockReset();
+		buildRagContextMock.mockReset();
+		buildRagContextMock.mockResolvedValue({
+			aiContext: null,
+			contextText: '',
+			includedScopes: [],
+			warnings: [],
+		});
 		novaSession.clear();
 	});
 
@@ -181,6 +191,127 @@ describe('sendNovaChat', () => {
 		expect(systemPrompt).not.toContain('narrative continuation');
 	});
 
+	it('injects project baseline context into chat prompts when no scene is active', async () => {
+		buildRagContextMock.mockResolvedValueOnce({
+			aiContext: {
+				policy: 'project_summary',
+				scene: null,
+				adjacentScenes: [],
+				chapter: null,
+				beats: [],
+				characters: [],
+				locations: [],
+				loreEntries: [],
+				plotThreads: [],
+				project: {
+					id: 'p1',
+					title: 'Signal Fire',
+					genre: 'fantasy',
+					logline: 'A scout races a civil war to save her brother.',
+					synopsis: 'A full synopsis goes here.',
+					targetWordCount: 100000,
+					status: 'drafting',
+					projectType: 'novel',
+					lastOpenedAt: '',
+					stylePresetId: 'preset-cinematic',
+					systemPrompt: '',
+					negativePrompt: '',
+					createdAt: '',
+					updatedAt: '2026-05-27T22:00:00.000Z',
+				},
+			},
+			contextText: '',
+			includedScopes: ['project', 'project-summary'],
+			warnings: [],
+		});
+		streamCompleteMock.mockReturnValueOnce(yieldChunks(['Grounded answer']));
+
+		await sendNovaChat({
+			prompt: 'What is this novel about?',
+			projectId: 'p1',
+			activeSceneId: null,
+			activeChapterId: null,
+		});
+
+		expect(buildRagContextMock).toHaveBeenCalledWith({
+			projectId: 'p1',
+			activeSceneId: null,
+			policy: 'scene_plus_adjacent',
+		});
+
+		const [payload] = streamCompleteMock.mock.calls[0];
+		const systemPrompt = payload.messages[0].content;
+		expect(systemPrompt).toContain('PROJECT: "Signal Fire"');
+		expect(systemPrompt).toContain('Logline: A scout races a civil war to save her brother.');
+		expect(systemPrompt).toContain('Synopsis: A full synopsis goes here.');
+		expect(systemPrompt).toContain('working conversation');
+	});
+
+	it('blocks project-dependent generation when no project is open', async () => {
+		await sendNovaChat({
+			prompt: 'Draft the first chapter',
+			projectId: null,
+			activeSceneId: null,
+			activeChapterId: null,
+		});
+
+		expect(streamCompleteMock).not.toHaveBeenCalled();
+		expect(novaSession.messages).toHaveLength(2);
+		expect(novaSession.messages[0]).toMatchObject({ role: 'user', content: 'Draft the first chapter' });
+		expect(novaSession.messages[1]).toMatchObject({
+			role: 'nova',
+			status: 'error',
+		});
+		expect(novaSession.messages[1].content).toContain('Open a project');
+	});
+
+	it('blocks generation when project baseline fields are missing', async () => {
+		buildRagContextMock.mockResolvedValueOnce({
+			aiContext: {
+				policy: 'project_summary',
+				scene: null,
+				adjacentScenes: [],
+				chapter: null,
+				beats: [],
+				characters: [],
+				locations: [],
+				loreEntries: [],
+				plotThreads: [],
+				project: {
+					id: 'p1',
+					title: 'Untitled',
+					genre: '',
+					logline: '',
+					synopsis: '',
+					targetWordCount: 0,
+					status: 'drafting',
+					projectType: 'novel',
+					lastOpenedAt: '',
+					stylePresetId: '',
+					systemPrompt: '',
+					negativePrompt: '',
+					createdAt: '',
+					updatedAt: '',
+				},
+			},
+			contextText: '',
+			includedScopes: ['project', 'project-summary'],
+			warnings: ['Project context is missing: logline, synopsis.'],
+		});
+
+		await sendNovaChat({
+			prompt: 'Create a chapter outline',
+			projectId: 'p1',
+			activeSceneId: null,
+			activeChapterId: null,
+		});
+
+		expect(streamCompleteMock).not.toHaveBeenCalled();
+		expect(novaSession.messages).toHaveLength(2);
+		expect(novaSession.messages[1]).toMatchObject({ role: 'nova', status: 'complete' });
+		expect(novaSession.messages[1].content).toContain('missing logline and synopsis');
+	});
+
 	describe('agentic flag — tools field on the OpenRouter payload', () => {
 		beforeEach(() => {
 			clearTools();
@@ -232,4 +363,3 @@ describe('sendNovaChat', () => {
 		});
 	});
 });
-

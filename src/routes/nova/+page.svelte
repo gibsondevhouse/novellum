@@ -7,6 +7,13 @@
 </svelte:head>
 
 <div class="nova-agent-page">
+	<section class="nova-route-notice" data-testid="nova-route-notice" aria-label="Nova route status">
+		<p class="nova-route-notice__eyebrow">Legacy fullscreen route</p>
+		<p class="nova-route-notice__body">
+			The embedded editor sidepanel is the canonical Nova runtime for plan-030. This fullscreen
+			route is retained for exploratory chat and may not match sidepanel capabilities.
+		</p>
+	</section>
 	<ChatInterface />
 </div>
 
@@ -17,5 +24,28 @@
 		display: flex;
 		flex-direction: column;
 		background: var(--color-surface-base);
+	}
+
+	.nova-route-notice {
+		display: grid;
+		gap: var(--space-1);
+		padding: var(--space-3) var(--space-4);
+		border-bottom: 1px solid var(--color-border-default);
+		background: var(--color-surface-ground);
+	}
+
+	.nova-route-notice__eyebrow {
+		margin: 0;
+		font-size: 0.625rem;
+		font-weight: var(--font-weight-semibold);
+		letter-spacing: var(--tracking-wide);
+		text-transform: uppercase;
+		color: var(--color-text-muted);
+	}
+
+	.nova-route-notice__body {
+		margin: 0;
+		font-size: var(--text-xs);
+		color: var(--color-text-secondary);
 	}
 </style>

@@ -54,8 +54,30 @@ function serializeContext(ctx: AiContext): string {
 	if (ctx.project) {
 		lines.push(`PROJECT: "${ctx.project.title}"`);
 		if (ctx.project.genre) lines.push(`Genre: ${ctx.project.genre}`);
+		if (ctx.project.status) lines.push(`Status: ${ctx.project.status}`);
+		if (ctx.project.projectType) lines.push(`Project Type: ${ctx.project.projectType}`);
+		if (ctx.project.targetWordCount > 0) lines.push(`Target Word Count: ${ctx.project.targetWordCount}`);
 		if (ctx.project.logline) lines.push(`Logline: ${ctx.project.logline}`);
 		if (ctx.project.synopsis) lines.push(`Synopsis: ${ctx.project.synopsis}`);
+		if (ctx.project.stylePresetId) lines.push(`Style Preset: ${ctx.project.stylePresetId}`);
+		if (ctx.project.updatedAt) lines.push(`Updated At: ${ctx.project.updatedAt}`);
+	}
+
+	if (ctx.projectCounts) {
+		lines.push('\nPROJECT COUNTS:');
+		lines.push(`- Chapters: ${ctx.projectCounts.chapters}`);
+		lines.push(`- Scenes: ${ctx.projectCounts.scenes}`);
+		lines.push(`- Beats: ${ctx.projectCounts.beats}`);
+		lines.push(`- Characters: ${ctx.projectCounts.characters}`);
+		lines.push(`- Character Relationships: ${ctx.projectCounts.characterRelationships}`);
+		lines.push(`- Locations: ${ctx.projectCounts.locations}`);
+		lines.push(`- Lore Entries: ${ctx.projectCounts.loreEntries}`);
+		lines.push(`- Plot Threads: ${ctx.projectCounts.plotThreads}`);
+		lines.push(`- Timeline Events: ${ctx.projectCounts.timelineEvents}`);
+		lines.push(`- Acts: ${ctx.projectCounts.acts}`);
+		lines.push(`- Arcs: ${ctx.projectCounts.arcs}`);
+		lines.push(`- Milestones: ${ctx.projectCounts.milestones}`);
+		lines.push(`- Writing Styles: ${ctx.projectCounts.writingStyles}`);
 	}
 
 	if (ctx.storyFrames && ctx.storyFrames.length > 0) {
@@ -286,13 +308,19 @@ export function buildPrompt(task: AiTask, ctx: AiContext): string {
 
 	// Hard truncation if over limit — trim CONTEXT section
 	if (prompt.length > MAX_PROMPT_CHARS) {
-		const excess = prompt.length - MAX_PROMPT_CHARS;
-		contextBody = contextBody.slice(0, contextBody.length - excess - 50); // 50 char buffer
 		const contextIndex = headerParts.findIndex(p => p.startsWith('## CONTEXT'));
 		if (contextIndex !== -1) {
-			headerParts[contextIndex] = `## CONTEXT\n${contextBody}\n[Context truncated due to size limit]`;
+			const truncationNote = '[Context truncated due to size limit; lower-priority context may be omitted]';
+			headerParts[contextIndex] =
+				`## CONTEXT\n${contextBody}\n` +
+				truncationNote;
+			prompt = headerParts.join('\n\n');
+			while (prompt.length > MAX_PROMPT_CHARS && contextBody.length > 0) {
+				contextBody = contextBody.slice(0, -32);
+				headerParts[contextIndex] = `## CONTEXT\n${contextBody}\n${truncationNote}`;
+				prompt = headerParts.join('\n\n');
+			}
 		}
-		prompt = headerParts.join('\n\n');
 	}
 
 	return prompt;

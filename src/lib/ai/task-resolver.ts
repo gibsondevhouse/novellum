@@ -79,6 +79,14 @@ const TASK_MAP: Record<string, TaskDefinition> = {
 			'You are NOT writing the manuscript for them \u2014 do not produce narrative prose unless explicitly asked to. ' +
 			'Use any provided characters / lore / scene context as background to keep suggestions consistent with their world.',
 	},
+	project_summary: {
+		taskType: 'chat',
+		contextPolicy: 'project_summary',
+		outputFormat: 'plain_text',
+		role:
+			'You are Nova, a thoughtful writing partner having a working conversation with the author. ' +
+			'Use project metadata and story framing context as grounding before scene-level details.',
+	},
 };
 
 const DEFAULT_TASK: TaskDefinition = TASK_MAP['continue'];

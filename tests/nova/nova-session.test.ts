@@ -54,6 +54,7 @@ describe('novaSession store', () => {
 		const a = novaSession.beginStream('nova');
 		const sigA = novaSession.getSignal(a.id);
 		novaSession.append({ role: 'user', content: 'x' });
+		novaSession.setContextDisclosure(['project'], 1, { warnings: ['baseline'] });
 
 		novaSession.clear();
 
@@ -61,6 +62,7 @@ describe('novaSession store', () => {
 		expect(novaSession.messages).toEqual([]);
 		expect(novaSession.activeStreamId).toBeNull();
 		expect(novaSession.isStreaming).toBe(false);
+		expect(novaSession.contextDisclosure).toBeNull();
 	});
 
 	it('latest reflects the most recently appended message', () => {

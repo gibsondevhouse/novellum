@@ -20,7 +20,12 @@ import type {
 	TimelineEvent,
 } from '$lib/db/domain-types';
 import { normalizeSevenLayerOutline } from '$modules/outline/services/seven-layer-outline.js';
-import type { AiContext, AiTask, ContextPolicy } from './types.js';
+import type {
+	AiContext,
+	AiTask,
+	ContextPolicy,
+	ProjectContextCounts,
+} from './types.js';
 import {
 	MAX_CHARACTERS,
 	MAX_LOCATIONS,
@@ -60,6 +65,63 @@ async function getOrUndefined<T>(path: string): Promise<T | undefined> {
 		if (err instanceof ApiError && err.status === 404) return undefined;
 		throw err;
 	}
+}
+
+async function safeCount(endpoint: string, projectId: string): Promise<number> {
+	try {
+		const rows = await apiGet<unknown[]>(endpoint, { projectId });
+		return rows.length;
+	} catch {
+		return 0;
+	}
+}
+
+async function fetchProjectContextCounts(projectId: string): Promise<ProjectContextCounts> {
+	const [
+		chapters,
+		scenes,
+		beats,
+		characters,
+		characterRelationships,
+		locations,
+		loreEntries,
+		plotThreads,
+		timelineEvents,
+		acts,
+		arcs,
+		milestones,
+		writingStyles,
+	] = await Promise.all([
+		safeCount('/api/db/chapters', projectId),
+		safeCount('/api/db/scenes', projectId),
+		safeCount('/api/db/beats', projectId),
+		safeCount('/api/db/characters', projectId),
+		safeCount('/api/db/character_relationships', projectId),
+		safeCount('/api/db/locations', projectId),
+		safeCount('/api/db/lore_entries', projectId),
+		safeCount('/api/db/plot_threads', projectId),
+		safeCount('/api/db/timeline_events', projectId),
+		safeCount('/api/db/acts', projectId),
+		safeCount('/api/db/arcs', projectId),
+		safeCount('/api/db/milestones', projectId),
+		safeCount('/api/db/writing_styles', projectId),
+	]);
+
+	return {
+		chapters,
+		scenes,
+		beats,
+		characters,
+		characterRelationships,
+		locations,
+		loreEntries,
+		plotThreads,
+		timelineEvents,
+		acts,
+		arcs,
+		milestones,
+		writingStyles,
+	};
 }
 
 async function fetchCharactersByIds(ids: string[], limit: number): Promise<Character[]> {
@@ -112,6 +174,34 @@ async function buildSceneOnlyData(sceneId: string) {
 
 export async function buildContext(task: AiTask, projectId: string): Promise<AiContext> {
 	switch (task.contextPolicy) {
+		case 'project_summary': {
+			const [project, storyFrames, projectCounts] = await Promise.all([
+				getOrUndefined<Project>(`/api/db/projects/${projectId}`),
+				apiGet<StoryFrame[]>('/api/db/story_frames', { projectId }),
+				fetchProjectContextCounts(projectId),
+			]);
+
+			return {
+				policy: 'project_summary',
+				scene: null,
+				adjacentScenes: [],
+				chapter: null,
+				beats: [],
+				characters: [],
+				locations: [],
+				loreEntries: [],
+				plotThreads: [],
+				project: project ?? null,
+				projectCounts,
+				storyFrames,
+				timelineEvents: [],
+				characterRelationships: [],
+				factions: [],
+				themes: [],
+				glossaryTerms: [],
+			};
+		}
+
 		case 'scene_only': {
 			if (!task.targetEntityId) return emptyContext('scene_only');
 			const data = await buildSceneOnlyData(task.targetEntityId);

@@ -20,11 +20,16 @@ export type NovaMessageStatus =
 	| 'error'
 	| 'aborted';
 
+export type NovaMessageIntent =
+	| 'default'
+	| 'unsupported_action';
+
 export interface NovaMessage {
 	id: string;
 	role: NovaRole;
 	content: string;
 	status: NovaMessageStatus;
+	intent?: NovaMessageIntent;
 	/** ISO8601 timestamp. */
 	createdAt: string;
 	toolId?: string;
@@ -110,8 +115,8 @@ export interface RagContextResult {
 	contextText: string;
 	includedScopes: string[];
 	warnings: string[];
-	/** plan-023 stage-005 — populated when ContextEngine produces a real
-	 * AiContext for `scene_plus_adjacent`. Null when no scene is active. */
+	/** plan-030 stage-001 — populated with project baseline whenever
+	 * projectId exists, then expanded with scene/outline scopes when available. */
 	aiContext?: AiContext | null;
 }
 

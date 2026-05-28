@@ -1,6 +1,6 @@
 # Context Engine
 
-> Last verified: 2026-05-07
+> Last verified: 2026-05-27 (plan-030 stage-004 docs sync)
 
 The Context Engine selects the **minimum viable context** for an AI task. Hallucination reduction at Novellum is mostly a context-discipline problem, not a prompt-tuning problem.
 
@@ -31,6 +31,28 @@ A policy is a deterministic function: same project state + same scope identifier
 2. **Deterministic serialization.** Keys are sorted; arrays are sorted by stable IDs. Two runs over identical state must produce byte-identical context.
 3. **Strip transient state.** Editor selection, undo stacks, and UI state never leak into context.
 4. **Explicit "missing" markers.** A null relationship is rendered explicitly so the model knows the absence is intentional.
+
+## Nova Project-Baseline Fallback (plan-030)
+
+For Nova sidepanel requests, if `projectId` is present and there is no active scene,
+the context contract still includes a compact project baseline before optional scene/outline scopes.
+
+Required baseline fields:
+
+- project title
+- genre
+- status
+- project type
+- target word count
+- logline
+- synopsis
+- style preset id
+- updated timestamp
+- entity counts
+- first story-frame summary (when available)
+
+This preserves grounding for "what is this novel about?" class prompts without widening
+to full-manuscript context.
 
 ## Adding a new policy
 

@@ -7,7 +7,13 @@
  * to its OpenRouter fetch.
  */
 
-import type { NovaArtifact, NovaMessage, NovaMessageStatus, NovaRole } from '../types.js';
+import type {
+	NovaArtifact,
+	NovaMessage,
+	NovaMessageIntent,
+	NovaMessageStatus,
+	NovaRole,
+} from '../types.js';
 import {
 	createStreamController,
 	type StreamController,
@@ -16,12 +22,16 @@ import {
 export interface ContextDisclosureState {
 	scopes: string[]; // e.g. ['scene', 'characters', 'locations']
 	itemCount: number; // total items across all scopes
+	warnings: string[];
+	compressed: boolean;
+	truncated: boolean;
 }
 
 interface AppendInput {
 	role: NovaRole;
 	content: string;
 	status?: NovaMessageStatus;
+	intent?: NovaMessageIntent;
 	toolId?: string;
 	toolPayload?: unknown;
 }
@@ -40,8 +50,22 @@ class NovaSessionStore {
 		return this.activeStreamId !== null;
 	}
 
-	setContextDisclosure(scopes: string[], itemCount: number): void {
-		this.contextDisclosure = { scopes, itemCount };
+	setContextDisclosure(
+		scopes: string[],
+		itemCount: number,
+		options?: {
+			warnings?: string[];
+			compressed?: boolean;
+			truncated?: boolean;
+		},
+	): void {
+		this.contextDisclosure = {
+			scopes,
+			itemCount,
+			warnings: options?.warnings ?? [],
+			compressed: options?.compressed ?? false,
+			truncated: options?.truncated ?? false,
+		};
 	}
 
 	append(input: AppendInput): NovaMessage {
@@ -50,12 +74,31 @@ class NovaSessionStore {
 			role: input.role,
 			content: input.content,
 			status: input.status ?? 'complete',
+			intent: input.intent ?? 'default',
 			createdAt: new Date().toISOString(),
 			toolId: input.toolId,
 			toolPayload: input.toolPayload,
 		};
 		this.messages = [...this.messages, message];
 		return message;
+	}
+
+	appendUnsupportedScribeAction(request: string): NovaMessage {
+		const trimmed = request.trim();
+		return this.append({
+			role: 'nova',
+			status: 'complete',
+			intent: 'unsupported_action',
+			content:
+				'Scribe currently supports one action: build a project outline. ' +
+				'For this request, switch to Chat mode for brainstorming or feedback.',
+			toolPayload: {
+				kind: 'unsupported-action',
+				mode: 'scribe',
+				request: trimmed,
+				supportedActions: ['build a project outline'],
+			},
+		});
 	}
 
 	beginStream(role: NovaRole): NovaMessage {
@@ -151,6 +194,7 @@ class NovaSessionStore {
 		this.controllers.clear();
 		this.messages = [];
 		this.activeStreamId = null;
+		this.contextDisclosure = null;
 	}
 
 	/**

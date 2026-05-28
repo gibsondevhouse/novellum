@@ -1,6 +1,6 @@
 # AI Pipeline
 
-> Last verified: 2026-05-26 (plan-028 UI shipped)
+> Last verified: 2026-05-27 (plan-030 stage-004 docs sync)
 
 Every AI feature in Novellum follows the same pipeline. The runtime
 agents (continuity / edit / rewrite / style) live in [src/lib/ai/](../../src/lib/ai/)
@@ -156,6 +156,21 @@ The review-gate guardrail is enforced at three layers:
 later editor accept-pipeline can ledger the provenance (`taskKey`,
 `family`, `stage`, `model`, `createdAt`). That integration is out of
 scope for plan-027.
+
+### Nova mode/workflow boundaries (plan-030)
+
+Plan-030 tightens the Nova product contract without adding autonomous tool runtime:
+
+- `chat` mode stays conversational and grounded to scoped project context.
+- `scribe` mode only routes supported outline-generation requests to the author pipeline.
+- Unsupported concrete Scribe requests render an explicit limitation state instead of fallback execution.
+- Draft/revision artifacts remain proposal cards with explicit user review actions (no auto-apply).
+
+Key enforcement tests:
+
+- `tests/nova/nova-panel-chat.test.ts`
+- `tests/nova/nova-artifact-cards.test.ts`
+- `tests/nova/nova-surface-reconciliation.test.ts`
 
 See [ADR-0027](../02-architecture/adr/adr-0027-pipeline-entity-scope.md)
 for the V1.1 scope decision.

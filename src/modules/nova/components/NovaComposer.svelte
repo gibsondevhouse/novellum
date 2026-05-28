@@ -1,5 +1,5 @@
 <!--
-	Nova chat composer: mode selector, file attachment staging, textarea, and
+	Nova chat composer: mode selector, textarea, and
 	send / abort controls. Owns its own draft and attachment state; submits via
 	sendNovaChat from the chat service.
 -->
@@ -15,30 +15,19 @@
 	type ChatModeOption = {
 		value: NovaChatMode;
 		label: string;
-		shortLabel: string;
 		description: string;
-	};
-
-	type StagedAttachment = {
-		id: string;
-		name: string;
-		size: number;
-		kind: 'image' | 'document' | 'other';
-		mimeType: string;
 	};
 
 	const CHAT_MODE_OPTIONS: ChatModeOption[] = [
 		{
 			value: 'chat',
 			label: 'Chat',
-			shortLabel: 'C',
 			description: 'Brainstorm and general story conversation.',
 		},
 		{
 			value: 'scribe',
 			label: 'Scribe',
-			shortLabel: 'S',
-			description: 'Agentic writing copilot for concrete drafting tasks.',
+			description: 'Structured task mode (currently supports project outline generation).',
 		},
 	];
 
@@ -52,17 +41,15 @@
 
 	let draft = $state('');
 	let selectedMode = $state<NovaChatMode>('chat');
-	let stagedAttachments = $state<StagedAttachment[]>([]);
-	let attachmentInputEl = $state<HTMLInputElement | null>(null);
 
 	const isStreaming = $derived(novaSession.isStreaming);
 	const selectedModeMeta = $derived.by(
 		() => CHAT_MODE_OPTIONS.find((option) => option.value === selectedMode) ?? CHAT_MODE_OPTIONS[0],
 	);
 	const composerPlaceholder = $derived.by(() => {
-		if (isStreaming) return 'Copilot is responding…';
+		if (isStreaming) return 'Nova is responding…';
 		if (selectedMode === 'chat') return 'Brainstorm, ask questions, or explore story ideas…';
-		return 'Give Scribe a concrete task (outline, draft, revise, or analyze)…';
+		return 'Ask Scribe to build a project outline…';
 	});
 	const canSubmit = $derived(draft.trim().length > 0 && !isStreaming);
 
@@ -74,77 +61,21 @@
 		}
 	});
 
-	function classifyAttachmentKind(file: File): StagedAttachment['kind'] {
-		if (file.type.startsWith('image/')) return 'image';
-		if (
-			file.type.includes('pdf') ||
-			file.type.includes('word') ||
-			file.type.includes('text') ||
-			file.type.includes('markdown')
-		) {
-			return 'document';
-		}
-		const lowerName = file.name.toLowerCase();
-		if (
-			lowerName.endsWith('.md') ||
-			lowerName.endsWith('.txt') ||
-			lowerName.endsWith('.doc') ||
-			lowerName.endsWith('.docx') ||
-			lowerName.endsWith('.pdf')
-		) {
-			return 'document';
-		}
-		return 'other';
-	}
-
-	function formatFileSize(bytes: number): string {
-		if (bytes < 1024) return `${bytes} B`;
-		if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-		return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-	}
-
-	function openAttachmentPicker(): void {
-		attachmentInputEl?.click();
-	}
-
-	function handleAttachmentSelect(event: Event): void {
-		const inputEl = event.currentTarget;
-		if (!(inputEl instanceof HTMLInputElement) || !inputEl.files) return;
-
-		const next = [...stagedAttachments];
-		// eslint-disable-next-line svelte/prefer-svelte-reactivity -- local dedup, not reactive state
-		const seen = new Set(next.map((item) => `${item.name}:${item.size}:${item.mimeType}`));
-		for (const file of Array.from(inputEl.files)) {
-			const candidate: StagedAttachment = {
-				id: crypto.randomUUID(),
-				name: file.name,
-				size: file.size,
-				kind: classifyAttachmentKind(file),
-				mimeType: file.type,
-			};
-			const key = `${candidate.name}:${candidate.size}:${candidate.mimeType}`;
-			if (seen.has(key)) continue;
-			seen.add(key);
-			next.push(candidate);
-		}
-
-		stagedAttachments = next;
-		inputEl.value = '';
-	}
-
-	function removeAttachment(id: string): void {
-		stagedAttachments = stagedAttachments.filter((item) => item.id !== id);
-	}
-
 	function buildModePrompt(rawPrompt: string): string {
 		if (selectedMode !== 'scribe') return rawPrompt;
-		return `Scribe mode: act as an agentic writing copilot. Be concrete, structured, and action-oriented.\n\n${rawPrompt}`;
+		return `Scribe mode: act as an agentic writing assistant. Be concrete, structured, and action-oriented.\n\n${rawPrompt}`;
 	}
 
 	function isOutlineBuildRequest(rawPrompt: string): boolean {
 		return (
 			/\b(outline|story\s*structure|plot\s*map|chapter\s*plan|chapter\s*outline)\b/i.test(rawPrompt) &&
 			/\b(build|create|generate|draft|make|design|plan|structure)\b/i.test(rawPrompt)
+		);
+	}
+
+	function isScribeConcreteRequest(rawPrompt: string): boolean {
+		return /\b(build|create|generate|draft|write|rewrite|revise|edit|analy(?:s|z)e|critique|plan|structure)\b/i.test(
+			rawPrompt,
 		);
 	}
 
@@ -176,6 +107,12 @@
 			return;
 		}
 
+		if (selectedMode === 'scribe' && isScribeConcreteRequest(value)) {
+			novaSession.append({ role: 'user', content: buildModePrompt(value), status: 'complete' });
+			novaSession.appendUnsupportedScribeAction(value);
+			return;
+		}
+
 		await sendNovaChat({
 			prompt: buildModePrompt(value),
 			projectId,
@@ -204,102 +141,70 @@
 		void submitDraft();
 	}}
 >
-	<div class="nova-composer__row">
-		<input
-			bind:this={attachmentInputEl}
-			type="file"
-			class="nova-attachment-input"
-			onchange={handleAttachmentSelect}
-			accept=".txt,.md,.pdf,.doc,.docx,.rtf,.odt,image/*"
-			multiple
-		/>
-
-		<div class="nova-square-stack">
+	<div class="nova-composer__shell">
+		<div class="nova-composer__toprow">
+			<label for="nova-mode-select" class="nova-mode-label">Mode</label>
 			<select
-				class="nova-mode-square"
+				id="nova-mode-select"
+				class="nova-mode-select"
 				bind:value={selectedMode}
-				aria-label="Copilot chat mode"
-				title={`${selectedModeMeta.label} mode`}
+				aria-label="Nova mode"
+				title={selectedModeMeta.description}
 				disabled={isStreaming}
 			>
 				{#each CHAT_MODE_OPTIONS as option (option.value)}
-					<option value={option.value}>{option.shortLabel}</option>
+					<option value={option.value}>{option.label}</option>
 				{/each}
 			</select>
-
-			<button
-				type="button"
-				class="nova-upload-icon"
-				onclick={openAttachmentPicker}
-				aria-label="Upload documents and images"
-			>
-				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<path d="M21.44 11.05 12.25 20.2a6 6 0 0 1-8.48-8.48l9.19-9.19a4 4 0 0 1 5.66 5.66L9.41 17.4a2 2 0 1 1-2.83-2.83l8.49-8.48"></path>
-				</svg>
-			</button>
 		</div>
 
-		<textarea
-			class="nova-input"
-			bind:value={draft}
-			onkeydown={handleKeydown}
-			placeholder={composerPlaceholder}
-			rows="3"
-			aria-label="Ask Copilot"
-			disabled={isStreaming}
-		></textarea>
+		<div class="nova-composer__row">
+			<textarea
+				class="nova-input"
+				bind:value={draft}
+				onkeydown={handleKeydown}
+				placeholder={composerPlaceholder}
+				rows="3"
+				aria-label="Ask Nova"
+				disabled={isStreaming}
+			></textarea>
 
-		{#if isStreaming}
-			<button
-				type="button"
-				class="nova-action nova-action-stop nova-action-abort"
-				onclick={abortActiveStream}
-				aria-label="Abort response"
-			>
-				<span class="nova-stop-glyph" aria-hidden="true"></span>
-				Stop
-			</button>
-		{:else}
-			<button
-				type="submit"
-				class="nova-action nova-action-send"
-				disabled={!canSubmit}
-				aria-label="Send message"
-			>
-				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path d="m22 2-7 20-4-9-9-4z"></path>
-					<path d="M22 2 11 13"></path>
-				</svg>
-				<span class="sr-only">Send</span>
-			</button>
+			{#if isStreaming}
+				<button
+					type="button"
+					class="nova-action nova-action-stop nova-action-abort"
+					onclick={abortActiveStream}
+					aria-label="Abort response"
+				>
+					<span class="nova-stop-glyph" aria-hidden="true"></span>
+					Stop
+				</button>
+			{:else}
+				<button
+					type="submit"
+					class="nova-action nova-action-send"
+					disabled={!canSubmit}
+					aria-label="Send message"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="m22 2-7 20-4-9-9-4z"></path>
+						<path d="M22 2 11 13"></path>
+					</svg>
+					<span class="sr-only">Send</span>
+				</button>
+			{/if}
+		</div>
+
+		{#if selectedMode === 'scribe'}
+			<p class="nova-mode-hint">Scribe currently supports outline generation.</p>
 		{/if}
 	</div>
-
-	{#if stagedAttachments.length > 0}
-		<ul class="nova-attachment-inline" aria-label="Staged attachments">
-			{#each stagedAttachments as attachment (attachment.id)}
-				<li class="nova-attachment-chip">
-					<span class="nova-attachment-chip__name">{attachment.name}</span>
-					<span class="nova-attachment-chip__meta">{formatFileSize(attachment.size)}</span>
-					<button
-						type="button"
-						class="nova-attachment-chip__remove"
-						onclick={() => removeAttachment(attachment.id)}
-						aria-label={`Remove ${attachment.name}`}
-					>
-						Remove
-					</button>
-				</li>
-			{/each}
-		</ul>
-	{/if}
 </form>
 
 <style>
-	.nova-mode-square,
-	.nova-upload-icon,
+	.nova-mode-select,
 	.nova-action,
-	.nova-attachment-chip__remove {
+	.nova-input {
 		transition:
 			background-color var(--duration-fast) var(--ease-standard),
 			border-color var(--duration-fast) var(--ease-standard),
@@ -307,44 +212,62 @@
 			opacity var(--duration-fast) var(--ease-standard);
 	}
 
-	.nova-mode-square:focus-visible,
-	.nova-upload-icon:focus-visible,
+	.nova-mode-select:focus-visible,
 	.nova-action:focus-visible,
-	.nova-attachment-chip__remove:focus-visible {
+	.nova-input:focus-visible {
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}
 
-	.nova-action:disabled,
-	.nova-attachment-chip__remove:disabled {
+	.nova-action:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
 	}
 
-	.nova-mode-square {
+	.nova-mode-select {
 		appearance: none;
 		-webkit-appearance: none;
-		width: 36px;
-		height: 36px;
-		padding: 0;
+		min-width: 118px;
+		height: 30px;
+		padding: 0 var(--space-6) 0 var(--space-2);
 		margin: 0;
-		border-radius: var(--radius-md);
-		border: 1px solid var(--color-border-default);
-		background: var(--color-surface-overlay);
-		color: var(--color-text-secondary);
+		border-radius: var(--radius-full);
+		border: 1px solid color-mix(in srgb, var(--color-border-default) 86%, var(--color-candle) 14%);
+		background-color: var(--color-surface-overlay);
+		color: var(--color-text-primary);
 		font-size: var(--text-xs);
 		font-weight: var(--font-weight-semibold);
-		text-align: center;
-		text-align-last: center;
+		text-align: left;
 		cursor: pointer;
+		background-image:
+			linear-gradient(
+				180deg,
+				color-mix(in srgb, var(--color-surface-overlay) 90%, var(--color-candle) 10%) 0%,
+				var(--color-surface-overlay) 100%
+			),
+			linear-gradient(45deg, transparent 50%, var(--color-text-muted) 50%),
+			linear-gradient(135deg, var(--color-text-muted) 50%, transparent 50%);
+		background-position:
+			0 0,
+			calc(100% - 12px) 12px,
+			calc(100% - 8px) 12px;
+		background-size:
+			100% 100%,
+			4px 4px,
+			4px 4px;
+		background-repeat: no-repeat;
 	}
 
-	.nova-mode-square:hover {
+	.nova-mode-select:hover {
 		background: var(--color-surface-hover);
-		color: var(--color-text-primary);
 	}
 
-	.nova-mode-square option {
+	.nova-mode-select:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.nova-mode-select option {
 		background: var(--color-surface-ground);
 		color: var(--color-text-primary);
 	}
@@ -355,49 +278,52 @@
 		gap: var(--space-2);
 	}
 
+	.nova-composer__shell {
+		display: grid;
+		gap: var(--space-2);
+		padding: var(--space-2);
+		border-radius: var(--radius-lg);
+		border: 1px solid color-mix(in srgb, var(--color-border-default) 82%, var(--color-candle) 18%);
+		background:
+			linear-gradient(
+				180deg,
+				color-mix(in srgb, var(--color-surface-overlay) 92%, var(--color-surface-ground)) 0%,
+				color-mix(in srgb, var(--color-surface-ground) 86%, var(--color-surface-base)) 100%
+			);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+	}
+
+	.nova-composer__toprow {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-2);
+	}
+
+	.nova-mode-label {
+		margin: 0;
+		font-size: 11px;
+		font-weight: var(--font-weight-semibold);
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		color: var(--color-text-muted);
+	}
+
 	.nova-composer__row {
 		display: grid;
-		grid-template-columns: 36px 1fr 36px;
+		grid-template-columns: 1fr auto;
 		align-items: end;
 		gap: var(--space-2);
 	}
 
-	.nova-square-stack {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-2);
-	}
-
-	.nova-attachment-input {
-		display: none;
-	}
-
-	.nova-upload-icon {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 36px;
-		height: 36px;
-		border-radius: var(--radius-md);
-		border: 1px solid var(--color-border-default);
-		background: var(--color-surface-overlay);
-		color: var(--color-text-secondary);
-		cursor: pointer;
-	}
-
-	.nova-upload-icon:hover {
-		background: var(--color-surface-hover);
-		color: var(--color-text-primary);
-	}
-
 	.nova-input {
 		width: 100%;
-		min-height: 96px;
+		min-height: 84px;
 		max-height: 220px;
 		padding: var(--space-2) var(--space-3);
-		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-md);
-		background: var(--color-surface-overlay);
+		border: 1px solid color-mix(in srgb, var(--color-border-default) 78%, var(--color-candle) 22%);
+		border-radius: var(--radius-lg);
+		background: color-mix(in srgb, var(--color-surface-ground) 88%, var(--color-surface-overlay));
 		color: var(--color-text-primary);
 		font-size: var(--text-sm);
 		line-height: var(--leading-relaxed);
@@ -405,9 +331,8 @@
 		resize: none;
 	}
 
-	.nova-input:focus-visible {
-		outline: none;
-		box-shadow: var(--focus-ring);
+	.nova-input::placeholder {
+		color: color-mix(in srgb, var(--color-text-muted) 82%, var(--color-text-secondary));
 	}
 
 	.nova-input:disabled {
@@ -419,10 +344,10 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		width: 36px;
-		height: 36px;
+		width: 40px;
+		height: 40px;
 		padding: 0;
-		border-radius: var(--radius-md);
+		border-radius: 999px;
 		border: 1px solid transparent;
 		font-size: var(--text-sm);
 		font-weight: var(--font-weight-medium);
@@ -437,6 +362,9 @@
 		background: var(--color-candle);
 		border-color: color-mix(in srgb, var(--color-brass) 70%, var(--color-candle));
 		color: var(--color-ink);
+		box-shadow:
+			0 4px 14px rgba(240, 187, 112, 0.25),
+			inset 0 1px 0 rgba(255, 255, 255, 0.32);
 	}
 
 	.nova-action-send:disabled {
@@ -444,9 +372,13 @@
 	}
 
 	.nova-action-stop {
-		background: var(--color-surface-overlay);
+		background: color-mix(in srgb, var(--color-surface-overlay) 80%, var(--color-surface-ground));
 		border-color: var(--color-border-default);
 		color: var(--color-text-secondary);
+		border-radius: var(--radius-md);
+		padding-inline: var(--space-2);
+		width: auto;
+		min-width: 64px;
 	}
 
 	.nova-action-stop:hover {
@@ -462,6 +394,12 @@
 		background: currentColor;
 	}
 
+	.nova-mode-hint {
+		margin: 0;
+		font-size: 11px;
+		color: var(--color-text-muted);
+	}
+
 	.sr-only {
 		position: absolute;
 		width: 1px;
@@ -474,51 +412,13 @@
 		border: 0;
 	}
 
-	.nova-attachment-inline {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--space-2);
-		list-style: none;
-		margin: 0;
-		padding: 0;
-	}
+	@media (max-width: 360px) {
+		.nova-composer__toprow {
+			flex-wrap: wrap;
+		}
 
-	.nova-attachment-chip {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--space-1);
-		padding: var(--space-1) var(--space-2);
-		border-radius: 999px;
-		border: 1px solid var(--color-border-default);
-		background: var(--color-surface-overlay);
-		max-width: 100%;
-	}
-
-	.nova-attachment-chip__name {
-		font-size: var(--text-xs);
-		color: var(--color-text-primary);
-		max-width: 170px;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
-	.nova-attachment-chip__meta {
-		font-size: 11px;
-		color: var(--color-text-muted);
-	}
-
-	.nova-attachment-chip__remove {
-		border: none;
-		background: transparent;
-		color: var(--color-text-secondary);
-		font-size: 11px;
-		cursor: pointer;
-		text-decoration: underline;
-		border-radius: var(--radius-md);
-	}
-
-	.nova-attachment-chip__remove:hover {
-		color: var(--color-text-primary);
+		.nova-composer__row {
+			grid-template-columns: 1fr auto;
+		}
 	}
 </style>

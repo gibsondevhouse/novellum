@@ -1,11 +1,10 @@
 # MASTER PLAN: Novellum Development
 
-> Last reconciled: 2026-05-27 (plan-029 stage-004 governance reconciliation)
+> Last reconciled: 2026-05-28 (plan-030 closeout reconciliation)
 
 ## Active Plans
 
-(none)
-
+- None.
 
 ## Deferred (not yet scheduled)
 
@@ -13,6 +12,7 @@
 
 ## Completed Plans (Archived)
 
+- [plan-030-nova-production-refactor](./plan-030-nova-production-refactor/plan.md): Nova production refactor focused on trust repair. 4 stages. Status: `complete` (closed 2026-05-28). Quality gates: `check`, `lint`, `lint:css`, and full `test` passed (190 files / 1299 tests). Full visual suite reported pre-existing cross-surface snapshot drift; targeted Nova visual specs were executed as documented substitute (2 passed, 3 skipped).
 - [plan-029-v1.1-unfinished-work-closeout](./plan-029-v1.1-unfinished-work-closeout/plan.md): V1.1 Unfinished Work Closeout umbrella. 4 stages. Status: `complete` (closed 2026-05-27). Retired plan-019, plan-021, plan-024 stage-003 as shipped. Executed plan-024 stage-006 docs rebaseline. Deferred plan-024 stage-002 (release engineering) to dedicated plan. Quality gates: 187 files / 1270 tests; 325 files / 0 token violations.
 - [plan-028-v1.1-hierarchical-pipeline-ui](./plan-028/plan.md): Outline-first hierarchical pipeline UI — Arc → Stage traversal, worldbuild run flow, checkpoint review console, verification/doc sync. 4 stages, 10 parts. Status: `complete` (closed 2026-05-26; 187 files / 1268 vitest tests; token guard 0 violations; 7 Playwright e2e specs covering traversal, run, review, accept/reject, failure flows; docs reconciled with shipped behavior).
 - [plan-027-v1.1-scoping](./plan-027-v1.1-scoping/plan.md): V1.1 staged fiction pipeline delivery — pipeline foundation, Vibe-Worldbuild, Vibe-Author. 3 stages. Status: `complete` (closed 2026-05-27; 177 files / 1156 vitest tests; token guard 0 violations; Playwright review-gate coverage for both worldbuild and author surfaces).

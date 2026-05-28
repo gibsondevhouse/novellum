@@ -36,6 +36,7 @@
 	const PANEL_DEFAULT_WIDTH = 360;
 	const PANEL_MIN_WIDTH = 280;
 	const PANEL_MAX_WIDTH = 520;
+	const PANEL_CONSTRAINED_WIDTH = 340;
 	const PANEL_KEYBOARD_STEP = 16;
 
 	let resizeHandleEl = $state<HTMLButtonElement | null>(null);
@@ -51,6 +52,37 @@
 	const keyConfigured = $derived(aiSession.keyConfigured);
 	const aiLoading = $derived(aiSession.loading);
 	const aiChecked = $derived(aiSession.checked);
+	const hasProjectContext = $derived(Boolean(projectId));
+	const panelStatusLabel = $derived.by(() => {
+		if (aiLoading) return 'Checking AI configuration';
+		if (aiChecked && !keyConfigured) return 'AI key required';
+		if (hasProjectContext) return 'Project context attached';
+		return 'No project context';
+	});
+	const greetingBody = $derived.by(() => {
+		if (hasProjectContext) return 'Ask about this project, scene plans, or next drafting steps.';
+		return 'Open a project to unlock grounded story help, or ask a general writing question.';
+	});
+	const showQuickPrompt = $derived(hasProjectContext && Boolean(onQuickPrompt));
+	const starterPrompts = $derived.by(() => {
+		if (hasProjectContext) {
+			return [
+				'Summarize this project premise in one paragraph.',
+				'Give me three options for the next scene.',
+				'What continuity risks should I watch right now?',
+			];
+		}
+		return [
+			'Help me outline a chapter arc.',
+			'Give me five plot-twist ideas for a thriller.',
+			'How do I raise stakes in my opening scene?',
+		];
+	});
+	const panelViewportState = $derived.by(() => {
+		if (isCompactViewport) return 'compact';
+		if (panelWidth <= PANEL_CONSTRAINED_WIDTH) return 'constrained';
+		return 'desktop';
+	});
 	const novaError = $derived.by(() => {
 		for (let i = novaSession.messages.length - 1; i >= 0; i--) {
 			const m = novaSession.messages[i];
@@ -59,6 +91,14 @@
 		return null;
 	});
 	const novaErrorType = $derived(novaError ? classifyNovaError(novaError) : null);
+
+	function queueStarterPrompt(prompt: string): void {
+		if (onQuickPrompt) {
+			onQuickPrompt(prompt);
+			return;
+		}
+		novaPanel.openWithPrompt(prompt);
+	}
 
 	function handleRetry(): void {
 		// Pop the failed assistant turn, re-run the AI pipeline against the
@@ -225,14 +265,19 @@
 </script>
 
 {#if novaPanel.isOpen}
-	<aside class="nova-panel" class:is-resizing={isResizing} aria-label="Nova copilot">
+	<aside
+		class="nova-panel"
+		class:is-resizing={isResizing}
+		aria-label="Nova panel"
+		data-viewport-state={panelViewportState}
+	>
 		<button
 			bind:this={resizeHandleEl}
 			type="button"
 			class="nova-resize-handle"
 			role="slider"
 			aria-orientation="horizontal"
-			aria-label="Resize Copilot panel"
+			aria-label="Resize Nova panel"
 			aria-valuemin={PANEL_MIN_WIDTH}
 			aria-valuemax={PANEL_MAX_WIDTH}
 			aria-valuenow={panelWidth}
@@ -243,6 +288,13 @@
 		></button>
 
 		<header class="nova-header">
+			<div class="nova-header-identity">
+				<h2 id="nova-panel-title" class="nova-header-title">Nova</h2>
+				<p class="nova-header-status" aria-live="polite">
+					<span class="nova-header-status-dot" aria-hidden="true"></span>
+					{panelStatusLabel}
+				</p>
+			</div>
 			<button
 				type="button"
 				class="nova-close"
@@ -252,7 +304,7 @@
 		</header>
 
 		{#if keyConfigured}
-			<div class="nova-session-tray" aria-label="Session controls">
+			<div class="nova-session-tray" aria-label="Context and model controls">
 				{#if aiLoading}
 					<span class="nova-checking-dot" aria-label="Checking AI configuration…" title="Checking AI configuration…"></span>
 				{/if}
@@ -261,26 +313,40 @@
 			</div>
 		{/if}
 
-		<div class="nova-body" aria-live="polite">
+		<div class="nova-body" class:nova-body-empty={messages.length === 0} aria-live="polite">
 			{#if aiChecked && !keyConfigured}
 				<EmptyStatePanel
 					title="No AI key configured"
-					description="Add your OpenRouter API key in Settings to start using the AI assistant."
+					description="Add your OpenRouter API key in AI Settings to start using Nova."
 				>
 					{#snippet actions()}
-						<a href="/settings/ai" class="nova-settings-link">Go to Settings</a>
+						<a href="/settings/ai" class="nova-settings-link">Open AI Settings</a>
 					{/snippet}
 				</EmptyStatePanel>
 			{:else}
 				{#if messages.length === 0}
 					<div class="nova-greeting">
 						<p class="nova-greeting-title">Hi, I'm Nova.</p>
-						<p class="nova-greeting-body">Ask me anything about your project.</p>
-						<button
-							type="button"
-							class="nova-quick-prompt"
-							onclick={() => onQuickPrompt?.('Summarize what we know so far.')}
-						>Summarize what we know so far</button>
+						<p class="nova-greeting-body">{greetingBody}</p>
+						{#if showQuickPrompt}
+							<button
+								type="button"
+								class="nova-quick-prompt"
+								onclick={() => onQuickPrompt?.('Summarize what we know so far.')}
+							>Summarize what we know so far</button>
+						{/if}
+
+						<div class="nova-starter-prompts" aria-label="Starter prompts">
+							{#each starterPrompts as prompt (prompt)}
+								<button
+									type="button"
+									class="nova-starter-btn"
+									onclick={() => queueStarterPrompt(prompt)}
+								>
+									{prompt}
+								</button>
+							{/each}
+						</div>
 					</div>
 				{/if}
 				{#if messages.length > 0}
@@ -313,9 +379,17 @@
 		min-width: var(--nova-panel-width-min);
 		display: flex;
 		flex-direction: column;
-		background: var(--color-surface-ground);
-		border-left: 1px solid color-mix(in srgb, var(--color-brass) 30%, var(--nova-panel-border));
-		box-shadow: var(--nova-panel-shadow);
+		background:
+			linear-gradient(
+				180deg,
+				color-mix(in srgb, var(--color-surface-ground) 90%, var(--color-surface-overlay)) 0%,
+				var(--color-surface-ground) 56%,
+				color-mix(in srgb, var(--color-surface-ground) 88%, var(--color-surface-base)) 100%
+			);
+		border-left: 1px solid color-mix(in srgb, var(--color-brass) 44%, var(--nova-panel-border));
+		box-shadow:
+			-10px 0 26px rgba(0, 0, 0, 0.44),
+			inset 0 1px 0 rgba(255, 255, 255, 0.02);
 		z-index: 50;
 		color: var(--color-text-primary);
 	}
@@ -373,16 +447,75 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-2);
-		padding: var(--space-2) var(--space-4);
-		border-bottom: 1px solid var(--color-border-default);
-		background: var(--color-surface-ground);
+		padding: var(--space-2) var(--space-4) var(--space-3);
+		background: color-mix(in srgb, var(--color-surface-ground) 86%, var(--color-surface-overlay));
+		border-bottom: 1px solid var(--color-border-subtle);
+	}
+
+	.nova-panel[data-viewport-state='constrained'] .nova-session-tray,
+	.nova-panel[data-viewport-state='compact'] .nova-session-tray {
+		flex-wrap: wrap;
+	}
+
+	.nova-panel[data-viewport-state='constrained'] .nova-session-tray {
+		align-items: flex-start;
+		row-gap: var(--space-1);
 	}
 
 	.nova-header {
+		position: relative;
 		display: flex;
-		justify-content: flex-end;
+		justify-content: space-between;
 		align-items: center;
-		padding: var(--space-2) var(--space-4);
+		padding: var(--space-3) var(--space-4) var(--space-2);
+		border-bottom: 1px solid var(--color-border-subtle);
+		background: color-mix(in srgb, var(--color-surface-ground) 84%, var(--color-surface-overlay));
+	}
+
+	.nova-header::after {
+		content: '';
+		position: absolute;
+		left: var(--space-4);
+		right: var(--space-4);
+		bottom: 0;
+		height: 1px;
+		background: color-mix(in srgb, var(--color-candle) 22%, transparent);
+		opacity: 0.7;
+	}
+
+	.nova-header-identity {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		min-width: 0;
+	}
+
+	.nova-header-title {
+		margin: 0;
+		font-size: var(--text-sm);
+		font-weight: var(--font-weight-semibold);
+		color: var(--color-text-primary);
+		line-height: var(--leading-tight);
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+	}
+
+	.nova-header-status {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		margin: 0;
+		font-size: var(--text-xs);
+		color: var(--color-text-muted);
+		line-height: var(--leading-tight);
+	}
+
+	.nova-header-status-dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: color-mix(in srgb, var(--color-candle) 78%, var(--color-text-secondary));
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-candle) 20%, transparent);
 	}
 
 	.nova-close {
@@ -391,9 +524,9 @@
 		justify-content: center;
 		width: var(--space-7);
 		height: var(--space-7);
-		border: 0;
+		border: 1px solid var(--color-border-subtle);
 		border-radius: var(--radius-sm);
-		background: transparent;
+		background: color-mix(in srgb, var(--color-surface-overlay) 72%, transparent);
 		color: var(--color-text-secondary);
 		font-size: var(--text-lg);
 		line-height: 1;
@@ -402,44 +535,88 @@
 
 	.nova-close:hover {
 		background: var(--color-surface-overlay);
+		border-color: var(--color-border-default);
 		color: var(--color-text-primary);
 	}
 
 	.nova-greeting {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-2);
-		padding: var(--space-6) var(--space-2);
-		text-align: center;
+		gap: var(--space-3);
+		padding: var(--space-5);
+		margin-top: var(--space-3);
+		border-radius: var(--radius-lg);
+		border: 1px solid color-mix(in srgb, var(--color-border-default) 86%, var(--color-candle) 14%);
+		background:
+			linear-gradient(
+				160deg,
+				color-mix(in srgb, var(--color-surface-overlay) 90%, var(--color-candle) 10%) 0%,
+				color-mix(in srgb, var(--color-surface-ground) 94%, var(--color-surface-overlay)) 100%
+			);
+		box-shadow:
+			0 10px 22px rgba(0, 0, 0, 0.22),
+			inset 0 1px 0 rgba(255, 255, 255, 0.04);
+		text-align: left;
 	}
 
 	.nova-greeting-title {
 		margin: 0;
-		font-size: var(--text-lg);
+		font-size: var(--text-2xl);
 		font-weight: 600;
 		color: var(--color-text-primary);
+		line-height: var(--leading-tight);
 	}
 
 	.nova-greeting-body {
 		margin: 0;
 		font-size: var(--text-sm);
 		color: var(--color-text-secondary);
+		max-width: 28ch;
 	}
 
 	.nova-quick-prompt {
-		align-self: center;
-		margin-top: var(--space-2);
+		align-self: flex-start;
 		padding: var(--space-2) var(--space-4);
 		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-md);
-		background: var(--color-surface-overlay);
+		border-radius: var(--radius-full);
+		background: color-mix(in srgb, var(--color-surface-overlay) 92%, var(--color-candle) 8%);
 		color: var(--color-text-primary);
 		font-size: var(--text-sm);
+		font-weight: var(--font-weight-medium);
 		cursor: pointer;
 	}
 
 	.nova-quick-prompt:hover {
-		background: var(--color-surface-raised);
+		background: color-mix(in srgb, var(--color-surface-overlay) 80%, var(--color-candle) 20%);
+	}
+
+	.nova-starter-prompts {
+		display: grid;
+		gap: var(--space-2);
+	}
+
+	.nova-starter-btn {
+		display: block;
+		width: 100%;
+		text-align: left;
+		padding: var(--space-2) var(--space-3);
+		border-radius: var(--radius-md);
+		border: 1px solid color-mix(in srgb, var(--color-border-default) 88%, var(--color-candle) 12%);
+		background: color-mix(in srgb, var(--color-surface-ground) 84%, var(--color-surface-overlay));
+		color: var(--color-text-secondary);
+		font-size: var(--text-sm);
+		line-height: 1.45;
+		cursor: pointer;
+		transition:
+			background-color var(--duration-fast) var(--ease-standard),
+			color var(--duration-fast) var(--ease-standard),
+			border-color var(--duration-fast) var(--ease-standard);
+	}
+
+	.nova-starter-btn:hover {
+		background: color-mix(in srgb, var(--color-surface-overlay) 78%, var(--color-candle) 22%);
+		color: var(--color-text-primary);
+		border-color: color-mix(in srgb, var(--color-candle) 28%, var(--color-border-default));
 	}
 
 	.nova-body {
@@ -447,6 +624,24 @@
 		min-height: 0;
 		overflow-y: auto;
 		padding: var(--space-4);
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3);
+		background: transparent;
+	}
+
+	.nova-body.nova-body-empty {
+		justify-content: flex-start;
+	}
+
+	.nova-panel[data-viewport-state='constrained'] .nova-body,
+	.nova-panel[data-viewport-state='constrained'] .nova-footer {
+		padding-inline: var(--space-3);
+	}
+
+	.nova-panel[data-viewport-state='constrained'] .nova-greeting {
+		padding: var(--space-4);
+		margin-top: 0;
 	}
 
 	.nova-settings-link {
@@ -467,9 +662,9 @@
 	}
 
 	.nova-footer {
-		border-top: 1px solid var(--color-border-default);
+		border-top: 1px solid var(--color-border-subtle);
 		padding: var(--space-3) var(--space-4);
-		background: var(--color-surface-ground);
+		background: color-mix(in srgb, var(--color-surface-ground) 82%, var(--color-surface-overlay));
 	}
 
 	@keyframes nova-typing-pulse {
@@ -504,6 +699,14 @@
 		.nova-body,
 		.nova-footer {
 			padding-inline: var(--space-3);
+		}
+
+		.nova-greeting {
+			padding: var(--space-4);
+		}
+
+		.nova-greeting-title {
+			font-size: var(--text-xl);
 		}
 	}
 </style>

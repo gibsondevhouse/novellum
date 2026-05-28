@@ -46,8 +46,8 @@ describe('NovaPanel.svelte — error states', () => {
 
 		const link = target.querySelector('.nova-error-hint a') as HTMLAnchorElement | null;
 		expect(link).not.toBeNull();
-		expect(link?.getAttribute('href')).toBe('/settings');
-		expect(link?.textContent).toContain('Settings');
+		expect(link?.getAttribute('href')).toBe('/settings/ai');
+		expect(link?.textContent).toContain('AI Settings');
 		unmount(cmp);
 	});
 

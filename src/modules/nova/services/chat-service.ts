@@ -58,6 +58,29 @@ function isOutlineContextRequest(prompt: string): boolean {
 	return /\b(outline|story\s*structure|plot\s*map|chapter\s*plan|chapter\s*outline)\b/i.test(prompt);
 }
 
+function isProjectDependentGenerationRequest(prompt: string): boolean {
+	return /\b(outline|first\s*chapter|chapter\s*outline|chapter\s*draft|scene\s*draft|draft\s+the\s+scene|plot\s*map|story\s*structure)\b/i.test(prompt);
+}
+
+function parseMissingProjectFields(warnings: string[]): string[] {
+	for (const warning of warnings) {
+		const match = warning.match(/^Project context is missing:\s*(.+)\.$/i);
+		if (!match) continue;
+		return match[1]
+			.split(',')
+			.map((field) => field.trim())
+			.filter(Boolean);
+	}
+	return [];
+}
+
+function formatMissingFieldsMessage(fields: string[]): string {
+	if (fields.length === 0) return 'project baseline details';
+	if (fields.length === 1) return fields[0];
+	if (fields.length === 2) return `${fields[0]} and ${fields[1]}`;
+	return `${fields.slice(0, -1).join(', ')}, and ${fields.at(-1) ?? ''}`;
+}
+
 export async function sendNovaChat(input: SendChatInput): Promise<void> {
 	const trimmed = input.prompt.trim();
 	if (!trimmed || novaSession.isStreaming) return;
@@ -100,6 +123,28 @@ export async function sendNovaChat(input: SendChatInput): Promise<void> {
 		aiContext = EMPTY_AI_CONTEXT;
 	}
 
+	const ragWarnings = ragResult?.warnings ?? [];
+	if (isProjectDependentGenerationRequest(trimmed) && !input.projectId) {
+		novaSession.append({
+			role: 'nova',
+			content: 'Open a project in Project Hub before asking Nova to generate outlines or drafts.',
+			status: 'error',
+		});
+		return;
+	}
+
+	const missingProjectFields = parseMissingProjectFields(ragWarnings);
+	if (isProjectDependentGenerationRequest(trimmed) && missingProjectFields.length > 0) {
+		novaSession.append({
+			role: 'nova',
+			content:
+				`I can help with that, but Project Hub is missing ${formatMissingFieldsMessage(missingProjectFields)}. ` +
+				'Add those fields, then retry so I can ground the output.',
+			status: 'complete',
+		});
+		return;
+	}
+
 	// Fold in the writer's live scene intent + signals when they apply to
 	// the active scene. Editor publishes this through the scene-intent store.
 	const intentSnapshot = sceneIntent.current;
@@ -108,13 +153,19 @@ export async function sendNovaChat(input: SendChatInput): Promise<void> {
 	}
 
 	const contextItemCount =
+		(aiContext.project ? 1 : 0) +
+		(aiContext.storyFrames?.length ?? 0) +
 		(aiContext.scene ? 1 : 0) +
 		aiContext.adjacentScenes.length +
 		aiContext.characters.length +
 		aiContext.locations.length +
 		aiContext.loreEntries.length +
 		aiContext.plotThreads.length;
-	novaSession.setContextDisclosure(ragResult?.includedScopes ?? [], contextItemCount);
+	novaSession.setContextDisclosure(ragResult?.includedScopes ?? ['no-context'], contextItemCount, {
+		warnings: ragWarnings,
+		compressed: ragWarnings.some((warning) => /compressed/i.test(warning)),
+		truncated: ragWarnings.some((warning) => /trimmed|truncated/i.test(warning)),
+	});
 
 	const systemPrompt = buildPrompt(task, aiContext);
 
