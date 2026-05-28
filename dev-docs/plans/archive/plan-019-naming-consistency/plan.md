@@ -2,10 +2,10 @@
 title: Naming Consistency Refactor
 slug: plan-019-naming-consistency
 version: 1.0.0
-status: deferred-to-v1.1
+status: retired
 owner: Planner Agent
 created: 2026-05-02
-last_updated: 2026-05-26
+last_updated: 2026-05-27
 target_completion: 2026-05-09
 stages:
   - stage-001-audit-and-canonical-name-map

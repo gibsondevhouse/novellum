@@ -1,22 +1,24 @@
 # MASTER PLAN: Novellum Development
 
-> Last reconciled: 2026-05-26 (plan-028 closed)
+> Last reconciled: 2026-05-27 (plan-029 stage-004 governance reconciliation)
 
 ## Active Plans
 
 (none)
 
-## Deferred to V1.1
 
-- [plan-019-naming-consistency](./archive/plan-019-naming-consistency/plan.md) — Codebase-wide naming alignment. Never executed. See [CLOSEOUT.md](./archive/plan-019-naming-consistency/CLOSEOUT.md).
-- [plan-021-reader-pagination](./archive/plan-021-reader-pagination/plan.md) — Reader empty state + pagination engine. Never executed. See [CLOSEOUT.md](./archive/plan-021-reader-pagination/CLOSEOUT.md).
-- plan-024 stages 002 (release engineering), 003 (ollama & shortcuts), 006 (docs re-baseline). See [plan-024 CLOSEOUT.md](./archive/plan-024-v1-final-mile/CLOSEOUT.md).
+## Deferred (not yet scheduled)
+
+- **Release engineering** — code signing, notarization, brand icons, formal smoke/keyring verification. Infrastructure exists; requires external procurement. Originally plan-024 stage-002.
 
 ## Completed Plans (Archived)
 
+- [plan-029-v1.1-unfinished-work-closeout](./plan-029-v1.1-unfinished-work-closeout/plan.md): V1.1 Unfinished Work Closeout umbrella. 4 stages. Status: `complete` (closed 2026-05-27). Retired plan-019, plan-021, plan-024 stage-003 as shipped. Executed plan-024 stage-006 docs rebaseline. Deferred plan-024 stage-002 (release engineering) to dedicated plan. Quality gates: 187 files / 1270 tests; 325 files / 0 token violations.
 - [plan-028-v1.1-hierarchical-pipeline-ui](./plan-028/plan.md): Outline-first hierarchical pipeline UI — Arc → Stage traversal, worldbuild run flow, checkpoint review console, verification/doc sync. 4 stages, 10 parts. Status: `complete` (closed 2026-05-26; 187 files / 1268 vitest tests; token guard 0 violations; 7 Playwright e2e specs covering traversal, run, review, accept/reject, failure flows; docs reconciled with shipped behavior).
 - [plan-027-v1.1-scoping](./plan-027-v1.1-scoping/plan.md): V1.1 staged fiction pipeline delivery — pipeline foundation, Vibe-Worldbuild, Vibe-Author. 3 stages. Status: `complete` (closed 2026-05-27; 177 files / 1156 vitest tests; token guard 0 violations; Playwright review-gate coverage for both worldbuild and author surfaces).
-- [plan-024-v1-final-mile](./archive/plan-024-v1-final-mile/plan.md): V1 Definition-of-Done closure & release engineering. 6 stages. Status: `complete` (closed 2026-05-26, 47/47 DoD). Three non-DoD stages deferred to V1.1.
+- [plan-024-v1-final-mile](./archive/plan-024-v1-final-mile/plan.md): V1 Definition-of-Done closure & release engineering. 6 stages. Status: `complete` (closed 2026-05-26, 47/47 DoD). Deferred stages resolved by plan-029 (2026-05-27): stage-003 retired (shipped), stage-006 executed (reduced scope), stage-002 deferred to dedicated release plan.
+- [plan-021-reader-pagination](./archive/plan-021-reader-pagination/plan.md): Reader empty state + pagination engine. 4 stages. Status: `retired` (2026-05-27, plan-029) — fully shipped via plans 027/028. See [CLOSEOUT.md](./archive/plan-021-reader-pagination/CLOSEOUT.md).
+- [plan-019-naming-consistency](./archive/plan-019-naming-consistency/plan.md): Codebase-wide naming alignment. 6 stages. Status: `retired` (2026-05-27, plan-029) — superseded by organic evolution through plans 020-028. See [CLOSEOUT.md](./archive/plan-019-naming-consistency/CLOSEOUT.md).
 - [plan-026-ui-v2-design-system](./archive/plan-026-ui-v2-design-system/plan.md): UI refactor adopting the Novellum v2 "author-first" design system as the source of visual truth. 6 stages. Status: `complete` (closed 2026-05-26).
 - [plan-025-functional-after-build](./archive/plan-025-functional-after-build/plan.md): V1 functional-after-build hardening. App-data path correctness inside the Tauri sidecar, cut 4 unimplemented agents from V1 surface, smoke harness extended 4 → 7 probes, `smoke:built` wired into CI. Status: `complete` (closed 2026-05-13).
 - [plan-023-editor-redesign-and-nova-copilot](./archive/plan-023-editor-redesign-and-nova-copilot/plan.md): Word-processor-style editor refactor and right-panel Nova copilot. 8 stages. Status: `complete` (last updated 2026-05-04).
