@@ -11,6 +11,35 @@ import type { AuthorSceneDraftPayload } from '$lib/ai/pipeline/author-agent.js';
 import type { AuthorOutline, AuthorRevisionPack } from '$lib/ai/pipeline/author-schemas.js';
 import type { PipelineArtifactEnvelope } from '$lib/ai/pipeline/contracts.js';
 
+export type NovaMode = 'ask' | 'write' | 'agent';
+
+export type WriteSubAction = 'outline' | 'scene' | 'revision';
+
+/* ── Attachment types (plan-031 stage-003) ─────────────────────────────── */
+
+export type NovaEntityKind = 'scene' | 'character' | 'location';
+
+export interface NovaEntityAttachment {
+	kind: 'entity';
+	/** Unique per attachment instance (crypto.randomUUID). */
+	id: string;
+	entityKind: NovaEntityKind;
+	entityId: string;
+	label: string;
+	summary?: string;
+}
+
+export interface NovaFileAttachment {
+	kind: 'file';
+	id: string;
+	filename: string;
+	/** Plain text, already validated and read client-side. */
+	content: string;
+	sizeBytes: number;
+}
+
+export type NovaAttachment = NovaEntityAttachment | NovaFileAttachment;
+
 export type NovaRole = 'user' | 'nova' | 'system' | 'tool-call' | 'tool-result';
 
 export type NovaMessageStatus =

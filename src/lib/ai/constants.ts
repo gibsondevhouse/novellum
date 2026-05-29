@@ -33,6 +33,8 @@ export const MODEL_MAP: Record<TaskType, string> = {
 	edit: 'openai/gpt-4o',
 	style_check: 'openai/gpt-4o',
 	chat: 'openai/gpt-4o-mini',
+	write: 'openai/gpt-4o-mini',
+	agent: 'openai/gpt-4o-mini',
 	pipeline: 'openai/gpt-4o-mini',
 };
 
@@ -89,6 +91,18 @@ export const CONSTRAINTS_BY_TYPE: Record<string, string[]> = {
 		'Only flag deviations that meaningfully conflict with the provided style guide rules — do not invent additional rules',
 		'If no deviations found, return an empty array: []',
 	],
+	write: [
+		'You are generating a structured writing proposal — an outline, scene draft, or revision plan — for the author to review.',
+		'Every artifact you produce is a proposal only. The author must explicitly accept or reject it; nothing is auto-applied to the manuscript.',
+		'Be concrete and actionable. Provide structure the author can immediately use or refine.',
+		'If required context (project title, logline, or scene) is missing, ask for the missing fields instead of fabricating plausible details.',
+		'Do not invent canonical facts about the world or characters that contradict the provided context.',
+	],
+	agent: [
+		'You are acting as an agentic writing assistant. Multi-step tool use is not yet enabled.',
+		'Describe what actions you would take and which tools you would invoke, but do not fabricate tool outputs.',
+		'Treat every proposed change as a proposal requiring explicit author acceptance.',
+	],
 };
 
 export const TASK_DESCRIPTIONS: Record<string, string> = {
@@ -99,6 +113,10 @@ export const TASK_DESCRIPTIONS: Record<string, string> = {
 	edit: 'Identify specific improvements in the provided text and return each as a targeted edit suggestion.',
 	style_check:
 		'Identify passages that deviate from the provided style guide rules and suggest corrections that bring the prose in line with the target style.',
+	write:
+		'Generate a structured writing proposal — outline, scene draft, or revision plan — based on the author\'s request and project context. Every output is a proposal the author reviews; nothing is auto-applied.',
+	agent:
+		'Plan and describe the multi-step actions you would take as an agentic writing assistant. Tool dispatch is not yet enabled — return a structured plan of proposed actions instead.',
 };
 
 export const OUTPUT_FORMAT_DESCRIPTIONS: Record<string, string> = {

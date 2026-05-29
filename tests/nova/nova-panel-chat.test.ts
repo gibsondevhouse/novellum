@@ -7,7 +7,6 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { mount, unmount, flushSync, tick } from 'svelte';
-import { PIPELINE_TASK_KEYS } from '$lib/ai/pipeline/task-catalog.js';
 
 const sendNovaChatMock = vi.fn();
 const runAuthorPipelineTaskMock = vi.fn();
@@ -20,7 +19,7 @@ vi.mock('$modules/nova/services/author-pipeline-runner.js', () => ({
 	runAuthorPipelineTask: (...args: unknown[]) => runAuthorPipelineTaskMock(...args),
 }));
 
-import { NovaPanel, novaPanel, novaSession, aiSession } from '$modules/nova';
+import { NovaPanel, novaPanel, novaSession, novaMode, aiSession } from '$modules/nova';
 
 describe('NovaPanel.svelte — chat interactions', () => {
 	let target: HTMLElement;
@@ -32,6 +31,7 @@ describe('NovaPanel.svelte — chat interactions', () => {
 		window.sessionStorage.clear();
 		novaPanel.close();
 		novaSession.clear();
+		novaMode.__resetForTests();
 		sendNovaChatMock.mockReset();
 		runAuthorPipelineTaskMock.mockReset();
 		aiSession.__resetForTests();
@@ -148,7 +148,7 @@ describe('NovaPanel.svelte — chat interactions', () => {
 		unmount(cmp);
 	});
 
-	it('quick-prompt button invokes onQuickPrompt with a non-empty payload', async () => {
+	it('starter prompt button invokes onQuickPrompt with a non-empty payload', async () => {
 		const onQuickPrompt = vi.fn();
 		const cmp = mount(NovaPanel, {
 			target,
@@ -157,7 +157,7 @@ describe('NovaPanel.svelte — chat interactions', () => {
 		novaPanel.open();
 		flushSync();
 
-		const btn = target.querySelector('.nova-quick-prompt') as HTMLButtonElement | null;
+		const btn = target.querySelector('.nova-starter-btn') as HTMLButtonElement | null;
 		expect(btn).not.toBeNull();
 		btn!.click();
 		await tick();
@@ -167,13 +167,8 @@ describe('NovaPanel.svelte — chat interactions', () => {
 		unmount(cmp);
 	});
 
-	it('routes supported Scribe outline requests to the author pipeline runner', async () => {
-		runAuthorPipelineTaskMock.mockResolvedValue({
-			ok: true,
-			messageId: 'm1',
-			artifact: {},
-		});
-
+	it('passes write mode to sendNovaChat when Write mode is selected', async () => {
+		sendNovaChatMock.mockResolvedValue(undefined);
 		const cmp = mount(NovaPanel, {
 			target,
 			props: { projectId: 'p1', activeSceneId: 's1', activeChapterId: 'c1' },
@@ -182,7 +177,7 @@ describe('NovaPanel.svelte — chat interactions', () => {
 		flushSync();
 
 		const modeSelect = target.querySelector('.nova-mode-select') as HTMLSelectElement;
-		modeSelect.value = 'scribe';
+		modeSelect.value = 'write';
 		modeSelect.dispatchEvent(new Event('change', { bubbles: true }));
 
 		const textarea = target.querySelector('textarea.nova-input') as HTMLTextAreaElement;
@@ -194,18 +189,18 @@ describe('NovaPanel.svelte — chat interactions', () => {
 		form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 		await tick();
 
-		expect(runAuthorPipelineTaskMock).toHaveBeenCalledWith({
-			taskKey: PIPELINE_TASK_KEYS.AUTHOR_OUTLINE,
-			projectId: 'p1',
-			activeSceneId: 's1',
-			activeChapterId: 'c1',
-			instruction: 'Build a chapter outline for act one.',
-		});
-		expect(sendNovaChatMock).not.toHaveBeenCalled();
+		expect(sendNovaChatMock).toHaveBeenCalledWith(
+			expect.objectContaining({
+				prompt: 'Build a chapter outline for act one.',
+				mode: 'write',
+				projectId: 'p1',
+			}),
+		);
 		unmount(cmp);
 	});
 
-	it('shows an actionable unsupported-action state for non-outline Scribe requests', async () => {
+	it('passes ask mode to sendNovaChat when Ask mode is selected (default)', async () => {
+		sendNovaChatMock.mockResolvedValue(undefined);
 		const cmp = mount(NovaPanel, {
 			target,
 			props: { projectId: 'p1', activeSceneId: 's1', activeChapterId: 'c1' },
@@ -213,12 +208,8 @@ describe('NovaPanel.svelte — chat interactions', () => {
 		novaPanel.open();
 		flushSync();
 
-		const modeSelect = target.querySelector('.nova-mode-select') as HTMLSelectElement;
-		modeSelect.value = 'scribe';
-		modeSelect.dispatchEvent(new Event('change', { bubbles: true }));
-
 		const textarea = target.querySelector('textarea.nova-input') as HTMLTextAreaElement;
-		textarea.value = 'Draft the opening scene in first person.';
+		textarea.value = 'What should happen in chapter 3?';
 		textarea.dispatchEvent(new Event('input', { bubbles: true }));
 		flushSync();
 
@@ -226,15 +217,12 @@ describe('NovaPanel.svelte — chat interactions', () => {
 		form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 		await tick();
 
-		expect(runAuthorPipelineTaskMock).not.toHaveBeenCalled();
-		expect(sendNovaChatMock).not.toHaveBeenCalled();
-		const unsupported = target.querySelector(
-			'[data-testid="nova-unsupported-action"]',
-		) as HTMLElement | null;
-		expect(unsupported).not.toBeNull();
-		expect(unsupported?.textContent).toContain('Scribe limitation');
-		expect(unsupported?.textContent).toContain('supports one action');
-		expect(unsupported?.textContent).toContain('switch to Chat mode');
+		expect(sendNovaChatMock).toHaveBeenCalledWith(
+			expect.objectContaining({
+				prompt: 'What should happen in chapter 3?',
+				mode: 'ask',
+			}),
+		);
 		unmount(cmp);
 	});
 });

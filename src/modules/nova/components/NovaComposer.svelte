@@ -1,35 +1,41 @@
 <!--
-	Nova chat composer: mode selector, textarea, and
-	send / abort controls. Owns its own draft and attachment state; submits via
-	sendNovaChat from the chat service.
+	plan-031 stage-003 phase-002 — Nova composer with attachment popover and chips.
+	Also hosts the Ask/Write/Agent mode pill from stage-002.
 -->
 <script lang="ts">
 	import { novaSession } from '../stores/nova-session.svelte.js';
 	import { novaPanel } from '../stores/nova-panel.svelte.js';
+	import { novaMode } from '../stores/nova-mode.svelte.js';
 	import { sendNovaChat } from '../services/chat-service.js';
-	import { runAuthorPipelineTask } from '../services/author-pipeline-runner.js';
-	import { PIPELINE_TASK_KEYS } from '$lib/ai/pipeline/task-catalog.js';
+	import ModelPickerDropdown from './ModelPickerDropdown.svelte';
+	import NovaAttachmentPopover from './NovaAttachmentPopover.svelte';
+	import type { NovaMode } from '../types.js';
 
-	type NovaChatMode = 'chat' | 'scribe';
-
-	type ChatModeOption = {
-		value: NovaChatMode;
+	type ModeOption = {
+		value: NovaMode;
 		label: string;
 		description: string;
 	};
 
-	const CHAT_MODE_OPTIONS: ChatModeOption[] = [
+	const MODE_OPTIONS: ModeOption[] = [
 		{
-			value: 'chat',
-			label: 'Chat',
+			value: 'ask',
+			label: 'Ask',
 			description: 'Brainstorm and general story conversation.',
 		},
 		{
-			value: 'scribe',
-			label: 'Scribe',
-			description: 'Structured task mode (currently supports project outline generation).',
+			value: 'write',
+			label: 'Write',
+			description: 'Generate outline, scene, and revision proposals.',
+		},
+		{
+			value: 'agent',
+			label: 'Agent',
+			description: 'Multi-step planning — coming soon.',
 		},
 	];
+
+	const MAX_COMPOSER_HEIGHT = 144;
 
 	interface Props {
 		projectId?: string | null;
@@ -40,18 +46,29 @@
 	let { projectId = null, activeSceneId = null, activeChapterId = null }: Props = $props();
 
 	let draft = $state('');
-	let selectedMode = $state<NovaChatMode>('chat');
+	let textareaEl = $state<HTMLTextAreaElement | null>(null);
+	let attachPopoverOpen = $state(false);
+	let attachButtonEl = $state<HTMLButtonElement | null>(null);
+
+	const attachments = $derived(novaSession.attachments);
 
 	const isStreaming = $derived(novaSession.isStreaming);
-	const selectedModeMeta = $derived.by(
-		() => CHAT_MODE_OPTIONS.find((option) => option.value === selectedMode) ?? CHAT_MODE_OPTIONS[0],
+	const currentMode = $derived(novaMode.current);
+	const currentModeMeta = $derived(
+		MODE_OPTIONS.find((opt) => opt.value === currentMode) ?? MODE_OPTIONS[0],
 	);
 	const composerPlaceholder = $derived.by(() => {
 		if (isStreaming) return 'Nova is responding…';
-		if (selectedMode === 'chat') return 'Brainstorm, ask questions, or explore story ideas…';
-		return 'Ask Scribe to build a project outline…';
+		if (currentMode === 'write') return 'Ask Write mode to build an outline or propose a revision…';
+		if (currentMode === 'agent') return 'Agent mode coming soon — routed to Ask for now…';
+		return 'Brainstorm, ask questions, or explore story ideas…';
 	});
 	const canSubmit = $derived(draft.trim().length > 0 && !isStreaming);
+
+	// Load persisted mode whenever projectId changes.
+	$effect(() => {
+		novaMode.loadForProject(projectId);
+	});
 
 	$effect(() => {
 		const pending = novaPanel.pendingPrompt;
@@ -61,60 +78,24 @@
 		}
 	});
 
-	function buildModePrompt(rawPrompt: string): string {
-		if (selectedMode !== 'scribe') return rawPrompt;
-		return `Scribe mode: act as an agentic writing assistant. Be concrete, structured, and action-oriented.\n\n${rawPrompt}`;
-	}
-
-	function isOutlineBuildRequest(rawPrompt: string): boolean {
-		return (
-			/\b(outline|story\s*structure|plot\s*map|chapter\s*plan|chapter\s*outline)\b/i.test(rawPrompt) &&
-			/\b(build|create|generate|draft|make|design|plan|structure)\b/i.test(rawPrompt)
-		);
-	}
-
-	function isScribeConcreteRequest(rawPrompt: string): boolean {
-		return /\b(build|create|generate|draft|write|rewrite|revise|edit|analy(?:s|z)e|critique|plan|structure)\b/i.test(
-			rawPrompt,
-		);
-	}
+	// Auto-grow textarea with draft as the trigger.
+	$effect(() => {
+		const el = textareaEl;
+		if (!el) return;
+		// Depend on draft so the effect re-runs on every keystroke.
+		const _draft = draft;
+		void _draft;
+		el.style.height = 'auto';
+		el.style.height = `${Math.min(el.scrollHeight, MAX_COMPOSER_HEIGHT)}px`;
+	});
 
 	async function submitDraft() {
 		const value = draft.trim();
 		if (!value || isStreaming) return;
 		draft = '';
-
-		if (selectedMode === 'scribe' && isOutlineBuildRequest(value)) {
-			if (!projectId) {
-				novaSession.append({ role: 'user', content: buildModePrompt(value), status: 'complete' });
-				const errorMessage = novaSession.append({
-					role: 'nova',
-					content: '',
-					status: 'error',
-				});
-				novaSession.fail(errorMessage.id, 'Open a project before asking Scribe to build an outline.');
-				return;
-			}
-
-			novaSession.append({ role: 'user', content: buildModePrompt(value), status: 'complete' });
-			await runAuthorPipelineTask({
-				taskKey: PIPELINE_TASK_KEYS.AUTHOR_OUTLINE,
-				projectId,
-				activeSceneId,
-				activeChapterId,
-				instruction: value,
-			});
-			return;
-		}
-
-		if (selectedMode === 'scribe' && isScribeConcreteRequest(value)) {
-			novaSession.append({ role: 'user', content: buildModePrompt(value), status: 'complete' });
-			novaSession.appendUnsupportedScribeAction(value);
-			return;
-		}
-
 		await sendNovaChat({
-			prompt: buildModePrompt(value),
+			prompt: value,
+			mode: novaMode.current,
 			projectId,
 			activeSceneId,
 			activeChapterId,
@@ -122,6 +103,12 @@
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
+		// Cmd+. (Mac) or Ctrl+. (Win/Linux) cycles modes.
+		if (event.key === '.' && (event.metaKey || event.ctrlKey)) {
+			event.preventDefault();
+			novaMode.cycle();
+			return;
+		}
 		if (event.key === 'Enter' && !event.shiftKey) {
 			event.preventDefault();
 			void submitDraft();
@@ -132,6 +119,11 @@
 		const id = novaSession.activeStreamId;
 		if (id) novaSession.abort(id);
 	}
+
+	function handleModeChange(event: Event) {
+		const value = (event.currentTarget as HTMLSelectElement).value as NovaMode;
+		novaMode.setMode(value);
+	}
 </script>
 
 <form
@@ -141,34 +133,88 @@
 		void submitDraft();
 	}}
 >
-	<div class="nova-composer__shell">
-		<div class="nova-composer__toprow">
-			<label for="nova-mode-select" class="nova-mode-label">Mode</label>
+	<div class="nova-composer__shell nova-composer__shell--with-popover">
+		{#if attachments.length > 0}
+			<ul class="nova-attachment-chips" role="list" aria-label="Attached items">
+				{#each attachments as attachment (attachment.id)}
+					<li class="nova-attachment-chip">
+						<span class="nova-attachment-chip__label">
+							{#if attachment.kind === 'entity'}
+								<span class="nova-attachment-chip__kind">{attachment.entityKind}</span>
+								{attachment.label}
+							{:else}
+								<span class="nova-attachment-chip__kind">file</span>
+								{attachment.filename}
+							{/if}
+						</span>
+						<button
+							type="button"
+							class="nova-attachment-chip__remove"
+							aria-label="Remove {attachment.kind === 'entity' ? attachment.label : attachment.filename}"
+							onclick={() => novaSession.removeAttachment(attachment.id)}
+						>×</button>
+					</li>
+				{/each}
+			</ul>
+		{/if}
+
+		<textarea
+			class="nova-input"
+			bind:this={textareaEl}
+			bind:value={draft}
+			onkeydown={handleKeydown}
+			placeholder={composerPlaceholder}
+			rows="1"
+			aria-label="Ask Nova"
+			disabled={isStreaming}
+		></textarea>
+
+		<div class="nova-composer__actions">
+			<button
+				bind:this={attachButtonEl}
+				type="button"
+				class="nova-action-slot"
+				class:is-active={attachPopoverOpen}
+				aria-label="Attach files or project context"
+				aria-expanded={attachPopoverOpen}
+				aria-haspopup="dialog"
+				title="Attach files or project context"
+				onclick={() => { attachPopoverOpen = !attachPopoverOpen; }}
+			>
+				<span aria-hidden="true">+</span>
+			</button>
+			<NovaAttachmentPopover
+				{projectId}
+				open={attachPopoverOpen}
+				anchorEl={attachButtonEl}
+				onClose={() => { attachPopoverOpen = false; }}
+			/>
+			<button
+				type="button"
+				class="nova-action-slot"
+				aria-label="Commands"
+				title="Slash commands (coming soon)"
+				disabled
+			>
+				<span aria-hidden="true" class="nova-commands-glyph">&lt;/&gt;</span>
+			</button>
 			<select
 				id="nova-mode-select"
 				class="nova-mode-select"
-				bind:value={selectedMode}
+				value={currentMode}
+				onchange={handleModeChange}
 				aria-label="Nova mode"
-				title={selectedModeMeta.description}
+				title={currentModeMeta.description}
 				disabled={isStreaming}
 			>
-				{#each CHAT_MODE_OPTIONS as option (option.value)}
+				{#each MODE_OPTIONS as option (option.value)}
 					<option value={option.value}>{option.label}</option>
 				{/each}
 			</select>
-		</div>
-
-		<div class="nova-composer__row">
-			<textarea
-				class="nova-input"
-				bind:value={draft}
-				onkeydown={handleKeydown}
-				placeholder={composerPlaceholder}
-				rows="3"
-				aria-label="Ask Nova"
-				disabled={isStreaming}
-			></textarea>
-
+			<span class="nova-model-slot">
+				<ModelPickerDropdown />
+			</span>
+			<span class="nova-composer__spacer" aria-hidden="true"></span>
 			{#if isStreaming}
 				<button
 					type="button"
@@ -186,7 +232,7 @@
 					disabled={!canSubmit}
 					aria-label="Send message"
 				>
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 						<path d="m22 2-7 20-4-9-9-4z"></path>
 						<path d="M22 2 11 13"></path>
 					</svg>
@@ -195,15 +241,13 @@
 			{/if}
 		</div>
 
-		{#if selectedMode === 'scribe'}
-			<p class="nova-mode-hint">Scribe currently supports outline generation.</p>
-		{/if}
 	</div>
 </form>
 
 <style>
 	.nova-mode-select,
 	.nova-action,
+	.nova-action-slot,
 	.nova-input {
 		transition:
 			background-color var(--duration-fast) var(--ease-standard),
@@ -214,22 +258,25 @@
 
 	.nova-mode-select:focus-visible,
 	.nova-action:focus-visible,
+	.nova-action-slot:focus-visible,
 	.nova-input:focus-visible {
 		outline: none;
 		box-shadow: var(--focus-ring);
 	}
 
-	.nova-action:disabled {
-		opacity: 0.5;
+	.nova-action:disabled,
+	.nova-action-slot:disabled {
+		opacity: 0.4;
 		cursor: not-allowed;
 	}
 
 	.nova-mode-select {
 		appearance: none;
 		-webkit-appearance: none;
-		min-width: 118px;
-		height: 30px;
-		padding: 0 var(--space-6) 0 var(--space-2);
+		height: 28px;
+		min-width: 72px;
+		flex-shrink: 1;
+		padding: 0 var(--space-5) 0 var(--space-2);
 		margin: 0;
 		border-radius: var(--radius-full);
 		border: 1px solid color-mix(in srgb, var(--color-border-default) 86%, var(--color-candle) 14%);
@@ -249,8 +296,8 @@
 			linear-gradient(135deg, var(--color-text-muted) 50%, transparent 50%);
 		background-position:
 			0 0,
-			calc(100% - 12px) 12px,
-			calc(100% - 8px) 12px;
+			calc(100% - 10px) 11px,
+			calc(100% - 6px) 11px;
 		background-size:
 			100% 100%,
 			4px 4px,
@@ -275,12 +322,12 @@
 	.nova-composer {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-2);
+		gap: var(--space-1);
 	}
 
 	.nova-composer__shell {
 		display: grid;
-		gap: var(--space-2);
+		gap: var(--space-1);
 		padding: var(--space-2);
 		border-radius: var(--radius-lg);
 		border: 1px solid color-mix(in srgb, var(--color-border-default) 82%, var(--color-candle) 18%);
@@ -290,45 +337,83 @@
 				color-mix(in srgb, var(--color-surface-overlay) 92%, var(--color-surface-ground)) 0%,
 				color-mix(in srgb, var(--color-surface-ground) 86%, var(--color-surface-base)) 100%
 			);
-		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+		box-shadow: var(--shadow-nova-inset-xs);
 	}
 
-	.nova-composer__toprow {
+	.nova-composer__actions {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		gap: var(--space-2);
+		gap: var(--space-1);
+		flex-wrap: nowrap;
+		min-width: 0;
 	}
 
-	.nova-mode-label {
+	.nova-composer__spacer {
+		flex: 1;
+		min-width: var(--space-1);
+	}
+
+	.nova-model-slot {
+		display: contents;
+		min-width: 0;
+		flex-shrink: 1;
+	}
+
+	.nova-model-slot :global(.model-picker) {
+		min-width: 0;
+		flex-shrink: 1;
+	}
+
+	.nova-model-slot :global(.model-picker select) {
+		min-width: 0;
+		max-width: 92px;
+		width: 92px;
+	}
+
+	.nova-action-slot {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: var(--space-7);
+		height: var(--space-7);
+		flex-shrink: 0;
+		padding: 0;
 		margin: 0;
-		font-size: 11px;
-		font-weight: var(--font-weight-semibold);
-		letter-spacing: 0.05em;
-		text-transform: uppercase;
+		border: 1px solid transparent;
+		border-radius: var(--radius-sm);
+		background: transparent;
 		color: var(--color-text-muted);
+		font-size: var(--text-xs);
+		font-weight: var(--font-weight-semibold);
+		cursor: pointer;
 	}
 
-	.nova-composer__row {
-		display: grid;
-		grid-template-columns: 1fr auto;
-		align-items: end;
-		gap: var(--space-2);
+	.nova-action-slot:not(:disabled):hover {
+		background: color-mix(in srgb, var(--color-surface-overlay) 72%, transparent);
+		border-color: var(--color-border-subtle);
+		color: var(--color-text-secondary);
+	}
+
+	.nova-commands-glyph {
+		font-family: var(--font-mono);
+		font-size: 9px;
+		letter-spacing: -0.03em;
 	}
 
 	.nova-input {
 		width: 100%;
-		min-height: 84px;
-		max-height: 220px;
-		padding: var(--space-2) var(--space-3);
+		min-height: 0;
+		max-height: 144px;
+		padding: var(--space-1) var(--space-2);
 		border: 1px solid color-mix(in srgb, var(--color-border-default) 78%, var(--color-candle) 22%);
-		border-radius: var(--radius-lg);
+		border-radius: var(--radius-md);
 		background: color-mix(in srgb, var(--color-surface-ground) 88%, var(--color-surface-overlay));
 		color: var(--color-text-primary);
 		font-size: var(--text-sm);
 		line-height: var(--leading-relaxed);
 		font-family: inherit;
 		resize: none;
+		overflow-y: auto;
 	}
 
 	.nova-input::placeholder {
@@ -344,8 +429,9 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		width: 40px;
-		height: 40px;
+		width: var(--space-8);
+		height: var(--space-8);
+		flex-shrink: 0;
 		padding: 0;
 		border-radius: 999px;
 		border: 1px solid transparent;
@@ -362,9 +448,6 @@
 		background: var(--color-candle);
 		border-color: color-mix(in srgb, var(--color-brass) 70%, var(--color-candle));
 		color: var(--color-ink);
-		box-shadow:
-			0 4px 14px rgba(240, 187, 112, 0.25),
-			inset 0 1px 0 rgba(255, 255, 255, 0.32);
 	}
 
 	.nova-action-send:disabled {
@@ -378,7 +461,7 @@
 		border-radius: var(--radius-md);
 		padding-inline: var(--space-2);
 		width: auto;
-		min-width: 64px;
+		min-width: 56px;
 	}
 
 	.nova-action-stop:hover {
@@ -394,10 +477,88 @@
 		background: currentColor;
 	}
 
-	.nova-mode-hint {
+.nova-composer__shell--with-popover {
+		position: relative;
+	}
+
+	.nova-action-slot.is-active {
+		background: color-mix(in srgb, var(--color-candle) 18%, var(--color-surface-overlay));
+		border-color: color-mix(in srgb, var(--color-candle) 40%, var(--color-border-subtle));
+		color: var(--color-text-primary);
+	}
+
+	.nova-attachment-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-1);
 		margin: 0;
-		font-size: 11px;
+		padding: 0;
+		list-style: none;
+	}
+
+	.nova-attachment-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		max-width: 100%;
+		padding: 2px var(--space-1) 2px var(--space-2);
+		border-radius: var(--radius-full);
+		border: 1px solid color-mix(in srgb, var(--color-border-default) 82%, var(--color-candle) 18%);
+		background: color-mix(in srgb, var(--color-surface-raised) 90%, var(--color-candle) 10%);
+		color: var(--color-text-secondary);
+		font-size: var(--text-xs);
+	}
+
+	.nova-attachment-chip__label {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.nova-attachment-chip__kind {
+		flex-shrink: 0;
+		padding: 0 4px;
+		border-radius: var(--radius-xs);
+		background: color-mix(in srgb, var(--color-surface-ground) 80%, transparent);
 		color: var(--color-text-muted);
+		font-size: 9px;
+		font-weight: var(--font-weight-semibold);
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+
+	.nova-attachment-chip__remove {
+		flex-shrink: 0;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 16px;
+		height: 16px;
+		padding: 0;
+		border: none;
+		border-radius: 50%;
+		background: transparent;
+		color: var(--color-text-muted);
+		font-size: var(--text-xs);
+		line-height: 1;
+		cursor: pointer;
+		transition:
+			background-color var(--duration-fast) var(--ease-standard),
+			color var(--duration-fast) var(--ease-standard);
+	}
+
+	.nova-attachment-chip__remove:hover {
+		background: color-mix(in srgb, var(--color-surface-overlay) 80%, transparent);
+		color: var(--color-text-primary);
+	}
+
+	.nova-attachment-chip__remove:focus-visible {
+		outline: none;
+		box-shadow: var(--focus-ring);
 	}
 
 	.sr-only {
@@ -410,15 +571,5 @@
 		clip-path: inset(50%);
 		white-space: nowrap;
 		border: 0;
-	}
-
-	@media (max-width: 360px) {
-		.nova-composer__toprow {
-			flex-wrap: wrap;
-		}
-
-		.nova-composer__row {
-			grid-template-columns: 1fr auto;
-		}
 	}
 </style>

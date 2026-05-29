@@ -9,6 +9,7 @@
 
 import type {
 	NovaArtifact,
+	NovaAttachment,
 	NovaMessage,
 	NovaMessageIntent,
 	NovaMessageStatus,
@@ -25,6 +26,8 @@ export interface ContextDisclosureState {
 	warnings: string[];
 	compressed: boolean;
 	truncated: boolean;
+	/** Number of user-attached items (entities + files), separate from RAG context. */
+	attachedCount: number;
 }
 
 interface AppendInput {
@@ -40,6 +43,7 @@ class NovaSessionStore {
 	messages = $state<NovaMessage[]>([]);
 	activeStreamId = $state<string | null>(null);
 	contextDisclosure = $state<ContextDisclosureState | null>(null);
+	attachments = $state<NovaAttachment[]>([]);
 	private controllers = new Map<string, StreamController>();
 
 	get latest(): NovaMessage | null {
@@ -57,6 +61,7 @@ class NovaSessionStore {
 			warnings?: string[];
 			compressed?: boolean;
 			truncated?: boolean;
+			attachedCount?: number;
 		},
 	): void {
 		this.contextDisclosure = {
@@ -65,7 +70,25 @@ class NovaSessionStore {
 			warnings: options?.warnings ?? [],
 			compressed: options?.compressed ?? false,
 			truncated: options?.truncated ?? false,
+			attachedCount: options?.attachedCount ?? 0,
 		};
+	}
+
+	addAttachment(attachment: NovaAttachment): void {
+		if (attachment.kind === 'entity') {
+			if (this.attachments.some(
+				(a) => a.kind === 'entity' && a.entityId === attachment.entityId,
+			)) return;
+		}
+		this.attachments = [...this.attachments, attachment];
+	}
+
+	removeAttachment(id: string): void {
+		this.attachments = this.attachments.filter((a) => a.id !== id);
+	}
+
+	clearAttachments(): void {
+		this.attachments = [];
 	}
 
 	append(input: AppendInput): NovaMessage {
@@ -83,20 +106,20 @@ class NovaSessionStore {
 		return message;
 	}
 
-	appendUnsupportedScribeAction(request: string): NovaMessage {
+	appendUnsupportedWriteAction(request: string): NovaMessage {
 		const trimmed = request.trim();
 		return this.append({
 			role: 'nova',
 			status: 'complete',
 			intent: 'unsupported_action',
 			content:
-				'Scribe currently supports one action: build a project outline. ' +
-				'For this request, switch to Chat mode for brainstorming or feedback.',
+				'Write mode currently supports outline generation. ' +
+				'For other requests, switch to Ask mode for brainstorming and conversation.',
 			toolPayload: {
 				kind: 'unsupported-action',
-				mode: 'scribe',
+				mode: 'write',
 				request: trimmed,
-				supportedActions: ['build a project outline'],
+				supportedActions: ['outline generation'],
 			},
 		});
 	}
@@ -195,6 +218,7 @@ class NovaSessionStore {
 		this.messages = [];
 		this.activeStreamId = null;
 		this.contextDisclosure = null;
+		this.attachments = [];
 	}
 
 	/**

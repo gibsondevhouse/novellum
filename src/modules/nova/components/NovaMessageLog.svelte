@@ -107,7 +107,7 @@
 						</span>
 					{:else}
 						{#if message.intent === 'unsupported_action'}
-							<p class="nova-unsupported-label">Scribe limitation</p>
+							<p class="nova-unsupported-label">Write mode</p>
 						{/if}
 						<div class="nova-prose">
 							<!-- eslint-disable-next-line svelte/no-at-html-tags -- safeHtml() runs DOMPurify sanitization -->
@@ -186,7 +186,7 @@
 		font-size: var(--text-sm);
 		line-height: 1.65;
 		overflow-wrap: break-word;
-		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+		box-shadow: var(--shadow-nova-inset-xs);
 	}
 
 	.nova-bubble-user {
@@ -274,12 +274,12 @@
 
 	.nova-typing {
 		display: inline-flex;
-		gap: 5px;
+		gap: var(--space-1);
 	}
 
 	.nova-typing span {
-		width: 7px;
-		height: 7px;
+		width: var(--size-dot-small);
+		height: var(--size-dot-small);
 		border-radius: 50%;
 		background: color-mix(in srgb, var(--color-text-muted) 72%, var(--color-candle) 28%);
 		animation: nova-typing-pulse var(--duration-pulse) infinite var(--ease-editorial);

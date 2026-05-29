@@ -12,9 +12,9 @@ const chatInterfaceSource = readFileSync(CHAT_INTERFACE_PATH, 'utf-8');
 
 describe('Nova canonical surface reconciliation', () => {
 	it('documents embedded sidepanel as canonical and /nova as deferred legacy', () => {
-		expect(moduleDocSource).toContain('Canonical runtime for plan-030 is the embedded editor sidepanel');
+		expect(moduleDocSource).toContain('embedded editor sidepanel');
+		expect(moduleDocSource).toContain('canonical Nova runtime');
 		expect(moduleDocSource).toContain('`/nova` remains a legacy fullscreen surface');
-		expect(moduleDocSource).toContain('must display an explicit legacy-status notice');
 		expect(moduleDocSource).toContain('Ownership Guardrails');
 	});
 

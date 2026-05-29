@@ -101,6 +101,12 @@ These should be completed opportunistically while implementing the main objectiv
 | stage-003 | Modes and Agentic Workflow Boundaries | Chat/Scribe modes are predictable and review-gated. |
 | stage-004 | Verification, Docs, and Closeout | Tests, docs, and evidence prove the branch is production-ready. |
 
+### Stage Supersession Note (2026-05-28)
+
+Plan-031 (Nova VS Code Copilot Parity) supersedes **stage-002** (Production Sidepanel UX) and **stage-003** (Modes and Agentic Workflow Boundaries) of this plan. Plan-031 replaces those goals with compact-shell density, Ask/Write/Agent mode routing, real attachments, and a bounded agentic tool loop.
+
+**Stage-001** (Context Grounding Contract) is NOT superseded — it remains the canonical baseline context contract and is referenced as a companion by plan-031.
+
 ## 7. Global Acceptance Criteria
 
 The plan is complete only when all of the following are true:

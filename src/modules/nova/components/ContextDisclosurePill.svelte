@@ -20,6 +20,7 @@
 		if (d.scopes.includes('characters')) parts.push('Characters');
 		if (d.scopes.includes('locations')) parts.push('Locations');
 		if (d.itemCount > 0) parts.push(`${d.itemCount} items`);
+		if (d.attachedCount > 0) parts.push(`${d.attachedCount} attached`);
 		if (d.compressed) parts.push('Compressed');
 		if (d.truncated) parts.push('Trimmed');
 		return parts.join(' · ');
@@ -55,8 +56,8 @@
 	}
 
 	.context-pill__dot {
-		width: 6px;
-		height: 6px;
+		width: var(--size-dot-small);
+		height: var(--size-dot-small);
 		border-radius: 50%;
 		background: color-mix(in srgb, var(--color-candle) 72%, var(--color-text-secondary));
 	}

@@ -6,10 +6,11 @@
 
 ## Current
 
-- No active plan.
+No active plan. See Recently completed for plan-031 closeout. Ask the user what to work on next.
 
 ## Recently completed
 
+- [plan-031-nova-vscode-copilot-parity](./plan-031-nova-vscode-copilot-parity/plan.md) — Nova VS Code Copilot Parity. Closed 2026-05-28 with all 5 stages complete. Compact sidepanel, Ask/Write/Agent modes, real attachments, bounded agentic tool loop (MAX_AGENT_STEPS=8), source-contract tests. Quality gates: `pnpm check` (0 errors), `pnpm lint` (clean), `pnpm lint:css` (clean), `pnpm test` (194 files / 1358 tests), `pnpm check:tokens` (0 violations). Visual test waived on same basis as plan-030.
 - [plan-030-nova-production-refactor](./plan-030-nova-production-refactor/plan.md) —
   Nova Production Refactor. Closed 2026-05-28 with all 4 stages complete.
   Quality gates: `pnpm run check`, `pnpm run lint`, `pnpm run lint:css`,

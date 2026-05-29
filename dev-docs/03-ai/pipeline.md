@@ -1,6 +1,6 @@
 # AI Pipeline
 
-> Last verified: 2026-05-27 (plan-030 stage-004 docs sync)
+> Last verified: 2026-05-28 (plan-031 stage-005 docs sync)
 
 Every AI feature in Novellum follows the same pipeline. The runtime
 agents (continuity / edit / rewrite / style) live in [src/lib/ai/](../../src/lib/ai/)
@@ -157,20 +157,43 @@ later editor accept-pipeline can ledger the provenance (`taskKey`,
 `family`, `stage`, `model`, `createdAt`). That integration is out of
 scope for plan-027.
 
-### Nova mode/workflow boundaries (plan-030)
+### Nova mode/workflow boundaries (plan-031)
 
-Plan-030 tightens the Nova product contract without adding autonomous tool runtime:
+Plan-031 ships three explicit modes and a real bounded Agent-mode tool loop.
 
-- `chat` mode stays conversational and grounded to scoped project context.
-- `scribe` mode only routes supported outline-generation requests to the author pipeline.
-- Unsupported concrete Scribe requests render an explicit limitation state instead of fallback execution.
-- Draft/revision artifacts remain proposal cards with explicit user review actions (no auto-apply).
+**Mode routing** (`sendNovaChat` → `chat-service.ts`):
+
+| Mode | Route | Tools | Output |
+| --- | --- | --- | --- |
+| `ask` | `OpenRouterClient.streamComplete` | None | Streamed nova message |
+| `write` (outline) | `runAuthorPipelineTask(AUTHOR_OUTLINE)` | None | Pipeline artifact card |
+| `write` (unsupported) | Explicit limitation card | None | `unsupported_action` message |
+| `agent` | `runAgentLoop` → `/api/nova/agent` | Registered agent tools | Tool chips + proposal envelope |
+
+**Agent loop** (`agent-loop.ts`, max 8 steps):
+
+1. `POST /api/nova/agent` with system prompt, message history, and `ToolDefinition[]` in OpenRouter tool format.
+2. Parse `{ content, tool_calls, finish_reason }`.
+3. For each tool call: dispatch via `dispatchTool`, append tool-call and tool-result chips, push `{ role: 'tool' }` message to history.
+4. Repeat until no tool calls or `MAX_AGENT_STEPS` reached.
+5. Cap exhaustion appends a visible nova message; user abort exits cleanly.
+
+**Attachment context scope** (`'user-attached'`):
+
+User-attached entities and files are appended to the system prompt as `# User-Attached Context` after the RAG-derived context. They are counted separately in the context disclosure pill. Attachment scope is additive; it does not replace or truncate the RAG context. Files are validated at client (`validateAttachmentFile`) and server (`validateAttachment`) before inclusion.
+
+**No-mutation guarantee**:
+
+- Agent read tools are pure functions over existing DB API endpoints.
+- Proposal tools return `ProposalEnvelope { kind: 'agent-proposal', proposalType, content }` and never write to manuscript, editor, or project entities.
+- Source-contract tests (`tests/nova/agent-source-contracts.test.ts`) statically assert that tool handler files contain no editor/manuscript mutation imports.
 
 Key enforcement tests:
 
-- `tests/nova/nova-panel-chat.test.ts`
-- `tests/nova/nova-artifact-cards.test.ts`
-- `tests/nova/nova-surface-reconciliation.test.ts`
+- `tests/nova/agent-loop.test.ts` — loop terminal states, tool dispatch, cap, abort
+- `tests/nova/agent-source-contracts.test.ts` — no-mutation import contracts
+- `tests/nova/attachments.test.ts` — attachment validation, session lifecycle
+- `tests/nova/mode-routing.test.ts` — ask/write/agent routing contracts
 
 See [ADR-0027](../02-architecture/adr/adr-0027-pipeline-entity-scope.md)
 for the V1.1 scope decision.
@@ -208,11 +231,15 @@ plan-028.
 
 ## Server boundary
 
-The browser never holds the OpenRouter API key. All model calls go through `/api/ai` ([src/routes/api/ai/+server.ts](../../src/routes/api/ai/+server.ts)), which:
+The browser never holds the OpenRouter API key. Model calls use one of two server-side routes:
 
-1. Reads the key from the OS keyring via [credential-service.ts](../../src/lib/ai/credential-service.ts).
-2. Builds the OpenRouter request.
-3. Streams the response back to the client.
+- **`/api/ai`** ([src/routes/api/ai/+server.ts](../../src/routes/api/ai/+server.ts)) — streaming completions for Ask/Write modes and proposal generation.
+- **`/api/nova/agent`** ([src/routes/api/nova/agent/+server.ts](../../src/routes/api/nova/agent/+server.ts)) — non-streaming tool-capable completions for Agent mode. Returns `{ content, tool_calls, finish_reason }`.
+
+Both routes:
+1. Read the key from the OS keyring via [credential-service.ts](../../src/lib/ai/credential-service.ts).
+2. Build the OpenRouter request.
+3. Return the response to the client.
 
 ## Constraints (always)
 

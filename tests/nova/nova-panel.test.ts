@@ -64,6 +64,8 @@ describe('NovaPanel.svelte', () => {
 		document.body.innerHTML = '';
 		target = document.createElement('div');
 		document.body.appendChild(target);
+		document.documentElement.style.removeProperty('--nova-panel-width');
+		document.documentElement.style.removeProperty('--nova-panel-open-offset');
 		window.sessionStorage.clear();
 		window.localStorage.clear();
 		novaPanel.close();
@@ -76,6 +78,8 @@ describe('NovaPanel.svelte', () => {
 		novaSession.clear();
 		window.sessionStorage.clear();
 		window.localStorage.clear();
+		document.documentElement.style.removeProperty('--nova-panel-width');
+		document.documentElement.style.removeProperty('--nova-panel-open-offset');
 	});
 
 	it('renders nothing when closed', () => {
@@ -96,10 +100,8 @@ describe('NovaPanel.svelte', () => {
 		expect(title?.textContent?.trim()).toBe('Nova');
 		const status = target.querySelector('.nova-header-status');
 		expect((status?.textContent ?? '').trim().length).toBeGreaterThan(0);
-		expect(target.textContent).toContain("Hi, I'm Nova");
-		expect(target.textContent).toContain(
-			'Open a project to unlock grounded story help, or ask a general writing question.',
-		);
+		expect(target.querySelector('.nova-greeting')).not.toBeNull();
+		expect(target.querySelector('.nova-starter-btn')).not.toBeNull();
 		expect(target.querySelector('.nova-quick-prompt')).toBeNull();
 		unmount(cmp);
 	});
@@ -134,7 +136,7 @@ describe('NovaPanel.svelte', () => {
 		unmount(cmp);
 	});
 
-	it('keeps context/model controls discoverable when key is configured', () => {
+	it('keeps context disclosure discoverable when key is configured', () => {
 		const cmp = mount(NovaPanel, { target });
 		novaPanel.open();
 		aiSession.keyConfigured = true;
@@ -143,7 +145,7 @@ describe('NovaPanel.svelte', () => {
 
 		const tray = target.querySelector('.nova-session-tray');
 		expect(tray).not.toBeNull();
-		expect(tray?.getAttribute('aria-label')).toBe('Context and model controls');
+		expect(tray?.getAttribute('aria-label')).toBe('Context disclosure');
 		unmount(cmp);
 	});
 
@@ -200,6 +202,31 @@ describe('NovaPanel.svelte', () => {
 		unmount(cmp);
 	});
 
+	it('publishes and updates app-shell open offset while open, then resets on close', () => {
+		const cmp = mount(NovaPanel, { target });
+		novaPanel.open();
+		flushSync();
+
+		const handle = target.querySelector('.nova-resize-handle') as HTMLButtonElement | null;
+		expect(handle).not.toBeNull();
+		expect(document.documentElement.style.getPropertyValue('--nova-panel-open-offset')).toBe(
+			'360px',
+		);
+
+		handle?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+		flushSync();
+		expect(document.documentElement.style.getPropertyValue('--nova-panel-open-offset')).toBe(
+			'376px',
+		);
+
+		novaPanel.close();
+		flushSync();
+		expect(document.documentElement.style.getPropertyValue('--nova-panel-open-offset')).toBe(
+			'0px',
+		);
+		unmount(cmp);
+	});
+
 	it('uses explicit constrained and compact viewport states while keeping composer usable', () => {
 		const media = installMatchMediaHarness(false);
 		try {
@@ -216,6 +243,9 @@ describe('NovaPanel.svelte', () => {
 			expect(handle?.disabled).toBe(false);
 			expect(textarea).not.toBeNull();
 			expect(textarea?.disabled).toBe(false);
+			expect(document.documentElement.style.getPropertyValue('--nova-panel-open-offset')).toBe(
+				'300px',
+			);
 
 			media.setMatches(true);
 			flushSync();
@@ -223,6 +253,9 @@ describe('NovaPanel.svelte', () => {
 			expect(aside?.getAttribute('data-viewport-state')).toBe('compact');
 			expect(handle?.disabled).toBe(true);
 			expect(textarea?.disabled).toBe(false);
+			expect(document.documentElement.style.getPropertyValue('--nova-panel-open-offset')).toBe(
+				'0px',
+			);
 			unmount(cmp);
 		} finally {
 			media.restore();

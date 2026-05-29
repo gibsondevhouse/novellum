@@ -4,7 +4,7 @@
 
 ## Active Plans
 
-- None.
+No active plan as of 2026-05-28. Plan-031 closed.
 
 ## Deferred (not yet scheduled)
 
@@ -12,6 +12,7 @@
 
 ## Completed Plans (Archived)
 
+- [plan-031-nova-vscode-copilot-parity](./plan-031-nova-vscode-copilot-parity/plan.md): Nova VS Code Copilot Parity — compact sidepanel, Ask/Write/Agent modes, real attachments, bounded agentic tool loop. 5 stages. Status: `complete` (closed 2026-05-28). Quality gates: check (0 errors), lint (clean), test (194 files / 1358 tests), check:tokens (0 violations). Visual test waived (same basis as plan-030).
 - [plan-030-nova-production-refactor](./plan-030-nova-production-refactor/plan.md): Nova production refactor focused on trust repair. 4 stages. Status: `complete` (closed 2026-05-28). Quality gates: `check`, `lint`, `lint:css`, and full `test` passed (190 files / 1299 tests). Full visual suite reported pre-existing cross-surface snapshot drift; targeted Nova visual specs were executed as documented substitute (2 passed, 3 skipped).
 - [plan-029-v1.1-unfinished-work-closeout](./plan-029-v1.1-unfinished-work-closeout/plan.md): V1.1 Unfinished Work Closeout umbrella. 4 stages. Status: `complete` (closed 2026-05-27). Retired plan-019, plan-021, plan-024 stage-003 as shipped. Executed plan-024 stage-006 docs rebaseline. Deferred plan-024 stage-002 (release engineering) to dedicated plan. Quality gates: 187 files / 1270 tests; 325 files / 0 token violations.
 - [plan-028-v1.1-hierarchical-pipeline-ui](./plan-028/plan.md): Outline-first hierarchical pipeline UI — Arc → Stage traversal, worldbuild run flow, checkpoint review console, verification/doc sync. 4 stages, 10 parts. Status: `complete` (closed 2026-05-26; 187 files / 1268 vitest tests; token guard 0 violations; 7 Playwright e2e specs covering traversal, run, review, accept/reject, failure flows; docs reconciled with shipped behavior).

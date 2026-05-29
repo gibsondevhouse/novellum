@@ -40,6 +40,8 @@ export type TaskType =
 	| 'edit'
 	| 'style_check'
 	| 'chat'
+	| 'write'
+	| 'agent'
 	| 'pipeline';
 
 export type EditMode = 'developmental' | 'line_edit' | 'proofread';
