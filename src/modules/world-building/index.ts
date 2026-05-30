@@ -60,3 +60,17 @@ export {
 	generateChroniclesWithNova,
 	generateDomainWithNova,
 } from './worldbuilding-generate-actions.js';
+
+// Generation state machine
+export type { WorldbuildingGenerationStateValue } from './stores/worldbuilding-generation-state.svelte.js';
+export {
+	getState as getGenerationState,
+	transition as transitionGenerationState,
+	resetState as resetGenerationState,
+	getMissingContextReason,
+	evaluateReadiness,
+} from './stores/worldbuilding-generation-state.svelte.js';
+
+// Stage-003 components
+export { default as WorldbuildingProposalCard } from './components/WorldbuildingProposalCard.svelte';
+export { default as WorldbuildingGenerationStatus } from './components/WorldbuildingGenerationStatus.svelte';

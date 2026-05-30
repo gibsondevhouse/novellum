@@ -9,6 +9,8 @@
 		canGenerateDomain,
 		generateDomainWithNova,
 	} from '$modules/world-building/worldbuilding-generate-actions.js';
+	import { WorldbuildingGenerationStatus } from '$modules/world-building';
+	import { evaluateReadiness } from '$modules/world-building/stores/worldbuilding-generation-state.svelte.js';
 	import type { DomainCounts } from './+page.js';
 
 	let { data }: { data: { projectId: string; domainCounts: DomainCounts } } = $props();
@@ -67,6 +69,13 @@
 			? WORLDBUILDING_HELP_SECTIONS.filter((s) => s.id === activeDomain)
 			: WORLDBUILDING_HELP_SECTIONS,
 	);
+
+	$effect(() => {
+		const counts = data.domainCounts;
+		for (const domain of WORLDBUILDING_DOMAIN_SEQUENCE) {
+			evaluateReadiness(domain.id, counts);
+		}
+	});
 </script>
 
 <svelte:head>
@@ -131,6 +140,7 @@
 							onclick={() => generateDomainWithNova(data.projectId, domainId)}
 						>Generate</button>
 					</div>
+					<WorldbuildingGenerationStatus domainId={domainId} />
 					<button
 						type="button"
 						class="domain-tile__guide-toggle"

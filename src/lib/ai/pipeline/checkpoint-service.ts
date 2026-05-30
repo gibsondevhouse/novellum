@@ -12,8 +12,12 @@ import {
 	type CheckpointRejectionState,
 	type CheckpointReviewState,
 	type WorldbuildCheckpointRecord,
+	type WorldbuildDomainCheckpointRecord,
 } from './checkpoint-contract.js';
 import type { PipelineArtifactEnvelope } from './contracts.js';
+import { isWorldbuildDomainTaskKey } from './task-catalog.js';
+import type { WorldbuildDomainTaskKey } from './task-catalog.js';
+import { createPipelineArtifactEnvelope, createDefaultHierarchyReferences } from './contracts.js';
 import type {
 	WorldbuildPayload,
 	WorldbuildPopulatedBibleTableWrites,
@@ -87,7 +91,7 @@ function deserializeCheckpoint(raw: string): WorldbuildCheckpointRecord | null {
 		if (typeof parsed.id !== 'string' || typeof parsed.projectId !== 'string') return null;
 		if (!isCheckpointLifecycle(parsed.lifecycle)) return null;
 		if (typeof parsed.taskKey !== 'string') return null;
-		if (!isWorldbuildTaskKey(parsed.taskKey)) return null;
+		if (!isWorldbuildTaskKey(parsed.taskKey) && !isWorldbuildDomainTaskKey(parsed.taskKey)) return null;
 		if (!parsed.artifact || typeof parsed.artifact !== 'object') return null;
 		if (typeof parsed.version !== 'string') return null;
 		if (typeof parsed.createdAt !== 'string' || typeof parsed.updatedAt !== 'string') return null;
@@ -114,14 +118,14 @@ function parseUpsertInput(
 	}
 
 	const artifact = artifactValue as unknown as PipelineArtifactEnvelope<WorldbuildPayload>;
-	if (artifact.pipeline !== 'vibe-worldbuild') {
+	if (artifact.pipeline !== 'vibe-worldbuild' && artifact.pipeline !== 'vibe-worldbuild-domain') {
 		throw new WorldbuildCheckpointError(
 			'invalid_payload',
-			'Checkpoint artifact must belong to the vibe-worldbuild pipeline family.',
+			'Checkpoint artifact must belong to a worldbuild pipeline family.',
 		);
 	}
 
-	if (!isWorldbuildTaskKey(artifact.taskKey)) {
+	if (!isWorldbuildTaskKey(artifact.taskKey) && !isWorldbuildDomainTaskKey(artifact.taskKey)) {
 		throw new WorldbuildCheckpointError('invalid_payload', 'Checkpoint artifact task key is not worldbuild-compatible.');
 	}
 
@@ -695,6 +699,56 @@ export function rejectWorldbuildCheckpoint(
 }
 
 export const worldbuildCheckpointService = defaultService;
+
+export function createDomainCheckpoint(params: {
+	projectId: string;
+	taskKey: WorldbuildDomainTaskKey;
+	payload: WorldbuildPayload;
+	ownerId?: string;
+}): WorldbuildDomainCheckpointRecord {
+	if (!isWorldbuildDomainTaskKey(params.taskKey)) {
+		throw new WorldbuildCheckpointError(
+			'invalid_payload',
+			`Task key ${params.taskKey} is not a valid worldbuilding domain key.`,
+		);
+	}
+
+	const createdAt = nowIso();
+	const ownerId = params.ownerId ?? WORLDBUILD_CHECKPOINT_OWNER_ID;
+
+	const artifact = createPipelineArtifactEnvelope<WorldbuildPayload>({
+		task: {
+			key: params.taskKey,
+			family: 'vibe-worldbuild-domain',
+			stage: params.taskKey.replace('vibe-worldbuild.domain.', ''),
+			role: '',
+			contextPolicy: 'continuity_scope',
+			outputFormat: `json_worldbuild_${params.taskKey.split('.').pop()}`,
+		},
+		payload: params.payload,
+		producedAt: createdAt,
+		lifecycle: 'draft',
+		hierarchyReferences: createDefaultHierarchyReferences(),
+	});
+
+	const record: WorldbuildDomainCheckpointRecord = {
+		id: artifact.id,
+		projectId: params.projectId,
+		ownerId,
+		version: PIPELINE_CHECKPOINT_SCHEMA_VERSION,
+		lifecycle: 'draft',
+		taskKey: params.taskKey,
+		artifact,
+		createdAt,
+		updatedAt: createdAt,
+		review: null,
+		acceptance: null,
+		rejection: null,
+	};
+
+	writeRow(db, record, artifact.id);
+	return record;
+}
 
 export function createCheckpointDraftFromArtifact(params: {
 	projectId: string;

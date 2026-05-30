@@ -159,4 +159,14 @@ export const OUTPUT_FORMAT_DESCRIPTIONS: Record<string, string> = {
 		'Respond with the scene prose first, followed by a fenced ---SIDECAR--- block containing a JSON object with: sceneId, assignedBeatIds, povCharacterId, locationId, characterIds, threadIds, factsIntroduced, continuityRisks, wordCountEstimate, draftStatus.',
 	json_author_revision_pack:
 		'Return a JSON object with an `issues[]` array. Each issue must have: severity, type, evidenceSpan, problemExplanation, minimalFix, deeperRewriteOption, requiresCanonDecision, relatedEntityIds, approvalChecklist.',
+	json_worldbuild_domain_personae:
+		'Return a JSON object with arrays: individuals[], factions[], relationships[]. Each individual requires a name field; each faction requires a name field.',
+	json_worldbuild_domain_atlas:
+		'Return a JSON object with arrays: realms[], landmarks[], travelConstraints[]. Each realm and landmark requires a name field.',
+	json_worldbuild_domain_archive:
+		'Return a JSON object with arrays: myths[], traditions[], technologies[], themes[], glossaryTerms[]. Each lore entry requires a title field; each glossary term requires a term field.',
+	json_worldbuild_domain_threads:
+		'Return a JSON object with arrays: majorArcs[], subplots[], motivations[]. Each arc and subplot requires a title field; each motivation requires a characterName field.',
+	json_worldbuild_domain_chronicles:
+		'Return a JSON object with arrays: eras[], keyEvents[], personalHistories[]. Each era requires a name field; each event requires a title field.',
 };
