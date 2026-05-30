@@ -1,181 +1,81 @@
 <script lang="ts">
 	import { SectionHeader } from '$lib/components/ui/index.js';
 	import { novaMode, novaPanel } from '$modules/nova';
+	import { WORLDBUILDING_HELP_SECTIONS } from '$modules/world-building/help/worldbuilding-help-content.js';
+	import { WorldbuildingHelpDrawer, WorldbuildingReadinessBadge } from '$modules/world-building';
+	import { WORLDBUILDING_DOMAIN_SEQUENCE } from '$modules/world-building/worldbuilding-workflow.js';
+	import type { WorldbuildingDomainId } from '$modules/world-building/worldbuilding-workflow.js';
+	import {
+		canGenerateDomain,
+		generateDomainWithNova,
+	} from '$modules/world-building/worldbuilding-generate-actions.js';
+	import { WorldbuildingGenerationStatus } from '$modules/world-building';
+	import { evaluateReadiness } from '$modules/world-building/stores/worldbuilding-generation-state.svelte.js';
+	import type { DomainCounts } from './+page.js';
 
-	let { data }: { data: { projectId: string } } = $props();
+	let { data }: { data: { projectId: string; domainCounts: DomainCounts } } = $props();
 
-	let showManifesto = $state(false);
+	let showHelp = $state(false);
 	let expandedSection = $state<string | null>(null);
+	let activeDomain = $state<WorldbuildingDomainId | null>(null);
 
 	function toggleSection(id: string): void {
 		expandedSection = expandedSection === id ? null : id;
 	}
 
-	function startWritingWithNova(): void {
+	function openHelp(domainId: WorldbuildingDomainId | null = null): void {
+		activeDomain = domainId;
+		showHelp = true;
+	}
+
+	function startWorldbuildWithNova(): void {
 		novaMode.loadForProject(data.projectId);
 		novaMode.setMode('write');
 		novaPanel.openWithPrompt(
-			'Build a three-act outline for this project using my current worldbuilding canon (characters, factions, lore, plot threads, timeline, and locations). Highlight where each act should escalate conflict.',
+			'Help me build a World Bible for this project. Guide me through each domain in order: Personae (characters, factions, lineages), Atlas (locations, realms, landmarks), The Archive (myths, technology, traditions), Threads (plot arcs, motivations, sub-plots), and Chronicles (eras, key events, personal histories). Start by reviewing my existing worldbuilding context and identifying which domain would benefit most from development.',
 		);
 	}
 
-	const sections = $derived([
-		{
-			id: 'personae',
-			label: 'Personae',
-			tagline: 'Who carries the world',
-			purpose:
-				'All sentient life and social structures in your narrative space, from singular voices to collective identity.',
-			meaning:
-				'Personae defines agency. If Atlas is terrain and Chronicles is time, Personae is will: who can act, who cannot, and what identity costs them to sustain.',
-			questions: [
-				'Who has power, and what limits that power?',
-				'Which loyalties are inherited, chosen, or imposed?',
-				'What contradictions make each group or individual dramatically unstable?',
-			],
-			pitfalls: [
-				'Flat archetypes with no conflicting drives.',
-				'Factions that exist only as labels, not pressure systems.',
-				'Lineages treated as trivia instead of social consequence.',
-			],
-			signals: [
-				'Every major actor has a desire that collides with another actor.',
-				'Group identity changes behavior, stakes, and language on the page.',
-				'Backstory explains current decisions rather than decorating them.',
-			],
-			glossary: [
-				{ term: 'Individuals', meaning: 'Specific voices with motive, leverage, and vulnerability.' },
-				{ term: 'Factions', meaning: 'Collective actors that institutionalize conflict and belonging.' },
-				{ term: 'Lineages', meaning: 'Inherited identity threads that shape status, expectation, and risk.' },
-				{ term: 'Notes', meaning: 'Unresolved character ideas parked before canonization.' },
-			],
-			entryHref: `/projects/${data.projectId}/world-building/characters`,
-		},
-		{
-			id: 'atlas',
-			label: 'Atlas',
-			tagline: 'Where pressure becomes place',
-			purpose:
-				'The physical where of your world: geography, material context, and the distances between narrative forces.',
-			meaning:
-				'Atlas defines constraint. It answers what movement costs, where scarcity concentrates, and how environment selects for behavior long before plot begins.',
-			questions: [
-				'Which routes create opportunity, and which routes create danger?',
-				'What resources are abundant, scarce, forbidden, or sacred?',
-				'How does geography force social structure?',
-			],
-			pitfalls: [
-				'Pretty maps with no narrative friction.',
-				'Landmarks disconnected from power or memory.',
-				'Travel distances that change only for convenience.',
-			],
-			signals: [
-				'Locations produce different choices from the same character.',
-				'Setting details alter conflict outcomes, not just atmosphere.',
-				'Spatial logic remains coherent across every chapter.',
-			],
-			glossary: [
-				{ term: 'Realms', meaning: 'Macro territories and ecological containers for conflict.' },
-				{ term: 'Landmarks', meaning: 'High-impact sites where story pressure concentrates.' },
-				{ term: 'Maps', meaning: 'Spatial references that preserve route and distance continuity.' },
-				{ term: 'Notes', meaning: 'Unslotted spatial ideas awaiting exact placement.' },
-			],
-			entryHref: `/projects/${data.projectId}/world-building/locations`,
-		},
-		{
-			id: 'archive',
-			label: 'The Archive',
-			tagline: 'What memory refuses to lose',
-			purpose:
-				'The cultural memory core: mythic inheritance, speculative systems, and traditions preserved through displacement.',
-			meaning:
-				'The Archive defines legitimacy. It explains why people believe what they believe, which systems feel inevitable, and what a society calls true even when it is wrong.',
-			questions: [
-				'What stories does this world tell to justify itself?',
-				'What technologies alter moral boundaries?',
-				'Which rituals preserve identity under stress?',
-			],
-			pitfalls: [
-				'Lore dumps detached from character stakes.',
-				'Tech concepts with no cultural side effects.',
-				'Traditions presented as static, not contested.',
-			],
-			signals: [
-				'Belief and custom materially affect plot outcomes.',
-				'Knowledge is unevenly distributed and politically useful.',
-				'Contradictory histories can both be meaningful in-scene.',
-			],
-			glossary: [
-				{ term: 'Myths', meaning: 'Narrative frameworks that define identity and destiny.' },
-				{ term: 'Technology', meaning: 'Applied systems that reshape daily life and power.' },
-				{ term: 'Traditions', meaning: 'Repeated practices that encode shared values.' },
-				{ term: 'Notes', meaning: 'Archive fragments pending verification or synthesis.' },
-			],
-			entryHref: `/projects/${data.projectId}/world-building/lore`,
-		},
-		{
-			id: 'threads',
-			label: 'Threads',
-			tagline: 'How movement becomes consequence',
-			purpose:
-				'The connective tissue of narrative motion: causal chains, secondary movement, and the why beneath action.',
-			meaning:
-				'Threads defines causality. It clarifies not only what happens, but why it had to happen given personalities, systems, and prior events.',
-			questions: [
-				'Which chain of decisions drives each major turn?',
-				'What counter-movements complicate the main arc?',
-				'Which motives remain hidden versus declared?',
-			],
-			pitfalls: [
-				'Events linked by chronology but not cause.',
-				'Sub-plots that do not alter the main story pressure.',
-				'Motivations stated but not evidenced in behavior.',
-			],
-			signals: [
-				'Every major beat has a traceable causal parent.',
-				'Secondary arcs sharpen, rather than distract from, theme.',
-				'Character choices remain legible even when surprising.',
-			],
-			glossary: [
-				{ term: 'Major Arcs', meaning: 'Primary movement of transformation and consequence.' },
-				{ term: 'Sub-plots', meaning: 'Secondary lines that intensify or counterpoint the main movement.' },
-				{ term: 'Motivations', meaning: 'Decision logic connecting desire to action.' },
-				{ term: 'Notes', meaning: 'Unsorted connective ideas before arc placement.' },
-			],
-			entryHref: `/projects/${data.projectId}/world-building/plot-threads`,
-		},
-		{
-			id: 'chronicles',
-			label: 'Chronicles',
-			tagline: 'When history splits and reforms',
-			purpose:
-				'The temporal where and when: historical strata, canonical events, and divergent personal timelines.',
-			meaning:
-				'Chronicles defines temporal truth. It keeps continuity coherent when official records, private memory, and lived sequence do not perfectly align.',
-			questions: [
-				'What changes from one era to the next, and why?',
-				'Which events are canonical, disputed, suppressed, or forgotten?',
-				'Where do personal timelines diverge from public history?',
-			],
-			pitfalls: [
-				'Ambiguous chronology that forces retroactive patching.',
-				'Key events listed without downstream effects.',
-				'Character histories that violate established world timing.',
-			],
-			signals: [
-				'Time references stay consistent across scenes and arcs.',
-				'Historical events produce durable consequences in the present.',
-				'Conflicting records are intentional and narratively useful.',
-			],
-			glossary: [
-				{ term: 'Eras', meaning: 'Temporal containers for macro historical shifts.' },
-				{ term: 'Key Events', meaning: 'Turning points that alter systemic trajectories.' },
-				{ term: 'Personal Histories', meaning: 'Character timeline layers intersecting canon.' },
-				{ term: 'Notes', meaning: 'Loose chronology ideas awaiting timeline anchoring.' },
-			],
-			entryHref: `/projects/${data.projectId}/world-building/timeline`,
-		},
-	]);
+	function getBadgeVariant(domainId: WorldbuildingDomainId): 'first' | 'dependent' | 'ready' {
+		const config = WORLDBUILDING_DOMAIN_SEQUENCE.find((d) => d.id === domainId);
+		if (!config) return 'dependent';
+		if (config.dependencyIds.length === 0) return 'first';
+		const allMet = config.dependencyIds.every((dep) => (data.domainCounts[dep] ?? 0) > 0);
+		return allMet ? 'ready' : 'dependent';
+	}
+
+	function getDomainCount(domainId: WorldbuildingDomainId): number {
+		return data.domainCounts[domainId] ?? 0;
+	}
+
+	function getGenerateGuard(domainId: WorldbuildingDomainId) {
+		return canGenerateDomain(domainId, {
+			projectId: data.projectId,
+			domainCounts: data.domainCounts,
+		});
+	}
+
+	const sections = $derived(
+		WORLDBUILDING_HELP_SECTIONS.map((section) => ({
+			...section,
+			entryHref: `/projects/${data.projectId}/world-building/${
+				WORLDBUILDING_DOMAIN_SEQUENCE.find((d) => d.id === section.id)?.entryPath ?? section.id
+			}`,
+		})),
+	);
+
+	const helpSections = $derived(
+		activeDomain
+			? WORLDBUILDING_HELP_SECTIONS.filter((s) => s.id === activeDomain)
+			: WORLDBUILDING_HELP_SECTIONS,
+	);
+
+	$effect(() => {
+		const counts = data.domainCounts;
+		for (const domain of WORLDBUILDING_DOMAIN_SEQUENCE) {
+			evaluateReadiness(domain.id, counts);
+		}
+	});
 </script>
 
 <svelte:head>
@@ -193,29 +93,60 @@
 				{#each sections as section (section.id)}
 					<a class="hero-jump" href={`#${section.id}`}>{section.label}</a>
 				{/each}
-				<button type="button" class="hero-jump hero-jump--nova" onclick={startWritingWithNova}>
-					Start Writing with Nova
+				<button type="button" class="hero-jump hero-jump--nova" onclick={startWorldbuildWithNova}>
+					Build World Bible with Nova
 				</button>
 			</div>
 		</section>
 
 		<section class="domain-grid" aria-label="World-building domains">
 			{#each sections as section (section.id)}
-				<article class="domain-tile">
+				{@const domainId = section.id as WorldbuildingDomainId}
+				{@const guard = getGenerateGuard(domainId)}
+				{@const count = getDomainCount(domainId)}
+				<article class="domain-tile" id={section.id}>
 					<div class="domain-tile__top">
-						<h2>{section.label}</h2>
+						<div class="domain-tile__title-row">
+							<h2>{section.label}</h2>
+							<WorldbuildingReadinessBadge
+								label={WORLDBUILDING_DOMAIN_SEQUENCE.find((d) => d.id === domainId)?.generationReadiness ?? ''}
+								variant={getBadgeVariant(domainId)}
+							/>
+						</div>
 						<p>{section.tagline}</p>
 					</div>
+					<p class="domain-tile__count">
+						{count > 0 ? `${count} record${count === 1 ? '' : 's'}` : 'No records yet'}
+					</p>
 					<p class="domain-tile__body">{section.purpose}</p>
 					<div class="domain-tile__actions">
-						<a class="domain-tile__cta" href={section.entryHref}>Open {section.label}</a>
+						<a
+							class="domain-tile__action domain-tile__action--open"
+							href={section.entryHref}
+							aria-label="Open {section.label}"
+						>Open</a>
 						<button
+							type="button"
+							class="domain-tile__action domain-tile__action--help"
+							aria-label="Help for {section.label}"
+							onclick={() => openHelp(domainId)}
+						>Help</button>
+						<button
+							type="button"
+							class="domain-tile__action domain-tile__action--generate"
+							aria-label="Generate {section.label} with Nova{guard.reason ? ': ' + guard.reason : ''}"
+							disabled={!guard.allowed}
+							title={guard.reason ?? undefined}
+							onclick={() => generateDomainWithNova(data.projectId, domainId)}
+						>Generate</button>
+					</div>
+					<WorldbuildingGenerationStatus domainId={domainId} />
+					<button
 						type="button"
 						class="domain-tile__guide-toggle"
 						aria-expanded={expandedSection === section.id}
 						onclick={() => toggleSection(section.id)}
 					>Guide {expandedSection === section.id ? '↑' : '↓'}</button>
-					</div>
 				</article>
 			{/each}
 		</section>
@@ -226,29 +157,15 @@
 				<button
 					type="button"
 					class="help-toggle"
-					aria-expanded={showManifesto}
+					aria-expanded={showHelp}
 					aria-label="Toggle worldbuilding orientation"
-					onclick={() => (showManifesto = !showManifesto)}
+					onclick={() => openHelp(null)}
 				>?</button>
 			</div>
-			{#if showManifesto}
-				<p>
-					World building is not inventory. It is a causality framework for meaning. Use this page as
-					a reference for semantics first: what each domain is for, what questions it should answer,
-					and how to recognize incomplete logic before it leaks into drafting.
-				</p>
-				<ol class="reading-sequence">
-					<li>Establish Personae to define agency and social force.</li>
-					<li>Map Atlas so movement, scarcity, and terrain create pressure.</li>
-					<li>Codify The Archive to explain legitimacy, belief, and systems.</li>
-					<li>Align Threads so events emerge from coherent motivation.</li>
-					<li>Lock Chronicles to preserve timeline and continuity truth.</li>
-				</ol>
-			{/if}
 		</section>
 
 		{#each sections as section, i (section.id)}
-			<section id={section.id} class="lane" aria-labelledby={`${section.id}-title`}>
+			<section class="lane" aria-labelledby={`${section.id}-title`}>
 				<div class="lane-heading">
 					<span class="lane-index">0{i + 1}</span>
 					<div>
@@ -306,6 +223,8 @@
 		{/each}
 	</div>
 </div>
+
+<WorldbuildingHelpDrawer bind:open={showHelp} sections={helpSections} />
 
 <style>
 	.landing-shell {
@@ -409,11 +328,24 @@
 		font-size: var(--text-xl);
 	}
 
+	.domain-tile__title-row {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		flex-wrap: wrap;
+	}
+
 	.domain-tile__top p {
 		margin: var(--space-1) 0 0;
 		font-size: var(--text-xs);
 		text-transform: uppercase;
 		letter-spacing: var(--tracking-widest);
+		color: var(--color-text-muted);
+	}
+
+	.domain-tile__count {
+		margin: 0;
+		font-size: var(--text-xs);
 		color: var(--color-text-muted);
 	}
 
@@ -426,45 +358,90 @@
 	.domain-tile__actions {
 		display: flex;
 		align-items: center;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		margin-top: auto;
+		flex-wrap: wrap;
 	}
 
-	.domain-tile__cta {
+	.domain-tile__action {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		padding: var(--space-2) var(--space-4);
+		padding: var(--space-1) var(--space-3);
 		border-radius: var(--radius-md);
+		font-size: var(--text-xs);
+		font-weight: var(--font-weight-medium);
+		text-decoration: none;
+		cursor: pointer;
+		transition:
+			background var(--duration-fast) var(--ease-standard),
+			border-color var(--duration-fast) var(--ease-standard),
+			color var(--duration-fast) var(--ease-standard);
+	}
+
+	.domain-tile__action--open {
 		border: 1px solid color-mix(in srgb, var(--color-brass) 45%, var(--color-border-default));
 		background: color-mix(in srgb, var(--color-candle) 14%, transparent);
 		color: var(--color-text-primary);
-		text-decoration: none;
-		font-size: var(--text-sm);
-		font-weight: var(--font-weight-medium);
 	}
 
-	.domain-tile__cta:hover,
-	.domain-tile__cta:focus-visible {
+	.domain-tile__action--open:hover,
+	.domain-tile__action--open:focus-visible {
 		outline: none;
 		background: color-mix(in srgb, var(--color-candle) 22%, transparent);
 		border-color: var(--color-border-focus);
 	}
 
+	.domain-tile__action--help {
+		border: 1px solid var(--color-border-default);
+		background: transparent;
+		color: var(--color-text-secondary);
+	}
+
+	.domain-tile__action--help:hover,
+	.domain-tile__action--help:focus-visible {
+		outline: none;
+		background: var(--color-surface-overlay);
+		color: var(--color-text-primary);
+		border-color: var(--color-border-focus);
+	}
+
+	.domain-tile__action--generate {
+		border: 1px solid color-mix(in srgb, var(--color-nova-blue) 45%, var(--color-border-default));
+		background: color-mix(in srgb, var(--color-nova-blue) 14%, transparent);
+		color: var(--color-text-primary);
+	}
+
+	.domain-tile__action--generate:hover:not(:disabled),
+	.domain-tile__action--generate:focus-visible:not(:disabled) {
+		outline: none;
+		background: color-mix(in srgb, var(--color-nova-blue) 22%, transparent);
+		border-color: var(--color-border-focus);
+	}
+
+	.domain-tile__action--generate:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+		border-color: var(--color-border-subtle);
+		background: transparent;
+		color: var(--color-text-muted);
+	}
+
 	.domain-tile__guide-toggle {
 		display: inline-flex;
 		align-items: center;
-		font-size: var(--text-sm);
-		color: var(--color-text-secondary);
+		font-size: var(--text-xs);
+		color: var(--color-text-muted);
 		background: transparent;
 		border: none;
 		cursor: pointer;
 		padding: 0;
 		gap: var(--space-1);
+		align-self: flex-start;
 	}
 
 	.domain-tile__guide-toggle:hover {
-		color: var(--color-text-primary);
+		color: var(--color-text-secondary);
 	}
 
 	.manifesto {
@@ -509,21 +486,6 @@
 	.manifesto h2 {
 		margin: 0;
 		font-size: var(--text-2xl);
-	}
-
-	.manifesto p {
-		margin: 0;
-		max-width: 76ch;
-		font-size: var(--text-base);
-		color: var(--color-text-secondary);
-	}
-
-	.reading-sequence {
-		margin: 0;
-		padding-inline-start: 1.2rem;
-		display: grid;
-		gap: var(--space-2);
-		color: var(--color-text-secondary);
 	}
 
 	.lane {

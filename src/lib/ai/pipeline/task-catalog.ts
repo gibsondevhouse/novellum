@@ -7,6 +7,11 @@ export const PIPELINE_TASK_KEYS = {
 	WORLDBUILD_WORLDSPEC: 'vibe-worldbuild.worldspec',
 	WORLDBUILD_RESEARCH: 'vibe-worldbuild.research',
 	WORLDBUILD_WORLD_BIBLE: 'vibe-worldbuild.populated-world-bible',
+	WORLDBUILD_DOMAIN_PERSONAE: 'vibe-worldbuild.domain.personae',
+	WORLDBUILD_DOMAIN_ATLAS: 'vibe-worldbuild.domain.atlas',
+	WORLDBUILD_DOMAIN_ARCHIVE: 'vibe-worldbuild.domain.archive',
+	WORLDBUILD_DOMAIN_THREADS: 'vibe-worldbuild.domain.threads',
+	WORLDBUILD_DOMAIN_CHRONICLES: 'vibe-worldbuild.domain.chronicles',
 	AUTHOR_PREMISE: 'vibe-author.premise',
 	AUTHOR_OUTLINE: 'vibe-author.outline',
 	AUTHOR_SCENE_DRAFT: 'vibe-author.scene-draft',
@@ -57,6 +62,51 @@ export const PIPELINE_TASK_CATALOG: Readonly<Record<PipelineTaskKey, PipelineTas
 		outputFormat: 'json_worldbuild_populated_bible',
 		role: 'You are the Novellum Vibe-Worldbuild Population Agent.',
 	},
+	[PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_PERSONAE]: {
+		key: PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_PERSONAE,
+		family: 'vibe-worldbuild-domain',
+		stage: 'domain-personae',
+		target: 'project',
+		contextPolicy: 'continuity_scope',
+		outputFormat: 'json_worldbuild_domain_personae',
+		role: 'You are the Novellum Worldbuilding Personae Domain Agent.',
+	},
+	[PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_ATLAS]: {
+		key: PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_ATLAS,
+		family: 'vibe-worldbuild-domain',
+		stage: 'domain-atlas',
+		target: 'project',
+		contextPolicy: 'continuity_scope',
+		outputFormat: 'json_worldbuild_domain_atlas',
+		role: 'You are the Novellum Worldbuilding Atlas Domain Agent.',
+	},
+	[PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_ARCHIVE]: {
+		key: PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_ARCHIVE,
+		family: 'vibe-worldbuild-domain',
+		stage: 'domain-archive',
+		target: 'project',
+		contextPolicy: 'continuity_scope',
+		outputFormat: 'json_worldbuild_domain_archive',
+		role: 'You are the Novellum Worldbuilding Archive Domain Agent.',
+	},
+	[PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_THREADS]: {
+		key: PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_THREADS,
+		family: 'vibe-worldbuild-domain',
+		stage: 'domain-threads',
+		target: 'project',
+		contextPolicy: 'continuity_scope',
+		outputFormat: 'json_worldbuild_domain_threads',
+		role: 'You are the Novellum Worldbuilding Threads Domain Agent.',
+	},
+	[PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_CHRONICLES]: {
+		key: PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_CHRONICLES,
+		family: 'vibe-worldbuild-domain',
+		stage: 'domain-chronicles',
+		target: 'project',
+		contextPolicy: 'continuity_scope',
+		outputFormat: 'json_worldbuild_domain_chronicles',
+		role: 'You are the Novellum Worldbuilding Chronicles Domain Agent.',
+	},
 	[PIPELINE_TASK_KEYS.AUTHOR_PREMISE]: {
 		key: PIPELINE_TASK_KEYS.AUTHOR_PREMISE,
 		family: 'vibe-author',
@@ -95,12 +145,33 @@ export const PIPELINE_TASK_CATALOG: Readonly<Record<PipelineTaskKey, PipelineTas
 	},
 };
 
+export const WORLDBUILD_DOMAIN_PIPELINE_KEYS = [
+	PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_PERSONAE,
+	PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_ATLAS,
+	PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_ARCHIVE,
+	PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_THREADS,
+	PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_CHRONICLES,
+] as const;
+
+export type WorldbuildDomainTaskKey = (typeof WORLDBUILD_DOMAIN_PIPELINE_KEYS)[number];
+
+export function isWorldbuildDomainTaskKey(key: string): key is WorldbuildDomainTaskKey {
+	return WORLDBUILD_DOMAIN_PIPELINE_KEYS.includes(key as WorldbuildDomainTaskKey);
+}
+
 export const PIPELINE_TASK_FAMILIES = {
 	'vibe-worldbuild': [
 		PIPELINE_TASK_KEYS.WORLDBUILD_PREMISE,
 		PIPELINE_TASK_KEYS.WORLDBUILD_WORLDSPEC,
 		PIPELINE_TASK_KEYS.WORLDBUILD_RESEARCH,
 		PIPELINE_TASK_KEYS.WORLDBUILD_WORLD_BIBLE,
+	] as const,
+	'vibe-worldbuild-domain': [
+		PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_PERSONAE,
+		PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_ATLAS,
+		PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_ARCHIVE,
+		PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_THREADS,
+		PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_CHRONICLES,
 	] as const,
 	'vibe-author': [
 		PIPELINE_TASK_KEYS.AUTHOR_PREMISE,

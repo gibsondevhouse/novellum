@@ -1,0 +1,97 @@
+import { checkDomainReadiness } from '../worldbuilding-readiness.js';
+import type { WorldbuildingDomainId } from '../worldbuilding-workflow.js';
+import { WORLDBUILDING_DOMAIN_SEQUENCE } from '../worldbuilding-workflow.js';
+
+export type WorldbuildingGenerationStateValue =
+	| 'idle'
+	| 'missing-context'
+	| 'queued'
+	| 'running'
+	| 'review-ready'
+	| 'accepted'
+	| 'rejected'
+	| 'failed';
+
+const LEGAL_TRANSITIONS: Record<WorldbuildingGenerationStateValue, WorldbuildingGenerationStateValue[]> = {
+	idle: ['missing-context', 'queued'],
+	'missing-context': ['idle', 'queued'],
+	queued: ['running', 'failed', 'idle'],
+	running: ['review-ready', 'failed', 'idle'],
+	'review-ready': ['accepted', 'rejected', 'idle'],
+	accepted: ['idle'],
+	rejected: ['idle'],
+	failed: ['idle', 'queued'],
+};
+
+const ALL_DOMAIN_IDS = WORLDBUILDING_DOMAIN_SEQUENCE.map((d) => d.id);
+
+function makeInitialState(): Record<WorldbuildingDomainId, WorldbuildingGenerationStateValue> {
+	return Object.fromEntries(ALL_DOMAIN_IDS.map((id) => [id, 'idle'])) as Record<
+		WorldbuildingDomainId,
+		WorldbuildingGenerationStateValue
+	>;
+}
+
+function makeInitialReasons(): Record<WorldbuildingDomainId, string | null> {
+	return Object.fromEntries(ALL_DOMAIN_IDS.map((id) => [id, null])) as Record<
+		WorldbuildingDomainId,
+		string | null
+	>;
+}
+
+const states = $state<Record<WorldbuildingDomainId, WorldbuildingGenerationStateValue>>(makeInitialState());
+const missingContextReasons = $state<Record<WorldbuildingDomainId, string | null>>(makeInitialReasons());
+
+export function getState(domainId: WorldbuildingDomainId): WorldbuildingGenerationStateValue {
+	return states[domainId];
+}
+
+export function transition(
+	domainId: WorldbuildingDomainId,
+	newState: WorldbuildingGenerationStateValue,
+): void {
+	const current = states[domainId];
+	const allowed = LEGAL_TRANSITIONS[current];
+	if (!allowed.includes(newState)) {
+		throw new Error(
+			`Illegal worldbuilding state transition for "${domainId}": ${current} → ${newState}. ` +
+				`Allowed: ${allowed.join(', ')}`,
+		);
+	}
+	states[domainId] = newState;
+	if (newState !== 'missing-context') {
+		missingContextReasons[domainId] = null;
+	}
+}
+
+export function resetState(domainId: WorldbuildingDomainId): void {
+	states[domainId] = 'idle';
+	missingContextReasons[domainId] = null;
+}
+
+export function getMissingContextReason(domainId: WorldbuildingDomainId): string | null {
+	return missingContextReasons[domainId];
+}
+
+export function evaluateReadiness(
+	domainId: WorldbuildingDomainId,
+	domainCounts: Record<WorldbuildingDomainId, number>,
+): void {
+	const result = checkDomainReadiness(domainId, domainCounts);
+	const current = states[domainId];
+
+	if (!result.allowed) {
+		if (current === 'idle' || current === 'missing-context') {
+			states[domainId] = 'missing-context';
+			missingContextReasons[domainId] =
+				result.missingDeps.length > 0
+					? `Requires ${result.missingDeps.join(', ')}`
+					: 'Missing required context';
+		}
+	} else {
+		if (current === 'missing-context') {
+			states[domainId] = 'idle';
+			missingContextReasons[domainId] = null;
+		}
+	}
+}

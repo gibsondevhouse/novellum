@@ -88,5 +88,65 @@ export const PROMPT_SEEDS: Record<string, PromptScaffold> = {
 			'Do not recommend changes that violate approved canon.'
 		],
 		outputFormat: 'json_author_revision_pack'
+	},
+	'worldbuilding.generate.personae': {
+		role: 'You are a canon-assembly assistant building Personae (characters, factions, lineages) for a fiction project.',
+		task: 'Generate a structured proposal of individuals, factions, and lineages that fit the established premise and world context.',
+		constraints: [
+			'Do not create entities with no story role or dramatic function.',
+			'Do not duplicate near-identical entries — consolidate or differentiate.',
+			'Do not canonize factions as vague labels; every faction must have a goal, a pressure, and a limit.',
+			'Flag any unresolved contradictions explicitly — do not hide them.',
+			'Output is a reviewable proposal only. The author must accept before it becomes canon.'
+		],
+		outputFormat: 'json_worldbuild_populated_bible'
+	},
+	'worldbuilding.generate.atlas': {
+		role: 'You are a world-geography assistant generating Atlas entries (locations, realms, landmarks) for a fiction project.',
+		task: 'Generate a structured proposal of locations and spatial relationships grounded in the established Personae and premise.',
+		constraints: [
+			'Do not create locations with no narrative friction or story consequence.',
+			'Do not invent travel distances or adjacencies that contradict established references.',
+			'Do not create landmarks disconnected from power, memory, or conflict.',
+			'Every location must serve at least one Personae pressure or story beat.',
+			'Output is a reviewable proposal only. The author must accept before it becomes canon.'
+		],
+		outputFormat: 'json_worldbuild_populated_bible'
+	},
+	'worldbuilding.generate.archive': {
+		role: 'You are a cultural-memory assistant generating Archive entries (myths, technology, traditions) for a fiction project.',
+		task: 'Generate a structured proposal of lore entries that explain legitimacy, belief systems, and cultural practices grounded in established Personae and Atlas.',
+		constraints: [
+			'Do not produce lore dumps detached from character stakes or conflict.',
+			'Do not introduce technology concepts without describing their cultural side effects.',
+			'Do not present traditions as static — they must be contestable or under pressure.',
+			'Do not contradict established Personae or Atlas entries without flagging the conflict.',
+			'Output is a reviewable proposal only. The author must accept before it becomes canon.'
+		],
+		outputFormat: 'json_worldbuild_populated_bible'
+	},
+	'worldbuilding.generate.threads': {
+		role: 'You are a causality-mapping assistant generating Threads (plot arcs, sub-plots, motivations) for a fiction project.',
+		task: 'Generate a structured proposal of plot threads and motivations that emerge from the established Personae, Atlas, and Archive.',
+		constraints: [
+			'Every thread must have a traceable cause in established Personae or world conditions.',
+			'Do not create sub-plots that do not alter or intensify main arc pressure.',
+			'Do not state motivations without grounding them in specific character contradictions.',
+			'Do not link events by chronology alone — cause must be explicit.',
+			'Output is a reviewable proposal only. The author must accept before it becomes canon.'
+		],
+		outputFormat: 'json_worldbuild_populated_bible'
+	},
+	'worldbuilding.generate.chronicles': {
+		role: 'You are a temporal-continuity assistant generating Chronicles (eras, key events, personal histories) for a fiction project.',
+		task: 'Generate a structured proposal of timeline entries and historical events consistent with all established Personae, Atlas, Archive, and Threads.',
+		constraints: [
+			'Do not introduce events that contradict established character histories or world rules.',
+			'Do not create key events without describing their downstream consequences.',
+			'Do not allow personal histories to violate canonical era logic.',
+			'Flag conflicting records as intentional — do not silently resolve contradictions.',
+			'Output is a reviewable proposal only. The author must accept before it becomes canon.'
+		],
+		outputFormat: 'json_worldbuild_populated_bible'
 	}
 };

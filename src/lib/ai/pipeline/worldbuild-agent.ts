@@ -114,11 +114,48 @@ export interface WorldbuildPopulatedBiblePayload {
 	tableWrites: WorldbuildPopulatedBibleTableWrites;
 }
 
+export interface WorldbuildDomainPersonaePayload {
+	individuals: WorldbuildCharacterDraft[];
+	factions: WorldbuildFactionDraft[];
+	relationships: Array<{ source: string; target: string; type: string; description: string }>;
+}
+
+export interface WorldbuildDomainAtlasPayload {
+	realms: WorldbuildLocationDraft[];
+	landmarks: WorldbuildLocationDraft[];
+	travelConstraints: Array<{ description: string }>;
+}
+
+export interface WorldbuildDomainArchivePayload {
+	myths: WorldbuildLoreEntryDraft[];
+	traditions: WorldbuildLoreEntryDraft[];
+	technologies: WorldbuildLoreEntryDraft[];
+	themes: WorldbuildThemeDraft[];
+	glossaryTerms: WorldbuildGlossaryDraft[];
+}
+
+export interface WorldbuildDomainThreadsPayload {
+	majorArcs: WorldbuildPlotThreadDraft[];
+	subplots: WorldbuildPlotThreadDraft[];
+	motivations: Array<{ characterId: string; characterName: string; drive: string; conflict: string }>;
+}
+
+export interface WorldbuildDomainChroniclesPayload {
+	eras: Array<{ name: string; period: string; description: string }>;
+	keyEvents: WorldbuildTimelineEventDraft[];
+	personalHistories: WorldbuildTimelineEventDraft[];
+}
+
 export type WorldbuildPayloadByTaskKey = {
 	[PIPELINE_TASK_KEYS.WORLDBUILD_PREMISE]: WorldbuildPremise;
 	[PIPELINE_TASK_KEYS.WORLDBUILD_WORLDSPEC]: WorldbuildWorldspec;
 	[PIPELINE_TASK_KEYS.WORLDBUILD_RESEARCH]: WorldbuildResearchBriefs;
 	[PIPELINE_TASK_KEYS.WORLDBUILD_WORLD_BIBLE]: WorldbuildPopulatedBiblePayload;
+	[PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_PERSONAE]: WorldbuildDomainPersonaePayload;
+	[PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_ATLAS]: WorldbuildDomainAtlasPayload;
+	[PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_ARCHIVE]: WorldbuildDomainArchivePayload;
+	[PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_THREADS]: WorldbuildDomainThreadsPayload;
+	[PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_CHRONICLES]: WorldbuildDomainChroniclesPayload;
 };
 
 export type WorldbuildPayload = WorldbuildPayloadByTaskKey[WorldbuildTaskKey];
