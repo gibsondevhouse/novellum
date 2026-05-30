@@ -2,7 +2,7 @@
 title: Create Worldbuilding Sequence
 slug: part-001-create-worldbuilding-sequence
 part_number: 1
-status: draft
+status: complete
 owner: Architect Agent
 assigned_to: Architect Agent
 phase: phase-002-workflow-config

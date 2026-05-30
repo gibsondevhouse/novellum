@@ -6,7 +6,7 @@
 
 ## Current
 
-No active plan. See Recently completed for plan-032 closeout. Ask the user what to work on next.
+[plan-034-world-building-workflow-refactor](./plan-034/plan.md) — World Building Workflow Refactor. Stage 001 (Foundation Refactor) complete. Stages 002–004 pending.
 
 ## Recently completed
 

@@ -1,18 +1,3 @@
----
-part: part-002-add-readiness-copy
----
+## 2026-05-30
 
-# Implementation Log
-
-> Append entries chronologically. Never edit or delete existing entries.
-> Format: ### [YYYY-MM-DD HH:MM] Agent: Agent Name
-
----
-
-### [2026-05-30 00:00] Agent: Planner Agent
-
-**Action:** Scaffolded part artifacts.
-
-**Result:** Created part.md, checklist.md, impl.log.md, and evidence/ for part-002-add-readiness-copy.
-
-**Notes:** Part remains draft; implementation has not started.
+Added `getReadinessLabel(domainId)` helper in `+page.svelte` that looks up `generationReadiness` from `WORLDBUILDING_DOMAIN_SEQUENCE`. Rendered readiness label as `.domain-tile__readiness` on each domain tile. Labels: Personae → "Recommended first", Atlas → "Requires Personae", Archive → "Works best after Atlas", Threads → "Requires Personae + Atlas", Chronicles → "Works best after all domains". `pnpm check`, `pnpm lint`, `pnpm lint:css` all pass.

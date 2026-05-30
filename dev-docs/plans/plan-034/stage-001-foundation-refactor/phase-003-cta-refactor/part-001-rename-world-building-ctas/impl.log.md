@@ -1,18 +1,3 @@
----
-part: part-001-rename-world-building-ctas
----
+## 2026-05-30
 
-# Implementation Log
-
-> Append entries chronologically. Never edit or delete existing entries.
-> Format: ### [YYYY-MM-DD HH:MM] Agent: Agent Name
-
----
-
-### [2026-05-30 00:00] Agent: Planner Agent
-
-**Action:** Scaffolded part artifacts.
-
-**Result:** Created part.md, checklist.md, impl.log.md, and evidence/ for part-001-rename-world-building-ctas.
-
-**Notes:** Part remains draft; implementation has not started.
+Renamed `startWritingWithNova` to `startWorldbuildWithNova` in `+page.svelte`. Updated button label from "Start Writing with Nova" to "Build World Bible with Nova". Replaced the outline-focused Nova prompt with a worldbuilding-scoped prompt covering all five domains. `pnpm check` and `pnpm lint` pass.

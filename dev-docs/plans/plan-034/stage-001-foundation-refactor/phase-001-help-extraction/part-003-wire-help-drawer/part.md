@@ -2,7 +2,7 @@
 title: Wire Help Drawer
 slug: part-003-wire-help-drawer
 part_number: 3
-status: draft
+status: complete
 owner: Architect Agent
 assigned_to: Architect Agent
 phase: phase-001-help-extraction

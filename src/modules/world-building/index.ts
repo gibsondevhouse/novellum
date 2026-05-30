@@ -32,3 +32,12 @@ export { default as PlotThreadForm } from './components/PlotThreadForm.svelte';
 export { default as TimelineEventForm } from './components/TimelineEventForm.svelte';
 export { default as GenerateButton } from './components/GenerateButton.svelte';
 export { default as GeneratedEntityModal } from './components/GeneratedEntityModal.svelte';
+
+// Help components
+export { default as WorldbuildingHelpPanel } from './help/WorldbuildingHelpPanel.svelte';
+export { default as WorldbuildingHelpDrawer } from './help/WorldbuildingHelpDrawer.svelte';
+export type { WorldbuildingHelpSection, WorldbuildingHelpGlossaryEntry } from './help/worldbuilding-help-content.js';
+
+// Workflow config
+export type { WorldbuildingDomainId, WorldbuildingDomainConfig } from './worldbuilding-workflow.js';
+export { WORLDBUILDING_DOMAIN_SEQUENCE, getWorldbuildingDomainConfig } from './worldbuilding-workflow.js';

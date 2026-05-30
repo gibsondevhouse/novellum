@@ -2,7 +2,7 @@
 title: Workflow Config
 slug: phase-002-workflow-config
 phase_number: 2
-status: draft
+status: complete
 owner: Architect Agent
 stage: stage-001-foundation-refactor
 parts:

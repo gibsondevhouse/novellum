@@ -2,7 +2,7 @@
 title: Add Prompt Seeds
 slug: part-003-add-prompt-seeds
 part_number: 3
-status: draft
+status: complete
 owner: Architect Agent
 assigned_to: Architect Agent
 phase: phase-002-workflow-config
