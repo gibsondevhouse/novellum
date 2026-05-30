@@ -13,6 +13,7 @@ import {
 	type CheckpointReviewState,
 	type WorldbuildCheckpointRecord,
 	type WorldbuildDomainCheckpointRecord,
+	type WorldbuildProvenance,
 } from './checkpoint-contract.js';
 import type { PipelineArtifactEnvelope } from './contracts.js';
 import { isWorldbuildDomainTaskKey } from './task-catalog.js';
@@ -705,6 +706,7 @@ export function createDomainCheckpoint(params: {
 	taskKey: WorldbuildDomainTaskKey;
 	payload: WorldbuildPayload;
 	ownerId?: string;
+	provenance?: Partial<WorldbuildProvenance>;
 }): WorldbuildDomainCheckpointRecord {
 	if (!isWorldbuildDomainTaskKey(params.taskKey)) {
 		throw new WorldbuildCheckpointError(
@@ -723,13 +725,20 @@ export function createDomainCheckpoint(params: {
 			stage: params.taskKey.replace('vibe-worldbuild.domain.', ''),
 			role: '',
 			contextPolicy: 'continuity_scope',
-			outputFormat: `json_worldbuild_${params.taskKey.split('.').pop()}`,
+			outputFormat: `json_worldbuild_domain_${params.taskKey.split('.').pop()}`,
 		},
 		payload: params.payload,
 		producedAt: createdAt,
 		lifecycle: 'draft',
 		hierarchyReferences: createDefaultHierarchyReferences(),
 	});
+
+	const provenance: WorldbuildProvenance = {
+		model: params.provenance?.model ?? 'unknown',
+		generationId: artifact.id,
+		createdAt,
+		sourceContextSummary: params.provenance?.sourceContextSummary ?? '',
+	};
 
 	const record: WorldbuildDomainCheckpointRecord = {
 		id: artifact.id,
@@ -744,6 +753,7 @@ export function createDomainCheckpoint(params: {
 		review: null,
 		acceptance: null,
 		rejection: null,
+		provenance,
 	};
 
 	writeRow(db, record, artifact.id);

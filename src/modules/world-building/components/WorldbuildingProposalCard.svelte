@@ -71,6 +71,21 @@
 		</p>
 	{/if}
 
+	{#if proposal.provenance}
+		<dl class="proposal-card__provenance">
+			<div class="proposal-card__provenance-row">
+				<dt>Model</dt>
+				<dd>{proposal.provenance.model}</dd>
+			</div>
+			{#if proposal.provenance.sourceContextSummary}
+				<div class="proposal-card__provenance-row">
+					<dt>Context</dt>
+					<dd>{proposal.provenance.sourceContextSummary}</dd>
+				</div>
+			{/if}
+		</dl>
+	{/if}
+
 	{#if proposal.lifecycle === 'draft' || proposal.lifecycle === 'review'}
 		<div class="proposal-card__actions">
 			{#if !rejecting}
@@ -287,5 +302,35 @@
 
 	.proposal-card__outcome--rejected {
 		color: var(--color-error);
+	}
+
+	.proposal-card__provenance {
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-1);
+		padding: var(--space-2) var(--space-3);
+		border-radius: var(--radius-sm);
+		background: var(--color-surface-overlay);
+		border: 1px solid var(--color-border-subtle);
+	}
+
+	.proposal-card__provenance-row {
+		display: flex;
+		gap: var(--space-2);
+		align-items: baseline;
+		font-size: var(--text-xs);
+	}
+
+	.proposal-card__provenance-row dt {
+		color: var(--color-text-muted);
+		font-weight: var(--font-weight-medium);
+		flex-shrink: 0;
+	}
+
+	.proposal-card__provenance-row dd {
+		margin: 0;
+		color: var(--color-text-secondary);
+		word-break: break-word;
 	}
 </style>

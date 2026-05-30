@@ -2,7 +2,7 @@
 title: World Building Workflow Refactor
 slug: plan-034
 version: 1.0.0
-status: in-progress
+status: complete
 owner: Planner Agent
 created: 2026-05-30
 last_updated: 2026-05-30
@@ -56,8 +56,8 @@ Refactor World Building from a mixed informational/navigation page into a guided
 | --- | --- | --- | --- |
 | 001 | [Foundation Refactor](stage-001-foundation-refactor/stage.md) | `complete` | 4d |
 | 002 | [UI Integration](stage-002-ui-integration/stage.md) | `complete` | 4d |
-| 003 | [Generation Pipeline](stage-003-generation-pipeline/stage.md) | `draft` | 6d |
-| 004 | [Hardening & Polish](stage-004-hardening-polish/stage.md) | `draft` | 4d |
+| 003 | [Generation Pipeline](stage-003-generation-pipeline/stage.md) | `complete` | 6d |
+| 004 | [Hardening & Polish](stage-004-hardening-polish/stage.md) | `complete` | 4d |
 
 ## Quality Gates
 

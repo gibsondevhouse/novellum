@@ -63,6 +63,7 @@ export {
 
 // Generation state machine
 export type { WorldbuildingGenerationStateValue } from './stores/worldbuilding-generation-state.svelte.js';
+export type { WorldbuildProvenance } from '$lib/ai/pipeline/checkpoint-contract.js';
 export {
 	getState as getGenerationState,
 	transition as transitionGenerationState,

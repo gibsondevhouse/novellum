@@ -10,6 +10,13 @@ import type {
 
 export type AnyWorldbuildTaskKey = WorldbuildTaskKey | WorldbuildDomainTaskKey;
 
+export interface WorldbuildProvenance {
+	model: string;
+	generationId: string;
+	createdAt: string;
+	sourceContextSummary: string;
+}
+
 export const PIPELINE_CHECKPOINT_SCHEMA_VERSION = '1.0.0' as const;
 export const PIPELINE_METADATA_SCOPE = 'pipeline' as const;
 export const WORLDBUILD_CHECKPOINT_OWNER_ID = 'vibe-worldbuild' as const;
@@ -59,6 +66,7 @@ export interface PopulatedBibleCheckpointRecord extends Omit<WorldbuildCheckpoin
 
 export interface WorldbuildDomainCheckpointRecord extends Omit<WorldbuildCheckpointRecord, 'taskKey'> {
 	taskKey: WorldbuildDomainTaskKey;
+	provenance: WorldbuildProvenance;
 }
 
 export const CHECKPOINT_LIFECYCLE_ORDER: readonly CheckpointLifecycle[] = [
