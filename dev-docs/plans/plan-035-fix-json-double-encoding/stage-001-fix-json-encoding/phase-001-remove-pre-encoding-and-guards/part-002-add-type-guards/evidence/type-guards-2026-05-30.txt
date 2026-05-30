@@ -1,0 +1,6 @@
+$ rg -n "joinCommaSeparated\(|formatAliases\(|Array\.isArray\(entry\?\.tags\)|Array\.isArray\(c\.traits\)" src/modules/world-building/narrative-locations.ts src/modules/world-building/components/IndividualsDossier.svelte src/modules/world-building/components/LoreEntryDetailHeader.svelte src/lib/ai/prompt-builder.ts
+src/lib/ai/prompt-builder.ts:122:				`- ${c.name} (${c.role}): ${(Array.isArray(c.traits) ? c.traits : []).join(', ')}`,
+src/modules/world-building/components/LoreEntryDetailHeader.svelte:68:		{#if Array.isArray(entry?.tags) && entry.tags.length > 0}
+src/modules/world-building/components/IndividualsDossier.svelte:88:	function formatAliases(aliases: unknown): string {
+src/modules/world-building/components/IndividualsDossier.svelte:243:									<span>Aliases: {formatAliases(selectedCharacter.aliases)}</span>
+src/modules/world-building/narrative-locations.ts:68:export function joinCommaSeparated(values: string[] | undefined): string {

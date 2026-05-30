@@ -2,7 +2,7 @@
 title: Harden Server POST Handler
 slug: phase-002-harden-server
 phase_number: 2
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-001-fix-json-encoding
 parts:
@@ -19,7 +19,7 @@ Update `createPostHandler` in `src/lib/server/api-helpers.ts` to detect and tole
 
 | #   | Part                                     | Status  | Est. Duration |
 | --- | ---------------------------------------- | ------- | ------------- |
-| 001 | [Harden createPostHandler](part-001-harden-createPostHandler/part.md) | `draft` | 0.5d |
+| 001 | [Harden createPostHandler](part-001-harden-createPostHandler/part.md) | `review` | 0.5d |
 
 ## Entry Criteria
 

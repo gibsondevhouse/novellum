@@ -2,7 +2,7 @@
 title: Add Regression Tests for JSON Encoding
 slug: part-002-add-regression-tests
 part_number: 2
-status: draft
+status: review
 owner: Planner Agent
 phase: phase-003-db-repair-and-tests
 target_file: tests/db/json-encoding.test.ts

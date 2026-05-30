@@ -43,16 +43,16 @@ Fix a critical double-encoding bug in `GeneratedEntityModal.saveDraft` that pre-
 
 | #   | Stage                                                           | Status        | Est. Duration |
 | --- | --------------------------------------------------------------- | ------------- | ------------- |
-| 001 | [Fix JSON Double-Encoding](stage-001-fix-json-encoding/stage.md) | `in-progress` | 2d            |
-| 002 | [Pre-Merge Polish](stage-002-pre-merge-polish/stage.md)           | `draft`       | 0.5d          |
+| 001 | [Fix JSON Double-Encoding](stage-001-fix-json-encoding/stage.md) | `review` | 2d            |
+| 002 | [Pre-Merge Polish](stage-002-pre-merge-polish/stage.md)           | `review`       | 0.5d          |
 
 ## Quality Gates
 
 All stages must pass the following gates before the plan is marked `complete`:
 
-- [ ] **lint** — zero lint errors in modified and new files
-- [ ] **typecheck** — zero type errors
-- [ ] **tests** — all tests pass (existing + new regression tests)
+- [x] **lint** — zero lint errors in modified and new files
+- [x] **typecheck** — zero type errors
+- [x] **tests** — all tests pass (existing + new regression tests)
 - [ ] **manual_verify** — Realms page navigates without freeze, no crashes in dossier views
 
 ## Risks & Mitigations

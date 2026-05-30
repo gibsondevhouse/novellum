@@ -2,7 +2,7 @@
 title: Changelog & Quality Gate Pass
 slug: part-001-changelog-and-gates
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 phase: phase-002-pre-merge-verification
 ---

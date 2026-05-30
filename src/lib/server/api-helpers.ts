@@ -101,7 +101,8 @@ export function createPostHandler(config: EntityRouteConfig): RequestHandler {
 
 		for (const [name, def] of Object.entries(fields)) {
 			if (def.json) {
-				entity[name] = encodeJson(body[name] ?? def.default ?? []);
+				const value = body[name] ?? def.default ?? [];
+				entity[name] = typeof value === 'string' ? value : encodeJson(value);
 			} else {
 				entity[name] = body[name] ?? def.default;
 			}

@@ -2,7 +2,7 @@
 title: Add Type Guards to Array Consumer Functions
 slug: part-002-add-type-guards
 part_number: 2
-status: draft
+status: review
 owner: Planner Agent
 phase: phase-001-remove-pre-encoding-and-guards
 ---

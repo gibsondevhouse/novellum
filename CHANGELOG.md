@@ -2,6 +2,19 @@
 
 All notable changes to Novellum are documented here.
 
+## [Unreleased]
+
+### Fixed
+
+- Prevented double-encoded JSON array fields created through `GeneratedEntityModal.saveDraft` across characters, locations/realms/landmarks, lore entries, plot threads, and timeline events.
+- Hardened array-consumer paths that previously called `.join()` on unexpected string payloads (`joinCommaSeparated`, Individuals Dossier aliases, Lore Entry header tags, and prompt-builder character traits).
+
+### Added
+
+- Defensive server behavior in `createPostHandler` to accept pre-stringified JSON values for `json: true` fields without re-encoding them.
+- One-time repair utility: `scripts/repair-json-fields.mjs` for existing double-encoded SQLite rows.
+- Regression coverage in `tests/db/json-encoding.test.ts` for route round-trips, pre-stringified input handling, and guard behavior.
+
 ## [1.0.0-beta.1] — 2026-Q2
 
 ### Added

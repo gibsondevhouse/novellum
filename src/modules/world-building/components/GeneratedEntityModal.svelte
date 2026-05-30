@@ -211,7 +211,7 @@
 
 	async function saveDraft(draft: unknown, kind: EntityKind, pid: string): Promise<void> {
 		if (kind === 'character') {
-			const ch = draft as unknown as WorldbuildCharacterDraft;
+			const ch = draft as WorldbuildCharacterDraft;
 			await fetch('/api/db/characters', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -221,23 +221,23 @@
 					role: ch.role || '',
 					bio: ch.bio || '',
 					faction: ch.faction || '',
-					traits: JSON.stringify(ch.traits || []),
-					goals: JSON.stringify(ch.goals || []),
-					flaws: JSON.stringify(ch.flaws || []),
-					tags: JSON.stringify(ch.tags || []),
+					traits: ch.traits || [],
+					goals: ch.goals || [],
+					flaws: ch.flaws || [],
+					tags: ch.tags || [],
 					notes: ch.notes || '',
 					pronunciation: '',
-					aliases: JSON.stringify([]),
+					aliases: [],
 					diasporaOrigin: '',
 					photoUrl: '',
-					anomalies: JSON.stringify([]),
-					arcs: JSON.stringify([]),
+					anomalies: [],
+					arcs: [],
 				}),
 			}).then(async (res) => {
 				if (!res.ok) throw new Error(await res.text());
 			});
 		} else if (kind === 'faction') {
-			const f = draft as unknown as WorldbuildFactionDraft;
+			const f = draft as WorldbuildFactionDraft;
 			await fetch('/api/db/factions', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -253,10 +253,10 @@
 				if (!res.ok) throw new Error(await res.text());
 			});
 		} else if (kind === 'lineage') {
-			const lineageDraft = draft as unknown as WorldbuildLineageDraft;
+			const lineageDraft = draft as WorldbuildLineageDraft;
 			await saveLineageDraft(lineageDraft, pid);
 		} else if (kind === 'realm' || kind === 'landmark') {
-			const loc = draft as unknown as WorldbuildLocationDraft;
+			const loc = draft as WorldbuildLocationDraft;
 			await fetch('/api/db/locations', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -264,7 +264,7 @@
 					projectId: pid,
 					name: loc.name || (kind === 'realm' ? 'New Realm' : 'New Landmark'),
 					description: loc.description || '',
-					tags: JSON.stringify(loc.tags || []),
+					tags: loc.tags || [],
 					kind,
 					realmType: kind === 'realm' ? normalizeRealmType(loc.realmType) : '',
 					realmId: kind === 'landmark' ? (loc.realmId ?? '') : '',
@@ -273,7 +273,7 @@
 				if (!res.ok) throw new Error(await res.text());
 			});
 		} else if (kind === 'lore-entry') {
-			const le = draft as unknown as WorldbuildLoreEntryDraft;
+			const le = draft as WorldbuildLoreEntryDraft;
 			await fetch('/api/db/lore_entries', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -282,13 +282,13 @@
 					title: le.title || 'New Lore Entry',
 					category: le.category || '',
 					content: le.content || '',
-					tags: JSON.stringify(le.tags || []),
+					tags: le.tags || [],
 				}),
 			}).then(async (res) => {
 				if (!res.ok) throw new Error(await res.text());
 			});
 		} else if (kind === 'plot-thread') {
-			const pt = draft as unknown as WorldbuildPlotThreadDraft;
+			const pt = draft as WorldbuildPlotThreadDraft;
 			await fetch('/api/db/plot_threads', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -297,14 +297,14 @@
 					title: pt.title || 'New Plot Thread',
 					description: pt.description || '',
 					status: pt.status || 'planned',
-					relatedSceneIds: JSON.stringify([]),
-					relatedCharacterIds: JSON.stringify([]),
+					relatedSceneIds: [],
+					relatedCharacterIds: [],
 				}),
 			}).then(async (res) => {
 				if (!res.ok) throw new Error(await res.text());
 			});
 		} else if (kind === 'timeline-event') {
-			const te = draft as unknown as WorldbuildTimelineEventDraft;
+			const te = draft as WorldbuildTimelineEventDraft;
 			await fetch('/api/db/timeline_events', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -313,8 +313,8 @@
 					title: te.title || 'New Timeline Event',
 					description: te.description || '',
 					date: te.date || '',
-					relatedCharacterIds: JSON.stringify([]),
-					relatedSceneIds: JSON.stringify([]),
+					relatedCharacterIds: [],
+					relatedSceneIds: [],
 				}),
 			}).then(async (res) => {
 				if (!res.ok) throw new Error(await res.text());

@@ -117,7 +117,11 @@ function serializeContext(ctx: AiContext): string {
 
 	if (ctx.characters.length > 0) {
 		lines.push('\nCHARACTERS:');
-		ctx.characters.forEach((c) => lines.push(`- ${c.name} (${c.role}): ${c.traits.join(', ')}`));
+		ctx.characters.forEach((c) =>
+			lines.push(
+				`- ${c.name} (${c.role}): ${(Array.isArray(c.traits) ? c.traits : []).join(', ')}`,
+			),
+		);
 	}
 
 	if (ctx.locations.length > 0) {

@@ -2,7 +2,7 @@
 title: Remove Pre-Encoding & Add Type Guards
 slug: phase-001-remove-pre-encoding-and-guards
 phase_number: 1
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-001-fix-json-encoding
 parts:
@@ -20,8 +20,8 @@ Remove 13 pre-encoding `JSON.stringify()` calls from `GeneratedEntityModal.saveD
 
 | #   | Part                                     | Status  | Est. Duration |
 | --- | ---------------------------------------- | ------- | ------------- |
-| 001 | [Remove Pre-Encoding](part-001-remove-pre-encoding/part.md) | `draft` | 0.5d |
-| 002 | [Add Type Guards](part-002-add-type-guards/part.md) | `draft` | 0.5d |
+| 001 | [Remove Pre-Encoding](part-001-remove-pre-encoding/part.md) | `review` | 0.5d |
+| 002 | [Add Type Guards](part-002-add-type-guards/part.md) | `review` | 0.5d |
 
 ## Entry Criteria
 

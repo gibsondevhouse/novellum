@@ -2,7 +2,7 @@
 title: Fix Double-Cast Type Assertions
 slug: part-001-fix-double-casts
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 phase: phase-001-type-assertion-cleanup
 ---

@@ -1,0 +1,10 @@
+$ rg -n "as unknown as" src/modules/world-building/components/GeneratedEntityModal.svelte
+
+$ rg -n "as Worldbuild(Character|Faction|Lineage|Location|LoreEntry|PlotThread|TimelineEvent)Draft" src/modules/world-building/components/GeneratedEntityModal.svelte
+214:			const ch = draft as WorldbuildCharacterDraft;
+240:			const f = draft as WorldbuildFactionDraft;
+256:			const lineageDraft = draft as WorldbuildLineageDraft;
+259:			const loc = draft as WorldbuildLocationDraft;
+276:			const le = draft as WorldbuildLoreEntryDraft;
+291:			const pt = draft as WorldbuildPlotThreadDraft;
+307:			const te = draft as WorldbuildTimelineEventDraft;

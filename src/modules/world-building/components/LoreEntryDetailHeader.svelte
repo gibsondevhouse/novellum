@@ -65,7 +65,7 @@
 			<span class="attribute-label">Status</span>
 			<p class="attribute-value">{entry?.content?.trim() ? 'Drafted' : 'Empty'}</p>
 		</div>
-		{#if entry?.tags && entry.tags.length > 0}
+		{#if Array.isArray(entry?.tags) && entry.tags.length > 0}
 			<div class="attribute-item">
 				<span class="attribute-label">Tags</span>
 				<p class="attribute-value">{entry.tags.slice(0, 2).join(', ')}</p>

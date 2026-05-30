@@ -2,7 +2,7 @@
 title: Type Assertion Cleanup
 slug: phase-001-type-assertion-cleanup
 phase_number: 1
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-002-pre-merge-polish
 parts:
@@ -18,7 +18,7 @@ Replace seven `as unknown as <Type>` double-casts in `GeneratedEntityModal.svelt
 
 | #   | Part                                                                          | Status  |
 | --- | ----------------------------------------------------------------------------- | ------- |
-| 001 | [Fix Double-Cast Type Assertions](part-001-fix-double-casts/part.md)          | `draft` |
+| 001 | [Fix Double-Cast Type Assertions](part-001-fix-double-casts/part.md)          | `review` |
 
 ## Entry Criteria
 

@@ -2,7 +2,7 @@
 title: Create DB Repair Script for Double-Encoded Rows
 slug: part-001-create-repair-script
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 phase: phase-003-db-repair-and-tests
 target_file: scripts/repair-json-fields.mjs

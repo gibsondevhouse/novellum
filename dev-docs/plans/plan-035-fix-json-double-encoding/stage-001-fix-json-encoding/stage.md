@@ -2,7 +2,7 @@
 title: Fix JSON Double-Encoding
 slug: stage-001-fix-json-encoding
 stage_number: 1
-status: in-progress
+status: review
 owner: Planner Agent
 plan: plan-035-fix-json-double-encoding
 phases:
@@ -21,9 +21,9 @@ Fix double-encoded JSON fields in the database and client code that cause TypeEr
 
 | #   | Phase                                                                   | Status        | Est. Duration |
 | --- | ----------------------------------------------------------------------- | ------------- | ------------- |
-| 001 | [Source Fixes (Pre-encoding + Guards)](phase-001-remove-pre-encoding-and-guards/phase.md) | `draft`       | 1d            |
-| 002 | [Server Hardening](phase-002-harden-server/phase.md)                   | `draft`       | 0.5d          |
-| 003 | [DB Repair & Tests](phase-003-db-repair-and-tests/phase.md)             | `draft`       | 0.5d          |
+| 001 | [Source Fixes (Pre-encoding + Guards)](phase-001-remove-pre-encoding-and-guards/phase.md) | `review`      | 1d            |
+| 002 | [Server Hardening](phase-002-harden-server/phase.md)                   | `review`      | 0.5d          |
+| 003 | [DB Repair & Tests](phase-003-db-repair-and-tests/phase.md)             | `review`      | 0.5d          |
 
 ## Entry Criteria
 

@@ -2,7 +2,7 @@
 title: DB Repair Script & Regression Tests
 slug: phase-003-db-repair-and-tests
 phase_number: 3
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-001-fix-json-encoding
 parts:
@@ -20,8 +20,8 @@ Create a one-time DB repair script to fix existing double-encoded JSON rows, and
 
 | #   | Part                                     | Status  | Est. Duration |
 | --- | ---------------------------------------- | ------- | ------------- |
-| 001 | [Create DB Repair Script](part-001-create-repair-script/part.md) | `draft` | 0.25d |
-| 002 | [Add Regression Tests](part-002-add-regression-tests/part.md) | `draft` | 0.25d |
+| 001 | [Create DB Repair Script](part-001-create-repair-script/part.md) | `review` | 0.25d |
+| 002 | [Add Regression Tests](part-002-add-regression-tests/part.md) | `review` | 0.25d |
 
 ## Entry Criteria
 

@@ -2,7 +2,7 @@
 title: Remove Pre-Encoding from GeneratedEntityModal
 slug: part-001-remove-pre-encoding
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 phase: phase-001-remove-pre-encoding-and-guards
 target_file: src/modules/world-building/components/GeneratedEntityModal.svelte

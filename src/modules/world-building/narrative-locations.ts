@@ -66,5 +66,6 @@ export function splitCommaSeparated(value: string): string[] {
 }
 
 export function joinCommaSeparated(values: string[] | undefined): string {
-	return (values ?? []).join(', ');
+	if (!Array.isArray(values)) return '';
+	return values.join(', ');
 }

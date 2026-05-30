@@ -2,7 +2,7 @@
 title: Pre-Merge Verification
 slug: phase-002-pre-merge-verification
 phase_number: 2
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-002-pre-merge-polish
 parts:
@@ -18,7 +18,7 @@ Run all quality gates, collect evidence, update CHANGELOG.md, and confirm the br
 
 | # | Part | Status |
 | --- | --- | --- |
-| 001 | [Changelog & Quality Gate Pass](part-001-changelog-and-gates/part.md) | `draft` |
+| 001 | [Changelog & Quality Gate Pass](part-001-changelog-and-gates/part.md) | `review` |
 
 ## Entry Criteria
 
