@@ -53,7 +53,7 @@ All stages must pass the following gates before the plan is marked `complete`:
 - [x] **lint** — zero lint errors in modified and new files
 - [x] **typecheck** — zero type errors
 - [x] **tests** — all tests pass (existing + new regression tests)
-- [ ] **manual_verify** — Realms page navigates without freeze, no crashes in dossier views
+- [x] **manual_verify** — Realms page navigates without freeze, no crashes in dossier views
 
 ## Risks & Mitigations
 

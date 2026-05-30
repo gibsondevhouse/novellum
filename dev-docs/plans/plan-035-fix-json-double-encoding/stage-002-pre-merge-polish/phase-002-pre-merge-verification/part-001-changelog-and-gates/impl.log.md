@@ -36,3 +36,13 @@ part: part-001-changelog-and-gates
 **Result:** All quality gates passed on branch `fix/json-double-encoding` (200/200 test files, 1431 tests).
 
 **Notes:** Evidence files: `lint-output-2026-05-30.txt`, `typecheck-output-2026-05-30.txt`, and `test-output-2026-05-30.txt` under this part's `evidence/` directory.
+
+---
+
+### [2026-05-30 19:33] Agent: Codex
+
+**Action:** Executed smoke navigation checks on Realms/Individuals/Lore routes against a temporary DB and opened draft PR #25 against `master`.
+
+**Result:** Smoke checks returned HTTP 200 for all three routes with no captured `pageerror` / `console.error` events. Draft PR created: https://github.com/gibsondevhouse/novellum/pull/25.
+
+**Notes:** Evidence files: `manual-smoke-2026-05-30.txt` and `pr-link-2026-05-30.txt`.
