@@ -35,7 +35,7 @@
 		},
 	];
 
-	const MAX_COMPOSER_HEIGHT = 144;
+	const MAX_COMPOSER_HEIGHT = 288;
 
 	interface Props {
 		projectId?: string | null;
@@ -85,8 +85,11 @@
 		// Depend on draft so the effect re-runs on every keystroke.
 		const _draft = draft;
 		void _draft;
+		// Temporarily remove overflow so scrollHeight reflects full content
+		el.style.overflowY = 'hidden';
 		el.style.height = 'auto';
 		el.style.height = `${Math.min(el.scrollHeight, MAX_COMPOSER_HEIGHT)}px`;
+		el.style.overflowY = el.scrollHeight > MAX_COMPOSER_HEIGHT ? 'auto' : 'hidden';
 	});
 
 	async function submitDraft() {
@@ -164,7 +167,6 @@
 			bind:value={draft}
 			onkeydown={handleKeydown}
 			placeholder={composerPlaceholder}
-			rows="1"
 			aria-label="Ask Nova"
 			disabled={isStreaming}
 		></textarea>
@@ -402,8 +404,8 @@
 
 	.nova-input {
 		width: 100%;
-		min-height: 0;
-		max-height: 144px;
+		min-height: 36px;
+		max-height: 288px;
 		padding: var(--space-1) var(--space-2);
 		border: 1px solid color-mix(in srgb, var(--color-border-default) 78%, var(--color-candle) 22%);
 		border-radius: var(--radius-md);

@@ -50,22 +50,22 @@
 		background-color: var(--color-surface-base);
 	}
 
-	.content-column {
-		flex: 1;
-		min-width: 0;
-		display: flex;
-		flex-direction: column;
-		height: 100vh;
-		padding-right: var(--nova-panel-open-offset, 0px);
-		transition: padding-right var(--duration-enter) var(--ease-decelerate);
-	}
-
 	.main-content {
 		flex: 1;
 		min-width: 0;
 		min-height: 0;
 		overflow-y: auto;
 		padding: var(--panel-padding);
+		padding-right: calc(var(--panel-padding, 0px) + var(--nova-panel-open-offset, 0px));
+		transition: padding-right var(--duration-enter) var(--ease-decelerate);
 		color: var(--color-text-primary);
+	}
+
+	.content-column {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		height: 100vh;
 	}
 </style>

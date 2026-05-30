@@ -2,7 +2,6 @@
 	import EmptyStatePanel from '$lib/components/ui/EmptyStatePanel.svelte';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
-	import WorldBuildingSubheaderNav from '$modules/world-building/components/WorldBuildingSubheaderNav.svelte';
 	import {
 		getCharacterSaving,
 		getLocationSaving,
@@ -142,13 +141,6 @@
 </script>
 
 <div class="worldbuilding-section-view">
-	<WorldBuildingSubheaderNav
-		projectId={projectId}
-		topSection={topSection}
-		activeId={activeId}
-		ariaLabel={subNavLabel}
-	/>
-
 	<div class="bible-page">
 		<div class="bible-page-header">
 			<div>

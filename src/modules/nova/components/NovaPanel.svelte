@@ -7,6 +7,7 @@
 -->
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { page } from '$app/state';
 	import { novaPanel } from '../stores/nova-panel.svelte.js';
 	import { novaSession } from '../stores/nova-session.svelte.js';
 	import { aiSession } from '../services/ai-session-service.svelte.js';
@@ -52,6 +53,10 @@
 	const aiLoading = $derived(aiSession.loading);
 	const aiChecked = $derived(aiSession.checked);
 	const hasProjectContext = $derived(Boolean(projectId));
+	const hasSubheader = $derived(
+		page.url.pathname.includes('/world-building') ||
+		(/^\/projects\/[^/]+\/editor$/.test(page.url.pathname)),
+	);
 	const panelStatusLabel = $derived.by(() => {
 		if (aiLoading) return 'Checking AI configuration';
 		if (aiChecked && !keyConfigured) return 'AI key required';
@@ -264,8 +269,12 @@
 		if (typeof document === 'undefined') return;
 		const offset = novaPanel.isOpen && !isCompactViewport ? `${panelWidth}px` : '0px';
 		document.documentElement.style.setProperty('--nova-panel-open-offset', offset);
+		// Set subheader height so Nova's fixed top accounts for it.
+		const subH = hasSubheader ? '40px' : '0px';
+		document.documentElement.style.setProperty('--subheader-height', subH);
 		return () => {
 			document.documentElement.style.removeProperty('--nova-panel-open-offset');
+			document.documentElement.style.removeProperty('--subheader-height');
 		};
 	});
 </script>
@@ -368,7 +377,7 @@
 		--nova-panel-width-min: 280px;
 		--nova-panel-width-max: 520px;
 		position: fixed;
-		top: 48px;
+		top: calc(48px + (var(--subheader-height, 0px)));
 		right: 0;
 		bottom: 0;
 		width: clamp(var(--nova-panel-width-min), var(--nova-panel-width), var(--nova-panel-width-max));

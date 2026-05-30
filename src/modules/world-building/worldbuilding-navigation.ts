@@ -6,7 +6,8 @@ export type WorldBuildingTopSectionId =
 	| 'locations'
 	| 'lore'
 	| 'plot-threads'
-	| 'timeline';
+	| 'timeline'
+	| 'help';
 
 export type WorldBuildingTopItem = {
 	id: WorldBuildingTopSectionId;
@@ -49,6 +50,7 @@ export const WORLD_BUILDING_TOP_ITEMS: WorldBuildingTopItem[] = [
 	{ id: 'lore', label: 'The Archive' },
 	{ id: 'plot-threads', label: 'Threads' },
 	{ id: 'timeline', label: 'Chronicles' },
+	{ id: 'help', label: 'Help' },
 ];
 
 function localized(
@@ -72,6 +74,7 @@ export const WORLD_BUILDING_SECTION_LABELS: Record<WorldBuildingTopSectionId, st
 	lore: 'The Archive',
 	'plot-threads': 'Threads',
 	timeline: 'Chronicles',
+	help: 'Help',
 };
 
 export const WORLD_BUILDING_LANDING_CONFIG: Record<
@@ -372,6 +375,7 @@ export const WORLD_BUILDING_SUB_ITEMS: Record<WorldBuildingTopSectionId, WorldBu
 		{ id: 'personal-histories', label: 'Personal Histories', path: 'timeline/personal-histories' },
 		{ id: 'notes', label: 'Notes', path: 'timeline/notes' },
 	],
+	help: [],
 };
 
 export function buildWorldBuildingSubItems(
@@ -390,6 +394,7 @@ const TOP_SECTION_IDS = new Set<WorldBuildingTopSectionId>([
 	'lore',
 	'plot-threads',
 	'timeline',
+	'help',
 ]);
 
 export function getWorldBuildingTopSection(pathname: string): WorldBuildingTopSectionId | null {
