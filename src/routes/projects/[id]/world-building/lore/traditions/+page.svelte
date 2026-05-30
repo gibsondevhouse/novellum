@@ -117,6 +117,7 @@
 	hasSelection={creating || selectedId !== null}
 	listAriaLabel={$translator('worldbuilding.list.traditions')}
 	createLabel={$translator('worldbuilding.workspace.common.createLabel')}
+	generateEntityKind="lore-entry"
 >
 	{#snippet dossier()}
 		{#if creating}

@@ -31,6 +31,7 @@ export type ContextPolicy =
 	| 'project_summary'
 	| 'chapter_scope'
 	| 'continuity_scope'
+	| 'worldbuilding_scope'
 	| 'outline_scope';
 
 export type TaskType =

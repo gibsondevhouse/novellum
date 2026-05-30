@@ -131,7 +131,12 @@ export type ToolHandler = (
 
 import type { AiContext } from '$lib/ai/types.js';
 
-export type RagPolicy = 'scene_plus_adjacent' | 'scene_only' | 'project_summary' | 'outline_scope';
+export type RagPolicy =
+	| 'scene_plus_adjacent'
+	| 'scene_only'
+	| 'project_summary'
+	| 'worldbuilding_scope'
+	| 'outline_scope';
 
 export interface RagContextRequest {
 	projectId: string;

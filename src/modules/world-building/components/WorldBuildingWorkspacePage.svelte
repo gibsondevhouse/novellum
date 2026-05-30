@@ -2,7 +2,10 @@
 	import type { Snippet } from 'svelte';
 	import IndividualsWorkspaceShell from '$modules/world-building/components/IndividualsWorkspaceShell.svelte';
 	import WorldBuildingSubheaderNav from '$modules/world-building/components/WorldBuildingSubheaderNav.svelte';
+	import GenerateButton from '$modules/world-building/components/GenerateButton.svelte';
+	import GeneratedEntityModal from '$modules/world-building/components/GeneratedEntityModal.svelte';
 	import type { WorldBuildingTopSectionId } from '$modules/world-building/worldbuilding-navigation.js';
+	import type { EntityKind } from '$modules/world-building/services/worldbuilding-generation-service.js';
 
 	type WorkspaceOption = {
 		id: string;
@@ -23,6 +26,11 @@
 		hasSelection,
 		listAriaLabel = 'Records',
 		createLabel = 'new +',
+		/**
+		 * When provided, a "✦ Suggest 3" generate button is shown in the sidebar
+		 * and GeneratedEntityModal is mounted on this page.
+		 */
+		generateEntityKind,
 		dossier: dossierContent,
 		empty: emptyContent,
 	}: {
@@ -37,6 +45,7 @@
 		hasSelection: boolean;
 		listAriaLabel?: string;
 		createLabel?: string;
+		generateEntityKind?: EntityKind;
 		dossier?: Snippet;
 		empty?: Snippet;
 	} = $props();
@@ -60,8 +69,18 @@
 		{#snippet empty()}
 			{@render emptyContent?.()}
 		{/snippet}
+		{#snippet generateActions()}
+			{#if generateEntityKind}
+				<GenerateButton {projectId} entityKind={generateEntityKind} count={3} />
+			{/if}
+		{/snippet}
 	</IndividualsWorkspaceShell>
 </div>
+
+<!-- Mount modal once per workspace page; it reads from the generation-draft store -->
+{#if generateEntityKind}
+	<GeneratedEntityModal />
+{/if}
 
 <style>
 	.worldbuilding-section-view {

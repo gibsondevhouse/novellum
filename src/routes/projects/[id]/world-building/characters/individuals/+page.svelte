@@ -734,6 +734,7 @@
 	onSelect={selectCharacter}
 	onCreate={createNewCharacter}
 	hasSelection={!!selectedCharacter}
+	generateEntityKind="character"
 >
 	{#snippet dossier()}
 		<div class="character-dossier">
@@ -786,7 +787,7 @@
 	{/snippet}
 
 	{#snippet empty()}
-		<EmptyCharacterState />
+		<EmptyCharacterState projectId={data.projectId} />
 	{/snippet}
 </WorldBuildingWorkspacePage>
 

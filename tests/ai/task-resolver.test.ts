@@ -47,4 +47,21 @@ describe('task-resolver', () => {
 			expect(resolveTask(action, ctx).taskType).toBe('continue');
 		}
 	});
+
+	it('routes ask-mode context to worldbuilding_scope when no scene is active', () => {
+		const task = resolveTask('ask', {
+			...ctx,
+			activeSceneId: null,
+		});
+		expect(task.taskType).toBe('chat');
+		expect(task.contextPolicy).toBe('worldbuilding_scope');
+		expect(task.targetEntityId).toBe('ch-1');
+	});
+
+	it('keeps ask-mode context on scene_plus_adjacent when a scene is active', () => {
+		const task = resolveTask('ask', ctx);
+		expect(task.taskType).toBe('chat');
+		expect(task.contextPolicy).toBe('scene_plus_adjacent');
+		expect(task.targetEntityId).toBe('scene-1');
+	});
 });

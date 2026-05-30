@@ -67,6 +67,13 @@ export async function buildRagContext(
 		const outlineTask = resolveTask('pipeline:vibe-author.outline', uiContext);
 		const outlineContext = await buildContext(outlineTask, req.projectId);
 		aiContext = mergeWithProjectBaseline(outlineContext, baselineContext);
+	} else if (req.policy === 'worldbuilding_scope') {
+		const worldbuildTask = resolveTask('ask', {
+			...uiContext,
+			activeSceneId: null,
+		});
+		const worldbuildContext = await buildContext(worldbuildTask, req.projectId);
+		aiContext = mergeWithProjectBaseline(worldbuildContext, baselineContext);
 	} else if (req.activeSceneId) {
 		const sceneTask = resolveTask('chat', uiContext);
 		const sceneContext = await buildContext(sceneTask, req.projectId);
@@ -84,6 +91,10 @@ export async function buildRagContext(
 	if (aiContext.adjacentScenes.length > 0) includedScopes.push('adjacent-scenes');
 	if (aiContext.characters.length > 0) includedScopes.push('characters');
 	if (aiContext.locations.length > 0) includedScopes.push('locations');
+	if (aiContext.factions && aiContext.factions.length > 0) includedScopes.push('factions');
+	if (aiContext.loreEntries.length > 0) includedScopes.push('lore');
+	if (aiContext.plotThreads.length > 0) includedScopes.push('plot-threads');
+	if (aiContext.timelineEvents && aiContext.timelineEvents.length > 0) includedScopes.push('timeline');
 	if (includedScopes.length === 0) includedScopes.push('no-context');
 
 	const missingFields = collectMissingProjectFields(aiContext);

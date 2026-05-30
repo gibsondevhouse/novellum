@@ -17,9 +17,10 @@
 		novaError: string | null;
 		novaErrorType: ReturnType<typeof classifyNovaError> | null;
 		onRetry: () => void;
+		projectId?: string | null;
 	}
 
-	let { messages, novaError, novaErrorType, onRetry }: Props = $props();
+	let { messages, novaError, novaErrorType, onRetry, projectId = null }: Props = $props();
 
 	function isMissingCredentialsError(message: NovaMessage): boolean {
 		return classifyNovaError(message.error ?? '') === 'invalid_key';
@@ -95,7 +96,7 @@
 						{/if}
 					{:else if message.artifact}
 						{#if message.artifact.kind === 'author-outline'}
-							<NovaOutlineCard envelope={message.artifact.envelope} />
+							<NovaOutlineCard envelope={message.artifact.envelope} {projectId} />
 						{:else if message.artifact.kind === 'author-scene-draft'}
 							<NovaSceneDraftCard envelope={message.artifact.envelope} />
 						{:else if message.artifact.kind === 'author-revision-pack'}

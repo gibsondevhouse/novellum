@@ -108,19 +108,19 @@ describe('Nova artifact cards', () => {
 		document.body.innerHTML = '';
 	});
 
-	it('outline card keeps review semantics explicit as draft-only + copy-only', () => {
+	it('outline card presents an apply action with writer-facing guidance', () => {
 		const target = document.createElement('div');
 		document.body.appendChild(target);
 		const cmp = mount(NovaOutlineCard, {
 			target,
-			props: { envelope: outlineEnvelope },
+			props: { envelope: outlineEnvelope, projectId: 'p1' },
 		});
 		flushSync();
 
 		expect(target.querySelector('[data-testid="nova-outline-card"]')).not.toBeNull();
 		expect(target.textContent).toContain('Draft artifact');
-		expect(target.textContent).toContain('Draft only. Nothing is applied to the outline');
-		expect(target.querySelector('.outline-card__btn')?.textContent).toContain('Copy');
+		expect(target.textContent).toContain('Apply To Outline');
+		expect(target.textContent).toContain('Applies this draft to your Outline board');
 		unmount(cmp);
 	});
 

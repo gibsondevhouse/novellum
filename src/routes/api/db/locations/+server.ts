@@ -13,18 +13,6 @@ function decodeRow(row: Record<string, unknown>) {
 	};
 }
 
-function validateLocation(body: Record<string, unknown>) {
-	if (body.kind === 'realm' && !body.realmType) {
-		return 'realmType is required for realms';
-	}
-
-	if (body.kind === 'landmark' && !body.realmId) {
-		return 'realmId is required for landmarks';
-	}
-
-	return null;
-}
-
 const config = {
 	table: 'locations',
 	fields: {
@@ -55,7 +43,6 @@ const config = {
 	orderBy: 'createdAt ASC',
 	queryParams: ['projectId'],
 	decodeRow,
-	customValidation: validateLocation,
 };
 
 export const GET = createGetHandler(config);

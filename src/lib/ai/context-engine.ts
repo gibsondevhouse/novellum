@@ -35,6 +35,17 @@ import {
 	MAX_CONTINUITY_TOTAL_CHARS,
 	MAX_CHAPTER_CHARACTERS,
 	MAX_CHAPTER_LOCATIONS,
+	MAX_WORLDBUILD_CHARACTERS,
+	MAX_WORLDBUILD_FACTIONS,
+	MAX_WORLDBUILD_LOCATIONS,
+	MAX_WORLDBUILD_LORE_ENTRIES,
+	MAX_WORLDBUILD_PLOT_THREADS,
+	MAX_WORLDBUILD_TIMELINE_EVENTS,
+	MAX_WORLDBUILD_CHARACTER_BIO_CHARS,
+	MAX_WORLDBUILD_LOCATION_DESC_CHARS,
+	MAX_WORLDBUILD_LORE_CONTENT_CHARS,
+	MAX_WORLDBUILD_PLOT_DESC_CHARS,
+	MAX_WORLDBUILD_TIMELINE_DESC_CHARS,
 } from './constants.js';
 
 function emptyContext(policy: ContextPolicy): AiContext {
@@ -172,6 +183,83 @@ async function buildSceneOnlyData(sceneId: string) {
 	return { scene, beats, characters, locations };
 }
 
+function trimText(value: string | undefined | null, maxChars: number): string {
+	return typeof value === 'string' ? value.slice(0, maxChars) : '';
+}
+
+function limitList<T>(rows: T[], max: number): T[] {
+	return rows.slice(0, max);
+}
+
+function sanitizeWorldbuildCharacters(rows: Character[]): Character[] {
+	return limitList(rows, MAX_WORLDBUILD_CHARACTERS).map((character) => ({
+		...character,
+		bio: trimText(character.bio, MAX_WORLDBUILD_CHARACTER_BIO_CHARS),
+		traits: (character.traits ?? []).slice(0, 8),
+		goals: (character.goals ?? []).slice(0, 6),
+		flaws: (character.flaws ?? []).slice(0, 6),
+		notes: trimText(character.notes, 220),
+	}));
+}
+
+function sanitizeWorldbuildLocations(rows: Location[]): Location[] {
+	return limitList(rows, MAX_WORLDBUILD_LOCATIONS).map((location) => ({
+		...location,
+		description: trimText(location.description, MAX_WORLDBUILD_LOCATION_DESC_CHARS),
+		tags: (location.tags ?? []).slice(0, 6),
+		notableFeatures: (location.notableFeatures ?? []).slice(0, 6),
+		conflictPressure: trimText(location.conflictPressure, 200),
+		storyRole: trimText(location.storyRole, 200),
+	}));
+}
+
+function sanitizeWorldbuildLoreEntries(rows: LoreEntry[]): LoreEntry[] {
+	return limitList(rows, MAX_WORLDBUILD_LORE_ENTRIES).map((entry) => ({
+		...entry,
+		content: trimText(entry.content, MAX_WORLDBUILD_LORE_CONTENT_CHARS),
+		tags: (entry.tags ?? []).slice(0, 6),
+	}));
+}
+
+function sanitizeWorldbuildPlotThreads(rows: PlotThread[]): PlotThread[] {
+	return limitList(rows, MAX_WORLDBUILD_PLOT_THREADS).map((thread) => ({
+		...thread,
+		description: trimText(thread.description, MAX_WORLDBUILD_PLOT_DESC_CHARS),
+		relatedSceneIds: (thread.relatedSceneIds ?? []).slice(0, 8),
+		relatedCharacterIds: (thread.relatedCharacterIds ?? []).slice(0, 8),
+	}));
+}
+
+function sanitizeWorldbuildTimeline(rows: TimelineEvent[]): TimelineEvent[] {
+	return limitList(rows, MAX_WORLDBUILD_TIMELINE_EVENTS).map((event) => ({
+		...event,
+		description: trimText(event.description, MAX_WORLDBUILD_TIMELINE_DESC_CHARS),
+		relatedCharacterIds: (event.relatedCharacterIds ?? []).slice(0, 8),
+		relatedSceneIds: (event.relatedSceneIds ?? []).slice(0, 8),
+	}));
+}
+
+async function loadWorldbuildingSnapshot(projectId: string) {
+	const [characters, factions, locations, loreEntries, plotThreads, timelineEvents] =
+		await Promise.all([
+			apiGet<Character[]>('/api/db/characters', { projectId }),
+			apiGet<Faction[]>('/api/db/factions', { projectId }),
+			apiGet<Location[]>('/api/db/locations', { projectId }),
+			apiGet<LoreEntry[]>('/api/db/lore_entries', { projectId }),
+			apiGet<PlotThread[]>('/api/db/plot_threads', { projectId }),
+			apiGet<TimelineEvent[]>('/api/db/timeline_events', { projectId }),
+		]);
+
+	return {
+		characters: sanitizeWorldbuildCharacters(characters),
+		factions: limitList(factions, MAX_WORLDBUILD_FACTIONS),
+		locations: sanitizeWorldbuildLocations(locations),
+		loreEntries: sanitizeWorldbuildLoreEntries(loreEntries),
+		plotThreads: sanitizeWorldbuildPlotThreads(plotThreads),
+		timelineEvents: sanitizeWorldbuildTimeline(timelineEvents),
+	};
+}
+
 export async function buildContext(task: AiTask, projectId: string): Promise<AiContext> {
 	switch (task.contextPolicy) {
 		case 'project_summary': {
@@ -265,11 +353,39 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 			};
 		}
 
+		case 'worldbuilding_scope': {
+			const [project, storyFrames, snapshot] = await Promise.all([
+				getOrUndefined<Project>(`/api/db/projects/${projectId}`),
+				apiGet<StoryFrame[]>('/api/db/story_frames', { projectId }),
+				loadWorldbuildingSnapshot(projectId),
+			]);
+
+			return {
+				policy: 'worldbuilding_scope',
+				scene: null,
+				adjacentScenes: [],
+				chapter: null,
+				beats: [],
+				characters: snapshot.characters,
+				locations: snapshot.locations,
+				loreEntries: snapshot.loreEntries,
+				plotThreads: snapshot.plotThreads,
+				project: project ?? null,
+				storyFrames,
+				timelineEvents: snapshot.timelineEvents,
+				characterRelationships: [],
+				factions: snapshot.factions,
+				themes: [],
+				glossaryTerms: [],
+			};
+		}
+
 		case 'chapter_scope':
 		case 'outline_scope': {
 			const isAuthorFamily =
 				task.taskType === 'pipeline' && task.pipelineTask?.family === 'vibe-author';
 			const includeProjectContext = task.contextPolicy === 'outline_scope' || isAuthorFamily;
+			const includeWorldbuildContext = task.contextPolicy === 'outline_scope' || isAuthorFamily;
 			// targetEntityId may be a scene id or chapter id — try scene first
 			let chapterId: string | null = null;
 			if (task.targetEntityId) {
@@ -280,7 +396,7 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 			// outline_scope can run without a target (whole-project outline). For
 			// chapter_scope we still require a chapter to anchor against.
 			const includeHierarchy = task.contextPolicy === 'outline_scope' || isAuthorFamily;
-			const [hierarchy, project, storyFrames, plotThreads] = await Promise.all([
+			const [hierarchy, project, storyFrames, plotThreads, worldbuildingSnapshot] = await Promise.all([
 				includeHierarchy ? buildOutlineHierarchy(projectId) : Promise.resolve(undefined),
 				includeProjectContext
 					? getOrUndefined<Project>(`/api/db/projects/${projectId}`)
@@ -291,15 +407,21 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 				includeProjectContext
 					? apiGet<PlotThread[]>('/api/db/plot_threads', { projectId })
 					: Promise.resolve([]),
+				includeWorldbuildContext ? loadWorldbuildingSnapshot(projectId) : Promise.resolve(null),
 			]);
 
 			if (!chapterId) {
 				const empty = emptyContext(task.contextPolicy);
 				return {
 					...empty,
+					characters: worldbuildingSnapshot?.characters ?? [],
+					locations: worldbuildingSnapshot?.locations ?? [],
+					loreEntries: worldbuildingSnapshot?.loreEntries ?? [],
+					plotThreads: worldbuildingSnapshot?.plotThreads ?? plotThreads,
 					project: project ?? null,
 					storyFrames,
-					plotThreads,
+					timelineEvents: worldbuildingSnapshot?.timelineEvents ?? [],
+					factions: worldbuildingSnapshot?.factions ?? [],
 					...(hierarchy ? { outlineHierarchy: hierarchy } : {}),
 				};
 			}
@@ -309,9 +431,14 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 				const empty = emptyContext(task.contextPolicy);
 				return {
 					...empty,
+					characters: worldbuildingSnapshot?.characters ?? [],
+					locations: worldbuildingSnapshot?.locations ?? [],
+					loreEntries: worldbuildingSnapshot?.loreEntries ?? [],
+					plotThreads: worldbuildingSnapshot?.plotThreads ?? plotThreads,
 					project: project ?? null,
 					storyFrames,
-					plotThreads,
+					timelineEvents: worldbuildingSnapshot?.timelineEvents ?? [],
+					factions: worldbuildingSnapshot?.factions ?? [],
 					...(hierarchy ? { outlineHierarchy: hierarchy } : {}),
 				};
 			}
@@ -333,6 +460,24 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 				fetchCharactersByIds(allCharacterIds, MAX_CHAPTER_CHARACTERS),
 				fetchLocationsByIds(allLocationIds, MAX_CHAPTER_LOCATIONS),
 			]);
+			const contextCharacters = includeWorldbuildContext
+				? (worldbuildingSnapshot?.characters ?? [])
+				: characters;
+			const contextLocations = includeWorldbuildContext
+				? (worldbuildingSnapshot?.locations ?? [])
+				: locations;
+			const contextLoreEntries = includeWorldbuildContext
+				? (worldbuildingSnapshot?.loreEntries ?? [])
+				: [];
+			const contextPlotThreads = includeWorldbuildContext
+				? (worldbuildingSnapshot?.plotThreads ?? plotThreads)
+				: plotThreads;
+			const contextTimelineEvents = includeWorldbuildContext
+				? (worldbuildingSnapshot?.timelineEvents ?? [])
+				: [];
+			const contextFactions = includeWorldbuildContext
+				? (worldbuildingSnapshot?.factions ?? [])
+				: [];
 
 			return {
 				policy: task.contextPolicy,
@@ -340,15 +485,15 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 				adjacentScenes: scenes,
 				chapter,
 				beats,
-				characters,
-				locations,
-				loreEntries: [],
-				plotThreads,
+				characters: contextCharacters,
+				locations: contextLocations,
+				loreEntries: contextLoreEntries,
+				plotThreads: contextPlotThreads,
 				project: project ?? null,
 				storyFrames,
-				timelineEvents: [],
+				timelineEvents: contextTimelineEvents,
 				characterRelationships: [],
-				factions: [],
+				factions: contextFactions,
 				themes: [],
 				glossaryTerms: [],
 				...(hierarchy ? { outlineHierarchy: hierarchy } : {}),

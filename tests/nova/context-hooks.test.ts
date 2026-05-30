@@ -208,4 +208,42 @@ describe('buildRagContext (real)', () => {
 		expect(outlineTask.contextPolicy).toBe('outline_scope');
 		expect(result.includedScopes).toEqual(expect.arrayContaining(['project', 'outline']));
 	});
+
+	it('loads worldbuilding_scope when requested without an active scene', async () => {
+		buildContextMock
+			.mockResolvedValueOnce(BASELINE_CONTEXT)
+			.mockResolvedValueOnce({
+				...BASELINE_CONTEXT,
+				policy: 'worldbuilding_scope',
+				characters: [{ id: 'char-1' }],
+				locations: [{ id: 'loc-1' }],
+				factions: [{ id: 'fac-1' }],
+				loreEntries: [{ id: 'lore-1' }],
+				plotThreads: [{ id: 'thread-1' }],
+				timelineEvents: [{ id: 'event-1' }],
+			} as unknown as AiContext);
+
+		const result = await buildRagContext({
+			projectId: 'p1',
+			activeSceneId: null,
+			policy: 'worldbuilding_scope',
+		});
+
+		expect(buildContextMock).toHaveBeenCalledTimes(2);
+		const [worldbuildTask] = buildContextMock.mock.calls[1];
+		expect(worldbuildTask.contextPolicy).toBe('worldbuilding_scope');
+		expect(result.includedScopes).toEqual(
+			expect.arrayContaining([
+				'project',
+				'project-summary',
+				'characters',
+				'locations',
+				'factions',
+				'lore',
+				'plot-threads',
+				'timeline',
+			]),
+		);
+		expect(result.warnings).toEqual([]);
+	});
 });

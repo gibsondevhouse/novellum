@@ -127,6 +127,31 @@ describe('parseAuthorOutput — JSON stages', () => {
 		});
 	});
 
+	it('accepts outline output when beats are present but milestones are omitted', () => {
+		const raw = JSON.stringify({
+			arcs: [{ id: 'arc-1', title: 'Rise of the storm thief' }],
+			acts: [{ id: 'act-1', arcId: 'arc-1', title: 'Act I' }],
+			chapters: [{ id: 'ch-1', actId: 'act-1', title: 'Skymarket' }],
+			scenes: [
+				{
+					id: 'sc-1',
+					chapterId: 'ch-1',
+					title: 'Approach',
+					povCharacterId: 'iri',
+				},
+			],
+			beats: [{ id: 'b-1', sceneId: 'sc-1', title: 'Alarm trip' }],
+		});
+
+		const result = parseAuthorOutput(PIPELINE_TASK_KEYS.AUTHOR_OUTLINE, raw);
+		expect(result.ok).toBe(true);
+		if (!result.ok) throw new Error('expected success');
+		expect(result.payload).toMatchObject({
+			beats: [{ id: 'b-1' }],
+			milestones: [{ id: 'b-1' }],
+		});
+	});
+
 	it('sorts revision-pack issues by severity (critical first)', () => {
 		const raw = JSON.stringify({
 			summary: 'Two issues found.',

@@ -351,6 +351,7 @@
 						{novaError}
 						{novaErrorType}
 						onRetry={handleRetry}
+						{projectId}
 					/>
 				{/if}
 			{/if}

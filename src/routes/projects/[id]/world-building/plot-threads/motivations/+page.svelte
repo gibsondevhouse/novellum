@@ -104,6 +104,7 @@
 	hasSelection={creating || selectedId !== null}
 	listAriaLabel={$translator('worldbuilding.list.motivations')}
 	createLabel={$translator('worldbuilding.workspace.common.createLabel')}
+	generateEntityKind="plot-thread"
 >
 	{#snippet dossier()}
 		{#if creating}

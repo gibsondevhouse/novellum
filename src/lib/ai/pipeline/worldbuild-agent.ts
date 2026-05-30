@@ -38,6 +38,8 @@ export interface WorldbuildLocationDraft {
 	name: string;
 	description: string;
 	tags: string[];
+	realmType?: string;
+	realmId?: string | null;
 }
 
 export interface WorldbuildFactionDraft {
@@ -46,6 +48,17 @@ export interface WorldbuildFactionDraft {
 	description: string;
 	mission: string;
 	ideology: string;
+}
+
+export interface WorldbuildLineageDraft {
+	name: string;
+	lineageType: string;
+	summary: string;
+	origin: string;
+	regionHomeland: string;
+	currentStatus: string;
+	foundingOrigin: string;
+	inheritedValues: string;
 }
 
 export interface WorldbuildThemeDraft {

@@ -198,9 +198,12 @@ export async function sendNovaChat(input: SendChatInput): Promise<void> {
 	let aiContext: AiContext = EMPTY_AI_CONTEXT;
 	let ragResult: Awaited<ReturnType<typeof buildRagContext>> | null = null;
 	try {
-		const ragPolicy = isOutlineContextRequest(trimmed) && input.projectId
-			? 'outline_scope'
-			: 'scene_plus_adjacent';
+		const ragPolicy =
+			isOutlineContextRequest(trimmed) && input.projectId
+				? 'outline_scope'
+				: input.activeSceneId
+					? 'scene_plus_adjacent'
+					: 'worldbuilding_scope';
 		ragResult = await buildRagContext({
 			projectId: input.projectId ?? '',
 			activeSceneId: input.activeSceneId,

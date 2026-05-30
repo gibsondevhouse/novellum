@@ -236,7 +236,7 @@ describe('sendNovaChat', () => {
 		expect(buildRagContextMock).toHaveBeenCalledWith({
 			projectId: 'p1',
 			activeSceneId: null,
-			policy: 'scene_plus_adjacent',
+			policy: 'worldbuilding_scope',
 		});
 
 		const [payload] = streamCompleteMock.mock.calls[0];

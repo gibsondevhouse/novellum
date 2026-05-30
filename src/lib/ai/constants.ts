@@ -47,6 +47,17 @@ export const MAX_CONTINUITY_SCENE_CHARS = 200;
 export const MAX_CONTINUITY_TOTAL_CHARS = 24000;
 export const MAX_CHAPTER_CHARACTERS = 10;
 export const MAX_CHAPTER_LOCATIONS = 5;
+export const MAX_WORLDBUILD_CHARACTERS = 10;
+export const MAX_WORLDBUILD_FACTIONS = 10;
+export const MAX_WORLDBUILD_LOCATIONS = 12;
+export const MAX_WORLDBUILD_LORE_ENTRIES = 12;
+export const MAX_WORLDBUILD_PLOT_THREADS = 12;
+export const MAX_WORLDBUILD_TIMELINE_EVENTS = 12;
+export const MAX_WORLDBUILD_CHARACTER_BIO_CHARS = 320;
+export const MAX_WORLDBUILD_LOCATION_DESC_CHARS = 320;
+export const MAX_WORLDBUILD_LORE_CONTENT_CHARS = 360;
+export const MAX_WORLDBUILD_PLOT_DESC_CHARS = 260;
+export const MAX_WORLDBUILD_TIMELINE_DESC_CHARS = 260;
 
 // ── Prompt Builder ──────────────────────────────────────────────────────────
 export const MAX_PROMPT_CHARS = 8000;
@@ -143,7 +154,7 @@ export const OUTPUT_FORMAT_DESCRIPTIONS: Record<string, string> = {
 	json_author_premise:
 		'Return a JSON object with fields: protagonistId, externalGoal, internalNeed, antagonisticForce, stakes, dramaticQuestion, themeHypothesis, endingPolarity, scopeStatement.',
 	json_author_outline:
-		'Return a JSON object with nested arrays: arcs[], acts[], chapters[], scenes[], beats[]. Scenes must include povCharacterId, locationId, threadIds, goal, conflict, turn, outcome, and arcRefs.',
+		'Return a JSON object with nested arrays: arcs[], acts[], milestones[], chapters[], scenes[], beats[]. Scenes must include povCharacterId, locationId, threadIds, goal, conflict, turn, outcome, and arcRefs.',
 	prose_plus_scene_sidecar:
 		'Respond with the scene prose first, followed by a fenced ---SIDECAR--- block containing a JSON object with: sceneId, assignedBeatIds, povCharacterId, locationId, characterIds, threadIds, factsIntroduced, continuityRisks, wordCountEstimate, draftStatus.',
 	json_author_revision_pack:

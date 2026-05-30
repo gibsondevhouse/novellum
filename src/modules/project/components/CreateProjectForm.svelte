@@ -12,6 +12,8 @@
 	let synopsis = $state('');
 	let targetWordCount = $state(80000);
 	let titleError = $state('');
+	let loglineError = $state('');
+	let synopsisError = $state('');
 
 	async function handleSubmit() {
 		if (!title.trim()) {
@@ -19,6 +21,16 @@
 			return;
 		}
 		titleError = '';
+		if (!logline.trim()) {
+			loglineError = 'Logline is required.';
+			return;
+		}
+		loglineError = '';
+		if (!synopsis.trim()) {
+			synopsisError = 'Synopsis is required.';
+			return;
+		}
+		synopsisError = '';
 		const parsedGenre = genre
 			.split(',')
 			.map((g) => g.trim())
@@ -26,8 +38,8 @@
 		await submitCreate({
 			title: title.trim(),
 			genre: parsedGenre,
-			logline,
-			synopsis,
+			logline: logline.trim(),
+			synopsis: synopsis.trim(),
 			targetWordCount,
 		});
 	}
@@ -67,20 +79,38 @@
 		</div>
 
 		<div class="field">
-			<label class="label" for="create-logline">Logline</label>
+			<label class="label" for="create-logline">Logline <span aria-hidden="true">*</span></label>
 			<input
 				id="create-logline"
 				class="input"
+				class:input-error={!!loglineError}
 				type="text"
 				bind:value={logline}
 				placeholder="One-sentence summary"
+				aria-required="true"
+				aria-invalid={!!loglineError}
+				aria-describedby={loglineError ? 'create-logline-error' : undefined}
 			/>
+			{#if loglineError}
+				<p id="create-logline-error" class="error-text" role="alert">{loglineError}</p>
+			{/if}
 		</div>
 
 		<div class="field">
-			<label class="label" for="create-synopsis">Synopsis</label>
-			<textarea id="create-synopsis" class="input textarea" bind:value={synopsis} rows={3}
+			<label class="label" for="create-synopsis">Synopsis <span aria-hidden="true">*</span></label>
+			<textarea
+				id="create-synopsis"
+				class="input textarea"
+				class:input-error={!!synopsisError}
+				bind:value={synopsis}
+				rows={3}
+				aria-required="true"
+				aria-invalid={!!synopsisError}
+				aria-describedby={synopsisError ? 'create-synopsis-error' : undefined}
 			></textarea>
+			{#if synopsisError}
+				<p id="create-synopsis-error" class="error-text" role="alert">{synopsisError}</p>
+			{/if}
 		</div>
 
 		<div class="field">

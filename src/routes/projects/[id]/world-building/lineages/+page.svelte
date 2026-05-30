@@ -80,6 +80,11 @@
 
 	type EditableLineageField = Exclude<keyof LineageRecord, 'id' | 'relationships'>;
 	type LineageOption = { id: string; name: string; role?: string; summary?: string };
+	type LineagesUpdatedEventDetail = {
+		projectId: string;
+		lineagesById: Record<string, LineageRecord>;
+		createdLineageId?: string;
+	};
 
 	let { data }: { data: { projectId: string } } = $props();
 
@@ -150,6 +155,27 @@
 				lineagesById,
 			);
 		}
+	});
+
+	$effect(() => {
+		if (typeof window === 'undefined') return;
+		const handleLineagesUpdated = (event: Event) => {
+			const detail = (event as CustomEvent<LineagesUpdatedEventDetail>).detail;
+			if (!detail || detail.projectId !== data.projectId) return;
+			lineagesById = detail.lineagesById ?? {};
+			if (detail.createdLineageId && lineagesById[detail.createdLineageId]) {
+				selectedLineageId = detail.createdLineageId;
+				return;
+			}
+			if (!selectedLineageId) {
+				selectedLineageId = Object.keys(lineagesById)[0] ?? null;
+			}
+		};
+
+		window.addEventListener('novellum:lineages-updated', handleLineagesUpdated);
+		return () => {
+			window.removeEventListener('novellum:lineages-updated', handleLineagesUpdated);
+		};
 	});
 
 	function selectLineage(id: string) {
@@ -293,6 +319,7 @@
 	hasSelection={!!selectedLineage}
 	listAriaLabel={$translator('worldbuilding.list.lineageNames')}
 	createLabel={$translator('worldbuilding.workspace.common.createLabel')}
+	generateEntityKind="lineage"
 >
 	{#snippet dossier()}
 		<div class="lineage-dossier">
@@ -325,7 +352,7 @@
 	{/snippet}
 
 	{#snippet empty()}
-		<EmptyLineageState />
+		<EmptyLineageState projectId={data.projectId} />
 	{/snippet}
 </WorldBuildingWorkspacePage>
 

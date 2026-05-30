@@ -132,6 +132,17 @@ function resolvePipelineTarget(action: string, uiCtx: UiContext): string | null 
 	}
 }
 
+function resolveContextPolicyForAction(
+	action: string,
+	uiCtx: UiContext,
+	fallback: ContextPolicy,
+): ContextPolicy {
+	if (action === 'ask') {
+		return uiCtx.activeSceneId ? 'scene_plus_adjacent' : 'worldbuilding_scope';
+	}
+	return fallback;
+}
+
 export function resolveTask(action: string, uiCtx: UiContext): AiTask {
 	const pipelineTask = resolvePipelineAction(action);
 	if (pipelineTask) {
@@ -156,7 +167,7 @@ export function resolveTask(action: string, uiCtx: UiContext): AiTask {
 		taskType: def.taskType,
 		role: def.role,
 		targetEntityId,
-		contextPolicy: def.contextPolicy,
+		contextPolicy: resolveContextPolicyForAction(action, uiCtx, def.contextPolicy),
 		outputFormat: def.outputFormat,
 		instruction: uiCtx.instruction,
 	};

@@ -1,6 +1,21 @@
+<script lang="ts">
+	import GenerateButton from './GenerateButton.svelte';
+
+	interface Props {
+		projectId?: string | null;
+	}
+
+	let { projectId = null }: Props = $props();
+</script>
+
 <section class="empty-state" aria-labelledby="empty-factions-title">
 	<h2 id="empty-factions-title">No faction selected</h2>
 	<p>Create a faction from the left rail to start building its dossier, relationships, and notable members.</p>
+	{#if projectId}
+		<div class="empty-state-actions">
+			<GenerateButton {projectId} entityKind="faction" count={1} label="✦ Generate a faction" />
+		</div>
+	{/if}
 </section>
 
 <style>
@@ -24,5 +39,9 @@
 		font-size: var(--text-sm);
 		color: var(--color-text-muted);
 		line-height: var(--leading-relaxed);
+	}
+
+	.empty-state-actions {
+		margin-top: var(--space-4);
 	}
 </style>
