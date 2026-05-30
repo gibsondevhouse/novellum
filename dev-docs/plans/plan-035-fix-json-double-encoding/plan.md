@@ -9,6 +9,7 @@ last_updated: 2026-05-30
 target_completion: 2026-05-31
 stages:
   - stage-001-fix-json-encoding
+  - stage-002-pre-merge-polish
 dependencies: []
 quality_gates:
   - lint
@@ -43,6 +44,7 @@ Fix a critical double-encoding bug in `GeneratedEntityModal.saveDraft` that pre-
 | #   | Stage                                                           | Status        | Est. Duration |
 | --- | --------------------------------------------------------------- | ------------- | ------------- |
 | 001 | [Fix JSON Double-Encoding](stage-001-fix-json-encoding/stage.md) | `in-progress` | 2d            |
+| 002 | [Pre-Merge Polish](stage-002-pre-merge-polish/stage.md)           | `draft`       | 0.5d          |
 
 ## Quality Gates
 
