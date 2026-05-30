@@ -6,10 +6,11 @@
 
 ## Current
 
-[plan-034-world-building-workflow-refactor](./plan-034/plan.md) — World Building Workflow Refactor. Stage 001 (Foundation Refactor) complete. Stages 002–004 pending.
+[plan-035-fix-json-double-encoding](./plan-035-fix-json-double-encoding/plan.md) — Fix GeneratedEntityModal Double-Encoding + JSON Hardening. Critical bug fix blocking Realms navigation. Stage 001 with 3 phases: source fixes (pre-encoding removal + type guards), server hardening, DB repair + tests. Started 2026-05-30.
 
 ## Recently completed
 
+- [plan-034-world-building-workflow-refactor](./plan-034/plan.md) — World Building Workflow Refactor. Stage 001 (Foundation Refactor) complete. Stages 002–004 pending.
 - [plan-032-worldbuilding-generation-engine](./plan-032-worldbuilding-generation-engine/plan.md) — Worldbuilding Generation Engine + Help Disclosure. Closed 2026-05-29. Proactive one-click entity generation (character / faction / realm / landmark / lore-entry / plot-thread / timeline-event) with review modal; help-disclosure toggles on all worldbuilding landing pages; AppShell transition token fix. Quality gates: `pnpm check` (0 errors), `pnpm lint` (clean), `pnpm lint:css` (clean), `pnpm test` (194 files / 1359 tests), `pnpm check:tokens` (0 violations).
 - [plan-031-nova-vscode-copilot-parity](./plan-031-nova-vscode-copilot-parity/plan.md) — Nova VS Code Copilot Parity. Closed 2026-05-28 with all 5 stages complete. Compact sidepanel, Ask/Write/Agent modes, real attachments, bounded agentic tool loop (MAX_AGENT_STEPS=8), source-contract tests. Quality gates: `pnpm check` (0 errors), `pnpm lint` (clean), `pnpm lint:css` (clean), `pnpm test` (194 files / 1358 tests), `pnpm check:tokens` (0 violations). Visual test waived on same basis as plan-030.
 - [plan-030-nova-production-refactor](./plan-030-nova-production-refactor/plan.md) —
