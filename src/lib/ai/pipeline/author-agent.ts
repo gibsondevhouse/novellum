@@ -100,6 +100,19 @@ type JsonExtractionResult =
 
 const SIDECAR_FENCE_PATTERN = /```(?:json)?\s*\n([\s\S]*?)\n```/gi;
 
+function normalizeAuthorOutline(payload: AuthorOutline): AuthorOutline {
+	const milestones = Array.isArray(payload.milestones) ? payload.milestones : [];
+	const beats = Array.isArray((payload as { beats?: unknown[] }).beats)
+		? ((payload as { beats: unknown[] }).beats as Record<string, unknown>[])
+		: [];
+
+	return {
+		...payload,
+		milestones: milestones.length > 0 ? milestones : beats,
+		beats: beats.length > 0 ? beats : milestones,
+	};
+}
+
 function formatZodIssues(issues: ZodIssue[]): string[] {
 	return issues.map((issue) => {
 		const path = issue.path.length > 0 ? issue.path.join('.') : '(root)';
@@ -383,6 +396,9 @@ function parseStructuredAuthorTask(
 	}
 
 	let payload = parsed.data as AuthorPayload;
+	if (task.key === PIPELINE_TASK_KEYS.AUTHOR_OUTLINE) {
+		payload = normalizeAuthorOutline(payload as AuthorOutline) as AuthorPayload;
+	}
 	if (task.key === PIPELINE_TASK_KEYS.AUTHOR_REVISION_PACK) {
 		payload = sortRevisionIssuesBySeverity(payload as AuthorRevisionPack) as AuthorPayload;
 	}

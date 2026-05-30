@@ -85,7 +85,6 @@ function buildOutlineRaw(): string {
 	return JSON.stringify({
 		arcs: [{ id: 'arc-a', title: 'The first fracture' }],
 		acts: [{ id: 'act-a', title: 'Arrival' }],
-		milestones: [{ id: 'milestone-a', title: 'The vow breaks' }],
 		chapters: [{ id: 'chapter-a', title: 'Ash at the gate' }],
 		scenes: [{ id: 'scene-a', title: 'The impossible return' }],
 		beats: [{ id: 'beat-a', title: 'Refusal' }],
@@ -135,6 +134,7 @@ describe('runAuthorPipelineTask', () => {
 		if (message?.artifact?.kind !== 'author-outline') throw new Error('wrong kind');
 		expect(message.artifact.envelope.lifecycle).toBe('draft');
 		expect(message.artifact.envelope.payload.chapters).toHaveLength(1);
+		expect(message.artifact.envelope.payload.milestones).toHaveLength(1);
 		expect(message?.content).toBe('');
 	});
 

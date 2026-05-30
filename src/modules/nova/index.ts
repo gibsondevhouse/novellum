@@ -13,6 +13,8 @@
 
 import { registerStubTools } from './services/stub-tools.js';
 import { novaSession } from './stores/nova-session.svelte.js';
+// plan-031 stage-004: import agent-tools to trigger tool registrations at module-load.
+import './services/agent-tools.js';
 
 registerStubTools();
 
@@ -37,6 +39,7 @@ export { default as NovaOutlineCard } from './components/NovaOutlineCard.svelte'
 export { default as NovaRevisionPackCard } from './components/NovaRevisionPackCard.svelte';
 export { novaPanel } from './stores/nova-panel.svelte.js';
 export { novaSession } from './stores/nova-session.svelte.js';
+export { novaMode } from './stores/nova-mode.svelte.js';
 export type { ContextDisclosureState } from './stores/nova-session.svelte.js';
 export { aiSession, AiSessionStore } from './services/ai-session-service.svelte.js';
 export { buildRagContext } from './services/context-hooks.js';
@@ -47,6 +50,8 @@ export {
 	type AuthorPipelineRunResult,
 } from './services/author-pipeline-runner.js';
 export { dispatchTool } from './services/tool-router.js';
+export { runAgentLoop, MAX_AGENT_STEPS, type AgentLoopInput } from './services/agent-loop.js';
+export { registerAgentTools, type ProposalEnvelope } from './services/agent-tools.js';
 export {
 	registerTool,
 	getTool,
@@ -54,6 +59,13 @@ export {
 } from './services/tool-registry.js';
 export { registerStubTools, STUB_TOOLS } from './services/stub-tools.js';
 export { classifyNovaError } from './utils/classify-nova-error.js';
+export {
+	validateAttachmentFile,
+	validateAttachment,
+	MAX_ATTACHMENT_SIZE_BYTES,
+	ALLOWED_EXTENSIONS,
+	type AttachmentValidationResult,
+} from './utils/attachment-validator.js';
 export {
 	isNovaAgenticEnabled,
 	setNovaAgenticFlag,
@@ -64,8 +76,13 @@ export {
 } from './services/stream-controller.js';
 export type {
 	NovaArtifact,
+	NovaAttachment,
+	NovaEntityAttachment,
+	NovaEntityKind,
+	NovaFileAttachment,
 	NovaMessage,
 	NovaMessageStatus,
+	NovaMode,
 	NovaRole,
 	NovaErrorType,
 	RagContextRequest,
@@ -76,4 +93,5 @@ export type {
 	ToolInvocation,
 	ToolResult,
 	ToolStatus,
+	WriteSubAction,
 } from './types.js';

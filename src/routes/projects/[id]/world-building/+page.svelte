@@ -1,7 +1,23 @@
 <script lang="ts">
 	import { SectionHeader } from '$lib/components/ui/index.js';
+	import { novaMode, novaPanel } from '$modules/nova';
 
 	let { data }: { data: { projectId: string } } = $props();
+
+	let showManifesto = $state(false);
+	let expandedSection = $state<string | null>(null);
+
+	function toggleSection(id: string): void {
+		expandedSection = expandedSection === id ? null : id;
+	}
+
+	function startWritingWithNova(): void {
+		novaMode.loadForProject(data.projectId);
+		novaMode.setMode('write');
+		novaPanel.openWithPrompt(
+			'Build a three-act outline for this project using my current worldbuilding canon (characters, factions, lore, plot threads, timeline, and locations). Highlight where each act should escalate conflict.',
+		);
+	}
 
 	const sections = $derived([
 		{
@@ -177,6 +193,9 @@
 				{#each sections as section (section.id)}
 					<a class="hero-jump" href={`#${section.id}`}>{section.label}</a>
 				{/each}
+				<button type="button" class="hero-jump hero-jump--nova" onclick={startWritingWithNova}>
+					Start Writing with Nova
+				</button>
 			</div>
 		</section>
 
@@ -190,26 +209,42 @@
 					<p class="domain-tile__body">{section.purpose}</p>
 					<div class="domain-tile__actions">
 						<a class="domain-tile__cta" href={section.entryHref}>Open {section.label}</a>
-						<a class="domain-tile__jump" href={`#${section.id}`}>Read Guide</a>
+						<button
+						type="button"
+						class="domain-tile__guide-toggle"
+						aria-expanded={expandedSection === section.id}
+						onclick={() => toggleSection(section.id)}
+					>Guide {expandedSection === section.id ? '↑' : '↓'}</button>
 					</div>
 				</article>
 			{/each}
 		</section>
 
 		<section class="manifesto" aria-labelledby="manifesto-title">
-			<h2 id="manifesto-title">Worldbuilding Orientation</h2>
-			<p>
-				World building is not inventory. It is a causality framework for meaning. Use this page as
-				a reference for semantics first: what each domain is for, what questions it should answer,
-				and how to recognize incomplete logic before it leaks into drafting.
-			</p>
-			<ol class="reading-sequence">
-				<li>Establish Personae to define agency and social force.</li>
-				<li>Map Atlas so movement, scarcity, and terrain create pressure.</li>
-				<li>Codify The Archive to explain legitimacy, belief, and systems.</li>
-				<li>Align Threads so events emerge from coherent motivation.</li>
-				<li>Lock Chronicles to preserve timeline and continuity truth.</li>
-			</ol>
+			<div class="manifesto-header">
+				<h2 id="manifesto-title">Worldbuilding Orientation</h2>
+				<button
+					type="button"
+					class="help-toggle"
+					aria-expanded={showManifesto}
+					aria-label="Toggle worldbuilding orientation"
+					onclick={() => (showManifesto = !showManifesto)}
+				>?</button>
+			</div>
+			{#if showManifesto}
+				<p>
+					World building is not inventory. It is a causality framework for meaning. Use this page as
+					a reference for semantics first: what each domain is for, what questions it should answer,
+					and how to recognize incomplete logic before it leaks into drafting.
+				</p>
+				<ol class="reading-sequence">
+					<li>Establish Personae to define agency and social force.</li>
+					<li>Map Atlas so movement, scarcity, and terrain create pressure.</li>
+					<li>Codify The Archive to explain legitimacy, belief, and systems.</li>
+					<li>Align Threads so events emerge from coherent motivation.</li>
+					<li>Lock Chronicles to preserve timeline and continuity truth.</li>
+				</ol>
+			{/if}
 		</section>
 
 		{#each sections as section, i (section.id)}
@@ -225,41 +260,43 @@
 
 				<p class="lane-meaning">{section.meaning}</p>
 
-				<div class="lane-grammar" aria-label={`${section.label} interpretation guide`}>
-					<div class="guide-block">
-						<h3>Core Questions</h3>
-						<ul>
-							{#each section.questions as item (item)}
-								<li>{item}</li>
-							{/each}
-						</ul>
-					</div>
-					<div class="guide-block">
-						<h3>Common Failure Modes</h3>
-						<ul>
-							{#each section.pitfalls as item (item)}
-								<li>{item}</li>
-							{/each}
-						</ul>
-					</div>
-					<div class="guide-block">
-						<h3>Completion Signals</h3>
-						<ul>
-							{#each section.signals as item (item)}
-								<li>{item}</li>
-							{/each}
-						</ul>
-					</div>
-				</div>
-
-				<dl class="lane-glossary">
-					{#each section.glossary as item (item.term)}
-						<div>
-							<dt>{item.term}</dt>
-							<dd>{item.meaning}</dd>
+				{#if expandedSection === section.id}
+					<div class="lane-grammar" aria-label={`${section.label} interpretation guide`}>
+						<div class="guide-block">
+							<h3>Core Questions</h3>
+							<ul>
+								{#each section.questions as item (item)}
+									<li>{item}</li>
+								{/each}
+							</ul>
 						</div>
-					{/each}
-				</dl>
+						<div class="guide-block">
+							<h3>Common Failure Modes</h3>
+							<ul>
+								{#each section.pitfalls as item (item)}
+									<li>{item}</li>
+								{/each}
+							</ul>
+						</div>
+						<div class="guide-block">
+							<h3>Completion Signals</h3>
+							<ul>
+								{#each section.signals as item (item)}
+									<li>{item}</li>
+								{/each}
+							</ul>
+						</div>
+					</div>
+
+					<dl class="lane-glossary">
+						{#each section.glossary as item (item.term)}
+							<div>
+								<dt>{item.term}</dt>
+								<dd>{item.meaning}</dd>
+							</div>
+						{/each}
+					</dl>
+				{/if}
 
 				<p class="lane-entry">
 					When you are clear on this domain's meaning, continue into
@@ -335,6 +372,13 @@
 		color: var(--color-text-secondary);
 	}
 
+	.hero-jump--nova {
+		cursor: pointer;
+		border-color: color-mix(in srgb, var(--color-nova-blue) 55%, var(--color-border-default));
+		background: color-mix(in srgb, var(--color-nova-blue) 14%, transparent);
+		color: var(--color-text-primary);
+	}
+
 	.hero-jump:hover {
 		background: var(--color-surface-overlay);
 		border-color: var(--color-border-focus);
@@ -407,17 +451,20 @@
 		border-color: var(--color-border-focus);
 	}
 
-	.domain-tile__jump {
+	.domain-tile__guide-toggle {
+		display: inline-flex;
+		align-items: center;
 		font-size: var(--text-sm);
 		color: var(--color-text-secondary);
-		text-decoration: none;
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		padding: 0;
+		gap: var(--space-1);
 	}
 
-	.domain-tile__jump:hover,
-	.domain-tile__jump:focus-visible {
+	.domain-tile__guide-toggle:hover {
 		color: var(--color-text-primary);
-		text-decoration: underline;
-		outline: none;
 	}
 
 	.manifesto {
@@ -426,6 +473,37 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-4);
+	}
+
+	.manifesto-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-3);
+	}
+
+	.help-toggle {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		width: var(--space-6);
+		height: var(--space-6);
+		border-radius: 50%;
+		border: 1px solid var(--color-border-subtle);
+		background: transparent;
+		color: var(--color-text-muted);
+		font-size: var(--text-xs);
+		font-weight: var(--font-weight-semibold);
+		cursor: pointer;
+		transition:
+			background var(--duration-fast) var(--ease-standard),
+			color var(--duration-fast) var(--ease-standard);
+	}
+
+	.help-toggle:hover {
+		background: var(--color-surface-overlay);
+		color: var(--color-text-secondary);
 	}
 
 	.manifesto h2 {

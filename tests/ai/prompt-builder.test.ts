@@ -141,6 +141,53 @@ describe('prompt-builder', () => {
 		expect(prompt).toContain('Opening Scene');
 	});
 
+	it('includes project baseline fields and counts when provided', () => {
+		const projectCtx: AiContext = {
+			...emptyCtx,
+			policy: 'project_summary',
+			project: {
+				id: 'proj-1',
+				title: 'Signal Fire',
+				genre: 'fantasy',
+				status: 'drafting',
+				projectType: 'novel',
+				targetWordCount: 100000,
+				logline: 'A scout races a civil war to save her brother.',
+				synopsis: 'A full synopsis goes here.',
+				lastOpenedAt: '2026-05-28T00:00:00.000Z',
+				stylePresetId: 'preset-cinematic',
+				systemPrompt: '',
+				negativePrompt: '',
+				createdAt: '2026-05-28T00:00:00.000Z',
+				updatedAt: '2026-05-28T00:00:00.000Z',
+			},
+			projectCounts: {
+				chapters: 0,
+				scenes: 0,
+				beats: 0,
+				characters: 2,
+				characterRelationships: 1,
+				locations: 1,
+				loreEntries: 0,
+				plotThreads: 1,
+				timelineEvents: 0,
+				acts: 3,
+				arcs: 2,
+				milestones: 5,
+				writingStyles: 1,
+			},
+		};
+
+		const prompt = buildPrompt(task, projectCtx);
+		expect(prompt).toContain('PROJECT: "Signal Fire"');
+		expect(prompt).toContain('Status: drafting');
+		expect(prompt).toContain('Project Type: novel');
+		expect(prompt).toContain('Target Word Count: 100000');
+		expect(prompt).toContain('Style Preset: preset-cinematic');
+		expect(prompt).toContain('PROJECT COUNTS:');
+		expect(prompt).toContain('Characters: 2');
+	});
+
 	it('does not exceed MAX_PROMPT_CHARS with very large context', () => {
 		const largeCtx: AiContext = {
 			...richCtx,
@@ -148,6 +195,15 @@ describe('prompt-builder', () => {
 		};
 		const prompt = buildPrompt(task, largeCtx);
 		expect(prompt.length).toBeLessThanOrEqual(8000);
+	});
+
+	it('flags when context is truncated due to prompt size limits', () => {
+		const hugeCtx: AiContext = {
+			...richCtx,
+			scene: richCtx.scene ? { ...richCtx.scene, content: 'x'.repeat(20000) } : null,
+		};
+		const prompt = buildPrompt(task, hugeCtx);
+		expect(prompt).toContain('lower-priority context may be omitted');
 	});
 
 	it('includes SPECIFIC COMMAND when instruction is provided', () => {
@@ -202,5 +258,18 @@ describe('prompt-builder', () => {
 		const prompt = buildPrompt(task, chatCtx);
 		expect(prompt).toContain('CUSTOM INSTRUCTIONS:');
 		expect(prompt).toContain('Be terse');
+	});
+
+	it('includes chat contract constraints about prose requests and proposal-only drafts', () => {
+		const chatTask: AiTask = {
+			taskType: 'chat',
+			role: 'You are Nova, a thoughtful writing partner.',
+			targetEntityId: 'proj-1',
+			contextPolicy: 'scene_plus_adjacent',
+			outputFormat: 'plain_text',
+		};
+		const prompt = buildPrompt(chatTask, emptyCtx);
+		expect(prompt).toContain('unless the author explicitly asks for prose');
+		expect(prompt).toContain('provide it as a proposal');
 	});
 });

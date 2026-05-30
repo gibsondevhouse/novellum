@@ -19,6 +19,7 @@
 		createLabel = 'new +',
 		dossier,
 		empty,
+		generateActions,
 	}: {
 		characterOptions: CharacterOption[];
 		selectedCharacterId: string | null;
@@ -29,6 +30,8 @@
 		createLabel?: string;
 		dossier?: Snippet;
 		empty?: Snippet;
+		/** Optional slot for a generate button rendered below the "new +" action. */
+		generateActions?: Snippet;
 	} = $props();
 
 	const itemCount = $derived(characterOptions.length);
@@ -47,6 +50,8 @@
 		<GhostButton type="button" class="name-item name-item--new" onclick={() => void onCreateCharacter()}>
 			{createLabel}
 		</GhostButton>
+
+		{@render generateActions?.()}
 
 		<div class="names-scroll">
 			<ul class="names-list">

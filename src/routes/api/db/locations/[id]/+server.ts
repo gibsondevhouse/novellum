@@ -62,18 +62,6 @@ export const PUT: RequestHandler = async ({ params, request }) => {
 		if (key in body) updates[key] = encodeJson(body[key]);
 	}
 
-	const nextKind = (body.kind ?? current.kind ?? '') as string;
-	const nextRealmType = (body.realmType ?? current.realmType ?? '') as string;
-	const nextRealmId = (body.realmId ?? current.realmId ?? '') as string;
-
-	if (nextKind === 'realm' && !nextRealmType) {
-		return json({ error: 'realmType is required for realms' }, { status: 400 });
-	}
-
-	if (nextKind === 'landmark' && !nextRealmId) {
-		return json({ error: 'realmId is required for landmarks' }, { status: 400 });
-	}
-
 	updates.updatedAt = new Date().toISOString();
 
 	const setClauses = Object.keys(updates).map((k) => `${k} = @${k}`);

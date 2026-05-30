@@ -26,6 +26,7 @@
 	const payload = $derived(envelope.payload);
 
 	let acknowledged = $state<Record<string, true>>({});
+	let copied = $state(false);
 
 	const sortedIssues = $derived(
 		[...payload.issues].sort(
@@ -33,9 +34,29 @@
 		),
 	);
 
+	function formatProducedAt(value: string): string {
+		const date = new Date(value);
+		if (Number.isNaN(date.getTime())) return value;
+		return date.toLocaleString();
+	}
+
 	function handleAcknowledge(issueId: string): void {
 		acknowledged = { ...acknowledged, [issueId]: true };
 		onAcknowledge?.(issueId, envelope);
+	}
+
+	async function handleCopy(): Promise<void> {
+		try {
+			if (typeof navigator !== 'undefined' && navigator.clipboard) {
+				await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+				copied = true;
+				setTimeout(() => {
+					copied = false;
+				}, 1500);
+			}
+		} catch {
+			copied = false;
+		}
 	}
 </script>
 
@@ -48,6 +69,13 @@
 	<header class="revision-pack-header">
 		<h3 class="revision-pack-title">Revision pack</h3>
 		<p class="revision-pack-summary">{payload.summary}</p>
+		<p class="revision-pack-provenance" aria-label="Artifact provenance">
+			<span>Task <code>{envelope.taskKey}</code></span>
+			·
+			<span>Model <code>{envelope.model ?? 'unknown-model'}</code></span>
+			·
+			<span>Generated {formatProducedAt(envelope.producedAt)}</span>
+		</p>
 	</header>
 
 	<ul class="revision-pack-list" aria-label="Revision issues">
@@ -86,6 +114,19 @@
 			</li>
 		{/each}
 	</ul>
+
+	<footer class="revision-pack-actions" aria-label="Revision pack actions">
+		<button
+			type="button"
+			class="revision-pack-btn"
+			data-testid="nova-revision-pack-copy"
+			aria-label="Copy revision pack JSON"
+			onclick={handleCopy}
+		>
+			{copied ? 'Copied' : 'Copy JSON'}
+		</button>
+		<p class="revision-pack-note">Draft only. No manuscript edits are applied automatically.</p>
+	</footer>
 </article>
 
 <style>
@@ -115,6 +156,17 @@
 	.revision-pack-summary {
 		margin: 0;
 		font-size: var(--text-xs);
+		color: var(--color-text-secondary);
+	}
+
+	.revision-pack-provenance {
+		margin: 0;
+		font-size: 11px;
+		color: var(--color-text-muted);
+	}
+
+	.revision-pack-provenance code {
+		font-family: var(--font-mono);
 		color: var(--color-text-secondary);
 	}
 
@@ -210,5 +262,18 @@
 	.revision-pack-btn:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
+	}
+
+	.revision-pack-actions {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: var(--space-2);
+	}
+
+	.revision-pack-note {
+		margin: 0;
+		font-size: var(--text-xs);
+		color: var(--color-text-muted);
 	}
 </style>

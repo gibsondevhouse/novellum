@@ -79,6 +79,42 @@ const TASK_MAP: Record<string, TaskDefinition> = {
 			'You are NOT writing the manuscript for them \u2014 do not produce narrative prose unless explicitly asked to. ' +
 			'Use any provided characters / lore / scene context as background to keep suggestions consistent with their world.',
 	},
+	project_summary: {
+		taskType: 'chat',
+		contextPolicy: 'project_summary',
+		outputFormat: 'plain_text',
+		role:
+			'You are Nova, a thoughtful writing partner having a working conversation with the author. ' +
+			'Use project metadata and story framing context as grounding before scene-level details.',
+	},
+	ask: {
+		taskType: 'chat',
+		contextPolicy: 'scene_plus_adjacent',
+		outputFormat: 'plain_text',
+		role:
+			'You are Nova, a thoughtful writing partner having a working conversation with the author. ' +
+			'You help them brainstorm, refine ideas, answer questions about their novel, and think through story problems. ' +
+			'You are NOT writing the manuscript for them — do not produce narrative prose unless explicitly asked to. ' +
+			'Use any provided characters / lore / scene context as background to keep suggestions consistent with their world.',
+	},
+	write: {
+		taskType: 'write',
+		contextPolicy: 'outline_scope',
+		outputFormat: 'plain_text',
+		role:
+			'You are Nova, a structured writing assistant. You generate proposals — outlines, scene drafts, and revision plans — that the author reviews and explicitly accepts or rejects. ' +
+			'Never auto-apply changes to the manuscript. Every artifact you produce is a proposal. ' +
+			'Be concrete and structured. If required context is missing, ask for it rather than fabricating.',
+	},
+	agent: {
+		taskType: 'agent',
+		contextPolicy: 'scene_plus_adjacent',
+		outputFormat: 'plain_text',
+		role:
+			'You are Nova, an agentic writing assistant. Multi-step tool dispatch is not yet enabled in this build. ' +
+			'Describe what steps you would take and which tools you would invoke, but do not fabricate tool outputs or apply changes. ' +
+			'Treat every proposed change as a proposal requiring explicit author acceptance.',
+	},
 };
 
 const DEFAULT_TASK: TaskDefinition = TASK_MAP['continue'];
@@ -94,6 +130,17 @@ function resolvePipelineTarget(action: string, uiCtx: UiContext): string | null 
 		default:
 			return uiCtx.activeSceneId ?? uiCtx.activeChapterId ?? uiCtx.activeProjectId;
 	}
+}
+
+function resolveContextPolicyForAction(
+	action: string,
+	uiCtx: UiContext,
+	fallback: ContextPolicy,
+): ContextPolicy {
+	if (action === 'ask') {
+		return uiCtx.activeSceneId ? 'scene_plus_adjacent' : 'worldbuilding_scope';
+	}
+	return fallback;
 }
 
 export function resolveTask(action: string, uiCtx: UiContext): AiTask {
@@ -120,7 +167,7 @@ export function resolveTask(action: string, uiCtx: UiContext): AiTask {
 		taskType: def.taskType,
 		role: def.role,
 		targetEntityId,
-		contextPolicy: def.contextPolicy,
+		contextPolicy: resolveContextPolicyForAction(action, uiCtx, def.contextPolicy),
 		outputFormat: def.outputFormat,
 		instruction: uiCtx.instruction,
 	};

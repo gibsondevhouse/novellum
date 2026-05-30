@@ -28,8 +28,10 @@ import type { SceneIntentSnapshot } from '$lib/stores/scene-intent.svelte.js';
 export type ContextPolicy =
 	| 'scene_only'
 	| 'scene_plus_adjacent'
+	| 'project_summary'
 	| 'chapter_scope'
 	| 'continuity_scope'
+	| 'worldbuilding_scope'
 	| 'outline_scope';
 
 export type TaskType =
@@ -39,6 +41,8 @@ export type TaskType =
 	| 'edit'
 	| 'style_check'
 	| 'chat'
+	| 'write'
+	| 'agent'
 	| 'pipeline';
 
 export type EditMode = 'developmental' | 'line_edit' | 'proofread';
@@ -104,6 +108,22 @@ export type PipelineRunState =
 	| 'completed_pending_checkpoint'
 	| 'failed';
 
+export interface ProjectContextCounts {
+	chapters: number;
+	scenes: number;
+	beats: number;
+	characters: number;
+	characterRelationships: number;
+	locations: number;
+	loreEntries: number;
+	plotThreads: number;
+	timelineEvents: number;
+	acts: number;
+	arcs: number;
+	milestones: number;
+	writingStyles: number;
+}
+
 export interface AiContext {
 	policy: ContextPolicy;
 	scene: Scene | null;
@@ -115,6 +135,7 @@ export interface AiContext {
 	loreEntries: LoreEntry[];
 	plotThreads: PlotThread[];
 	project?: Project | null;
+	projectCounts?: ProjectContextCounts;
 	storyFrames?: StoryFrame[];
 	timelineEvents?: TimelineEvent[];
 	characterRelationships?: CharacterRelationship[];

@@ -46,6 +46,7 @@ export interface PipelineArtifactEnvelope<TPayload = unknown> {
 	taskKey: string;
 	pipeline: PipelineFamily;
 	stage: string;
+	model: string | null;
 	lifecycle: ArtifactLifecycleStatus;
 	parserVersion: string;
 	producedAt: string;
@@ -57,6 +58,7 @@ export interface PipelineArtifactEnvelope<TPayload = unknown> {
 export interface PipelineRunRequest<TPayload = unknown> {
 	task: PipelineTaskContract;
 	payload: TPayload;
+	model?: string | null;
 	producedAt?: string;
 	lifecycle?: ArtifactLifecycleStatus;
 	parserVersion?: string;
@@ -94,6 +96,7 @@ export function createPipelineArtifactEnvelope<TPayload>(
 		taskKey: request.task.key,
 		pipeline: request.task.family,
 		stage: request.task.stage,
+		model: request.model ?? null,
 		lifecycle: request.lifecycle ?? 'draft',
 		parserVersion: request.parserVersion ?? '1.0.0',
 		producedAt,

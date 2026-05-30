@@ -42,7 +42,7 @@ async function seedEditorProject(request: APIRequestContext, label: string) {
 
 test.describe('Visual Regression — Editor Nova panel (plan-023 stage-004)', () => {
 	// TODO(V1.1): Nova panel snapshots hang on Linux CI (toHaveScreenshot polls
-	// indefinitely, likely because the streaming/animated copilot UI never reaches
+	// indefinitely, likely because the streaming/animated Nova UI never reaches
 	// a pixel-stable state in headless chromium). Re-enable once the panel has a
 	// deterministic settle hook. Tracked under plan-024 stage-001 CI3 follow-up.
 	test.skip('Editor with Nova panel toggled open — 1280×800', async ({ page, request }) => {
@@ -54,10 +54,76 @@ test.describe('Visual Regression — Editor Nova panel (plan-023 stage-004)', ()
 
 			const novaToggle = page.getByRole('button', { name: 'Nova', exact: true });
 			await novaToggle.click();
-			await page.waitForSelector('aside[aria-label="Nova copilot"]');
+			await page.waitForSelector('aside[aria-label="Nova panel"]');
 			await page.waitForTimeout(250);
 
 			await expect(page).toHaveScreenshot('editor-nova-panel.png');
+		} finally {
+			await request.delete(`/api/db/projects/${projectId}`);
+		}
+	});
+
+	test('Composer controls remain visible within constrained panel width — 1024×720', async ({
+		page,
+		request,
+	}) => {
+		const { projectId } = await seedEditorProject(request, 'ConstrainedLayout');
+		try {
+			await page.addInitScript(() => {
+				window.localStorage.setItem('novellum.nova.panel.width', '280');
+			});
+			await page.setViewportSize({ width: 1024, height: 720 });
+			await page.goto(`/projects/${projectId}/editor`);
+			await waitForStableRender(page);
+
+			const novaToggle = page.getByRole('button', { name: 'Nova', exact: true });
+			await novaToggle.click();
+			const panel = page.locator('aside[aria-label="Nova panel"]');
+			await expect(panel).toBeVisible();
+
+			const modeSelect = panel.locator('.nova-mode-select');
+			const textarea = panel.locator('textarea.nova-input');
+			const send = panel.locator('.nova-action-send');
+			await expect(modeSelect).toBeVisible();
+			await expect(textarea).toBeVisible();
+			await expect(send).toBeVisible();
+
+			const panelBox = await panel.boundingBox();
+			const modeBox = await modeSelect.boundingBox();
+			const textareaBox = await textarea.boundingBox();
+			const sendBox = await send.boundingBox();
+			expect(panelBox).not.toBeNull();
+			expect(modeBox).not.toBeNull();
+			expect(textareaBox).not.toBeNull();
+			expect(sendBox).not.toBeNull();
+
+			const rightEdge = (panelBox?.x ?? 0) + (panelBox?.width ?? 0) + 1;
+			for (const box of [modeBox, textareaBox, sendBox]) {
+				expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(rightEdge);
+			}
+		} finally {
+			await request.delete(`/api/db/projects/${projectId}`);
+		}
+	});
+
+	test('Compact viewport keeps composer usable and hides resize handle — 375×800', async ({
+		page,
+		request,
+	}) => {
+		const { projectId } = await seedEditorProject(request, 'CompactLayout');
+		try {
+			await page.setViewportSize({ width: 375, height: 800 });
+			await page.goto(`/projects/${projectId}/editor`);
+			await waitForStableRender(page);
+
+			const novaToggle = page.getByRole('button', { name: 'Nova', exact: true });
+			await novaToggle.click();
+			const panel = page.locator('aside[aria-label="Nova panel"]');
+			await expect(panel).toBeVisible();
+			await expect(panel.locator('.nova-resize-handle')).toBeHidden();
+			await expect(panel.locator('.nova-mode-select')).toBeVisible();
+			await expect(panel.locator('textarea.nova-input')).toBeVisible();
+			await expect(panel.locator('.nova-action-send')).toBeVisible();
 		} finally {
 			await request.delete(`/api/db/projects/${projectId}`);
 		}

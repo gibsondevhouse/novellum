@@ -25,6 +25,12 @@
 	const payload = $derived(envelope.payload);
 	const sidecar = $derived(payload.sidecar);
 
+	function formatProducedAt(value: string): string {
+		const date = new Date(value);
+		if (Number.isNaN(date.getTime())) return value;
+		return date.toLocaleString();
+	}
+
 	async function handleCopy(): Promise<void> {
 		try {
 			if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -66,6 +72,13 @@
 			<span aria-label="Word count">{sidecar.wordCount} words</span>
 			·
 			<span aria-label="POV character">POV <code>{sidecar.povCharacterId}</code></span>
+		</p>
+		<p class="scene-draft-provenance" aria-label="Artifact provenance">
+			<span>Task <code>{envelope.taskKey}</code></span>
+			·
+			<span>Model <code>{envelope.model ?? 'unknown-model'}</code></span>
+			·
+			<span>Generated {formatProducedAt(envelope.producedAt)}</span>
 		</p>
 	</header>
 
@@ -161,9 +174,20 @@
 		color: var(--color-text-secondary);
 	}
 
+	.scene-draft-provenance {
+		margin: 0;
+		font-size: 11px;
+		color: var(--color-text-muted);
+	}
+
 	.scene-draft-meta code {
 		font-family: var(--font-mono);
 		color: var(--color-text-primary);
+	}
+
+	.scene-draft-provenance code {
+		font-family: var(--font-mono);
+		color: var(--color-text-secondary);
 	}
 
 	.scene-draft-prose {

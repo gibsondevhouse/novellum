@@ -56,6 +56,8 @@
 		display: flex;
 		flex-direction: column;
 		height: 100vh;
+		padding-right: var(--nova-panel-open-offset, 0px);
+		transition: padding-right var(--duration-enter) var(--ease-decelerate);
 	}
 
 	.main-content {

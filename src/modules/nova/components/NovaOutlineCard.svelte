@@ -1,17 +1,23 @@
 <!--
 	Renders a parsed `vibe-author.outline` artifact as an explicit draft.
-	No outline rows are written to canon from this card.
+	Writers can review and apply this draft to the outline workspace.
 -->
 <script lang="ts">
+	import { invalidateAll } from '$app/navigation';
 	import type { PipelineArtifactEnvelope } from '$lib/ai/pipeline/contracts.js';
 	import type { AuthorOutline } from '$lib/ai/pipeline/author-schemas.js';
+	import { applyAuthorOutlineArtifact } from '../services/outline-artifact-apply.js';
 
 	interface Props {
 		envelope: PipelineArtifactEnvelope<AuthorOutline>;
+		projectId?: string | null;
 	}
 
-	let { envelope }: Props = $props();
+	let { envelope, projectId = null }: Props = $props();
 
+	let applying = $state(false);
+	let applied = $state(false);
+	let applyError = $state<string | null>(null);
 	let copied = $state(false);
 	const payload = $derived(envelope.payload);
 	const counts = $derived({
@@ -21,13 +27,35 @@
 		chapters: payload.chapters.length,
 		scenes: payload.scenes.length,
 	});
+	const hasProject = $derived(Boolean(projectId));
+	const summaryLine = $derived.by(() => {
+		const actLabel = counts.acts === 1 ? 'act' : 'acts';
+		const chapterLabel = counts.chapters === 1 ? 'chapter' : 'chapters';
+		return `Drafted ${counts.acts} ${actLabel} and ${counts.chapters} ${chapterLabel}.`;
+	});
 
 	function titleOf(value: Record<string, unknown>, fallback: string): string {
 		const candidate = value.title ?? value.name ?? value.label ?? value.id;
 		return typeof candidate === 'string' && candidate.trim() ? candidate.trim() : fallback;
 	}
 
-	async function handleCopy(): Promise<void> {
+	async function handleApply(): Promise<void> {
+		if (!projectId || applying) return;
+		applying = true;
+		applied = false;
+		applyError = null;
+		try {
+			await applyAuthorOutlineArtifact(projectId, payload);
+			await invalidateAll();
+			applied = true;
+		} catch (err) {
+			applyError = err instanceof Error ? err.message : 'Could not apply outline draft.';
+		} finally {
+			applying = false;
+		}
+	}
+
+	async function handleCopyJson(): Promise<void> {
 		try {
 			await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
 			copied = true;
@@ -82,10 +110,37 @@
 	</details>
 
 	<footer class="outline-card__actions">
-		<button type="button" class="outline-card__btn" onclick={handleCopy}>
-			{copied ? 'Copied' : 'Copy JSON'}
-		</button>
-		<p class="outline-card__note">Draft only. Nothing is applied to the outline until an accept flow is wired.</p>
+		<p class="outline-card__summary">{summaryLine}</p>
+		{#if counts.milestones === 0}
+			<p class="outline-card__summary">
+				Milestones were not provided by the model. Nova will create milestone buckets automatically on apply.
+			</p>
+		{/if}
+		{#if !hasProject}
+			<p class="outline-card__error">Open this project before applying the draft to Outline.</p>
+		{/if}
+		{#if applyError}
+			<p class="outline-card__error">{applyError}</p>
+		{/if}
+		{#if applied}
+			<p class="outline-card__success">Outline updated. Your arcs, acts, chapters, scenes, and beats were applied.</p>
+		{/if}
+		<div class="outline-card__action-row">
+			<button
+				type="button"
+				class="outline-card__btn outline-card__btn--primary"
+				onclick={handleApply}
+				disabled={!hasProject || applying}
+			>
+				{applying ? 'Applying…' : 'Apply To Outline'}
+			</button>
+			<button type="button" class="outline-card__btn" onclick={handleCopyJson}>
+				{copied ? 'Copied' : 'Copy Technical JSON'}
+			</button>
+		</div>
+		<p class="outline-card__note">
+			Applies this draft to your Outline board so you can edit it directly.
+		</p>
 	</footer>
 </article>
 
@@ -178,6 +233,12 @@
 		color: var(--color-text-muted);
 	}
 
+	.outline-card__summary {
+		margin: 0;
+		font-size: var(--text-xs);
+		color: var(--color-text-secondary);
+	}
+
 	.outline-card__payload {
 		font-size: var(--text-xs);
 		color: var(--color-text-secondary);
@@ -199,9 +260,13 @@
 	}
 
 	.outline-card__actions {
+		display: grid;
+		gap: var(--space-2);
+	}
+
+	.outline-card__action-row {
 		display: flex;
 		flex-wrap: wrap;
-		align-items: center;
 		gap: var(--space-2);
 	}
 
@@ -219,5 +284,27 @@
 	.outline-card__btn:focus-visible {
 		outline: 2px solid var(--color-candle);
 		outline-offset: 2px;
+	}
+
+	.outline-card__btn:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.outline-card__btn--primary {
+		background: color-mix(in srgb, var(--color-candle) 14%, var(--color-surface-ground));
+		border-color: color-mix(in srgb, var(--color-candle) 46%, var(--color-border-default));
+	}
+
+	.outline-card__success {
+		margin: 0;
+		font-size: var(--text-xs);
+		color: color-mix(in srgb, var(--color-accent-success, #6fcf97) 82%, white);
+	}
+
+	.outline-card__error {
+		margin: 0;
+		font-size: var(--text-xs);
+		color: var(--color-error);
 	}
 </style>

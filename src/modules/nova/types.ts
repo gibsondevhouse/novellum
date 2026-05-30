@@ -11,6 +11,35 @@ import type { AuthorSceneDraftPayload } from '$lib/ai/pipeline/author-agent.js';
 import type { AuthorOutline, AuthorRevisionPack } from '$lib/ai/pipeline/author-schemas.js';
 import type { PipelineArtifactEnvelope } from '$lib/ai/pipeline/contracts.js';
 
+export type NovaMode = 'ask' | 'write' | 'agent';
+
+export type WriteSubAction = 'outline' | 'scene' | 'revision';
+
+/* ── Attachment types (plan-031 stage-003) ─────────────────────────────── */
+
+export type NovaEntityKind = 'scene' | 'character' | 'location';
+
+export interface NovaEntityAttachment {
+	kind: 'entity';
+	/** Unique per attachment instance (crypto.randomUUID). */
+	id: string;
+	entityKind: NovaEntityKind;
+	entityId: string;
+	label: string;
+	summary?: string;
+}
+
+export interface NovaFileAttachment {
+	kind: 'file';
+	id: string;
+	filename: string;
+	/** Plain text, already validated and read client-side. */
+	content: string;
+	sizeBytes: number;
+}
+
+export type NovaAttachment = NovaEntityAttachment | NovaFileAttachment;
+
 export type NovaRole = 'user' | 'nova' | 'system' | 'tool-call' | 'tool-result';
 
 export type NovaMessageStatus =
@@ -20,11 +49,16 @@ export type NovaMessageStatus =
 	| 'error'
 	| 'aborted';
 
+export type NovaMessageIntent =
+	| 'default'
+	| 'unsupported_action';
+
 export interface NovaMessage {
 	id: string;
 	role: NovaRole;
 	content: string;
 	status: NovaMessageStatus;
+	intent?: NovaMessageIntent;
 	/** ISO8601 timestamp. */
 	createdAt: string;
 	toolId?: string;
@@ -97,7 +131,12 @@ export type ToolHandler = (
 
 import type { AiContext } from '$lib/ai/types.js';
 
-export type RagPolicy = 'scene_plus_adjacent' | 'scene_only' | 'project_summary' | 'outline_scope';
+export type RagPolicy =
+	| 'scene_plus_adjacent'
+	| 'scene_only'
+	| 'project_summary'
+	| 'worldbuilding_scope'
+	| 'outline_scope';
 
 export interface RagContextRequest {
 	projectId: string;
@@ -110,8 +149,8 @@ export interface RagContextResult {
 	contextText: string;
 	includedScopes: string[];
 	warnings: string[];
-	/** plan-023 stage-005 — populated when ContextEngine produces a real
-	 * AiContext for `scene_plus_adjacent`. Null when no scene is active. */
+	/** plan-030 stage-001 — populated with project baseline whenever
+	 * projectId exists, then expanded with scene/outline scopes when available. */
 	aiContext?: AiContext | null;
 }
 

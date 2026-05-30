@@ -33,7 +33,7 @@
 		onToggleSpellcheck: (next: boolean) => void;
 		/** View-in-reader handoff lands in stage-003; this stage just emits. */
 		onViewInReader: () => void;
-		/** Nova copilot toggle (plan-023 stage-004 phase-002). */
+		/** Nova panel toggle (plan-023 stage-004 phase-002). */
 		novaPanelOpen?: boolean;
 		onToggleNova?: () => void;
 	}
@@ -219,7 +219,7 @@
 				icon: SVG_NOVA,
 				pressed: novaPanelOpen,
 				disabled: !onToggleNova,
-				title: novaPanelOpen ? 'Close Nova copilot' : 'Open Nova copilot',
+				title: novaPanelOpen ? 'Close Nova panel' : 'Open Nova panel',
 				onSelect: () => onToggleNova?.(),
 			},
 		];

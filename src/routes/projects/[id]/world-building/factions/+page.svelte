@@ -289,6 +289,7 @@
 	hasSelection={!!selectedFaction}
 	listAriaLabel={$translator('worldbuilding.list.factionNames')}
 	createLabel={$translator('worldbuilding.workspace.common.createLabel')}
+	generateEntityKind="faction"
 >
 	{#snippet dossier()}
 		<div class="faction-dossier">
@@ -318,7 +319,7 @@
 	{/snippet}
 
 	{#snippet empty()}
-		<EmptyFactionState />
+		<EmptyFactionState projectId={data.projectId} />
 	{/snippet}
 </WorldBuildingWorkspacePage>
 

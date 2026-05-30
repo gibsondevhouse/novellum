@@ -7,7 +7,14 @@
  * to its OpenRouter fetch.
  */
 
-import type { NovaArtifact, NovaMessage, NovaMessageStatus, NovaRole } from '../types.js';
+import type {
+	NovaArtifact,
+	NovaAttachment,
+	NovaMessage,
+	NovaMessageIntent,
+	NovaMessageStatus,
+	NovaRole,
+} from '../types.js';
 import {
 	createStreamController,
 	type StreamController,
@@ -16,12 +23,18 @@ import {
 export interface ContextDisclosureState {
 	scopes: string[]; // e.g. ['scene', 'characters', 'locations']
 	itemCount: number; // total items across all scopes
+	warnings: string[];
+	compressed: boolean;
+	truncated: boolean;
+	/** Number of user-attached items (entities + files), separate from RAG context. */
+	attachedCount: number;
 }
 
 interface AppendInput {
 	role: NovaRole;
 	content: string;
 	status?: NovaMessageStatus;
+	intent?: NovaMessageIntent;
 	toolId?: string;
 	toolPayload?: unknown;
 }
@@ -30,6 +43,7 @@ class NovaSessionStore {
 	messages = $state<NovaMessage[]>([]);
 	activeStreamId = $state<string | null>(null);
 	contextDisclosure = $state<ContextDisclosureState | null>(null);
+	attachments = $state<NovaAttachment[]>([]);
 	private controllers = new Map<string, StreamController>();
 
 	get latest(): NovaMessage | null {
@@ -40,8 +54,41 @@ class NovaSessionStore {
 		return this.activeStreamId !== null;
 	}
 
-	setContextDisclosure(scopes: string[], itemCount: number): void {
-		this.contextDisclosure = { scopes, itemCount };
+	setContextDisclosure(
+		scopes: string[],
+		itemCount: number,
+		options?: {
+			warnings?: string[];
+			compressed?: boolean;
+			truncated?: boolean;
+			attachedCount?: number;
+		},
+	): void {
+		this.contextDisclosure = {
+			scopes,
+			itemCount,
+			warnings: options?.warnings ?? [],
+			compressed: options?.compressed ?? false,
+			truncated: options?.truncated ?? false,
+			attachedCount: options?.attachedCount ?? 0,
+		};
+	}
+
+	addAttachment(attachment: NovaAttachment): void {
+		if (attachment.kind === 'entity') {
+			if (this.attachments.some(
+				(a) => a.kind === 'entity' && a.entityId === attachment.entityId,
+			)) return;
+		}
+		this.attachments = [...this.attachments, attachment];
+	}
+
+	removeAttachment(id: string): void {
+		this.attachments = this.attachments.filter((a) => a.id !== id);
+	}
+
+	clearAttachments(): void {
+		this.attachments = [];
 	}
 
 	append(input: AppendInput): NovaMessage {
@@ -50,12 +97,31 @@ class NovaSessionStore {
 			role: input.role,
 			content: input.content,
 			status: input.status ?? 'complete',
+			intent: input.intent ?? 'default',
 			createdAt: new Date().toISOString(),
 			toolId: input.toolId,
 			toolPayload: input.toolPayload,
 		};
 		this.messages = [...this.messages, message];
 		return message;
+	}
+
+	appendUnsupportedWriteAction(request: string): NovaMessage {
+		const trimmed = request.trim();
+		return this.append({
+			role: 'nova',
+			status: 'complete',
+			intent: 'unsupported_action',
+			content:
+				'Write mode currently supports outline generation. ' +
+				'For other requests, switch to Ask mode for brainstorming and conversation.',
+			toolPayload: {
+				kind: 'unsupported-action',
+				mode: 'write',
+				request: trimmed,
+				supportedActions: ['outline generation'],
+			},
+		});
 	}
 
 	beginStream(role: NovaRole): NovaMessage {
@@ -151,6 +217,8 @@ class NovaSessionStore {
 		this.controllers.clear();
 		this.messages = [];
 		this.activeStreamId = null;
+		this.contextDisclosure = null;
+		this.attachments = [];
 	}
 
 	/**

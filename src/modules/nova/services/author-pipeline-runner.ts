@@ -166,9 +166,11 @@ export async function runAuthorPipelineTask(
 
 	const client = new OpenRouterClient();
 	let rawOutput: string;
+	let modelUsed: string | null;
 	try {
 		const response = await client.complete(payload, { signal: signal ?? undefined });
 		rawOutput = response.text;
+		modelUsed = response.model || payload.model;
 	} catch (err) {
 		const isAbort =
 			(err instanceof Error && err.name === 'AbortError') || (signal?.aborted ?? false);
@@ -201,6 +203,7 @@ export async function runAuthorPipelineTask(
 			contextPolicy: task.contextPolicy ?? 'scene_plus_adjacent',
 		},
 		rawOutput,
+		model: modelUsed,
 	});
 
 	if (!result.ok) {

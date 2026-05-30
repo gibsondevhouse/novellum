@@ -31,6 +31,8 @@
 		orientation: string;
 		links: LandingLink[];
 	} = $props();
+
+	let showOrientation = $state(false);
 </script>
 
 <div class="worldbuilding-section-view landing-shell">
@@ -56,8 +58,19 @@
 		</section>
 
 		<section class="manifesto" aria-labelledby="orientation-title">
-			<h2 id="orientation-title">{orientationTitle}</h2>
-			<p>{orientation}</p>
+			<div class="manifesto-header">
+				<h2 id="orientation-title">{orientationTitle}</h2>
+				<button
+					type="button"
+					class="help-toggle"
+					aria-expanded={showOrientation}
+					aria-label="Toggle orientation guide"
+					onclick={() => (showOrientation = !showOrientation)}
+				>?</button>
+			</div>
+			{#if showOrientation}
+				<p>{orientation}</p>
+			{/if}
 		</section>
 
 		{#each links as link, index (link.id)}
@@ -163,6 +176,13 @@
 		gap: var(--space-3);
 	}
 
+	.manifesto-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-3);
+	}
+
 	.manifesto h2 {
 		margin: 0;
 		font-size: var(--text-2xl);
@@ -172,6 +192,30 @@
 		margin: 0;
 		max-width: 76ch;
 		font-size: var(--text-base);
+		color: var(--color-text-secondary);
+	}
+
+	.help-toggle {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		width: var(--space-6);
+		height: var(--space-6);
+		border-radius: 50%;
+		border: 1px solid var(--color-border-subtle);
+		background: transparent;
+		color: var(--color-text-muted);
+		font-size: var(--text-xs);
+		font-weight: var(--font-weight-semibold);
+		cursor: pointer;
+		transition:
+			background var(--duration-fast) var(--ease-standard),
+			color var(--duration-fast) var(--ease-standard);
+	}
+
+	.help-toggle:hover {
+		background: var(--color-surface-overlay);
 		color: var(--color-text-secondary);
 	}
 

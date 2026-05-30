@@ -17,13 +17,13 @@
 		novaError: string | null;
 		novaErrorType: ReturnType<typeof classifyNovaError> | null;
 		onRetry: () => void;
+		projectId?: string | null;
 	}
 
-	let { messages, novaError, novaErrorType, onRetry }: Props = $props();
+	let { messages, novaError, novaErrorType, onRetry, projectId = null }: Props = $props();
 
 	function isMissingCredentialsError(message: NovaMessage): boolean {
-		const text = message.error ?? '';
-		return /401|MissingCredentials/i.test(text);
+		return classifyNovaError(message.error ?? '') === 'invalid_key';
 	}
 
 	function renderAssistant(content: string): string {
@@ -84,17 +84,19 @@
 				<div
 					class="nova-bubble nova-bubble-nova"
 					class:is-error={message.status === 'error'}
+					class:is-unsupported={message.intent === 'unsupported_action'}
+					data-testid={message.intent === 'unsupported_action' ? 'nova-unsupported-action' : undefined}
 				>
 					{#if message.status === 'error'}
 						<p class="nova-error-text">{message.error ?? 'Something went wrong.'}</p>
 						{#if isMissingCredentialsError(message)}
 							<p class="nova-error-hint">
-								<a href="/settings">Settings → AI providers</a>
+								<a href="/settings/ai">Open AI Settings</a>
 							</p>
 						{/if}
 					{:else if message.artifact}
 						{#if message.artifact.kind === 'author-outline'}
-							<NovaOutlineCard envelope={message.artifact.envelope} />
+							<NovaOutlineCard envelope={message.artifact.envelope} {projectId} />
 						{:else if message.artifact.kind === 'author-scene-draft'}
 							<NovaSceneDraftCard envelope={message.artifact.envelope} />
 						{:else if message.artifact.kind === 'author-revision-pack'}
@@ -105,6 +107,9 @@
 							<span></span><span></span><span></span>
 						</span>
 					{:else}
+						{#if message.intent === 'unsupported_action'}
+							<p class="nova-unsupported-label">Write mode</p>
+						{/if}
 						<div class="nova-prose">
 							<!-- eslint-disable-next-line svelte/no-at-html-tags -- safeHtml() runs DOMPurify sanitization -->
 							{@html renderAssistant(message.content)}
@@ -155,7 +160,7 @@
 	.nova-log {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		list-style: none;
 		margin: 0;
 		padding: 0;
@@ -163,6 +168,7 @@
 
 	.nova-message {
 		display: flex;
+		animation: novellum-enter var(--duration-enter) var(--ease-editorial);
 	}
 
 	.nova-message-user {
@@ -175,30 +181,55 @@
 	}
 
 	.nova-bubble {
-		max-width: 90%;
+		max-width: 92%;
 		padding: var(--space-2) var(--space-3);
-		border-radius: var(--radius-md);
+		border-radius: var(--radius-lg);
 		font-size: var(--text-sm);
-		line-height: var(--leading-relaxed);
+		line-height: 1.65;
 		overflow-wrap: break-word;
+		box-shadow: var(--shadow-nova-inset-xs);
 	}
 
 	.nova-bubble-user {
-		background: var(--color-surface-ground);
-		border: 1px solid var(--color-border-default);
+		background:
+			linear-gradient(
+				180deg,
+				color-mix(in srgb, var(--color-surface-ground) 86%, var(--color-surface-overlay)) 0%,
+				var(--color-surface-ground) 100%
+			);
+		border: 1px solid color-mix(in srgb, var(--color-border-default) 82%, var(--color-candle) 18%);
 		color: var(--color-text-primary);
 		white-space: pre-wrap;
 	}
 
 	.nova-bubble-nova {
-		background: var(--color-surface-overlay);
-		border: 1px solid var(--color-border-default);
+		background:
+			linear-gradient(
+				180deg,
+				color-mix(in srgb, var(--color-surface-overlay) 92%, var(--color-candle) 8%) 0%,
+				var(--color-surface-overlay) 100%
+			);
+		border: 1px solid color-mix(in srgb, var(--color-border-default) 86%, var(--color-candle) 14%);
 		color: var(--color-text-primary);
 	}
 
 	.nova-bubble-nova.is-error {
 		border-color: var(--color-error);
 		color: var(--color-error);
+	}
+
+	.nova-bubble-nova.is-unsupported {
+		border-color: color-mix(in srgb, var(--color-candle) 48%, var(--color-border-default));
+		background: color-mix(in srgb, var(--color-candle) 10%, var(--color-surface-overlay));
+	}
+
+	.nova-unsupported-label {
+		margin: 0 0 var(--space-2);
+		font-size: 11px;
+		font-weight: var(--font-weight-semibold);
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: color-mix(in srgb, var(--color-text-muted) 82%, var(--color-candle));
 	}
 
 	.nova-error-text {
@@ -220,6 +251,12 @@
 		margin: 0 0 var(--space-2);
 	}
 
+	.nova-prose :global(ul),
+	.nova-prose :global(ol) {
+		margin: 0 0 var(--space-2);
+		padding-left: var(--space-4);
+	}
+
 	.nova-prose :global(p:last-child) {
 		margin-bottom: 0;
 	}
@@ -238,14 +275,14 @@
 
 	.nova-typing {
 		display: inline-flex;
-		gap: 4px;
+		gap: var(--space-1);
 	}
 
 	.nova-typing span {
-		width: 6px;
-		height: 6px;
+		width: var(--size-dot-small);
+		height: var(--size-dot-small);
 		border-radius: 50%;
-		background: var(--color-text-muted);
+		background: color-mix(in srgb, var(--color-text-muted) 72%, var(--color-candle) 28%);
 		animation: nova-typing-pulse var(--duration-pulse) infinite var(--ease-editorial);
 	}
 
@@ -274,11 +311,16 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-1);
-		max-width: 90%;
+		max-width: 92%;
 		padding: var(--space-2) var(--space-3);
-		border-radius: var(--radius-md);
-		background: var(--color-surface-overlay);
-		border: 1px solid var(--color-border-default);
+		border-radius: var(--radius-lg);
+		background:
+			linear-gradient(
+				180deg,
+				color-mix(in srgb, var(--color-surface-overlay) 90%, var(--color-candle) 10%) 0%,
+				var(--color-surface-overlay) 100%
+			);
+		border: 1px solid color-mix(in srgb, var(--color-border-default) 84%, var(--color-candle) 16%);
 		color: var(--color-text-secondary);
 		font-size: var(--text-xs);
 		line-height: var(--leading-relaxed);
@@ -320,7 +362,8 @@
 	.nova-tool-payload {
 		margin: var(--space-1) 0 0;
 		padding: var(--space-2);
-		background: var(--color-surface-ground);
+		background: color-mix(in srgb, var(--color-surface-ground) 88%, var(--color-surface-overlay));
+		border: 1px solid var(--color-border-subtle);
 		border-radius: var(--radius-md);
 		font-family: var(--font-mono);
 		font-size: var(--text-xs);

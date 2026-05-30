@@ -101,6 +101,7 @@
 	hasSelection={creating || selectedId !== null}
 	listAriaLabel={$translator('worldbuilding.list.keyEvents')}
 	createLabel={$translator('worldbuilding.workspace.common.createLabel')}
+	generateEntityKind="timeline-event"
 >
 	{#snippet dossier()}
 		{#if creating}

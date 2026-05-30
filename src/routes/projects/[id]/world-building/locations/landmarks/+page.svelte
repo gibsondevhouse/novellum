@@ -231,6 +231,7 @@
 	hasSelection={creating || !!selectedLandmark}
 	listAriaLabel={$translator('worldbuilding.list.landmarks')}
 	createLabel={$translator('worldbuilding.workspace.common.createLabel')}
+	generateEntityKind="landmark"
 >
 	{#snippet dossier()}
 		{#if creating}
@@ -265,6 +266,7 @@
 	{#snippet empty()}
 		<LandmarkEmptyState
 			hasRealms={realmOptions.length > 0}
+			projectId={data.projectId}
 			onCreate={createLandmark}
 			openRealmsHref={`/projects/${data.projectId}/world-building/locations/realms`}
 		/>

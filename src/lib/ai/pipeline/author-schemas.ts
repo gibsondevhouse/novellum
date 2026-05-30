@@ -35,9 +35,10 @@ export const authorOutlineSchema = z
 	.object({
 		arcs: z.array(entityRecordSchema),
 		acts: z.array(entityRecordSchema),
-		milestones: z.array(entityRecordSchema),
+		milestones: z.array(entityRecordSchema).optional().default([]),
 		chapters: z.array(entityRecordSchema),
 		scenes: z.array(entityRecordSchema),
+		beats: z.array(entityRecordSchema).optional().default([]),
 	})
 	.passthrough();
 

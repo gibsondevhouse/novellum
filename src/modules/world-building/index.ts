@@ -7,6 +7,21 @@ export * from './stores/world-building-store.svelte.ts';
 // Store — CRUD actions
 export * from './stores/world-building-crud.svelte.ts';
 
+// Store — generation draft state machine
+export {
+	startGeneration,
+	abortGeneration,
+	toggleDraftSelect,
+	resetGeneration,
+	getPhase as getGenerationPhase,
+	isGenerating,
+	isReviewing,
+	isIdle as isGenerationIdle,
+} from './stores/generation-draft.svelte.ts';
+
+// Service — entity generation
+export type { EntityKind, GenerationResult } from './services/worldbuilding-generation-service.js';
+
 // Components
 export { default as CharacterCard } from './components/CharacterCard.svelte';
 export { default as CharacterForm } from './components/CharacterForm.svelte';
@@ -15,3 +30,5 @@ export { default as LocationForm } from './components/LocationForm.svelte';
 export { default as LoreEntryForm } from './components/LoreEntryForm.svelte';
 export { default as PlotThreadForm } from './components/PlotThreadForm.svelte';
 export { default as TimelineEventForm } from './components/TimelineEventForm.svelte';
+export { default as GenerateButton } from './components/GenerateButton.svelte';
+export { default as GeneratedEntityModal } from './components/GeneratedEntityModal.svelte';

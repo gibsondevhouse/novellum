@@ -73,7 +73,7 @@ test.describe('Visual Regression — Editor Nova conversation (plan-023 stage-00
 
 			const novaToggle = page.getByRole('button', { name: 'Nova', exact: true });
 			await novaToggle.click();
-			await page.waitForSelector('aside[aria-label="Nova copilot"]');
+			await page.waitForSelector('aside[aria-label="Nova panel"]');
 
 			const textarea = page.locator('textarea.nova-input');
 			await textarea.fill('How can I sharpen the opening?');

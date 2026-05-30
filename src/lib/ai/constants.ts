@@ -33,6 +33,8 @@ export const MODEL_MAP: Record<TaskType, string> = {
 	edit: 'openai/gpt-4o',
 	style_check: 'openai/gpt-4o',
 	chat: 'openai/gpt-4o-mini',
+	write: 'openai/gpt-4o-mini',
+	agent: 'openai/gpt-4o-mini',
 	pipeline: 'openai/gpt-4o-mini',
 };
 
@@ -45,6 +47,17 @@ export const MAX_CONTINUITY_SCENE_CHARS = 200;
 export const MAX_CONTINUITY_TOTAL_CHARS = 24000;
 export const MAX_CHAPTER_CHARACTERS = 10;
 export const MAX_CHAPTER_LOCATIONS = 5;
+export const MAX_WORLDBUILD_CHARACTERS = 10;
+export const MAX_WORLDBUILD_FACTIONS = 10;
+export const MAX_WORLDBUILD_LOCATIONS = 12;
+export const MAX_WORLDBUILD_LORE_ENTRIES = 12;
+export const MAX_WORLDBUILD_PLOT_THREADS = 12;
+export const MAX_WORLDBUILD_TIMELINE_EVENTS = 12;
+export const MAX_WORLDBUILD_CHARACTER_BIO_CHARS = 320;
+export const MAX_WORLDBUILD_LOCATION_DESC_CHARS = 320;
+export const MAX_WORLDBUILD_LORE_CONTENT_CHARS = 360;
+export const MAX_WORLDBUILD_PLOT_DESC_CHARS = 260;
+export const MAX_WORLDBUILD_TIMELINE_DESC_CHARS = 260;
 
 // ── Prompt Builder ──────────────────────────────────────────────────────────
 export const MAX_PROMPT_CHARS = 8000;
@@ -54,6 +67,7 @@ export const CONSTRAINTS_BY_TYPE: Record<string, string[]> = {
 		'You are having a conversation with the author about their novel — not writing prose for them.',
 		'Answer the author\'s actual question or request. If they want to brainstorm, propose ideas; if they ask a question, answer it; if they want feedback, give feedback.',
 		'Use the provided CONTEXT (characters, locations, lore, plot threads, scene) only as background to keep your suggestions consistent with the established world — do NOT continue the narrative or generate manuscript prose unless the author explicitly asks for prose.',
+		'If the author explicitly asks for draft prose, provide it as a proposal and make clear it is not auto-applied to the manuscript.',
 		'Default to concise, structured replies: short paragraphs, bullets, or numbered lists. Use headings sparingly.',
 		'If the author has provided little or no context yet, ask one or two focused clarifying questions before generating long lists of ideas.',
 		'Never invent canonical facts about the world or the characters. When you propose new ideas, mark them clearly as suggestions ("Option A:", "Idea:", "What if…").',
@@ -88,16 +102,32 @@ export const CONSTRAINTS_BY_TYPE: Record<string, string[]> = {
 		'Only flag deviations that meaningfully conflict with the provided style guide rules — do not invent additional rules',
 		'If no deviations found, return an empty array: []',
 	],
+	write: [
+		'You are generating a structured writing proposal — an outline, scene draft, or revision plan — for the author to review.',
+		'Every artifact you produce is a proposal only. The author must explicitly accept or reject it; nothing is auto-applied to the manuscript.',
+		'Be concrete and actionable. Provide structure the author can immediately use or refine.',
+		'If required context (project title, logline, or scene) is missing, ask for the missing fields instead of fabricating plausible details.',
+		'Do not invent canonical facts about the world or characters that contradict the provided context.',
+	],
+	agent: [
+		'You are acting as an agentic writing assistant. Multi-step tool use is not yet enabled.',
+		'Describe what actions you would take and which tools you would invoke, but do not fabricate tool outputs.',
+		'Treat every proposed change as a proposal requiring explicit author acceptance.',
+	],
 };
 
 export const TASK_DESCRIPTIONS: Record<string, string> = {
-	chat: 'Have a productive conversation with the author about their novel. Brainstorm, answer questions, give feedback, or help them think through story problems. You are a collaborator, not a ghostwriter — do not produce manuscript prose unless explicitly asked.',
+	chat: 'Have a productive conversation with the author about their novel. Brainstorm, answer questions, give feedback, or help them think through story problems. You are a collaborator, not a ghostwriter — do not produce manuscript prose unless explicitly asked, and treat any prose you do provide as a proposal.',
 	continue: 'Continue the narrative from where the scene ends.',
 	rewrite: 'Rewrite this scene with improved prose quality.',
 	continuity_check: 'Identify all continuity issues across this story.',
 	edit: 'Identify specific improvements in the provided text and return each as a targeted edit suggestion.',
 	style_check:
 		'Identify passages that deviate from the provided style guide rules and suggest corrections that bring the prose in line with the target style.',
+	write:
+		'Generate a structured writing proposal — outline, scene draft, or revision plan — based on the author\'s request and project context. Every output is a proposal the author reviews; nothing is auto-applied.',
+	agent:
+		'Plan and describe the multi-step actions you would take as an agentic writing assistant. Tool dispatch is not yet enabled — return a structured plan of proposed actions instead.',
 };
 
 export const OUTPUT_FORMAT_DESCRIPTIONS: Record<string, string> = {
@@ -124,7 +154,7 @@ export const OUTPUT_FORMAT_DESCRIPTIONS: Record<string, string> = {
 	json_author_premise:
 		'Return a JSON object with fields: protagonistId, externalGoal, internalNeed, antagonisticForce, stakes, dramaticQuestion, themeHypothesis, endingPolarity, scopeStatement.',
 	json_author_outline:
-		'Return a JSON object with nested arrays: arcs[], acts[], chapters[], scenes[], beats[]. Scenes must include povCharacterId, locationId, threadIds, goal, conflict, turn, outcome, and arcRefs.',
+		'Return a JSON object with nested arrays: arcs[], acts[], milestones[], chapters[], scenes[], beats[]. Scenes must include povCharacterId, locationId, threadIds, goal, conflict, turn, outcome, and arcRefs.',
 	prose_plus_scene_sidecar:
 		'Respond with the scene prose first, followed by a fenced ---SIDECAR--- block containing a JSON object with: sceneId, assignedBeatIds, povCharacterId, locationId, characterIds, threadIds, factsIntroduced, continuityRisks, wordCountEstimate, draftStatus.',
 	json_author_revision_pack:

@@ -195,6 +195,7 @@
 	hasSelection={creating || selectedId !== null}
 	listAriaLabel={$translator('worldbuilding.list.realms')}
 	createLabel={$translator('worldbuilding.workspace.common.createLabel')}
+	generateEntityKind="realm"
 >
 	{#snippet dossier()}
 		{#if creating}
@@ -223,6 +224,6 @@
 		{/if}
 	{/snippet}
 	{#snippet empty()}
-		<RealmEmptyState onCreate={createNewRealm} />
+		<RealmEmptyState onCreate={createNewRealm} projectId={data.projectId} />
 	{/snippet}
 </WorldBuildingWorkspacePage>
