@@ -2,7 +2,7 @@
 title: Extract Content
 slug: part-001-extract-content
 part_number: 1
-status: draft
+status: complete
 owner: Architect Agent
 assigned_to: Architect Agent
 phase: phase-001-help-extraction

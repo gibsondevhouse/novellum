@@ -2,7 +2,7 @@
 title: Rename World Building Ctas
 slug: part-001-rename-world-building-ctas
 part_number: 1
-status: draft
+status: complete
 owner: Stylist Agent
 assigned_to: Stylist Agent
 phase: phase-003-cta-refactor

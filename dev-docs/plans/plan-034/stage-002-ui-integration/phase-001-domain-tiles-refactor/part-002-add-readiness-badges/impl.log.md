@@ -1,18 +1,3 @@
----
-part: part-002-add-readiness-badges
----
+## 2026-05-30
 
-# Implementation Log
-
-> Append entries chronologically. Never edit or delete existing entries.
-> Format: ### [YYYY-MM-DD HH:MM] Agent: Agent Name
-
----
-
-### [2026-05-30 00:00] Agent: Planner Agent
-
-**Action:** Scaffolded part artifacts.
-
-**Result:** Created part.md, checklist.md, impl.log.md, and evidence/ for part-002-add-readiness-badges.
-
-**Notes:** Part remains draft; implementation has not started.
+Created WorldbuildingReadinessBadge.svelte with 'first' | 'dependent' | 'ready' variants. Badge variant is derived at runtime: dependencyIds.length === 0 → 'first'; all deps have records → 'ready'; else 'dependent'. Rendered in the domain tile title row. All styles use --color-brass, --color-success, --color-text-muted design tokens. pnpm check:tokens passes with 0 violations.

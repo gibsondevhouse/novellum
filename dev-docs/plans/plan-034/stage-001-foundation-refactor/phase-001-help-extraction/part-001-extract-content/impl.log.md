@@ -1,18 +1,3 @@
----
-part: part-001-extract-content
----
+## 2026-05-30
 
-# Implementation Log
-
-> Append entries chronologically. Never edit or delete existing entries.
-> Format: ### [YYYY-MM-DD HH:MM] Agent: Agent Name
-
----
-
-### [2026-05-30 00:00] Agent: Planner Agent
-
-**Action:** Scaffolded part artifacts.
-
-**Result:** Created part.md, checklist.md, impl.log.md, and evidence/ for part-001-extract-content.
-
-**Notes:** Part remains draft; implementation has not started.
+Extracted the full `sections` `$derived` array from `+page.svelte` into `src/modules/world-building/help/worldbuilding-help-content.ts`. Defined `WorldbuildingHelpGlossaryEntry` and `WorldbuildingHelpSection` interfaces. Exported `WORLDBUILDING_HELP_SECTIONS` as a typed `readonly` array of all five domain objects. `pnpm check` passes with 0 errors.

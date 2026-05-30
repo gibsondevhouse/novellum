@@ -2,7 +2,7 @@
 title: Add Readiness Badges
 slug: part-002-add-readiness-badges
 part_number: 2
-status: draft
+status: complete
 owner: Stylist Agent
 assigned_to: Stylist Agent
 phase: phase-001-domain-tiles-refactor

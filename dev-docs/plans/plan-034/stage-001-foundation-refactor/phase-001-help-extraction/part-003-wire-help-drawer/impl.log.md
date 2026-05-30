@@ -1,18 +1,3 @@
----
-part: part-003-wire-help-drawer
----
+## 2026-05-30
 
-# Implementation Log
-
-> Append entries chronologically. Never edit or delete existing entries.
-> Format: ### [YYYY-MM-DD HH:MM] Agent: Agent Name
-
----
-
-### [2026-05-30 00:00] Agent: Planner Agent
-
-**Action:** Scaffolded part artifacts.
-
-**Result:** Created part.md, checklist.md, impl.log.md, and evidence/ for part-003-wire-help-drawer.
-
-**Notes:** Part remains draft; implementation has not started.
+Replaced `showManifesto` state with `showHelp`. Mounted `<WorldbuildingHelpDrawer>` in `+page.svelte`. Removed inline orientation text from the manifesto section. Exported help components, types, workflow config, and `WORLDBUILDING_DOMAIN_SEQUENCE` from module barrel `index.ts`. `pnpm check` and `pnpm lint` pass.

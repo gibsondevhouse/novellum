@@ -1,4 +1,5 @@
 import { PIPELINE_TASK_KEYS } from './task-catalog.js';
+import type { WorldbuildDomainTaskKey } from './task-catalog.js';
 import type { PipelineArtifactEnvelope } from './contracts.js';
 import type {
 	WorldbuildPayload,
@@ -6,6 +7,15 @@ import type {
 	WorldbuildPopulatedBibleTableWrites,
 	WorldbuildTaskKey,
 } from './worldbuild-agent.js';
+
+export type AnyWorldbuildTaskKey = WorldbuildTaskKey | WorldbuildDomainTaskKey;
+
+export interface WorldbuildProvenance {
+	model: string;
+	generationId: string;
+	createdAt: string;
+	sourceContextSummary: string;
+}
 
 export const PIPELINE_CHECKPOINT_SCHEMA_VERSION = '1.0.0' as const;
 export const PIPELINE_METADATA_SCOPE = 'pipeline' as const;
@@ -40,7 +50,7 @@ export interface WorldbuildCheckpointRecord {
 	ownerId: string;
 	version: string;
 	lifecycle: CheckpointLifecycle;
-	taskKey: WorldbuildTaskKey;
+	taskKey: AnyWorldbuildTaskKey;
 	artifact: PipelineArtifactEnvelope<WorldbuildPayload>;
 	createdAt: string;
 	updatedAt: string;
@@ -52,6 +62,11 @@ export interface WorldbuildCheckpointRecord {
 export interface PopulatedBibleCheckpointRecord extends Omit<WorldbuildCheckpointRecord, 'taskKey' | 'artifact'> {
 	taskKey: typeof PIPELINE_TASK_KEYS.WORLDBUILD_WORLD_BIBLE;
 	artifact: PipelineArtifactEnvelope<WorldbuildPopulatedBiblePayload>;
+}
+
+export interface WorldbuildDomainCheckpointRecord extends Omit<WorldbuildCheckpointRecord, 'taskKey'> {
+	taskKey: WorldbuildDomainTaskKey;
+	provenance: WorldbuildProvenance;
 }
 
 export const CHECKPOINT_LIFECYCLE_ORDER: readonly CheckpointLifecycle[] = [

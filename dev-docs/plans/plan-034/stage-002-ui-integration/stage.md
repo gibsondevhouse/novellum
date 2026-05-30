@@ -2,7 +2,7 @@
 title: UI Integration
 slug: stage-002-ui-integration
 stage_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-034
 phases:
@@ -20,8 +20,8 @@ Refactor worldbuilding domain tiles to surface action trio (open/help/generate),
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Domain Tiles Refactor](phase-001-domain-tiles-refactor/phase.md) | `draft` | 2d |
-| 002 | [Generate Buttons](phase-002-generate-buttons/phase.md) | `draft` | 2d |
+| 001 | [Domain Tiles Refactor](phase-001-domain-tiles-refactor/phase.md) | `complete` | 2d |
+| 002 | [Generate Buttons](phase-002-generate-buttons/phase.md) | `complete` | 2d |
 
 ## Entry Criteria
 

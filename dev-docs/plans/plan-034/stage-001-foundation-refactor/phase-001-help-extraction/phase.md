@@ -2,7 +2,7 @@
 title: Help Extraction
 slug: phase-001-help-extraction
 phase_number: 1
-status: draft
+status: complete
 owner: Architect Agent
 stage: stage-001-foundation-refactor
 parts:

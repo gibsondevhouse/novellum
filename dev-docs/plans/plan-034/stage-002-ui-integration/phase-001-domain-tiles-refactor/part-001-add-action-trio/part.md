@@ -2,7 +2,7 @@
 title: Add Action Trio
 slug: part-001-add-action-trio
 part_number: 1
-status: draft
+status: complete
 owner: Stylist Agent
 assigned_to: Stylist Agent
 phase: phase-001-domain-tiles-refactor

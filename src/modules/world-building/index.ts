@@ -32,3 +32,46 @@ export { default as PlotThreadForm } from './components/PlotThreadForm.svelte';
 export { default as TimelineEventForm } from './components/TimelineEventForm.svelte';
 export { default as GenerateButton } from './components/GenerateButton.svelte';
 export { default as GeneratedEntityModal } from './components/GeneratedEntityModal.svelte';
+
+// Help components
+export { default as WorldbuildingHelpPanel } from './help/WorldbuildingHelpPanel.svelte';
+export { default as WorldbuildingHelpDrawer } from './help/WorldbuildingHelpDrawer.svelte';
+export type { WorldbuildingHelpSection, WorldbuildingHelpGlossaryEntry } from './help/worldbuilding-help-content.js';
+
+// Domain tile components
+export { default as WorldbuildingReadinessBadge } from './components/WorldbuildingReadinessBadge.svelte';
+
+// Workflow config
+export type { WorldbuildingDomainId, WorldbuildingDomainConfig } from './worldbuilding-workflow.js';
+export { WORLDBUILDING_DOMAIN_SEQUENCE, getWorldbuildingDomainConfig } from './worldbuilding-workflow.js';
+
+// Readiness checks
+export type { WorldbuildingReadinessResult, WorldbuildingReadinessState } from './worldbuilding-readiness.js';
+export { checkDomainReadiness } from './worldbuilding-readiness.js';
+
+// Generate actions
+export type { GenerateGuardContext, GenerateGuardResult } from './worldbuilding-generate-actions.js';
+export {
+	canGenerateDomain,
+	generatePersonaeWithNova,
+	generateAtlasWithNova,
+	generateArchiveWithNova,
+	generateThreadsWithNova,
+	generateChroniclesWithNova,
+	generateDomainWithNova,
+} from './worldbuilding-generate-actions.js';
+
+// Generation state machine
+export type { WorldbuildingGenerationStateValue } from './stores/worldbuilding-generation-state.svelte.js';
+export type { WorldbuildProvenance } from '$lib/ai/pipeline/checkpoint-contract.js';
+export {
+	getState as getGenerationState,
+	transition as transitionGenerationState,
+	resetState as resetGenerationState,
+	getMissingContextReason,
+	evaluateReadiness,
+} from './stores/worldbuilding-generation-state.svelte.js';
+
+// Stage-003 components
+export { default as WorldbuildingProposalCard } from './components/WorldbuildingProposalCard.svelte';
+export { default as WorldbuildingGenerationStatus } from './components/WorldbuildingGenerationStatus.svelte';

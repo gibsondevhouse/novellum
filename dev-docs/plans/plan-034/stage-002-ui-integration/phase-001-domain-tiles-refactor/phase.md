@@ -2,7 +2,7 @@
 title: Domain Tiles Refactor
 slug: phase-001-domain-tiles-refactor
 phase_number: 1
-status: draft
+status: complete
 owner: Stylist Agent
 stage: stage-002-ui-integration
 parts:

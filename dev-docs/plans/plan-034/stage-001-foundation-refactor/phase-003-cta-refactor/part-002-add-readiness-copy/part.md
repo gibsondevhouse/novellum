@@ -2,7 +2,7 @@
 title: Add Readiness Copy
 slug: part-002-add-readiness-copy
 part_number: 2
-status: draft
+status: complete
 owner: Stylist Agent
 assigned_to: Stylist Agent
 phase: phase-003-cta-refactor

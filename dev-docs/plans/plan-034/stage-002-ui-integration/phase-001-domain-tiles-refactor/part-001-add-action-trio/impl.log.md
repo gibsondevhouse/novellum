@@ -1,18 +1,3 @@
----
-part: part-001-add-action-trio
----
+## 2026-05-30
 
-# Implementation Log
-
-> Append entries chronologically. Never edit or delete existing entries.
-> Format: ### [YYYY-MM-DD HH:MM] Agent: Agent Name
-
----
-
-### [2026-05-30 00:00] Agent: Planner Agent
-
-**Action:** Scaffolded part artifacts.
-
-**Result:** Created part.md, checklist.md, impl.log.md, and evidence/ for part-001-add-action-trio.
-
-**Notes:** Part remains draft; implementation has not started.
+Added three-action row (Open, Help, Generate) to each domain tile in +page.svelte. Open links to entryHref; Help button opens WorldbuildingHelpDrawer scoped to the domain; Generate button wired to generateDomainWithNova (disabled state added in part-002). Domain tiles remain keyboard-navigable with aria-label attributes. All token-driven styles.

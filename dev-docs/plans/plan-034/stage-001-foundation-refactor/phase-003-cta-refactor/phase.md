@@ -2,7 +2,7 @@
 title: CTA Refactor
 slug: phase-003-cta-refactor
 phase_number: 3
-status: draft
+status: complete
 owner: Stylist Agent
 stage: stage-001-foundation-refactor
 parts:

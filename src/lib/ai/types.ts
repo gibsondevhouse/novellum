@@ -97,7 +97,7 @@ export interface AiTask {
 
 export interface PipelineTaskReference {
 	key: string;
-	family: 'vibe-worldbuild' | 'vibe-author';
+	family: 'vibe-worldbuild' | 'vibe-worldbuild-domain' | 'vibe-author';
 	stage: string;
 }
 

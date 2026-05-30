@@ -2,7 +2,7 @@
 title: Add Completion Counts
 slug: part-003-add-completion-counts
 part_number: 3
-status: draft
+status: complete
 owner: Stylist Agent
 assigned_to: Stylist Agent
 phase: phase-001-domain-tiles-refactor

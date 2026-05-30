@@ -2,7 +2,7 @@
 title: Foundation Refactor
 slug: stage-001-foundation-refactor
 stage_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-034
 phases:
@@ -21,9 +21,9 @@ Extract hardcoded help content, define the worldbuilding sequence as reusable co
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Help Extraction](phase-001-help-extraction/phase.md) | `draft` | 1d |
-| 002 | [Workflow Config](phase-002-workflow-config/phase.md) | `draft` | 1.5d |
-| 003 | [CTA Refactor](phase-003-cta-refactor/phase.md) | `draft` | 1.5d |
+| 001 | [Help Extraction](phase-001-help-extraction/phase.md) | `complete` | 1d |
+| 002 | [Workflow Config](phase-002-workflow-config/phase.md) | `complete` | 1.5d |
+| 003 | [CTA Refactor](phase-003-cta-refactor/phase.md) | `complete` | 1.5d |
 
 ## Entry Criteria
 
