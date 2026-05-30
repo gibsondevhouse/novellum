@@ -2,7 +2,7 @@
 title: Add Idle Disabled States
 slug: part-002-add-idle-disabled-states
 part_number: 2
-status: draft
+status: complete
 owner: Architect Agent
 assigned_to: Architect Agent
 phase: phase-002-generate-buttons

@@ -1,0 +1,6 @@
+
+> novellum@0.0.1 check /home/user/novellum
+> svelte-kit sync && svelte-check --tsconfig ./tsconfig.json
+
+1780117912486 START "/home/user/novellum"
+1780117912492 COMPLETED 1722 FILES 0 ERRORS 0 WARNINGS 0 FILES_WITH_PROBLEMS

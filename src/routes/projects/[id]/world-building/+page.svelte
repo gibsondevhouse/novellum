@@ -2,16 +2,28 @@
 	import { SectionHeader } from '$lib/components/ui/index.js';
 	import { novaMode, novaPanel } from '$modules/nova';
 	import { WORLDBUILDING_HELP_SECTIONS } from '$modules/world-building/help/worldbuilding-help-content.js';
-	import { WorldbuildingHelpDrawer } from '$modules/world-building';
+	import { WorldbuildingHelpDrawer, WorldbuildingReadinessBadge } from '$modules/world-building';
 	import { WORLDBUILDING_DOMAIN_SEQUENCE } from '$modules/world-building/worldbuilding-workflow.js';
+	import type { WorldbuildingDomainId } from '$modules/world-building/worldbuilding-workflow.js';
+	import {
+		canGenerateDomain,
+		generateDomainWithNova,
+	} from '$modules/world-building/worldbuilding-generate-actions.js';
+	import type { DomainCounts } from './+page.js';
 
-	let { data }: { data: { projectId: string } } = $props();
+	let { data }: { data: { projectId: string; domainCounts: DomainCounts } } = $props();
 
 	let showHelp = $state(false);
 	let expandedSection = $state<string | null>(null);
+	let activeDomain = $state<WorldbuildingDomainId | null>(null);
 
 	function toggleSection(id: string): void {
 		expandedSection = expandedSection === id ? null : id;
+	}
+
+	function openHelp(domainId: WorldbuildingDomainId | null = null): void {
+		activeDomain = domainId;
+		showHelp = true;
 	}
 
 	function startWorldbuildWithNova(): void {
@@ -22,9 +34,23 @@
 		);
 	}
 
-	function getReadinessLabel(domainId: string): string {
+	function getBadgeVariant(domainId: WorldbuildingDomainId): 'first' | 'dependent' | 'ready' {
 		const config = WORLDBUILDING_DOMAIN_SEQUENCE.find((d) => d.id === domainId);
-		return config?.generationReadiness ?? '';
+		if (!config) return 'dependent';
+		if (config.dependencyIds.length === 0) return 'first';
+		const allMet = config.dependencyIds.every((dep) => (data.domainCounts[dep] ?? 0) > 0);
+		return allMet ? 'ready' : 'dependent';
+	}
+
+	function getDomainCount(domainId: WorldbuildingDomainId): number {
+		return data.domainCounts[domainId] ?? 0;
+	}
+
+	function getGenerateGuard(domainId: WorldbuildingDomainId) {
+		return canGenerateDomain(domainId, {
+			projectId: data.projectId,
+			domainCounts: data.domainCounts,
+		});
 	}
 
 	const sections = $derived(
@@ -34,6 +60,12 @@
 				WORLDBUILDING_DOMAIN_SEQUENCE.find((d) => d.id === section.id)?.entryPath ?? section.id
 			}`,
 		})),
+	);
+
+	const helpSections = $derived(
+		activeDomain
+			? WORLDBUILDING_HELP_SECTIONS.filter((s) => s.id === activeDomain)
+			: WORLDBUILDING_HELP_SECTIONS,
 	);
 </script>
 
@@ -60,22 +92,51 @@
 
 		<section class="domain-grid" aria-label="World-building domains">
 			{#each sections as section (section.id)}
-				<article class="domain-tile">
+				{@const domainId = section.id as WorldbuildingDomainId}
+				{@const guard = getGenerateGuard(domainId)}
+				{@const count = getDomainCount(domainId)}
+				<article class="domain-tile" id={section.id}>
 					<div class="domain-tile__top">
-						<h2>{section.label}</h2>
+						<div class="domain-tile__title-row">
+							<h2>{section.label}</h2>
+							<WorldbuildingReadinessBadge
+								label={WORLDBUILDING_DOMAIN_SEQUENCE.find((d) => d.id === domainId)?.generationReadiness ?? ''}
+								variant={getBadgeVariant(domainId)}
+							/>
+						</div>
 						<p>{section.tagline}</p>
 					</div>
-					<p class="domain-tile__readiness">{getReadinessLabel(section.id)}</p>
+					<p class="domain-tile__count">
+						{count > 0 ? `${count} record${count === 1 ? '' : 's'}` : 'No records yet'}
+					</p>
 					<p class="domain-tile__body">{section.purpose}</p>
 					<div class="domain-tile__actions">
-						<a class="domain-tile__cta" href={section.entryHref}>Open {section.label}</a>
+						<a
+							class="domain-tile__action domain-tile__action--open"
+							href={section.entryHref}
+							aria-label="Open {section.label}"
+						>Open</a>
 						<button
+							type="button"
+							class="domain-tile__action domain-tile__action--help"
+							aria-label="Help for {section.label}"
+							onclick={() => openHelp(domainId)}
+						>Help</button>
+						<button
+							type="button"
+							class="domain-tile__action domain-tile__action--generate"
+							aria-label="Generate {section.label} with Nova{guard.reason ? ': ' + guard.reason : ''}"
+							disabled={!guard.allowed}
+							title={guard.reason ?? undefined}
+							onclick={() => generateDomainWithNova(data.projectId, domainId)}
+						>Generate</button>
+					</div>
+					<button
 						type="button"
 						class="domain-tile__guide-toggle"
 						aria-expanded={expandedSection === section.id}
 						onclick={() => toggleSection(section.id)}
 					>Guide {expandedSection === section.id ? '↑' : '↓'}</button>
-					</div>
 				</article>
 			{/each}
 		</section>
@@ -88,13 +149,13 @@
 					class="help-toggle"
 					aria-expanded={showHelp}
 					aria-label="Toggle worldbuilding orientation"
-					onclick={() => (showHelp = !showHelp)}
+					onclick={() => openHelp(null)}
 				>?</button>
 			</div>
 		</section>
 
 		{#each sections as section, i (section.id)}
-			<section id={section.id} class="lane" aria-labelledby={`${section.id}-title`}>
+			<section class="lane" aria-labelledby={`${section.id}-title`}>
 				<div class="lane-heading">
 					<span class="lane-index">0{i + 1}</span>
 					<div>
@@ -153,7 +214,7 @@
 	</div>
 </div>
 
-<WorldbuildingHelpDrawer bind:open={showHelp} sections={WORLDBUILDING_HELP_SECTIONS} />
+<WorldbuildingHelpDrawer bind:open={showHelp} sections={helpSections} />
 
 <style>
 	.landing-shell {
@@ -257,6 +318,13 @@
 		font-size: var(--text-xl);
 	}
 
+	.domain-tile__title-row {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		flex-wrap: wrap;
+	}
+
 	.domain-tile__top p {
 		margin: var(--space-1) 0 0;
 		font-size: var(--text-xs);
@@ -265,13 +333,10 @@
 		color: var(--color-text-muted);
 	}
 
-	.domain-tile__readiness {
+	.domain-tile__count {
 		margin: 0;
 		font-size: var(--text-xs);
-		font-weight: var(--font-weight-semibold);
-		color: var(--color-brass);
-		letter-spacing: var(--tracking-wide);
-		text-transform: uppercase;
+		color: var(--color-text-muted);
 	}
 
 	.domain-tile__body {
@@ -283,45 +348,90 @@
 	.domain-tile__actions {
 		display: flex;
 		align-items: center;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		margin-top: auto;
+		flex-wrap: wrap;
 	}
 
-	.domain-tile__cta {
+	.domain-tile__action {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		padding: var(--space-2) var(--space-4);
+		padding: var(--space-1) var(--space-3);
 		border-radius: var(--radius-md);
+		font-size: var(--text-xs);
+		font-weight: var(--font-weight-medium);
+		text-decoration: none;
+		cursor: pointer;
+		transition:
+			background var(--duration-fast) var(--ease-standard),
+			border-color var(--duration-fast) var(--ease-standard),
+			color var(--duration-fast) var(--ease-standard);
+	}
+
+	.domain-tile__action--open {
 		border: 1px solid color-mix(in srgb, var(--color-brass) 45%, var(--color-border-default));
 		background: color-mix(in srgb, var(--color-candle) 14%, transparent);
 		color: var(--color-text-primary);
-		text-decoration: none;
-		font-size: var(--text-sm);
-		font-weight: var(--font-weight-medium);
 	}
 
-	.domain-tile__cta:hover,
-	.domain-tile__cta:focus-visible {
+	.domain-tile__action--open:hover,
+	.domain-tile__action--open:focus-visible {
 		outline: none;
 		background: color-mix(in srgb, var(--color-candle) 22%, transparent);
 		border-color: var(--color-border-focus);
 	}
 
+	.domain-tile__action--help {
+		border: 1px solid var(--color-border-default);
+		background: transparent;
+		color: var(--color-text-secondary);
+	}
+
+	.domain-tile__action--help:hover,
+	.domain-tile__action--help:focus-visible {
+		outline: none;
+		background: var(--color-surface-overlay);
+		color: var(--color-text-primary);
+		border-color: var(--color-border-focus);
+	}
+
+	.domain-tile__action--generate {
+		border: 1px solid color-mix(in srgb, var(--color-nova-blue) 45%, var(--color-border-default));
+		background: color-mix(in srgb, var(--color-nova-blue) 14%, transparent);
+		color: var(--color-text-primary);
+	}
+
+	.domain-tile__action--generate:hover:not(:disabled),
+	.domain-tile__action--generate:focus-visible:not(:disabled) {
+		outline: none;
+		background: color-mix(in srgb, var(--color-nova-blue) 22%, transparent);
+		border-color: var(--color-border-focus);
+	}
+
+	.domain-tile__action--generate:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+		border-color: var(--color-border-subtle);
+		background: transparent;
+		color: var(--color-text-muted);
+	}
+
 	.domain-tile__guide-toggle {
 		display: inline-flex;
 		align-items: center;
-		font-size: var(--text-sm);
-		color: var(--color-text-secondary);
+		font-size: var(--text-xs);
+		color: var(--color-text-muted);
 		background: transparent;
 		border: none;
 		cursor: pointer;
 		padding: 0;
 		gap: var(--space-1);
+		align-self: flex-start;
 	}
 
 	.domain-tile__guide-toggle:hover {
-		color: var(--color-text-primary);
+		color: var(--color-text-secondary);
 	}
 
 	.manifesto {
