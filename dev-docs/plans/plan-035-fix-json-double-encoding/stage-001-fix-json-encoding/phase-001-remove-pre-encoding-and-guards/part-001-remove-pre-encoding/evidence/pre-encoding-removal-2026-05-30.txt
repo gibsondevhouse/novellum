@@ -1,0 +1,16 @@
+$ rg -n "JSON\.stringify\((ch\.|loc\.|le\.|\[\])" src/modules/world-building/components/GeneratedEntityModal.svelte
+
+$ rg -n "traits:|goals:|flaws:|tags:|aliases:|anomalies:|arcs:|relatedSceneIds:|relatedCharacterIds:" src/modules/world-building/components/GeneratedEntityModal.svelte
+224:					traits: ch.traits || [],
+225:					goals: ch.goals || [],
+226:					flaws: ch.flaws || [],
+227:					tags: ch.tags || [],
+230:					aliases: [],
+233:					anomalies: [],
+234:					arcs: [],
+267:					tags: loc.tags || [],
+285:					tags: le.tags || [],
+300:					relatedSceneIds: [],
+301:					relatedCharacterIds: [],
+316:					relatedCharacterIds: [],
+317:					relatedSceneIds: [],

@@ -1,0 +1,8 @@
+$ NOVELLUM_DB_PATH=/tmp/novellum-plan035-smoke.db pnpm dev --host 127.0.0.1 --port 4173
+(server started in separate terminal session for this check)
+
+$ node --input-type=module <<NODE
+/projects/smoke-proj/world-building/locations/realms -> HTTP 200
+/projects/smoke-proj/world-building/characters/individuals -> HTTP 200
+/projects/smoke-proj/world-building/lore -> HTTP 200
+No pageerror/console.error events captured.

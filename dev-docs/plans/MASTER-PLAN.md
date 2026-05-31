@@ -1,13 +1,14 @@
 # MASTER PLAN: Novellum Development
 
-> Last reconciled: 2026-05-29 (plan-032 closeout)
+> Last reconciled: 2026-05-30 (plan-035 initiation)
 
 ## Active Plans
 
-No active plan as of 2026-05-29. Plan-032 closed.
+- [plan-035-fix-json-double-encoding](./plan-035-fix-json-double-encoding/plan.md): Fix GeneratedEntityModal Double-Encoding + JSON Hardening. Critical bug fix (UI freeze on Realms page). 1 stage, 3 phases. Status: `in-progress` (started 2026-05-30). Targets completion 2026-05-31.
 
 ## Deferred (not yet scheduled)
 
+- **plan-034-world-building-workflow-refactor** — Stage 001 complete; stages 002–004 pending. Deferred to resume after plan-035 completion.
 - **Release engineering** — code signing, notarization, brand icons, formal smoke/keyring verification. Infrastructure exists; requires external procurement. Originally plan-024 stage-002.
 
 ## Completed Plans (Archived)

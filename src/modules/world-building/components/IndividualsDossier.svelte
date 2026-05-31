@@ -85,6 +85,11 @@
 		return `/api/local-files/image?path=${encodeURIComponent(trimmed)}`;
 	}
 
+	function formatAliases(aliases: unknown): string {
+		if (!Array.isArray(aliases) || aliases.length === 0) return 'None logged';
+		return aliases.join(', ');
+	}
+
 	async function selectCharacter(id: string | null, replaceState = false) {
 		selectionOverride = id ?? '';
 		const url = new URL(page.url);
@@ -235,7 +240,7 @@
 								<h2>{selectedCharacter.name}</h2>
 								<p class="identity-panel__subhead">
 									<span>Pronunciation: {selectedCharacter.pronunciation || 'Unfiled'}</span>
-									<span>Aliases: {selectedCharacter.aliases.length ? selectedCharacter.aliases.join(', ') : 'None logged'}</span>
+									<span>Aliases: {formatAliases(selectedCharacter.aliases)}</span>
 								</p>
 								<div class="identity-panel__tags">
 									<span>{selectedCharacter.diasporaOrigin || 'Diaspora origin pending'}</span>

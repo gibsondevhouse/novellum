@@ -1,0 +1,42 @@
+$ node scripts/repair-json-fields.mjs --db-path /tmp/novellum-json-repair-test.db --dry-run
+Scanning DB: /tmp/novellum-json-repair-test.db
+Mode: dry-run (no writes)
+
+locations: scanned 1 row(s), repaired 1 field(s) across 1 row(s)
+characters: scanned 1 row(s), repaired 1 field(s) across 1 row(s)
+lore_entries: scanned 1 row(s), repaired 1 field(s) across 1 row(s)
+plot_threads: scanned 1 row(s), repaired 1 field(s) across 1 row(s)
+timeline_events: scanned 1 row(s), repaired 1 field(s) across 1 row(s)
+
+Dry-run complete. 5 field(s) in 5 row(s) would be repaired.
+
+$ node scripts/repair-json-fields.mjs --db-path /tmp/novellum-json-repair-test.db
+Scanning DB: /tmp/novellum-json-repair-test.db
+Mode: apply repairs
+
+locations: scanned 1 row(s), repaired 1 field(s) across 1 row(s)
+characters: scanned 1 row(s), repaired 1 field(s) across 1 row(s)
+lore_entries: scanned 1 row(s), repaired 1 field(s) across 1 row(s)
+plot_threads: scanned 1 row(s), repaired 1 field(s) across 1 row(s)
+timeline_events: scanned 1 row(s), repaired 1 field(s) across 1 row(s)
+
+Repair complete. 5 field(s) in 5 row(s) repaired.
+
+$ node --input-type=module <<NODE (verification query)
+{
+  "location": {
+    "tags": "[\"arcane\",\"coastal\"]"
+  },
+  "character": {
+    "traits": "[\"patient\"]"
+  },
+  "lore": {
+    "tags": "[\"archive\"]"
+  },
+  "thread": {
+    "relatedSceneIds": "[\"scene-1\"]"
+  },
+  "event": {
+    "relatedCharacterIds": "[\"char-1\"]"
+  }
+}
