@@ -1,0 +1,29 @@
+Plan: plan-036-context-priority-generation
+Stage/Phase/Part: stage-001 / phase-001 / part-001
+Date: 2026-05-31
+
+Implemented:
+- Added typed generation context module:
+  - src/modules/world-building/services/generation-context.ts
+- Wired generationContext through:
+  - src/modules/world-building/services/worldbuilding-generation-service.ts
+  - src/modules/world-building/stores/generation-draft.svelte.ts
+  - src/routes/api/worldbuilding/generate/+server.ts
+- Added regression coverage:
+  - tests/routes/worldbuilding-generate-route.test.ts
+    - structured generationContext payload accepted
+    - legacy context string remains supported
+
+Commands run:
+1) pnpm test tests/routes/worldbuilding-generate-route.test.ts
+   - PASS (1 file, 4 tests)
+2) pnpm exec eslint src/modules/world-building/services/generation-context.ts src/modules/world-building/services/worldbuilding-generation-service.ts src/modules/world-building/stores/generation-draft.svelte.ts src/routes/api/worldbuilding/generate/+server.ts tests/routes/worldbuilding-generate-route.test.ts
+   - PASS
+3) pnpm lint
+   - FAIL (pre-existing unrelated errors in world-building Svelte components)
+4) pnpm check
+   - FAIL (pre-existing unrelated type error: DomainCounts export mismatch in world-building route)
+
+Notes:
+- Part implementation is complete functionally for contract wiring.
+- Part remains in-progress pending full-repo lint/check baseline cleanup outside this part scope.

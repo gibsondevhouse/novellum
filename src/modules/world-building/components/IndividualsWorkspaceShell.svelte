@@ -179,6 +179,9 @@
 	:global(.name-item) {
 		width: 100%;
 		display: grid;
+		justify-items: start;
+		text-align: left;
+		justify-content: start !important;
 		gap: 0.2rem;
 		padding: var(--space-2) var(--space-3);
 		border: 1px solid transparent;
@@ -200,9 +203,11 @@
 
 	:global(.name-item__subtitle),
 	:global(.name-item__meta) {
+		display: block;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+		text-align: left;
 	}
 
 	:global(.name-item__subtitle) {

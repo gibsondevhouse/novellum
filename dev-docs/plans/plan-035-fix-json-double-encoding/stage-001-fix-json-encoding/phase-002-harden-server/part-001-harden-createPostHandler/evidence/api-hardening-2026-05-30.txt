@@ -1,0 +1,21 @@
+$ sed -n "96,126p" src/lib/server/api-helpers.ts
+		const entity: Record<string, unknown> = {
+			id: crypto.randomUUID(),
+			createdAt: now,
+			updatedAt: now,
+		};
+
+		for (const [name, def] of Object.entries(fields)) {
+			if (def.json) {
+				const value = body[name] ?? def.default ?? [];
+				entity[name] = typeof value === 'string' ? value : encodeJson(value);
+			} else {
+				entity[name] = body[name] ?? def.default;
+			}
+		}
+
+		db.prepare(sql).run(entity);
+
+		return json(decode ? decode({ ...entity }) : entity, { status: 201 });
+	};
+}

@@ -11,13 +11,28 @@
 	import { locale } from '$lib/i18n';
 	import {
 		buildWorldBuildingTopItems,
+		buildWorldBuildingSubItems,
 		getWorldBuildingTopSection,
+		getWorldBuildingSubSectionId,
 	} from '$modules/world-building/worldbuilding-navigation.js';
 	import { getReaderMode, setReaderMode, type ReaderMode } from '$lib/stores/reader-mode.svelte.js';
 	let isWorldBuildingRoute = $derived(page.url.pathname.includes('/world-building'));
 
 	let worldBuildingActiveId = $derived(getWorldBuildingTopSection(page.url.pathname));
 	let worldBuildingTopItems = $derived.by(() => buildWorldBuildingTopItems($locale));
+	let worldBuildingSubItems = $derived.by(() => {
+		const top = worldBuildingActiveId;
+		if (!top) return [];
+		return buildWorldBuildingSubItems(top, $locale);
+	});
+	let worldBuildingSubActiveId = $derived(getWorldBuildingSubSectionId(page.url.pathname));
+
+	function handleWorldBuildingSubSelect(id: string) {
+		if (!page.params?.id) return;
+		const target = worldBuildingSubItems.find((item) => item.id === id);
+		if (!target) return;
+		void goto(`/projects/${page.params.id}/world-building/${target.path}`);
+	}
 
 	let isSettingsRoute = $derived(page.url.pathname.startsWith('/settings'));
 	let isNovaRoute = $derived(page.url.pathname === '/nova');
@@ -282,6 +297,17 @@
 	</nav>
 {/if}
 
+{#if isWorldBuildingRoute && worldBuildingSubItems.length > 0}
+	<nav class="worldbuilding-subheader" aria-label="World building sub-sections">
+		<PillNav
+			items={worldBuildingSubItems}
+			activeId={worldBuildingSubActiveId}
+			onSelect={handleWorldBuildingSubSelect}
+			ariaLabel="World building sub-sections"
+		/>
+	</nav>
+{/if}
+
 <style>
 	.app-header {
 		display: flex;
@@ -472,6 +498,28 @@
 		background: color-mix(in srgb, var(--color-surface-hover) 88%, transparent);
 		color: var(--color-text-primary);
 		border-color: color-mix(in srgb, var(--color-border-strong) 80%, transparent);
+	}
+
+	.worldbuilding-subheader {
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0 var(--space-4);
+		border-bottom: 1px solid var(--color-border-subtle);
+		background: var(--color-surface-ground);
+		overflow-x: auto;
+		overflow-y: hidden;
+		scrollbar-width: none;
+	}
+
+	.worldbuilding-subheader::-webkit-scrollbar {
+		display: none;
+	}
+
+	.worldbuilding-subheader :global(.pill-nav) {
+		flex: 0 0 auto;
+		min-width: max-content;
 	}
 
 	@media (max-width: 960px) {

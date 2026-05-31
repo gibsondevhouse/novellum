@@ -12,6 +12,8 @@
 		getEntityKind,
 	} from '../stores/generation-draft.svelte.js';
 	import type { EntityKind } from '../services/worldbuilding-generation-service.js';
+	import type { GenerationContextPayload } from '../services/generation-context.js';
+	import PreGenerationDialog from './PreGenerationDialog.svelte';
 
 	interface Props {
 		projectId: string;
@@ -38,18 +40,49 @@
 					? '✦ Generate'
 					: `✦ Suggest ${count}`),
 	);
+
+	let dialogOpen = $state(false);
+
+	const DIALOG_ENTITY_KINDS = new Set<EntityKind>(['character', 'faction', 'lineage']);
+
+	function handleClick(): void {
+		if (disabled) return;
+		if (DIALOG_ENTITY_KINDS.has(entityKind)) {
+			dialogOpen = true;
+		} else {
+			void startGeneration(projectId, entityKind, count);
+		}
+	}
+
+	function handleDialogSubmit(ctx: GenerationContextPayload | undefined): void {
+		dialogOpen = false;
+		void startGeneration(projectId, entityKind, count, undefined, ctx);
+	}
+
+	function handleDialogCancel(): void {
+		dialogOpen = false;
+	}
 </script>
 
 <span class="generate-btn-host">
 	<GhostButton
 		type="button"
 		{disabled}
-		onclick={() => void startGeneration(projectId, entityKind, count)}
+		onclick={handleClick}
 		aria-label={`Generate ${entityKind} suggestions`}
 	>
 		{displayLabel}
 	</GhostButton>
 </span>
+
+{#if dialogOpen}
+	<PreGenerationDialog
+		{projectId}
+		{entityKind}
+		onsubmit={handleDialogSubmit}
+		oncancel={handleDialogCancel}
+	/>
+{/if}
 
 <style>
 	.generate-btn-host {

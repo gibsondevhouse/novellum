@@ -6,7 +6,8 @@ export type WorldBuildingTopSectionId =
 	| 'locations'
 	| 'lore'
 	| 'plot-threads'
-	| 'timeline';
+	| 'timeline'
+	| 'help';
 
 export type WorldBuildingTopItem = {
 	id: WorldBuildingTopSectionId;
@@ -49,6 +50,7 @@ export const WORLD_BUILDING_TOP_ITEMS: WorldBuildingTopItem[] = [
 	{ id: 'lore', label: 'The Archive' },
 	{ id: 'plot-threads', label: 'Threads' },
 	{ id: 'timeline', label: 'Chronicles' },
+	{ id: 'help', label: 'Help' },
 ];
 
 function localized(
@@ -72,6 +74,7 @@ export const WORLD_BUILDING_SECTION_LABELS: Record<WorldBuildingTopSectionId, st
 	lore: 'The Archive',
 	'plot-threads': 'Threads',
 	timeline: 'Chronicles',
+	help: 'Help',
 };
 
 export const WORLD_BUILDING_LANDING_CONFIG: Record<
@@ -338,40 +341,36 @@ export function buildWorldBuildingLandingProps(
 
 export const WORLD_BUILDING_SUB_ITEMS: Record<WorldBuildingTopSectionId, WorldBuildingSubItem[]> = {
 	characters: [
-		{ id: 'overview', label: 'Overview', path: 'characters' },
 		{ id: 'individuals', label: 'Individuals', path: 'characters/individuals' },
 		{ id: 'factions', label: 'Factions', path: 'factions' },
 		{ id: 'lineages', label: 'Lineages', path: 'lineages' },
 		{ id: 'notes', label: 'Notes', path: 'characters/notes' },
 	],
 	locations: [
-		{ id: 'overview', label: 'Overview', path: 'locations' },
 		{ id: 'realms', label: 'Realms', path: 'locations/realms' },
 		{ id: 'landmarks', label: 'Landmarks', path: 'locations/landmarks' },
 		{ id: 'maps', label: 'Maps', path: 'locations/maps' },
 		{ id: 'notes', label: 'Notes', path: 'locations/notes' },
 	],
 	lore: [
-		{ id: 'overview', label: 'Overview', path: 'lore' },
 		{ id: 'myths', label: 'Myths', path: 'lore/myths' },
-		{ id: 'technology', label: 'Technology', path: 'lore/technology' },
 		{ id: 'traditions', label: 'Traditions', path: 'lore/traditions' },
+		{ id: 'technology', label: 'Technology', path: 'lore/technology' },
 		{ id: 'notes', label: 'Notes', path: 'lore/notes' },
 	],
 	'plot-threads': [
-		{ id: 'overview', label: 'Overview', path: 'plot-threads' },
 		{ id: 'major-arcs', label: 'Major Arcs', path: 'plot-threads/major-arcs' },
 		{ id: 'sub-plots', label: 'Sub-plots', path: 'plot-threads/sub-plots' },
 		{ id: 'motivations', label: 'Motivations', path: 'plot-threads/motivations' },
 		{ id: 'notes', label: 'Notes', path: 'plot-threads/notes' },
 	],
 	timeline: [
-		{ id: 'overview', label: 'Overview', path: 'timeline' },
 		{ id: 'eras', label: 'Eras', path: 'timeline/eras' },
 		{ id: 'key-events', label: 'Key Events', path: 'timeline/key-events' },
 		{ id: 'personal-histories', label: 'Personal Histories', path: 'timeline/personal-histories' },
 		{ id: 'notes', label: 'Notes', path: 'timeline/notes' },
 	],
+	help: [],
 };
 
 export function buildWorldBuildingSubItems(
@@ -390,6 +389,7 @@ const TOP_SECTION_IDS = new Set<WorldBuildingTopSectionId>([
 	'lore',
 	'plot-threads',
 	'timeline',
+	'help',
 ]);
 
 export function getWorldBuildingTopSection(pathname: string): WorldBuildingTopSectionId | null {

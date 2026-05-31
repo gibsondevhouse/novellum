@@ -2,6 +2,26 @@
 
 All notable changes to Novellum are documented here.
 
+## [Unreleased]
+
+### Added
+
+- **Context-priority generation** — Before generating characters, factions, or lineages, a pre-generation dialog surfaces candidate names extracted from the project title and synopsis. Authors can classify each as `target` (prioritize), `avoid` (deprioritize), or `neutral`. The selection is threaded as a typed `GenerationContextPayload` into the generation prompt. Manual name entry is also available.
+- **Expanded character draft fields** — AI-generated character drafts now populate `coreDesire`, `fear`, `contradiction`, `strength`, `flaw`, `storyRole`, `externalGoal`, `internalNeed`, `stakes`, `voiceSummary`, and `speechPattern` when saving to `/api/db/characters`, filling fields that were previously always empty.
+- **Draft validation layer** — `POST /api/worldbuilding/generate` now validates and normalizes each AI-generated draft through `validateGeneratedDrafts` before returning it to the UI. Drafts missing required identity fields are dropped; valid drafts in mixed arrays are retained. Returns `validation_failed` when all drafts are invalid.
+- `extractNameCandidates(title, synopsis)` — a deterministic pure-function utility for proper-noun extraction from project prose, exported from the world-building module.
+
+### Fixed
+
+- Prevented double-encoded JSON array fields created through `GeneratedEntityModal.saveDraft` across characters, locations/realms/landmarks, lore entries, plot threads, and timeline events.
+- Hardened array-consumer paths that previously called `.join()` on unexpected string payloads (`joinCommaSeparated`, Individuals Dossier aliases, Lore Entry header tags, and prompt-builder character traits).
+
+### Added (continued — JSON hardening, plan-035)
+
+- Defensive server behavior in `createPostHandler` to accept pre-stringified JSON values for `json: true` fields without re-encoding them.
+- One-time repair utility: `scripts/repair-json-fields.mjs` for existing double-encoded SQLite rows.
+- Regression coverage in `tests/db/json-encoding.test.ts` for route round-trips, pre-stringified input handling, and guard behavior.
+
 ## [1.0.0-beta.1] — 2026-Q2
 
 ### Added

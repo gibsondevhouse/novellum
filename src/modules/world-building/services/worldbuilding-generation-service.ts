@@ -6,6 +6,7 @@
  * should use the generation-draft store's `startGeneration()` instead.
  */
 import type { EntityKind } from '../../../routes/api/worldbuilding/generate/+server.js';
+import type { GenerationContextPayload } from './generation-context.js';
 
 export type { EntityKind };
 
@@ -26,6 +27,7 @@ export async function generateWorldbuildingEntities(params: {
 	entityKind: EntityKind;
 	count: 1 | 3 | 5;
 	context?: string;
+	generationContext?: GenerationContextPayload;
 	signal?: AbortSignal;
 }): Promise<GenerationResult> {
 	const response = await fetch('/api/worldbuilding/generate', {
@@ -36,6 +38,7 @@ export async function generateWorldbuildingEntities(params: {
 			entityKind: params.entityKind,
 			count: params.count,
 			context: params.context,
+			generationContext: params.generationContext,
 		}),
 		signal: params.signal,
 	});

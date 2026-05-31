@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import IndividualsWorkspaceShell from '$modules/world-building/components/IndividualsWorkspaceShell.svelte';
-	import WorldBuildingSubheaderNav from '$modules/world-building/components/WorldBuildingSubheaderNav.svelte';
 	import GenerateButton from '$modules/world-building/components/GenerateButton.svelte';
 	import GeneratedEntityModal from '$modules/world-building/components/GeneratedEntityModal.svelte';
 	import type { WorldBuildingTopSectionId } from '$modules/world-building/worldbuilding-navigation.js';
@@ -52,8 +51,6 @@
 </script>
 
 <div class="worldbuilding-section-view">
-	<WorldBuildingSubheaderNav {projectId} {topSection} {activeId} {ariaLabel} />
-
 	<IndividualsWorkspaceShell
 		characterOptions={options}
 		selectedCharacterId={selectedId}

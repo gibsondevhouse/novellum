@@ -14,6 +14,7 @@
 import { SvelteSet } from 'svelte/reactivity';
 import { generateWorldbuildingEntities } from '../services/worldbuilding-generation-service.js';
 import type { EntityKind } from '../services/worldbuilding-generation-service.js';
+import type { GenerationContextPayload } from '../services/generation-context.js';
 
 export type GenerationPhase = 'idle' | 'generating' | 'reviewing' | 'error';
 export interface GenerationProjectContext {
@@ -99,6 +100,7 @@ export async function startGeneration(
 	kind: EntityKind,
 	count: 1 | 3 | 5,
 	context?: string,
+	generationContext?: GenerationContextPayload,
 ): Promise<void> {
 	if (phase === 'generating') return; // already in-flight
 
@@ -118,6 +120,7 @@ export async function startGeneration(
 			entityKind: kind,
 			count,
 			context,
+			generationContext,
 			signal: abortController.signal,
 		});
 

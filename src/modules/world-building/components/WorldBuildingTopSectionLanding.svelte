@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { translator } from '$lib/i18n';
-	import { SectionHeader } from '$lib/components/ui/index.js';
-	import WorldBuildingSubheaderNav from '$modules/world-building/components/WorldBuildingSubheaderNav.svelte';
 	import type { WorldBuildingTopSectionId } from '$modules/world-building/worldbuilding-navigation.js';
 
 	type LandingLink = {
@@ -36,27 +34,7 @@
 </script>
 
 <div class="worldbuilding-section-view landing-shell">
-	<WorldBuildingSubheaderNav
-		{projectId}
-		{topSection}
-		activeId="overview"
-		{ariaLabel}
-	/>
-
 	<div class="landing-page">
-		<section class="hero" aria-labelledby="top-section-hero-title">
-			<SectionHeader title={title} {description} />
-			<div
-				class="hero-actions"
-				role="navigation"
-				aria-label={$translator('worldbuilding.landing.jumpNavAria')}
-			>
-				{#each links as link (link.id)}
-					<a class="hero-jump" href={`#${link.id}`}>{link.label}</a>
-				{/each}
-			</div>
-		</section>
-
 		<section class="manifesto" aria-labelledby="orientation-title">
 			<div class="manifesto-header">
 				<h2 id="orientation-title">{orientationTitle}</h2>
@@ -89,10 +67,6 @@
 						>{link.label}</a
 					>.
 				</p>
-
-				<div class="lane-actions">
-					<a class="lane-cta" href={link.href}>{$translator('worldbuilding.landing.open')} {link.label}</a>
-				</div>
 			</section>
 		{/each}
 	</div>
@@ -276,32 +250,6 @@
 
 	.lane-entry a:hover {
 		text-decoration: underline;
-	}
-
-	.lane-actions {
-		display: flex;
-		justify-content: flex-start;
-	}
-
-	.lane-cta {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		padding: var(--space-2) var(--space-4);
-		border-radius: var(--radius-md);
-		border: 1px solid color-mix(in srgb, var(--color-nova-blue) 45%, var(--color-border-default));
-		background: color-mix(in srgb, var(--color-nova-blue) 18%, transparent);
-		color: var(--color-text-primary);
-		text-decoration: none;
-		font-size: var(--text-sm);
-		font-weight: var(--font-weight-medium);
-	}
-
-	.lane-cta:hover,
-	.lane-cta:focus-visible {
-		outline: none;
-		background: color-mix(in srgb, var(--color-nova-blue) 26%, transparent);
-		border-color: var(--color-border-focus);
 	}
 
 	@media (max-width: 768px) {
