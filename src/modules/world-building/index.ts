@@ -21,6 +21,8 @@ export {
 
 // Service — entity generation
 export type { EntityKind, GenerationResult } from './services/worldbuilding-generation-service.js';
+export type { GenerationContextPayload, GenerationContextHint } from './services/generation-context.js';
+export { extractNameCandidates } from './services/generation-context.js';
 
 // Components
 export { default as CharacterCard } from './components/CharacterCard.svelte';
@@ -32,6 +34,7 @@ export { default as PlotThreadForm } from './components/PlotThreadForm.svelte';
 export { default as TimelineEventForm } from './components/TimelineEventForm.svelte';
 export { default as GenerateButton } from './components/GenerateButton.svelte';
 export { default as GeneratedEntityModal } from './components/GeneratedEntityModal.svelte';
+export { default as PreGenerationDialog } from './components/PreGenerationDialog.svelte';
 
 // Help components
 export { default as WorldbuildingHelpPanel } from './help/WorldbuildingHelpPanel.svelte';

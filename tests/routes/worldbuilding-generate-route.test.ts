@@ -146,4 +146,119 @@ describe('POST /api/worldbuilding/generate', () => {
 		};
 		expect(payload.drafts[0].realmType).toBeTypeOf('string');
 	});
+
+	it('accepts structured generationContext payload in mock mode', async () => {
+		const { POST } = await import('../../src/routes/api/worldbuilding/generate/+server.js');
+		const request = new Request('http://localhost/api/worldbuilding/generate', {
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({
+				projectId: 'proj-1',
+				entityKind: 'character',
+				count: 1,
+				generationContext: {
+					note: 'Favor project-title entities as anchors.',
+					hints: [
+						{ name: 'Oayara', intent: 'target', source: 'title' },
+						{ name: 'Ash Court', intent: 'avoid', source: 'manual' },
+					],
+				},
+			}),
+		});
+
+		const response = await POST({ request } as never);
+		expect(response.status).toBe(200);
+		const payload = (await response.json()) as {
+			entityKind: string;
+			drafts: Array<Record<string, unknown>>;
+		};
+		expect(payload.entityKind).toBe('character');
+		expect(payload.drafts).toHaveLength(1);
+		expect(payload.drafts[0].name).toBeTypeOf('string');
+		expect(payload.drafts[0].coreDesire).toBeTypeOf('string');
+		expect(payload.drafts[0].voiceSummary).toBeTypeOf('string');
+	});
+
+	it('keeps legacy context string requests working in mock mode', async () => {
+		const { POST } = await import('../../src/routes/api/worldbuilding/generate/+server.js');
+		const request = new Request('http://localhost/api/worldbuilding/generate', {
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({
+				projectId: 'proj-1',
+				entityKind: 'character',
+				count: 1,
+				context: 'Legacy free-text context still supported.',
+			}),
+		});
+
+		const response = await POST({ request } as never);
+		expect(response.status).toBe(200);
+		const payload = (await response.json()) as {
+			entityKind: string;
+			drafts: Array<Record<string, unknown>>;
+		};
+		expect(payload.entityKind).toBe('character');
+		expect(payload.drafts).toHaveLength(1);
+		expect(payload.drafts[0].name).toBeTypeOf('string');
+		expect(payload.drafts[0].storyRole).toBeTypeOf('string');
+	});
+
+	it('returns faction drafts with correct shape in mock mode', async () => {
+		const { POST } = await import('../../src/routes/api/worldbuilding/generate/+server.js');
+		const request = new Request('http://localhost/api/worldbuilding/generate', {
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({ projectId: 'proj-1', entityKind: 'faction', count: 1 }),
+		});
+
+		const response = await POST({ request } as never);
+		expect(response.status).toBe(200);
+		const payload = (await response.json()) as { drafts: Array<Record<string, unknown>> };
+		expect(payload.drafts[0].name).toBeTypeOf('string');
+		expect(payload.drafts[0].type).toBeTypeOf('string');
+		expect(payload.drafts[0].description).toBeTypeOf('string');
+	});
+
+	it('accepts context hints for lineage generation and returns normalized drafts', async () => {
+		const { POST } = await import('../../src/routes/api/worldbuilding/generate/+server.js');
+		const request = new Request('http://localhost/api/worldbuilding/generate', {
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({
+				projectId: 'proj-1',
+				entityKind: 'lineage',
+				count: 1,
+				generationContext: {
+					hints: [{ name: 'House Tal', intent: 'target', source: 'manual' }],
+				},
+			}),
+		});
+
+		const response = await POST({ request } as never);
+		expect(response.status).toBe(200);
+		const payload = (await response.json()) as { drafts: Array<Record<string, unknown>> };
+		expect(payload.drafts[0].name).toBeTypeOf('string');
+		expect(payload.drafts[0].lineageType).toBeTypeOf('string');
+	});
+
+	it('drafts returned from mock mode pass validator shape (no undefined fields)', async () => {
+		const { POST } = await import('../../src/routes/api/worldbuilding/generate/+server.js');
+		for (const entityKind of ['character', 'faction', 'lineage', 'realm', 'landmark', 'lore-entry', 'plot-thread', 'timeline-event']) {
+			const request = new Request('http://localhost/api/worldbuilding/generate', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ projectId: 'proj-1', entityKind, count: 1 }),
+			});
+			const response = await POST({ request } as never);
+			expect(response.status).toBe(200);
+			const payload = (await response.json()) as { drafts: Array<Record<string, unknown>> };
+			expect(payload.drafts).toHaveLength(1);
+			// All normalized drafts should have no undefined-valued required key
+			const draft = payload.drafts[0];
+			for (const [, v] of Object.entries(draft)) {
+				expect(v).not.toBeUndefined();
+			}
+		}
+	});
 });

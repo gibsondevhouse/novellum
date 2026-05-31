@@ -112,6 +112,75 @@ When `acceptCheckpoint(projectId, ownerId, proposalId)` is called (via the POST 
 
 Domain proposals (`vibe-worldbuild-domain` family) use `createDomainCheckpoint` but currently store directly to the `project_metadata` table. Their accept/reject flows route through the same `WorldbuildCheckpointService` endpoints.
 
+## Quick-Generate Context-Priority Flow
+
+A lighter-weight generation path under `POST /api/worldbuilding/generate` lets authors
+generate individual entity drafts (character, faction, lineage, realm, landmark, lore-entry,
+plot-thread, timeline-event) without going through the full Nova/checkpoint domain pipeline.
+This was introduced in plan-032 and extended in plan-036 to support context-priority hints.
+
+### Request shape
+
+```ts
+{
+  projectId: string;
+  entityKind: EntityKind;
+  count: 1 | 3 | 5;
+  // Optional: typed context with intent hints
+  generationContext?: {
+    note?: string;
+    hints?: Array<{
+      name: string;
+      intent: 'target' | 'avoid' | 'neutral';
+      source: 'title' | 'synopsis' | 'manual' | 'legacy';
+    }>;
+  };
+  // Legacy: plain free-text context string (still accepted)
+  context?: string;
+}
+```
+
+### Context-priority flow
+
+1. **Pre-generation dialog** (`PreGenerationDialog.svelte`) — for character, faction, and lineage
+   entity kinds, clicking the Generate button opens a dialog before dispatching the request.
+   The dialog fetches the project's title/synopsis and runs `extractNameCandidates()` to surface
+   candidate proper nouns. Authors can set each candidate's intent to `target` (prioritize) or
+   `avoid` (deprioritize). Manual name entry is also available.
+
+2. **Candidate extraction** (`extractNameCandidates` in `services/generation-context.ts`) —
+   a deterministic, pure function that splits the combined title+synopsis into sentences, then
+   collects capitalized non-sentence-initial words that are not stopwords. Returns up to 12 unique
+   candidates.
+
+3. **Server-side prompt injection** — `buildSystemPrompt` adds RULES lines for target/avoid hints:
+   - `target` hints → "Treat these entities as preferred anchors when relevant"
+   - `avoid` hints → "Do not make these entities the primary generated outputs"
+   - Both → "If a target name already exists in canon, elaborate with a distinct variant"
+
+4. **Draft validation** (`validateGeneratedDrafts` in `lib/ai/validators/worldbuilding-draft-validator.ts`) —
+   after JSON extraction, each draft is validated and normalized for its entity kind:
+   - Missing the required identity field (`name`/`title`) → draft dropped
+   - Optional fields absent → filled with safe defaults (`''` or `[]`)
+   - Mixed arrays retain valid drafts; all-invalid arrays return `validation_failed` error
+
+5. **Save path** (`GeneratedEntityModal.saveDraft`) — character saves persist all expanded
+   dossier fields: `coreDesire`, `fear`, `contradiction`, `strength`, `flaw`, `storyRole`,
+   `externalGoal`, `internalNeed`, `stakes`, `voiceSummary`, `speechPattern`.
+
+### Extending dialog kinds
+
+`DIALOG_ENTITY_KINDS` in `GenerateButton.svelte` controls which entity kinds open the
+pre-generation dialog. Currently: `character`, `faction`, `lineage`. Add new kinds there to
+enable the dialog for them.
+
+### Adding expanded fields to a new entity kind
+
+1. Add the field to the entity's draft interface in `worldbuild-agent.ts`.
+2. Update `ENTITY_SCHEMA` in the generate server to include the new field.
+3. Update `normalizeByKind` in the validator to include/default the field.
+4. Update `saveDraft` in `GeneratedEntityModal.svelte` to include the field in the POST body.
+
 ## Troubleshooting
 
 ### Schema validation failure

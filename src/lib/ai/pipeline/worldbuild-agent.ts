@@ -27,6 +27,17 @@ export interface WorldbuildCharacterDraft {
 	role: string;
 	bio: string;
 	faction: string;
+	coreDesire?: string;
+	fear?: string;
+	contradiction?: string;
+	strength?: string;
+	flaw?: string;
+	storyRole?: string;
+	externalGoal?: string;
+	internalNeed?: string;
+	stakes?: string;
+	voiceSummary?: string;
+	speechPattern?: string;
 	traits: string[];
 	goals: string[];
 	flaws: string[];
@@ -354,6 +365,17 @@ function normalizePopulatedBiblePayload(
 			role: getString(record, ['role', 'storyRole']),
 			bio: getString(record, ['bio', 'description', 'summary']),
 			faction: getString(record, ['faction', 'factionName']),
+			coreDesire: getString(record, ['coreDesire']),
+			fear: getString(record, ['fear']),
+			contradiction: getString(record, ['contradiction']),
+			strength: getString(record, ['strength']),
+			flaw: getString(record, ['flaw']),
+			storyRole: getString(record, ['storyRole', 'role']),
+			externalGoal: getString(record, ['externalGoal']),
+			internalNeed: getString(record, ['internalNeed']),
+			stakes: getString(record, ['stakes']),
+			voiceSummary: getString(record, ['voiceSummary']),
+			speechPattern: getString(record, ['speechPattern']),
 			traits: getStringArray(record, ['traits']),
 			goals: getStringArray(record, ['goals']),
 			flaws: getStringArray(record, ['flaws']),

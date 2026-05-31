@@ -1,10 +1,11 @@
 # MASTER PLAN: Novellum Development
 
-> Last reconciled: 2026-05-30 (plan-035 initiation)
+> Last reconciled: 2026-05-30 (plan-036 authored; plan-035 remains active)
 
 ## Active Plans
 
 - [plan-035-fix-json-double-encoding](./plan-035-fix-json-double-encoding/plan.md): Fix GeneratedEntityModal Double-Encoding + JSON Hardening. Critical bug fix (UI freeze on Realms page). 1 stage, 3 phases. Status: `in-progress` (started 2026-05-30). Targets completion 2026-05-31.
+- [plan-036-context-priority-generation](./plan-036-context-priority-generation/plan.md): Context-priority worldbuilding generation with typed target/avoid entity hints, expanded character draft field coverage, and faction/lineage prompt extension. 3 stages. Status: `draft` (authored 2026-05-30; queued after plan-035).
 
 ## Deferred (not yet scheduled)
 
