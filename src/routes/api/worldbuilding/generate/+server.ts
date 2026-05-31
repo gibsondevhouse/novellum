@@ -25,6 +25,13 @@ import {
 	type ActiveProvider,
 } from '$lib/ai/provider-config.js';
 import { ensureOllamaRunning } from '$lib/server/ai/ollama-launcher.js';
+import {
+	buildPromptContextNote,
+	legacyStringToGenerationContext,
+	normalizeGenerationContext,
+	type GenerationContextPayload,
+} from '$modules/world-building/services/generation-context.js';
+import { validateGeneratedDrafts } from '$lib/ai/validators/worldbuilding-draft-validator.js';
 
 const credentialService = createCredentialService();
 const openRouterProvider = createOpenRouterProvider();
@@ -62,6 +69,7 @@ interface GenerateRequestBody {
 	entityKind: EntityKind;
 	count: GenerateCount;
 	context?: string;
+	generationContext?: GenerationContextPayload;
 }
 
 // ── Provider loading (mirrors /api/ai/+server.ts) ──────────────────────────
@@ -322,7 +330,7 @@ const ENTITY_LABEL: Record<EntityKind, string> = {
 
 const ENTITY_SCHEMA: Record<EntityKind, string> = {
 	character:
-		'{"name":"string","role":"string","bio":"string","faction":"string","traits":["string"],"goals":["string"],"flaws":["string"],"tags":["string"],"notes":"string"}',
+		'{"name":"string","role":"string","bio":"string","faction":"string","coreDesire":"string","fear":"string","contradiction":"string","strength":"string","flaw":"string","storyRole":"string","externalGoal":"string","internalNeed":"string","stakes":"string","voiceSummary":"string","speechPattern":"string","traits":["string"],"goals":["string"],"flaws":["string"],"tags":["string"],"notes":"string"}',
 	faction:
 		'{"name":"string","type":"string","description":"string","mission":"string","ideology":"string"}',
 	lineage:
@@ -344,6 +352,7 @@ function buildSystemPrompt(
 	count: GenerateCount,
 	existingContext: ExistingEntityContext,
 	userContext?: string,
+	generationContext?: GenerationContextPayload,
 ): string {
 	const label = ENTITY_LABEL[entityKind];
 	const schema = ENTITY_SCHEMA[entityKind];
@@ -368,6 +377,30 @@ function buildSystemPrompt(
 		entityKind === 'lineage'
 			? '\nTreat a lineage as a dynasty/house/bloodline with inherited social consequence. Do not output character-sheet prose.'
 			: '';
+	const characterFieldGuidance =
+		entityKind === 'character'
+			? '\nFor character fields `coreDesire`, `fear`, `contradiction`, `strength`, `flaw`, `storyRole`, `externalGoal`, `internalNeed`, `stakes`, `voiceSummary`, and `speechPattern`, return concrete, story-specific values (not placeholders).'
+			: '';
+	const targetNames =
+		generationContext?.hints
+			?.filter((hint) => hint.intent === 'target')
+			.map((hint) => hint.name) ?? [];
+	const avoidNames =
+		generationContext?.hints
+			?.filter((hint) => hint.intent === 'avoid')
+			.map((hint) => hint.name) ?? [];
+	const targetRule =
+		targetNames.length > 0
+			? `\n- Treat these entities as preferred anchors when relevant: ${targetNames.join(', ')}.`
+			: '';
+	const avoidRule =
+		avoidNames.length > 0
+			? `\n- Do not make these entities the primary generated outputs: ${avoidNames.join(', ')}.`
+			: '';
+	const duplicateTargetRule =
+		targetNames.length > 0
+			? '\n- If a target name already exists in canon, elaborate with a distinct variant or associate rather than reusing an exact duplicate.'
+			: '';
 
 	return `You are a fiction worldbuilding assistant. Generate exactly ${count} ${label}(s) that feel grounded in the project below.
 
@@ -375,7 +408,7 @@ PROJECT
 Title: ${project.title || 'Untitled'}
 Genre: ${project.genre || 'Unspecified'}
 Logline: ${project.logline || '(not yet written)'}
-Synopsis: ${project.synopsis || '(not yet written)'}${existingNameNote}${existingSummaryNote}${contextNote}${realmTypeGuidance}${landmarkGuidance}${lineageGuidance}
+Synopsis: ${project.synopsis || '(not yet written)'}${existingNameNote}${existingSummaryNote}${contextNote}${realmTypeGuidance}${landmarkGuidance}${lineageGuidance}${characterFieldGuidance}
 
 TASK
 Return ONLY a valid JSON array. Each element must match this schema exactly:
@@ -386,7 +419,7 @@ RULES
 - Use the project logline and synopsis to make the ${label}(s) feel like they belong in this story.
 - Every string field must be non-empty.
 - Array fields must have at least one element.
-- Do not reuse any names from the existing names list.`;
+- Do not reuse any names from the existing names list.${targetRule}${avoidRule}${duplicateTargetRule}`;
 }
 
 // ── JSON array extraction ──────────────────────────────────────────────────
@@ -426,6 +459,17 @@ function mockDrafts(entityKind: EntityKind, count: GenerateCount): unknown[] {
 				role: 'Supporting',
 				bio: 'A compelling figure with hidden depths.',
 				faction: 'Unknown',
+				coreDesire: 'To reclaim a stolen inheritance.',
+				fear: 'Becoming the very force they resist.',
+				contradiction: 'Compassionate in private, ruthless in strategy.',
+				strength: 'Exceptional pattern recognition under pressure.',
+				flaw: 'Refuses help until too late.',
+				storyRole: 'Pressure catalyst for the protagonist.',
+				externalGoal: 'Secure proof that clears their family name.',
+				internalNeed: 'Trust allies without controlling them.',
+				stakes: 'Failure means exile and civil unrest.',
+				voiceSummary: 'Measured cadence with surgical precision.',
+				speechPattern: 'Short clauses, then sudden vivid metaphors.',
 				traits: ['perceptive', 'loyal'],
 				goals: ['find belonging'],
 				flaws: ['overly cautious'],
@@ -501,7 +545,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		error(400, 'Invalid JSON body');
 	}
 
-	const { projectId, entityKind, count, context } = body as GenerateRequestBody;
+	const { projectId, entityKind, count, context, generationContext } = body as GenerateRequestBody;
 
 	if (!projectId || typeof projectId !== 'string') {
 		error(400, 'Missing projectId');
@@ -512,6 +556,11 @@ export const POST: RequestHandler = async ({ request }) => {
 	if (!VALID_COUNTS.includes(count as GenerateCount)) {
 		error(400, 'count must be 1, 3, or 5');
 	}
+
+	const normalizedGenerationContext =
+		normalizeGenerationContext(generationContext) ??
+		legacyStringToGenerationContext(typeof context === 'string' ? context : undefined);
+	const promptContextNote = buildPromptContextNote(normalizedGenerationContext);
 
 	// Load project
 	const project = db
@@ -531,8 +580,9 @@ export const POST: RequestHandler = async ({ request }) => {
 	if (providerResult.kind === 'no_creds') return noCredsResponse();
 
 	if (providerResult.kind === 'mock') {
+		const mockValidation = validateGeneratedDrafts(mockDrafts(entityKind, count), entityKind, count);
 		return json({
-			drafts: mockDrafts(entityKind, count),
+			drafts: mockValidation.ok ? mockValidation.drafts : mockDrafts(entityKind, count),
 			entityKind,
 			projectContext: { title: project.title, genre: project.genre, logline: project.logline },
 			...(missingContext ? { warning: 'logline_missing' } : {}),
@@ -544,7 +594,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		entityKind,
 		count,
 		existingContext,
-		typeof context === 'string' ? context : undefined,
+		promptContextNote,
+		normalizedGenerationContext,
 	);
 
 	const { provider, apiKey, modelOverride } = providerResult;
@@ -558,9 +609,9 @@ export const POST: RequestHandler = async ({ request }) => {
 			signal: request.signal,
 		});
 
-		const drafts = extractJsonArray(result.content);
+		const rawDrafts = extractJsonArray(result.content);
 
-		if (drafts.length === 0) {
+		if (rawDrafts.length === 0) {
 			return json(
 				{
 					error: {
@@ -572,8 +623,22 @@ export const POST: RequestHandler = async ({ request }) => {
 			);
 		}
 
+		const validation = validateGeneratedDrafts(rawDrafts, entityKind, count);
+
+		if (!validation.ok) {
+			return json(
+				{
+					error: {
+						code: 'validation_failed',
+						message: validation.error.message,
+					},
+				},
+				{ status: 502 },
+			);
+		}
+
 		return json({
-			drafts: drafts.slice(0, count),
+			drafts: validation.drafts,
 			entityKind,
 			projectContext: {
 				title: project.title,

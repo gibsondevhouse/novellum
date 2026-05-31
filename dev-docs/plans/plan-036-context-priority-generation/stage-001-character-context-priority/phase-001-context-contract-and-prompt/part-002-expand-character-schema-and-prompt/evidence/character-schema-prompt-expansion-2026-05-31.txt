@@ -1,0 +1,29 @@
+Plan: plan-036-context-priority-generation
+Stage/Phase/Part: stage-001 / phase-001 / part-002
+Date: 2026-05-31
+
+Implemented:
+- Expanded character generation output schema in route prompt contract to include:
+  coreDesire, fear, contradiction, strength, flaw, storyRole,
+  externalGoal, internalNeed, stakes, voiceSummary, speechPattern.
+- Added explicit target/avoid rules in prompt assembly when generationContext hints are present.
+- Added character-specific guidance requiring concrete advanced-field values.
+- Expanded mock character drafts with advanced fields for local mock parity.
+- Extended character draft typing/parsing support:
+  - src/lib/ai/pipeline/worldbuild-agent.ts
+  - src/lib/ai/pipeline/worldbuild-schemas.ts
+- Added tests:
+  - tests/world-building/generation-context.test.ts
+  - tests/routes/worldbuilding-generate-route.test.ts (expanded assertions)
+
+Commands run:
+1) pnpm test tests/routes/worldbuilding-generate-route.test.ts tests/world-building/generation-context.test.ts
+   - PASS (2 files, 8 tests)
+2) pnpm exec eslint src/modules/world-building/services/generation-context.ts src/modules/world-building/services/worldbuilding-generation-service.ts src/modules/world-building/stores/generation-draft.svelte.ts src/routes/api/worldbuilding/generate/+server.ts src/lib/ai/pipeline/worldbuild-agent.ts src/lib/ai/pipeline/worldbuild-schemas.ts tests/routes/worldbuilding-generate-route.test.ts tests/world-building/generation-context.test.ts
+   - PASS
+3) pnpm check
+   - FAIL (pre-existing unrelated error: DomainCounts export mismatch in world-building route)
+
+Notes:
+- Functional scope for part-002 is complete.
+- Part remains in-progress pending global typecheck baseline cleanup outside part scope.
