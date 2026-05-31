@@ -389,17 +389,24 @@ function buildSystemPrompt(
 		generationContext?.hints
 			?.filter((hint) => hint.intent === 'avoid')
 			.map((hint) => hint.name) ?? [];
+
+	// Cap targets to requested count so we don't ask for more than we generate
+	const cappedTargetNames = targetNames.slice(0, count as number);
+	const remainingCount = (count as number) - cappedTargetNames.length;
+
 	const targetRule =
-		targetNames.length > 0
-			? `\n- Treat these entities as preferred anchors when relevant: ${targetNames.join(', ')}.`
+		cappedTargetNames.length > 0
+			? `\n- You MUST generate a profile for each of these named characters (use their exact names as-is, do NOT rename them): ${cappedTargetNames.join(', ')}.`
 			: '';
+	const remainingRule =
+		cappedTargetNames.length > 0 && remainingCount > 0
+			? `\n- The remaining ${remainingCount} character(s) may be newly invented to fit the story world.`
+			: cappedTargetNames.length > 0 && remainingCount === 0
+				? `\n- Only generate profiles for the targeted characters above — do not invent additional ones.`
+				: '';
 	const avoidRule =
 		avoidNames.length > 0
-			? `\n- Do not make these entities the primary generated outputs: ${avoidNames.join(', ')}.`
-			: '';
-	const duplicateTargetRule =
-		targetNames.length > 0
-			? '\n- If a target name already exists in canon, elaborate with a distinct variant or associate rather than reusing an exact duplicate.'
+			? `\n- Do NOT generate any ${label} with these names: ${avoidNames.join(', ')}.`
 			: '';
 
 	return `You are a fiction worldbuilding assistant. Generate exactly ${count} ${label}(s) that feel grounded in the project below.
@@ -419,7 +426,7 @@ RULES
 - Use the project logline and synopsis to make the ${label}(s) feel like they belong in this story.
 - Every string field must be non-empty.
 - Array fields must have at least one element.
-- Do not reuse any names from the existing names list.${targetRule}${avoidRule}${duplicateTargetRule}`;
+- Do not reuse any names from the existing names list.${targetRule}${remainingRule}${avoidRule}`;
 }
 
 // ── JSON array extraction ──────────────────────────────────────────────────

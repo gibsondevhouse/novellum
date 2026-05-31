@@ -1,16 +1,15 @@
 <!--
   PreGenerationDialog — pre-generation context controls for worldbuilding entity generation.
 
-  Surfaces candidate names extracted from the project title/synopsis and lets authors
-  classify each as target/avoid/neutral before generation is dispatched.
+  Lets authors name specific entities they want profiles generated for.
+  Existing project records are shown as informational context (server already prevents duplicates).
 
   Uses position:fixed so it overlays the viewport regardless of container stacking.
 -->
 <script lang="ts">
 	import { GhostButton } from '$lib/components/ui/index.js';
 	import type { EntityKind } from '../services/worldbuilding-generation-service.js';
-	import type { GenerationContextPayload, GenerationHintIntent } from '../services/generation-context.js';
-	import { extractNameCandidates } from '../services/generation-context.js';
+	import type { GenerationContextPayload } from '../services/generation-context.js';
 
 	interface Props {
 		projectId: string;
@@ -20,11 +19,6 @@
 	}
 
 	let { projectId, entityKind, onsubmit, oncancel }: Props = $props();
-
-	interface CandidateHint {
-		name: string;
-		intent: GenerationHintIntent;
-	}
 
 	const ENTITY_LABELS: Record<EntityKind, string> = {
 		character: 'Characters',
@@ -37,59 +31,74 @@
 		'timeline-event': 'Timeline Events',
 	};
 
+	const ENTITY_SINGULAR: Record<EntityKind, string> = {
+		character: 'character',
+		faction: 'faction',
+		lineage: 'lineage',
+		realm: 'realm',
+		landmark: 'landmark',
+		'lore-entry': 'lore entry',
+		'plot-thread': 'plot thread',
+		'timeline-event': 'timeline event',
+	};
+
+	// Map entityKind to its DB endpoint (best-effort — graceful on failure)
+	const ENTITY_ENDPOINT: Partial<Record<EntityKind, string>> = {
+		character: '/api/db/characters',
+		faction: '/api/db/factions',
+	};
+
 	let loading = $state(true);
-	let candidates = $state<CandidateHint[]>([]);
+	let existingNames = $state<string[]>([]);
+	let targets = $state<string[]>([]);
 	let manualInput = $state('');
 
 	$effect(() => {
 		loading = true;
-		void fetch(`/api/db/projects/${projectId}`)
-			.then((r) => (r.ok ? (r.json() as Promise<Record<string, unknown>>) : Promise.reject(new Error('Not found'))))
-			.then((project) => {
-				const title = typeof project.title === 'string' ? project.title : '';
-				const synopsis = typeof project.synopsis === 'string' ? project.synopsis : '';
-				const extracted = extractNameCandidates(title, synopsis);
-				candidates = extracted.map((name) => ({ name, intent: 'neutral' }));
-			})
-			.catch(() => {
-				candidates = [];
-			})
-			.finally(() => {
-				loading = false;
-			});
+		const endpoint = ENTITY_ENDPOINT[entityKind];
+		const fetchPromise = endpoint
+			? fetch(`${endpoint}?projectId=${encodeURIComponent(projectId)}`)
+					.then((r) => (r.ok ? (r.json() as Promise<unknown[]>) : Promise.resolve([])))
+					.then((rows) => {
+						existingNames = (rows as Record<string, unknown>[])
+							.map((c) => String(c.name ?? ''))
+							.filter(Boolean);
+					})
+			: Promise.resolve();
+		void fetchPromise
+			.catch(() => { existingNames = []; })
+			.finally(() => { loading = false; });
 	});
 
-	function setIntent(index: number, intent: GenerationHintIntent): void {
-		candidates = candidates.map((c, i) => (i === index ? { ...c, intent } : c));
+	function addTarget(name: string): void {
+		const n = name.trim().slice(0, 120);
+		if (!n) return;
+		const lower = n.toLowerCase();
+		if (targets.some((t) => t.toLowerCase() === lower)) return;
+		targets = [...targets, n];
+		manualInput = '';
 	}
 
-	function addManualCandidate(): void {
-		const name = manualInput.trim().slice(0, 120);
-		if (!name) return;
-		const alreadyExists = candidates.some((c) => c.name.toLowerCase() === name.toLowerCase());
-		if (!alreadyExists) {
-			candidates = [...candidates, { name, intent: 'target' }];
-		}
-		manualInput = '';
+	function removeTarget(name: string): void {
+		targets = targets.filter((t) => t !== name);
 	}
 
 	function handleManualKeydown(e: KeyboardEvent): void {
 		if (e.key === 'Enter') {
 			e.preventDefault();
-			addManualCandidate();
+			addTarget(manualInput);
 		}
 	}
 
 	function buildContext(): GenerationContextPayload | undefined {
-		const hints = candidates
-			.filter((c) => c.intent !== 'neutral')
-			.map((c) => ({
-				name: c.name,
-				intent: c.intent,
+		if (targets.length === 0) return undefined;
+		return {
+			hints: targets.map((name) => ({
+				name,
+				intent: 'target' as const,
 				source: 'manual' as const,
-			}));
-		if (hints.length === 0) return undefined;
-		return { hints };
+			})),
+		};
 	}
 
 	function handleSubmit(): void {
@@ -108,7 +117,14 @@
 	}
 
 	const entityLabel = $derived(ENTITY_LABELS[entityKind] ?? entityKind);
-	const hasCandidates = $derived(candidates.length > 0);
+	const singular = $derived(ENTITY_SINGULAR[entityKind] ?? entityKind);
+	const generateLabel = $derived(
+		targets.length === 1
+			? `Generate profile for ${targets[0]}`
+			: targets.length > 1
+				? `Generate ${targets.length} ${entityLabel.toLowerCase()}`
+				: `Generate original ${singular}s from story context`,
+	);
 </script>
 
 <svelte:window onkeydown={handleWindowKeydown} />
@@ -134,65 +150,61 @@
 		{#if loading}
 			<div class="pregen-loading" aria-live="polite">
 				<div class="pregen-spinner" aria-hidden="true"></div>
-				<p class="pregen-loading-label">Loading project context…</p>
+				<p class="pregen-loading-label">Loading…</p>
 			</div>
 		{:else}
-			<p class="pregen-hint-label">
-				{#if hasCandidates}
-					Optionally mark names as <strong>target</strong> (prioritize) or <strong>avoid</strong> before generating. Unset names are neutral.
+			<div class="pregen-input-section">
+				<label class="pregen-input-label" for="pregen-name-input">
+					Name specific {entityLabel.toLowerCase()} to generate profiles for
+				</label>
+				<div class="pregen-manual-row">
+					<input
+						id="pregen-name-input"
+						type="text"
+						class="pregen-manual-input"
+						placeholder="Type a name and press Enter…"
+						bind:value={manualInput}
+						onkeydown={handleManualKeydown}
+						autofocus
+						maxlength="120"
+					/>
+					<button
+						type="button"
+						class="pregen-manual-add"
+						onclick={() => addTarget(manualInput)}
+						disabled={!manualInput.trim()}
+					>
+						Add
+					</button>
+				</div>
+
+				{#if targets.length > 0}
+					<ul class="pregen-target-list" role="list" aria-label="Names to generate">
+						{#each targets as name (name)}
+							<li class="pregen-target-chip">
+								<span class="pregen-target-name">{name}</span>
+								<button
+									type="button"
+									class="pregen-target-remove"
+									aria-label="Remove {name}"
+									onclick={() => removeTarget(name)}
+								>×</button>
+							</li>
+						{/each}
+					</ul>
 				{:else}
-					No candidate names found in your project title or synopsis. You can still generate, or add names below.
+					<p class="pregen-empty-hint">
+						Leave empty to generate original {entityLabel.toLowerCase()} grounded in your story.
+					</p>
 				{/if}
-			</p>
-
-			{#if hasCandidates}
-				<ul class="pregen-candidate-list" role="list" aria-label="Candidate names">
-					{#each candidates as candidate, i (candidate.name)}
-						<li class="pregen-candidate">
-							<span class="pregen-candidate-name">{candidate.name}</span>
-							<div
-								class="pregen-intent-group"
-								role="group"
-								aria-label="Intent for {candidate.name}"
-							>
-								{#each (['target', 'avoid', 'neutral'] as const) as intent (intent)}
-									<button
-										type="button"
-										class="pregen-intent-btn"
-										class:is-active={candidate.intent === intent}
-										class:is-target={intent === 'target' && candidate.intent === 'target'}
-										class:is-avoid={intent === 'avoid' && candidate.intent === 'avoid'}
-										onclick={() => setIntent(i, intent)}
-										aria-pressed={candidate.intent === intent}
-									>
-										{intent}
-									</button>
-								{/each}
-							</div>
-						</li>
-					{/each}
-				</ul>
-			{/if}
-
-			<div class="pregen-manual-row">
-				<input
-					type="text"
-					class="pregen-manual-input"
-					placeholder="Add a name…"
-					bind:value={manualInput}
-					onkeydown={handleManualKeydown}
-					aria-label="Add a name hint"
-					maxlength="120"
-				/>
-				<button
-					type="button"
-					class="pregen-manual-add"
-					onclick={addManualCandidate}
-					disabled={!manualInput.trim()}
-				>
-					Add
-				</button>
 			</div>
+
+			{#if existingNames.length > 0}
+				<div class="pregen-existing-section" aria-label="Existing {entityLabel.toLowerCase()}">
+					<span class="pregen-existing-label">Already in your story (won't be duplicated):</span>
+					<span class="pregen-existing-names">{existingNames.join(', ')}</span>
+				</div>
+			{/if}
 		{/if}
 	</div>
 
@@ -204,7 +216,7 @@
 			disabled={loading}
 			onclick={handleSubmit}
 		>
-			Generate
+			{generateLabel}
 		</button>
 	</div>
 </div>
@@ -309,86 +321,86 @@
 		color: var(--color-text-muted);
 	}
 
-	.pregen-hint-label {
-		margin: 0;
-		font-size: var(--text-xs);
-		color: var(--color-text-secondary);
-		line-height: var(--leading-relaxed);
+	.pregen-input-section {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
 	}
 
-	.pregen-candidate-list {
+	.pregen-input-label {
+		font-size: var(--text-xs);
+		color: var(--color-text-secondary);
+		font-weight: var(--font-weight-medium);
+	}
+
+	.pregen-target-list {
 		list-style: none;
 		margin: 0;
 		padding: 0;
 		display: flex;
-		flex-direction: column;
+		flex-wrap: wrap;
 		gap: var(--space-1);
 	}
 
-	.pregen-candidate {
-		display: flex;
+	.pregen-target-chip {
+		display: inline-flex;
 		align-items: center;
-		justify-content: space-between;
-		gap: var(--space-3);
-		padding: var(--space-2) var(--space-3);
-		border: 1px solid var(--color-border-subtle);
-		border-radius: var(--radius-md);
-		background: color-mix(in srgb, var(--color-surface-overlay) 30%, transparent);
-	}
-
-	.pregen-candidate-name {
-		font-size: var(--text-sm);
-		color: var(--color-text-primary);
-		font-weight: var(--font-weight-medium);
-		min-width: 0;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
-	.pregen-intent-group {
-		display: flex;
 		gap: var(--space-1);
-		flex-shrink: 0;
-	}
-
-	.pregen-intent-btn {
-		font-size: var(--text-xs);
-		padding: 2px var(--space-2);
+		padding: var(--space-1) var(--space-2);
 		border-radius: var(--radius-full);
-		border: 1px solid var(--color-border-subtle);
-		background: transparent;
-		color: var(--color-text-muted);
-		cursor: pointer;
-		line-height: 1.5;
-		transition:
-			background var(--duration-fast) var(--ease-standard),
-			color var(--duration-fast) var(--ease-standard),
-			border-color var(--duration-fast) var(--ease-standard);
-	}
-
-	.pregen-intent-btn:hover:not(.is-active) {
-		background: var(--color-surface-overlay);
-		color: var(--color-text-secondary);
-	}
-
-	.pregen-intent-btn.is-active {
-		background: var(--color-surface-overlay);
-		color: var(--color-text-primary);
-		border-color: var(--color-border-default);
-		font-weight: var(--font-weight-semibold);
-	}
-
-	.pregen-intent-btn.is-target {
 		background: color-mix(in srgb, var(--color-nova-blue) 15%, transparent);
-		color: var(--color-nova-blue);
-		border-color: color-mix(in srgb, var(--color-nova-blue) 40%, transparent);
+		border: 1px solid color-mix(in srgb, var(--color-nova-blue) 40%, transparent);
 	}
 
-	.pregen-intent-btn.is-avoid {
-		background: color-mix(in srgb, var(--color-warning) 12%, transparent);
+	.pregen-target-name {
+		font-size: var(--text-xs);
+		color: var(--color-nova-blue);
+		font-weight: var(--font-weight-medium);
+	}
+
+	.pregen-target-remove {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 14px;
+		height: 14px;
+		border: none;
+		background: transparent;
+		color: var(--color-nova-blue);
+		font-size: var(--text-sm);
+		line-height: 1;
+		cursor: pointer;
+		opacity: 0.7;
+		padding: 0;
+	}
+
+	.pregen-target-remove:hover {
+		opacity: 1;
+	}
+
+	.pregen-empty-hint {
+		margin: 0;
+		font-size: var(--text-xs);
+		color: var(--color-text-muted);
+		font-style: italic;
+	}
+
+	.pregen-existing-section {
+		padding: var(--space-2) var(--space-3);
+		border-radius: var(--radius-md);
+		background: color-mix(in srgb, var(--color-surface-overlay) 40%, transparent);
+		border: 1px solid var(--color-border-subtle);
+		font-size: var(--text-xs);
+		line-height: var(--leading-relaxed);
+	}
+
+	.pregen-existing-label {
+		color: var(--color-text-muted);
+		margin-right: var(--space-1);
+	}
+
+	.pregen-existing-names {
 		color: var(--color-text-secondary);
-		border-color: color-mix(in srgb, var(--color-warning) 30%, transparent);
 	}
 
 	.pregen-manual-row {
