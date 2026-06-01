@@ -6,10 +6,13 @@
 
 ## Current
 
-[plan-035-fix-json-double-encoding](./plan-035-fix-json-double-encoding/plan.md) — Fix GeneratedEntityModal Double-Encoding + JSON Hardening. Critical bug fix blocking Realms navigation. Stage 001 with 3 phases: source fixes (pre-encoding removal + type guards), server hardening, DB repair + tests. Started 2026-05-30.
+No active plan. Await user direction for next work.
 
 ## Recently completed
 
+- [plan-037-agentic-worldbuild-scan](./plan-037-agentic-worldbuild-scan/plan.md) — Agentic worldbuild scan + review-gated proposal flow. Closed 2026-05-31 with all 5 stages complete. Scan contract, proposal schema, pending notification UI, atomic accept/reject, 72 new tests. Quality gates: check (0 errors), test (209 files / 1545 tests), tokens (0 violations). Pre-existing lint errors documented; scan AI execution deferred to follow-up plan.
+- [plan-036-context-priority-generation](./plan-036-context-priority-generation/plan.md) — Context-priority worldbuilding generation with typed target/avoid hints, expanded character draft field coverage, and faction/lineage extension. Closed 2026-05-30 (PR #26 merge).
+- [plan-035-fix-json-double-encoding](./plan-035-fix-json-double-encoding/plan.md) — GeneratedEntityModal JSON hardening and double-encoding fix for world-building draft saves. Closed 2026-05-30 (PR #25 merge).
 - [plan-034-world-building-workflow-refactor](./plan-034/plan.md) — World Building Workflow Refactor. Stage 001 (Foundation Refactor) complete. Stages 002–004 pending.
 - [plan-032-worldbuilding-generation-engine](./plan-032-worldbuilding-generation-engine/plan.md) — Worldbuilding Generation Engine + Help Disclosure. Closed 2026-05-29. Proactive one-click entity generation (character / faction / realm / landmark / lore-entry / plot-thread / timeline-event) with review modal; help-disclosure toggles on all worldbuilding landing pages; AppShell transition token fix. Quality gates: `pnpm check` (0 errors), `pnpm lint` (clean), `pnpm lint:css` (clean), `pnpm test` (194 files / 1359 tests), `pnpm check:tokens` (0 violations).
 - [plan-031-nova-vscode-copilot-parity](./plan-031-nova-vscode-copilot-parity/plan.md) — Nova VS Code Copilot Parity. Closed 2026-05-28 with all 5 stages complete. Compact sidepanel, Ask/Write/Agent modes, real attachments, bounded agentic tool loop (MAX_AGENT_STEPS=8), source-contract tests. Quality gates: `pnpm check` (0 errors), `pnpm lint` (clean), `pnpm lint:css` (clean), `pnpm test` (194 files / 1358 tests), `pnpm check:tokens` (0 violations). Visual test waived on same basis as plan-030.

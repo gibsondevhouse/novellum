@@ -2,10 +2,10 @@
 title: Fix GeneratedEntityModal Double-Encoding + JSON Hardening
 slug: plan-035-fix-json-double-encoding
 version: 1.0.0
-status: in-progress
+status: complete
 owner: Planner Agent
 created: 2026-05-30
-last_updated: 2026-05-30
+last_updated: 2026-05-31
 target_completion: 2026-05-31
 stages:
   - stage-001-fix-json-encoding
