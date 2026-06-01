@@ -42,3 +42,27 @@ part: part-001-sync-docs-and-capture-quality-gate-evidence
 **Notes:** Part and phase advanced to `complete`. Plan-037 is closed.
 
 ---
+
+### [2026-06-01 22:20] Agent: Codex
+
+**Action:** Wired the previously deferred scan execution path and refreshed closeout evidence.
+
+**Result:**
+- Implemented executable `POST /api/worldbuilding/scan` behavior: provider/mock loading, scan prompt construction, response extraction, proposal normalization, canon/pending dedupe, and `project_metadata` persistence under `vibe-worldbuild-scan`.
+- Added `WORLDBUILD_PROPOSAL_OWNER_ID`, `persistWorldbuildProposal`, `acceptProposalAtomically`, and `rejectProposalAtomically`.
+- Updated accept/reject proposal routes to use the scan-proposal atomic path with legacy checkpoint fallback preserved.
+- Retargeted `WorldbuildingProposalCard` to `WorldbuildProposalRecord` so proposed scan UI type-checks.
+- Updated scan route tests from the old 501 placeholder contract to executable mock-mode scan and persistence coverage.
+- Updated current docs, changelog, plan tracker, and master tracker to remove the scan-execution-deferred claim.
+- Created `evidence/scan-execution-implementation-2026-06-01.md`.
+
+**Quality gates:**
+- `pnpm check`: PASS — 0 errors, 11 pre-existing warnings
+- `pnpm test`: PASS — 209 files / 1546 tests
+- `pnpm lint`: FAIL — 9 pre-existing unused-var errors in world-building components; no new implementation errors
+- `pnpm lint:css`: FAIL — 1 pre-existing duplicate-property error in `IndividualsWorkspaceShell.svelte`
+- `pnpm check:tokens`: PASS — 337 files, 0 violations
+
+**Notes:** Plan remains `complete`; this entry closes the deferred scan-execution risk documented in the 2026-05-31 evidence.
+
+---

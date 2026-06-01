@@ -6,6 +6,8 @@ All notable changes to Novellum are documented here.
 
 ### Added
 
+- **Agentic worldbuild scan execution** — `POST /api/worldbuilding/scan` now generates review-gated `pending_review` proposals, dedupes them against canon and pending suggestions, persists them under `vibe-worldbuild-scan`, and keeps all scan output non-canonical until explicit accept.
+- **Atomic scan proposal decisions** — scan proposal accept/reject routes now use transaction-backed mutation helpers; accepted proposals project to canon only inside the accept transaction, and failed projection leaves proposals pending.
 - **Context-priority generation** — Before generating characters, factions, or lineages, a pre-generation dialog surfaces candidate names extracted from the project title and synopsis. Authors can classify each as `target` (prioritize), `avoid` (deprioritize), or `neutral`. The selection is threaded as a typed `GenerationContextPayload` into the generation prompt. Manual name entry is also available.
 - **Expanded character draft fields** — AI-generated character drafts now populate `coreDesire`, `fear`, `contradiction`, `strength`, `flaw`, `storyRole`, `externalGoal`, `internalNeed`, `stakes`, `voiceSummary`, and `speechPattern` when saving to `/api/db/characters`, filling fields that were previously always empty.
 - **Draft validation layer** — `POST /api/worldbuilding/generate` now validates and normalizes each AI-generated draft through `validateGeneratedDrafts` before returning it to the UI. Drafts missing required identity fields are dropped; valid drafts in mixed arrays are retained. Returns `validation_failed` when all drafts are invalid.

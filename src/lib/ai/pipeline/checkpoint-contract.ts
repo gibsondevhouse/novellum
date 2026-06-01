@@ -20,6 +20,7 @@ export interface WorldbuildProvenance {
 export const PIPELINE_CHECKPOINT_SCHEMA_VERSION = '1.0.0' as const;
 export const PIPELINE_METADATA_SCOPE = 'pipeline' as const;
 export const WORLDBUILD_CHECKPOINT_OWNER_ID = 'vibe-worldbuild' as const;
+export const WORLDBUILD_PROPOSAL_OWNER_ID = 'vibe-worldbuild-scan' as const;
 
 export type CheckpointLifecycle = 'draft' | 'review' | 'accepted' | 'rejected';
 

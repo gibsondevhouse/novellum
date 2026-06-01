@@ -10,7 +10,7 @@ No active plan. Await user direction for next work.
 
 ## Recently completed
 
-- [plan-037-agentic-worldbuild-scan](./plan-037-agentic-worldbuild-scan/plan.md) — Agentic worldbuild scan + review-gated proposal flow. Closed 2026-05-31 with all 5 stages complete. Scan contract, proposal schema, pending notification UI, atomic accept/reject, 72 new tests. Quality gates: check (0 errors), test (209 files / 1545 tests), tokens (0 violations). Pre-existing lint errors documented; scan AI execution deferred to follow-up plan.
+- [plan-037-agentic-worldbuild-scan](./plan-037-agentic-worldbuild-scan/plan.md) — Agentic worldbuild scan + review-gated proposal flow. Closed 2026-05-31 with all 5 stages complete; scan execution wired 2026-06-01. Scan contract, provider-backed proposal generation, proposal schema, pending notification UI, atomic accept/reject, 73 new tests. Quality gates: check (0 errors), test (209 files / 1546 tests), tokens (0 violations). Pre-existing lint and lint:css errors documented.
 - [plan-036-context-priority-generation](./plan-036-context-priority-generation/plan.md) — Context-priority worldbuilding generation with typed target/avoid hints, expanded character draft field coverage, and faction/lineage extension. Closed 2026-05-30 (PR #26 merge).
 - [plan-035-fix-json-double-encoding](./plan-035-fix-json-double-encoding/plan.md) — GeneratedEntityModal JSON hardening and double-encoding fix for world-building draft saves. Closed 2026-05-30 (PR #25 merge).
 - [plan-034-world-building-workflow-refactor](./plan-034/plan.md) — World Building Workflow Refactor. Stage 001 (Foundation Refactor) complete. Stages 002–004 pending.

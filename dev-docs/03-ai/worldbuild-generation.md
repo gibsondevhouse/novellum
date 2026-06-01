@@ -110,7 +110,22 @@ When `acceptCheckpoint(projectId, ownerId, proposalId)` is called (via the POST 
 4. Sets `acceptance.projectedToCanon = true` and `acceptance.entityCounts`
 5. Updates the checkpoint lifecycle to `accepted`
 
-Domain proposals (`vibe-worldbuild-domain` family) use `createDomainCheckpoint` but currently store directly to the `project_metadata` table. Their accept/reject flows route through the same `WorldbuildCheckpointService` endpoints.
+Domain proposals (`vibe-worldbuild-domain` family) use `createDomainCheckpoint` and route through the same `WorldbuildCheckpointService` endpoints.
+
+## Agentic Scan Proposal Flow
+
+`POST /api/worldbuilding/scan` executes a scoped worldbuilding scan for one domain at a time. The route accepts the `WorldbuildScanRequest` envelope, validates that only allowed project context fields are present, calls the active AI provider (or `NOVELLUM_AI_MOCK=1` in tests/dev), normalizes model output into `WorldbuildProposalRecord` objects, suppresses exact duplicates against existing canon and pending proposals, then stores the surviving records under `project_metadata` with owner `vibe-worldbuild-scan`.
+
+Scan proposals always start as `pending_review`. They never write to canon during scan execution.
+
+When `POST /api/worldbuilding/proposals/[proposalId]/accept` receives a scan proposal, it delegates to `acceptProposalAtomically(projectId, proposalId)`. That helper wraps the canon insert and proposal status update in one SQLite transaction:
+
+1. Load the `pending_review` proposal from `project_metadata`.
+2. Insert the payload into the mapped canon table (`characters`, `locations`, `lore_entries`, `plot_threads`, or `timeline_events`).
+3. Update the proposal to `accepted` with `acceptance.projectedToCanon = true`.
+4. Roll the full transaction back if validation or insertion fails, leaving the proposal `pending_review`.
+
+Rejecting a scan proposal records `rejection` audit metadata and performs no canon write.
 
 ## Quick-Generate Context-Priority Flow
 

@@ -1,9 +1,11 @@
 <script lang="ts">
-	import type { WorldbuildDomainCheckpointRecord } from '$lib/ai/pipeline/checkpoint-contract.js';
-	import type { CheckpointLifecycle } from '$lib/ai/pipeline/checkpoint-contract.js';
+	import type {
+		WorldbuildProposalRecord,
+		WorldbuildProposalStatus,
+	} from '$lib/ai/pipeline/worldbuild-proposal-schema.js';
 
 	interface Props {
-		proposal: WorldbuildDomainCheckpointRecord;
+		proposal: WorldbuildProposalRecord;
 		onAccept?: (proposalId: string) => void;
 		onReject?: (proposalId: string, reason: string) => void;
 	}
@@ -11,7 +13,7 @@
 	let { proposal, onAccept, onReject }: Props = $props();
 
 	const domainLabel = $derived(
-		proposal.taskKey.split('.').pop()?.replace(/-/g, ' ') ?? 'Domain',
+		proposal.categoryId.replace(/-/g, ' '),
 	);
 
 	function formatDate(iso: string): string {
@@ -25,13 +27,12 @@
 		}
 	}
 
-	function lifecycleVariant(lc: CheckpointLifecycle): string {
-		switch (lc) {
-			case 'draft': return 'draft';
-			case 'review': return 'review';
+	function statusVariant(status: WorldbuildProposalStatus): string {
+		switch (status) {
+			case 'pending_review': return 'review';
 			case 'accepted': return 'accepted';
 			case 'rejected': return 'rejected';
-			default: return 'draft';
+			case 'failed_validation': return 'rejected';
 		}
 	}
 
@@ -39,13 +40,13 @@
 	let rejectReason = $state('');
 
 	function handleAccept(): void {
-		onAccept?.(proposal.id);
+		onAccept?.(proposal.proposalId);
 	}
 
 	function handleRejectSubmit(): void {
 		const reason = rejectReason.trim();
 		if (reason) {
-			onReject?.(proposal.id, reason);
+			onReject?.(proposal.proposalId, reason);
 			rejecting = false;
 			rejectReason = '';
 		}
@@ -56,37 +57,48 @@
 	<div class="proposal-card__header">
 		<div class="proposal-card__meta">
 			<span class="proposal-card__domain">{domainLabel}</span>
-			<span class="proposal-card__badge proposal-card__badge--{lifecycleVariant(proposal.lifecycle)}">
-				{proposal.lifecycle}
+			<span class="proposal-card__badge proposal-card__badge--{statusVariant(proposal.status)}">
+				{proposal.status.replace('_', ' ')}
 			</span>
 		</div>
-		<time class="proposal-card__time" datetime={proposal.createdAt}>
-			{formatDate(proposal.createdAt)}
+		<time class="proposal-card__time" datetime={proposal.generatedAt}>
+			{formatDate(proposal.generatedAt)}
 		</time>
 	</div>
 
-	{#if proposal.artifact?.payload}
-		<p class="proposal-card__preview">
-			Proposal generated — {Object.keys(proposal.artifact.payload).length} field group(s) in payload.
-		</p>
-	{/if}
+	<p class="proposal-card__preview">
+		{proposal.reasoningSummary} {Object.keys(proposal.payload).length} field(s) available for review.
+	</p>
 
-	{#if proposal.provenance}
-		<dl class="proposal-card__provenance">
+	<dl class="proposal-card__provenance">
+		<div class="proposal-card__provenance-row">
+			<dt>Source</dt>
+			<dd>{proposal.sourceContext.title}</dd>
+		</div>
+		<div class="proposal-card__provenance-row">
+			<dt>Confidence</dt>
+			<dd>{Math.round(proposal.confidence * 100)}%</dd>
+		</div>
+		{#if proposal.sourceContext.logline}
 			<div class="proposal-card__provenance-row">
-				<dt>Model</dt>
-				<dd>{proposal.provenance.model}</dd>
+				<dt>Context</dt>
+				<dd>{proposal.sourceContext.logline}</dd>
 			</div>
-			{#if proposal.provenance.sourceContextSummary}
+		{/if}
+	</dl>
+
+	{#if Object.keys(proposal.payload).length > 0}
+		<dl class="proposal-card__payload">
+			{#each Object.entries(proposal.payload).slice(0, 4) as [key, value] (key)}
 				<div class="proposal-card__provenance-row">
-					<dt>Context</dt>
-					<dd>{proposal.provenance.sourceContextSummary}</dd>
+					<dt>{key.replace(/([A-Z])/g, ' $1')}</dt>
+					<dd>{Array.isArray(value) ? value.join(', ') : String(value)}</dd>
 				</div>
-			{/if}
+			{/each}
 		</dl>
 	{/if}
 
-	{#if proposal.lifecycle === 'draft' || proposal.lifecycle === 'review'}
+	{#if proposal.status === 'pending_review'}
 		<div class="proposal-card__actions">
 			{#if !rejecting}
 				<button
@@ -124,12 +136,12 @@
 				</div>
 			{/if}
 		</div>
-	{:else if proposal.lifecycle === 'accepted'}
+	{:else if proposal.status === 'accepted'}
 		<p class="proposal-card__outcome proposal-card__outcome--accepted">
 			Accepted — projected to canon
 			{#if proposal.acceptance?.acceptedAt}on {formatDate(proposal.acceptance.acceptedAt)}{/if}
 		</p>
-	{:else if proposal.lifecycle === 'rejected'}
+	{:else if proposal.status === 'rejected'}
 		<p class="proposal-card__outcome proposal-card__outcome--rejected">
 			Rejected{#if proposal.rejection?.reason}: {proposal.rejection.reason}{/if}
 		</p>

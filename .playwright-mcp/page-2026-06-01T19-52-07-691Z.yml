@@ -1,0 +1,219 @@
+- generic [ref=e2]:
+  - link "Skip to content" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e4]:
+    - complementary "Navigation" [ref=e5]:
+      - button "Toggle Navigation" [expanded] [ref=e6] [cursor=pointer]:
+        - img [ref=e7]
+      - search [ref=e8]:
+        - img [ref=e9]
+        - searchbox "Search projects" [ref=e12]
+      - navigation "Primary navigation links" [ref=e13]:
+        - generic [ref=e15]:
+          - link "Home" [ref=e16] [cursor=pointer]:
+            - /url: /?home=1
+            - img [ref=e18]
+            - generic [ref=e21]: Home
+          - link "Reader" [ref=e22] [cursor=pointer]:
+            - /url: /books/2424d456-319e-4c51-aef2-0c58dea8297e
+            - img [ref=e24]
+            - generic [ref=e27]: Reader
+          - link "Muse" [ref=e28] [cursor=pointer]:
+            - /url: /nova
+            - img [ref=e30]
+            - generic [ref=e32]: Muse
+          - link "Images" [ref=e33] [cursor=pointer]:
+            - /url: /images
+            - img [ref=e35]
+            - generic [ref=e39]: Images
+          - link "Styles" [ref=e40] [cursor=pointer]:
+            - /url: /styles
+            - img [ref=e42]
+            - generic [ref=e44]: Styles
+          - link "Projects" [ref=e45] [cursor=pointer]:
+            - /url: /projects
+            - img [ref=e47]
+            - generic [ref=e52]: Projects
+        - separator [ref=e53]
+        - generic [ref=e54]:
+          - button "LAST PROJECT" [expanded] [ref=e55] [cursor=pointer]:
+            - heading "LAST PROJECT" [level=3] [ref=e56]
+            - img [ref=e57]
+          - generic [ref=e59]:
+            - link "Hub" [ref=e60] [cursor=pointer]:
+              - /url: /projects/2424d456-319e-4c51-aef2-0c58dea8297e
+              - img [ref=e62]
+              - generic [ref=e67]: Hub
+            - link "Editor" [ref=e68] [cursor=pointer]:
+              - /url: /projects/2424d456-319e-4c51-aef2-0c58dea8297e/editor
+              - img [ref=e70]
+              - generic [ref=e72]: Editor
+            - link "Outline" [ref=e73] [cursor=pointer]:
+              - /url: /projects/2424d456-319e-4c51-aef2-0c58dea8297e/outline
+              - img [ref=e75]
+              - generic [ref=e78]: Outline
+            - link "Worldbuilding" [ref=e79] [cursor=pointer]:
+              - /url: /projects/2424d456-319e-4c51-aef2-0c58dea8297e/world-building
+              - img [ref=e81]
+              - generic [ref=e84]: Worldbuilding
+            - link "AI Assistant" [ref=e85] [cursor=pointer]:
+              - /url: /projects/2424d456-319e-4c51-aef2-0c58dea8297e/editor?panel=ai
+              - img [ref=e87]
+              - generic [ref=e91]: AI Assistant
+            - button "Export project" [ref=e92] [cursor=pointer]:
+              - img [ref=e94]
+              - generic [ref=e97]: Export
+        - separator [ref=e98]
+        - link "Settings" [ref=e101] [cursor=pointer]:
+          - /url: /settings
+          - img [ref=e103]
+          - generic [ref=e106]: Settings
+      - generic [ref=e107]:
+        - link "Muse AI Help" [ref=e108] [cursor=pointer]:
+          - /url: /nova
+          - img [ref=e109]
+          - generic [ref=e111]: Muse
+        - generic [ref=e112]: ·
+        - link "About and Help" [ref=e113] [cursor=pointer]:
+          - /url: /settings/about
+          - img [ref=e114]
+          - generic [ref=e117]: About
+    - generic [ref=e118]:
+      - banner [ref=e119]:
+        - generic [ref=e121]:
+          - img [ref=e123]
+          - generic [ref=e126]:
+            - generic [ref=e127]: The Page
+            - generic "Oyara's War of Love" [ref=e128]
+        - navigation "Chapter selection" [ref=e130]:
+          - button "CH 1" [ref=e131] [cursor=pointer]
+          - button "CH 2" [ref=e132] [cursor=pointer]
+          - button "CH 3" [ref=e133] [cursor=pointer]
+          - button "CH 4" [ref=e134] [cursor=pointer]
+          - button "CH 5" [ref=e135] [cursor=pointer]
+          - button "CH 6" [ref=e136] [cursor=pointer]
+          - button "CH 7" [ref=e137] [cursor=pointer]
+          - button "CH 8" [ref=e138] [cursor=pointer]
+          - button "CH 9" [ref=e139] [cursor=pointer]
+          - button "CH 10" [ref=e140] [cursor=pointer]
+          - button "CH 11" [ref=e141] [cursor=pointer]
+          - button "CH 12" [ref=e142] [cursor=pointer]
+          - button "CH 13" [ref=e143] [cursor=pointer]
+        - generic [ref=e144]:
+          - button "New project" [ref=e145] [cursor=pointer]:
+            - img [ref=e146]
+          - button "Toggle theme" [ref=e147] [cursor=pointer]:
+            - img [ref=e148]
+          - button "Hide Copilot" [active] [ref=e240] [cursor=pointer]:
+            - img [ref=e155]
+          - link "Settings" [ref=e157] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e158]
+      - navigation "Scene selection" [ref=e161]:
+        - button "SC 1" [ref=e163] [cursor=pointer]
+      - main "Main content" [ref=e164]:
+        - main "Writing workspace" [ref=e168]:
+          - generic "Editor toolbar" [ref=e169]:
+            - toolbar "Editor formatting toolbar" [ref=e171]:
+              - button "Bold" [ref=e172] [cursor=pointer]:
+                - generic [ref=e173]: B
+              - button "Italic" [ref=e174] [cursor=pointer]:
+                - generic [ref=e175]: I
+              - button "Underline" [ref=e176] [cursor=pointer]:
+                - generic [ref=e177]: U
+              - button "Strikethrough" [ref=e178] [cursor=pointer]:
+                - generic [ref=e179]: S
+              - separator [ref=e180]
+              - button "Heading 1" [ref=e181] [cursor=pointer]:
+                - generic [ref=e182]: H1
+              - button "Heading 2" [ref=e183] [cursor=pointer]:
+                - generic [ref=e184]: H2
+              - button "Bullet list" [ref=e185] [cursor=pointer]:
+                - img [ref=e186]
+              - button "Ordered list" [ref=e190] [cursor=pointer]:
+                - img [ref=e191]
+              - button "Blockquote" [ref=e194] [cursor=pointer]:
+                - img [ref=e195]
+              - separator [ref=e198]
+              - button "Insert image" [ref=e199] [cursor=pointer]:
+                - img [ref=e200]
+              - button "Insert table" [ref=e204] [cursor=pointer]:
+                - img [ref=e205]
+              - separator [ref=e208]
+              - button "Spellcheck" [pressed] [ref=e209] [cursor=pointer]:
+                - img [ref=e210]
+              - separator [ref=e212]
+              - button "View in Reader" [ref=e213] [cursor=pointer]:
+                - img [ref=e214]
+              - button "Nova" [pressed] [ref=e217] [cursor=pointer]:
+                - img [ref=e218]
+            - generic [ref=e220]:
+              - group "Editor mode" [ref=e221]:
+                - button "Writing" [pressed] [ref=e222] [cursor=pointer]
+                - button "Planning" [ref=e223] [cursor=pointer]
+                - button "Revision" [ref=e224] [cursor=pointer]
+              - button "Focus" [ref=e225] [cursor=pointer]
+            - generic "Scene context controls" [ref=e226]:
+              - generic [ref=e227]:
+                - generic [ref=e228]: POV
+                - combobox "POV" [ref=e229]:
+                  - option "Unassigned"
+              - generic [ref=e230]:
+                - button "Previous" [disabled] [ref=e231]
+                - button "Next" [disabled] [ref=e232]
+          - generic [ref=e234]:
+            - paragraph [ref=e238]
+            - toolbar "Text formatting menu":
+              - button "Toggle bold":
+                - generic: B
+              - button "Toggle italic":
+                - generic: I
+              - button "Toggle underline":
+                - generic: U
+              - button "Toggle strikethrough":
+                - generic: S
+              - button "Toggle heading 1":
+                - generic: H1
+              - button "Toggle heading 2":
+                - generic: H2
+              - button "Toggle bullet list":
+                - generic: •
+              - button "Toggle blockquote":
+                - generic: "\""
+              - button "Ask Nova about selected text":
+                - img
+                - generic: Nova
+  - complementary "Nova panel" [ref=e241]:
+    - slider "Resize Nova panel" [ref=e242]
+    - generic [ref=e243]:
+      - generic [ref=e244]:
+        - heading "Nova" [level=2] [ref=e245]
+        - paragraph [ref=e246]: Project context attached
+      - button "Close Nova" [ref=e248] [cursor=pointer]: ×
+    - generic "Context disclosure" [ref=e249]
+    - generic [ref=e251]:
+      - paragraph [ref=e252]: Nova
+      - generic "Starter prompts" [ref=e253]:
+        - button "Summarize this project premise in one paragraph." [ref=e254] [cursor=pointer]
+        - button "Give me three options for the next scene." [ref=e255] [cursor=pointer]
+        - button "What continuity risks should I watch right now?" [ref=e256] [cursor=pointer]
+    - generic [ref=e259]:
+      - textbox "Ask Nova" [ref=e260]:
+        - /placeholder: Brainstorm, ask questions, or explore story ideas…
+      - generic [ref=e261]:
+        - button "Attach files or project context" [ref=e262] [cursor=pointer]:
+          - generic [ref=e263]: +
+        - button "Commands" [disabled] [ref=e264]:
+          - generic [ref=e265]: </>
+        - combobox "Nova mode" [ref=e266] [cursor=pointer]:
+          - option "Ask" [selected]
+          - option "Write"
+          - option "Agent"
+        - generic [ref=e268]:
+          - generic [ref=e269]: Active model
+          - combobox "Active model" [ref=e270] [cursor=pointer]:
+            - option "Gemini 3.1 Flash" [selected]
+        - button "Send message" [disabled] [ref=e271]:
+          - img [ref=e272]
+          - generic [ref=e275]: Send
+  - status

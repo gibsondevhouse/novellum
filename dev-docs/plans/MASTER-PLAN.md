@@ -1,11 +1,10 @@
 # MASTER PLAN: Novellum Development
 
-> Last reconciled: 2026-05-30 (plan-036 authored; plan-035 remains active)
+> Last reconciled: 2026-06-01 (plan-037 scan execution wired; no active plan)
 
 ## Active Plans
 
-- [plan-035-fix-json-double-encoding](./plan-035-fix-json-double-encoding/plan.md): Fix GeneratedEntityModal Double-Encoding + JSON Hardening. Critical bug fix (UI freeze on Realms page). 1 stage, 3 phases. Status: `in-progress` (started 2026-05-30). Targets completion 2026-05-31.
-- [plan-036-context-priority-generation](./plan-036-context-priority-generation/plan.md): Context-priority worldbuilding generation with typed target/avoid entity hints, expanded character draft field coverage, and faction/lineage prompt extension. 3 stages. Status: `draft` (authored 2026-05-30; queued after plan-035).
+No active plans. Await user direction for next work.
 
 ## Deferred (not yet scheduled)
 
@@ -14,6 +13,9 @@
 
 ## Completed Plans (Archived)
 
+- [plan-037-agentic-worldbuild-scan](./plan-037-agentic-worldbuild-scan/plan.md): Agentic worldbuild scan + review-gated proposal flow. Status: `complete` (closed 2026-05-31; scan execution wired 2026-06-01). Quality gates: check (0 errors, 11 pre-existing warnings), test (209 files / 1546 tests), check:tokens (0 violations). Existing lint/lint:css cleanup remains deferred.
+- [plan-036-context-priority-generation](./plan-036-context-priority-generation/plan.md): Context-priority worldbuilding generation with typed target/avoid hints, expanded character draft field coverage, and faction/lineage extension. Status: `complete` (closed 2026-05-30; PR #26 merge).
+- [plan-035-fix-json-double-encoding](./plan-035-fix-json-double-encoding/plan.md): GeneratedEntityModal JSON hardening and double-encoding fix for world-building draft saves. Status: `complete` (closed 2026-05-30; PR #25 merge).
 - [plan-032-worldbuilding-generation-engine](./plan-032-worldbuilding-generation-engine/plan.md): Worldbuilding Generation Engine + Help Disclosure — one-click AI entity generation (7 entity kinds), review modal, help-disclosure toggles, AppShell fix. Status: `complete` (closed 2026-05-29). Quality gates: check (0 errors), lint (clean), lint:css (clean), test (194 files / 1359 tests), check:tokens (0 violations).
 - [plan-031-nova-vscode-copilot-parity](./plan-031-nova-vscode-copilot-parity/plan.md): Nova VS Code Copilot Parity — compact sidepanel, Ask/Write/Agent modes, real attachments, bounded agentic tool loop. 5 stages. Status: `complete` (closed 2026-05-28). Quality gates: check (0 errors), lint (clean), test (194 files / 1358 tests), check:tokens (0 violations). Visual test waived (same basis as plan-030).
 - [plan-030-nova-production-refactor](./plan-030-nova-production-refactor/plan.md): Nova production refactor focused on trust repair. 4 stages. Status: `complete` (closed 2026-05-28). Quality gates: `check`, `lint`, `lint:css`, and full `test` passed (190 files / 1299 tests). Full visual suite reported pre-existing cross-surface snapshot drift; targeted Nova visual specs were executed as documented substitute (2 passed, 3 skipped).

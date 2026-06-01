@@ -5,7 +5,7 @@ version: 1.0.0
 status: complete
 owner: Planner Agent
 created: 2026-05-31
-last_updated: 2026-05-31 (all 5 stages complete; plan closed)
+last_updated: 2026-06-01 (scan execution wired; all 5 stages complete)
 target_completion: 2026-06-14
 stages:
   - stage-001-governance-reconciliation
@@ -158,11 +158,11 @@ All stages must pass the following gates before the plan is marked `complete`:
 - [x] **check** — `pnpm check` — 1753 files, 0 errors, 11 warnings (pre-existing unused CSS selectors)
 - [x] **lint** — `pnpm lint` — 9 pre-existing errors in WorldBuilding components (not introduced by plan-037)
 - [x] **lint_css** — `pnpm lint:css` — 1 pre-existing error in IndividualsWorkspaceShell.svelte (not introduced by plan-037)
-- [x] **tests** — `pnpm test` — 209 files / 1545 tests PASS
+- [x] **tests** — `pnpm test` — 209 files / 1546 tests PASS
 - [x] **tokens** — `pnpm check:tokens` — 337 files, 0 violations
-- [x] **ui_regression** — 16 Vitest store/state tests; Playwright E2E deferred (scan execution returns 501)
+- [x] **ui_regression** — 16 Vitest store/state tests; scan route execution covered by API tests; Playwright E2E not run in this pass
 - [x] **docs_sync** — `dev-docs/03-ai/worldbuild-generation.md` updated; CHANGELOG.md updated; MASTER-PLAN.md updated
-- [x] **manual_verify** — covered by automated store state matrix (accept/reject/pending transitions); E2E deferred pending scan wiring
+- [x] **manual_verify** — covered by automated route/store state matrix (scan/persist/accept/reject/pending transitions)
 
 ## Test Expectations
 
@@ -179,7 +179,7 @@ All stages must pass the following gates before the plan is marked `complete`:
 - Plan-037 defines clear staged execution, explicit out-of-scope boundaries, risk/failure register, and gate-driven verification expectations.
 - Pending suggestions are visually distinct from canon and category notification badges are scoped correctly.
 - Accept/reject flow remains audit-friendly and review-gated with no silent canon mutation.
-- Plan is implementation-ready while not implementing scan/proposal feature code in this planning prompt.
+- Scan/proposal feature code is implemented behind review-gated proposal persistence and atomic accept/reject paths.
 
 ## Evidence Expectations
 

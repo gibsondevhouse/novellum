@@ -5,6 +5,7 @@ import {
 	PIPELINE_CHECKPOINT_SCHEMA_VERSION,
 	PIPELINE_METADATA_SCOPE,
 	WORLDBUILD_CHECKPOINT_OWNER_ID,
+	WORLDBUILD_PROPOSAL_OWNER_ID,
 	hasPopulatedBibleProjection,
 	isCheckpointLifecycle,
 	isSupportedCheckpointVersion,
@@ -24,6 +25,11 @@ import type {
 	WorldbuildPopulatedBibleTableWrites,
 	WorldbuildTaskKey,
 } from './worldbuild-agent.js';
+import type {
+	WorldbuildProposalAcceptance,
+	WorldbuildProposalRecord,
+	WorldbuildProposalRejection,
+} from './worldbuild-proposal-schema.js';
 
 type JsonObject = Record<string, unknown>;
 
@@ -97,6 +103,26 @@ function deserializeCheckpoint(raw: string): WorldbuildCheckpointRecord | null {
 		if (typeof parsed.version !== 'string') return null;
 		if (typeof parsed.createdAt !== 'string' || typeof parsed.updatedAt !== 'string') return null;
 		return parsed as WorldbuildCheckpointRecord;
+	} catch {
+		return null;
+	}
+}
+
+function deserializeProposal(raw: string): WorldbuildProposalRecord | null {
+	try {
+		const parsed = JSON.parse(raw) as Partial<WorldbuildProposalRecord>;
+		if (!isObject(parsed)) return null;
+		if (typeof parsed.proposalId !== 'string') return null;
+		if (typeof parsed.projectId !== 'string') return null;
+		if (typeof parsed.categoryId !== 'string') return null;
+		if (typeof parsed.entityKind !== 'string') return null;
+		if (typeof parsed.status !== 'string') return null;
+		if (typeof parsed.generatedAt !== 'string') return null;
+		if (typeof parsed.confidence !== 'number') return null;
+		if (typeof parsed.reasoningSummary !== 'string') return null;
+		if (!isObject(parsed.payload)) return null;
+		if (typeof parsed.dedupeKey !== 'string') return null;
+		return parsed as WorldbuildProposalRecord;
 	} catch {
 		return null;
 	}
@@ -200,6 +226,29 @@ function writeRow(
 			keyOverride ?? record.id,
 			JSON.stringify(record),
 			record.updatedAt,
+	);
+}
+
+function writeProposalRow(
+	database: Database.Database,
+	proposal: WorldbuildProposalRecord,
+	keyOverride?: string,
+): void {
+	database
+		.prepare(
+			`INSERT INTO project_metadata (projectId, scope, ownerId, key, value, updatedAt)
+			 VALUES (?, ?, ?, ?, ?, ?)
+			 ON CONFLICT(projectId, scope, ownerId, key) DO UPDATE SET
+			 value = excluded.value,
+			 updatedAt = excluded.updatedAt`,
+		)
+		.run(
+			proposal.projectId,
+			PIPELINE_METADATA_SCOPE,
+			WORLDBUILD_PROPOSAL_OWNER_ID,
+			keyOverride ?? proposal.proposalId,
+			JSON.stringify(proposal),
+			nowIso(),
 		);
 }
 
@@ -219,6 +268,27 @@ function loadCheckpointOrThrow(
 		throw new WorldbuildCheckpointError(
 			'invalid_payload',
 			`Checkpoint ${key} payload is malformed and cannot be processed.`,
+		);
+	}
+
+	return parsed;
+}
+
+function loadProposalOrThrow(
+	database: Database.Database,
+	projectId: string,
+	proposalId: string,
+): WorldbuildProposalRecord {
+	const row = getRow(database, projectId, WORLDBUILD_PROPOSAL_OWNER_ID, proposalId);
+	if (!row) {
+		throw new WorldbuildCheckpointError('not_found', `Proposal ${proposalId} not found.`);
+	}
+
+	const parsed = deserializeProposal(row.value);
+	if (!parsed) {
+		throw new WorldbuildCheckpointError(
+			'invalid_payload',
+			`Proposal ${proposalId} payload is malformed and cannot be processed.`,
 		);
 	}
 
@@ -404,6 +474,125 @@ function applyPopulatedBibleProjection(
 
 	return counts;
 }
+
+function applyProposalProjection(
+	database: Database.Database,
+	proposal: WorldbuildProposalRecord,
+	timestamp: string,
+): string {
+	const payload = proposal.payload;
+
+	if (proposal.categoryId === 'personae') {
+		database
+			.prepare(
+				`INSERT INTO characters (id, projectId, name, role, bio, faction, factionId, traits, goals, flaws, notes, tags, createdAt, updatedAt)
+				 VALUES (@id, @projectId, @name, @role, @bio, @faction, @factionId, @traits, @goals, @flaws, @notes, @tags, @createdAt, @updatedAt)`,
+			)
+			.run({
+				id: crypto.randomUUID(),
+				projectId: proposal.projectId,
+				name: ensureNonEmpty(asString(payload.name), 'character name'),
+				role: asString(payload.role),
+				bio: asString(payload.bio),
+				faction: asString(payload.faction),
+				factionId: asOptionalString(payload.factionId),
+				traits: encodeJson(normalizeStringArray(payload.traits)),
+				goals: encodeJson(normalizeStringArray(payload.goals)),
+				flaws: encodeJson(normalizeStringArray(payload.flaws)),
+				notes: asString(payload.notes),
+				tags: encodeJson(normalizeStringArray(payload.tags)),
+				createdAt: timestamp,
+				updatedAt: timestamp,
+			});
+		return 'personae';
+	}
+
+	if (proposal.categoryId === 'atlas') {
+		database
+			.prepare(
+				`INSERT INTO locations (id, projectId, name, description, tags, createdAt, updatedAt)
+				 VALUES (@id, @projectId, @name, @description, @tags, @createdAt, @updatedAt)`,
+			)
+			.run({
+				id: crypto.randomUUID(),
+				projectId: proposal.projectId,
+				name: ensureNonEmpty(asString(payload.name), 'location name'),
+				description: asString(payload.description),
+				tags: encodeJson(normalizeStringArray(payload.tags)),
+				createdAt: timestamp,
+				updatedAt: timestamp,
+			});
+		return 'atlas';
+	}
+
+	if (proposal.categoryId === 'archive') {
+		database
+			.prepare(
+				`INSERT INTO lore_entries (id, projectId, title, category, content, tags, createdAt, updatedAt)
+				 VALUES (@id, @projectId, @title, @category, @content, @tags, @createdAt, @updatedAt)`,
+			)
+			.run({
+				id: crypto.randomUUID(),
+				projectId: proposal.projectId,
+				title: ensureNonEmpty(asString(payload.title), 'lore entry title'),
+				category: asString(payload.category),
+				content: asString(payload.content),
+				tags: encodeJson(normalizeStringArray(payload.tags)),
+				createdAt: timestamp,
+				updatedAt: timestamp,
+			});
+		return 'archive';
+	}
+
+	if (proposal.categoryId === 'threads') {
+		database
+			.prepare(
+				`INSERT INTO plot_threads (id, projectId, title, description, status, relatedSceneIds, relatedCharacterIds, createdAt, updatedAt)
+				 VALUES (@id, @projectId, @title, @description, @status, @relatedSceneIds, @relatedCharacterIds, @createdAt, @updatedAt)`,
+			)
+			.run({
+				id: crypto.randomUUID(),
+				projectId: proposal.projectId,
+				title: ensureNonEmpty(asString(payload.title), 'plot thread title'),
+				description: asString(payload.description),
+				status: asString(payload.status),
+				relatedSceneIds: encodeJson(normalizeStringArray(payload.relatedSceneIds)),
+				relatedCharacterIds: encodeJson(normalizeStringArray(payload.relatedCharacterIds)),
+				createdAt: timestamp,
+				updatedAt: timestamp,
+			});
+		return 'threads';
+	}
+
+	if (proposal.categoryId === 'chronicles') {
+		database
+			.prepare(
+				`INSERT INTO timeline_events (id, projectId, title, description, date, relatedCharacterIds, relatedSceneIds, createdAt, updatedAt)
+				 VALUES (@id, @projectId, @title, @description, @date, @relatedCharacterIds, @relatedSceneIds, @createdAt, @updatedAt)`,
+			)
+			.run({
+				id: crypto.randomUUID(),
+				projectId: proposal.projectId,
+				title: ensureNonEmpty(asString(payload.title), 'timeline event title'),
+				description: asString(payload.description),
+				date: asString(payload.date),
+				relatedCharacterIds: encodeJson(normalizeStringArray(payload.relatedCharacterIds)),
+				relatedSceneIds: encodeJson(normalizeStringArray(payload.relatedSceneIds)),
+				createdAt: timestamp,
+				updatedAt: timestamp,
+			});
+		return 'chronicles';
+	}
+
+	throw new WorldbuildCheckpointError(
+		'projection_failed',
+		`Unsupported proposal category ${String(proposal.categoryId)}.`,
+	);
+}
+
+export type WorldbuildProposalMutationResult =
+	| { ok: true; proposal: WorldbuildProposalRecord }
+	| { ok: false; code: WorldbuildCheckpointErrorCode; error: string };
 
 export interface ReviewCheckpointInput {
 	reviewer?: string | null;
@@ -700,6 +889,110 @@ export function rejectWorldbuildCheckpoint(
 }
 
 export const worldbuildCheckpointService = defaultService;
+
+export function persistWorldbuildProposal(
+	proposal: WorldbuildProposalRecord,
+	database: Database.Database = db,
+): WorldbuildProposalRecord {
+	writeProposalRow(database, proposal, proposal.proposalId);
+	return proposal;
+}
+
+export function acceptProposalAtomically(
+	projectId: string,
+	proposalId: string,
+	database: Database.Database = db,
+): WorldbuildProposalMutationResult {
+	try {
+		const tx = database.transaction(() => {
+			const proposal = loadProposalOrThrow(database, projectId, proposalId);
+			if (proposal.status !== 'pending_review') {
+				throw new WorldbuildCheckpointError(
+					'invalid_transition',
+					`Proposal is already ${proposal.status} and cannot be accepted.`,
+				);
+			}
+
+			const acceptedAt = nowIso();
+			const projectionTarget = applyProposalProjection(database, proposal, acceptedAt);
+			const acceptance: WorldbuildProposalAcceptance = {
+				acceptedAt,
+				acceptedBy: null,
+				projectionTarget,
+				projectedToCanon: true,
+			};
+			const next: WorldbuildProposalRecord = {
+				...proposal,
+				status: 'accepted',
+				acceptance,
+				rejection: null,
+			};
+			writeProposalRow(database, next, proposalId);
+			return next;
+		});
+
+		return { ok: true, proposal: tx() };
+	} catch (e) {
+		if (e instanceof WorldbuildCheckpointError) {
+			return { ok: false, code: e.code, error: e.message };
+		}
+		const message = e instanceof Error ? e.message : 'Unknown proposal projection failure.';
+		return { ok: false, code: 'projection_failed', error: message };
+	}
+}
+
+export function rejectProposalAtomically(
+	projectId: string,
+	proposalId: string,
+	input: RejectCheckpointInput,
+	database: Database.Database = db,
+): WorldbuildProposalMutationResult {
+	try {
+		const reason = input.reason.trim();
+		if (!reason) {
+			throw new WorldbuildCheckpointError('invalid_payload', 'Reject reason is required.');
+		}
+
+		const tx = database.transaction(() => {
+			const proposal = loadProposalOrThrow(database, projectId, proposalId);
+			if (proposal.status === 'accepted') {
+				throw new WorldbuildCheckpointError(
+					'invalid_transition',
+					`Accepted proposal ${proposalId} cannot be rejected.`,
+				);
+			}
+			if (proposal.status === 'rejected') {
+				throw new WorldbuildCheckpointError(
+					'invalid_transition',
+					`Proposal ${proposalId} is already rejected.`,
+				);
+			}
+
+			const rejectedAt = nowIso();
+			const rejection: WorldbuildProposalRejection = {
+				rejectedAt,
+				rejectedBy: asOptionalString(input.rejectedBy),
+				reason,
+			};
+			const next: WorldbuildProposalRecord = {
+				...proposal,
+				status: 'rejected',
+				acceptance: null,
+				rejection,
+			};
+			writeProposalRow(database, next, proposalId);
+			return next;
+		});
+
+		return { ok: true, proposal: tx() };
+	} catch (e) {
+		if (e instanceof WorldbuildCheckpointError) {
+			return { ok: false, code: e.code, error: e.message };
+		}
+		const message = e instanceof Error ? e.message : 'Unknown proposal rejection failure.';
+		return { ok: false, code: 'projection_failed', error: message };
+	}
+}
 
 export function createDomainCheckpoint(params: {
 	projectId: string;
