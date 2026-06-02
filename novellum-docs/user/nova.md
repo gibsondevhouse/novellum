@@ -43,7 +43,7 @@ Nova routes your request to the right specialized agent:
 - **Rewrite** — alternative phrasings of a passage.
 - **Style** — tone/voice consistency.
 
-Four more agents are planned (Brainstorm, Outline, Draft, Summarize) and are not yet shipped. You will see them appear in future releases.
+Additional agents may be added as Novellum's AI capabilities grow.
 
 ## Privacy and safety
 

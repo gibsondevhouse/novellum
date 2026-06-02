@@ -2,7 +2,7 @@
 title: Nova Composer Agent Mode Copy Fix
 slug: part-001-nova-composer-agent-copy
 part_number: 1
-status: draft
+status: complete
 owner: Stylist Agent
 assigned_to: Stylist Agent
 phase: phase-002-composer-copy

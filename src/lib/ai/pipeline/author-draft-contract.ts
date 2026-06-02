@@ -37,7 +37,7 @@ export const authorDraftArtifactSchema = z
 
 export type AuthorDraftArtifact = z.infer<typeof authorDraftArtifactSchema>;
 
-export const AUTHOR_DRAFT_LIFECYCLE_VALUES = ['draft', 'review', 'accepted', 'rejected'] as const;
+export const AUTHOR_DRAFT_LIFECYCLE_VALUES = ['review', 'accepted', 'rejected'] as const;
 export type AuthorDraftLifecycle = (typeof AUTHOR_DRAFT_LIFECYCLE_VALUES)[number];
 
 export const authorDraftCheckpointSchema = z

@@ -1,18 +1,26 @@
 # MASTER PLAN: Novellum Development
 
-> Last reconciled: 2026-06-01 (plan-038 artifacts generated; in-progress)
+> Last reconciled: 2026-06-01 (plan-041 complete; no active plan)
 
 ## Active Plans
 
-- **[plan-038-novel-engine-v1](./plan-038/plan.md)** — Novel Engine v1: Draft From Outline guided pipeline. Status: `in-progress`. Stages: 001 (partial — composer copy draft), 002 (draft — fetch DI), 003 (complete — checkpoint pipeline), 004 (complete — chapter draft runner), 005 (draft — quality gap closure). Quality baseline: pnpm check (0 errors / 11 pre-existing warnings), pnpm test (210 files / 1554 tests), pnpm check:tokens (0 violations).
+No active plans. Await user direction for next work.
+
+Two skeleton plans are drafted and ready to be picked up:
+
+- [plan-039-manuscript-export-ui](./plan-039-manuscript-export-ui/plan.md) — wire `exportProject()` services to a real UI.
+- [plan-040-outline-generation](./plan-040-outline-generation/plan.md) — Worldbuild → Outline → Draft loop closure.
 
 ## Deferred (not yet scheduled)
 
-- **plan-034-world-building-workflow-refactor** — Stage 001 complete; stages 002–004 pending. Deferred to resume after plan-035 completion.
 - **Release engineering** — code signing, notarization, brand icons, formal smoke/keyring verification. Infrastructure exists; requires external procurement. Originally plan-024 stage-002.
 
 ## Completed Plans (Archived)
 
+- [plan-041-docs-rebaseline-internal-version](./plan-041-docs-rebaseline-internal-version/plan.md): Docs rebaseline — reframe V1/V1.1/V2 as **internal development milestones** (Novellum has not cut a public release yet), absorb plans 030–038 into the roadmap, drop closed plan-018 reference and the four cut-agents claim from user docs, and roll `Last verified` across content-accurate dev-docs. Status: `complete` (closed 2026-06-01).
+
+- [plan-038-novel-engine-v1](./plan-038/plan.md): Novel Engine v1 — Draft From Outline guided pipeline. Status: `complete` (closed 2026-06-01). Agentic surface copy, fetch DI for buildContext, author-draft checkpoint service with stale-guard, chapter draft runner with AbortSignal, quality gap closure (unresolvedThreads, rawOutput strip, progress counter, draft lifecycle). Quality gates: check (0 errors), test (212 files / 1575 tests), check:tokens (0 violations).
+- [plan-034-world-building-workflow-refactor](./archive/plan-034/plan.md): World Building Workflow Refactor — generation pipeline, UI integration, guardrails + polish. Status: `complete` (closed 2026-05-30 via PR #27).
 - [plan-037-agentic-worldbuild-scan](./plan-037-agentic-worldbuild-scan/plan.md): Agentic worldbuild scan + review-gated proposal flow. Status: `complete` (closed 2026-05-31; scan execution wired 2026-06-01). Quality gates: check (0 errors, 11 pre-existing warnings), test (209 files / 1546 tests), check:tokens (0 violations). Existing lint/lint:css cleanup remains deferred.
 - [plan-036-context-priority-generation](./plan-036-context-priority-generation/plan.md): Context-priority worldbuilding generation with typed target/avoid hints, expanded character draft field coverage, and faction/lineage extension. Status: `complete` (closed 2026-05-30; PR #26 merge).
 - [plan-035-fix-json-double-encoding](./plan-035-fix-json-double-encoding/plan.md): GeneratedEntityModal JSON hardening and double-encoding fix for world-building draft saves. Status: `complete` (closed 2026-05-30; PR #25 merge).

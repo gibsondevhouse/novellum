@@ -102,7 +102,7 @@
 	function canAccept(): boolean {
 		if (!projectId) return false;
 		if (!checkpoint) return false;
-		if (checkpoint.lifecycle !== 'draft' && checkpoint.lifecycle !== 'review') return false;
+		if (checkpoint.lifecycle !== 'review') return false;
 		if (acceptState === 'accepting') return false;
 		return true;
 	}
@@ -110,7 +110,7 @@
 	function canReject(): boolean {
 		if (!projectId) return false;
 		if (!checkpoint) return false;
-		if (checkpoint.lifecycle !== 'draft' && checkpoint.lifecycle !== 'review') return false;
+		if (checkpoint.lifecycle !== 'review') return false;
 		if (rejectState === 'rejecting') return false;
 		return true;
 	}
@@ -214,8 +214,6 @@
 		switch (value) {
 			case 'review':
 				return 'Draft ready';
-			case 'draft':
-				return 'Draft';
 			case 'accepted':
 				return 'Accepted';
 			case 'rejected':
@@ -316,7 +314,7 @@
 			<p class="checkpoint-error" role="alert">{errorMessage}</p>
 		{/if}
 
-		{#if checkpoint.lifecycle === 'draft' || checkpoint.lifecycle === 'review'}
+		{#if checkpoint.lifecycle === 'review'}
 			<div class="checkpoint-actions" aria-label="Draft actions">
 				<button
 					type="button"

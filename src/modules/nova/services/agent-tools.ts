@@ -438,8 +438,8 @@ registerTool(
 				sceneId: { type: 'string', description: 'Optional scene ID filter.' },
 				lifecycle: {
 					type: 'string',
-					description: 'Optional lifecycle filter: draft|review|accepted|rejected.',
-					enum: ['draft', 'review', 'accepted', 'rejected'],
+					description: 'Optional lifecycle filter: review|accepted|rejected.',
+					enum: ['review', 'accepted', 'rejected'],
 				},
 			},
 			required: ['projectId'],
@@ -450,7 +450,7 @@ registerTool(
 			projectId: string;
 			chapterId?: string;
 			sceneId?: string;
-			lifecycle?: 'draft' | 'review' | 'accepted' | 'rejected';
+			lifecycle?: 'review' | 'accepted' | 'rejected';
 		};
 		try {
 			const checkpoints = await listAuthorDraftCheckpoints(projectId, { chapterId, sceneId, lifecycle });

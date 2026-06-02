@@ -1,4 +1,4 @@
-import { apiGet, ApiError } from '$lib/api-client.js';
+import { ApiError } from '$lib/api-client.js';
 import type {
 	Act,
 	Arc,
@@ -69,120 +69,6 @@ function emptyContext(policy: ContextPolicy): AiContext {
 	};
 }
 
-async function getOrUndefined<T>(path: string): Promise<T | undefined> {
-	try {
-		return await apiGet<T>(path);
-	} catch (err) {
-		if (err instanceof ApiError && err.status === 404) return undefined;
-		throw err;
-	}
-}
-
-async function safeCount(endpoint: string, projectId: string): Promise<number> {
-	try {
-		const rows = await apiGet<unknown[]>(endpoint, { projectId });
-		return rows.length;
-	} catch {
-		return 0;
-	}
-}
-
-async function fetchProjectContextCounts(projectId: string): Promise<ProjectContextCounts> {
-	const [
-		chapters,
-		scenes,
-		beats,
-		characters,
-		characterRelationships,
-		locations,
-		loreEntries,
-		plotThreads,
-		timelineEvents,
-		acts,
-		arcs,
-		milestones,
-		writingStyles,
-	] = await Promise.all([
-		safeCount('/api/db/chapters', projectId),
-		safeCount('/api/db/scenes', projectId),
-		safeCount('/api/db/beats', projectId),
-		safeCount('/api/db/characters', projectId),
-		safeCount('/api/db/character_relationships', projectId),
-		safeCount('/api/db/locations', projectId),
-		safeCount('/api/db/lore_entries', projectId),
-		safeCount('/api/db/plot_threads', projectId),
-		safeCount('/api/db/timeline_events', projectId),
-		safeCount('/api/db/acts', projectId),
-		safeCount('/api/db/arcs', projectId),
-		safeCount('/api/db/milestones', projectId),
-		safeCount('/api/db/writing_styles', projectId),
-	]);
-
-	return {
-		chapters,
-		scenes,
-		beats,
-		characters,
-		characterRelationships,
-		locations,
-		loreEntries,
-		plotThreads,
-		timelineEvents,
-		acts,
-		arcs,
-		milestones,
-		writingStyles,
-	};
-}
-
-async function fetchCharactersByIds(ids: string[], limit: number): Promise<Character[]> {
-	const results = await Promise.all(
-		ids.slice(0, limit).map((id) => getOrUndefined<Character>(`/api/db/characters/${id}`)),
-	);
-	return results.filter((c): c is Character => c !== undefined);
-}
-
-async function fetchLocationsByIds(ids: string[], limit: number): Promise<Location[]> {
-	const results = await Promise.all(
-		ids.slice(0, limit).map((id) => getOrUndefined<Location>(`/api/db/locations/${id}`)),
-	);
-	return results.filter((l): l is Location => l !== undefined);
-}
-
-async function getBeatsBySceneId(sceneId: string): Promise<Beat[]> {
-	const beats = await apiGet<Beat[]>('/api/db/beats', { sceneId });
-	return [...beats].sort((a, b) => a.order - b.order);
-}
-
-async function getScenesByChapterId(chapterId: string): Promise<Scene[]> {
-	const scenes = await apiGet<Scene[]>('/api/db/scenes', { chapterId });
-	return [...scenes].sort((a, b) => a.order - b.order);
-}
-
-async function buildOutlineHierarchy(projectId: string) {
-	const [arcs, acts, milestones, chapters, scenes, beats, stages] = await Promise.all([
-		apiGet<Arc[]>('/api/db/arcs', { projectId }),
-		apiGet<Act[]>('/api/db/acts', { projectId }),
-		apiGet<Milestone[]>('/api/db/milestones', { projectId }),
-		apiGet<Chapter[]>('/api/db/chapters', { projectId }),
-		apiGet<Scene[]>('/api/db/scenes', { projectId }),
-		apiGet<Beat[]>('/api/db/beats', { projectId }),
-		apiGet<Stage[]>('/api/db/stages', { projectId }),
-	]);
-	return normalizeSevenLayerOutline({ arcs, acts, milestones, chapters, scenes, beats, stages });
-}
-
-async function buildSceneOnlyData(sceneId: string) {
-	const scene = await getOrUndefined<Scene>(`/api/db/scenes/${sceneId}`);
-	if (!scene) return null;
-	const [beats, characters, locations] = await Promise.all([
-		getBeatsBySceneId(sceneId),
-		fetchCharactersByIds(scene.characterIds, MAX_CHARACTERS),
-		fetchLocationsByIds(scene.locationIds, MAX_LOCATIONS),
-	]);
-	return { scene, beats, characters, locations };
-}
-
 function trimText(value: string | undefined | null, maxChars: number): string {
 	return typeof value === 'string' ? value.slice(0, maxChars) : '';
 }
@@ -239,34 +125,130 @@ function sanitizeWorldbuildTimeline(rows: TimelineEvent[]): TimelineEvent[] {
 	}));
 }
 
-async function loadWorldbuildingSnapshot(projectId: string) {
-	const [characters, factions, locations, loreEntries, plotThreads, timelineEvents] =
-		await Promise.all([
-			apiGet<Character[]>('/api/db/characters', { projectId }),
-			apiGet<Faction[]>('/api/db/factions', { projectId }),
-			apiGet<Location[]>('/api/db/locations', { projectId }),
-			apiGet<LoreEntry[]>('/api/db/lore_entries', { projectId }),
-			apiGet<PlotThread[]>('/api/db/plot_threads', { projectId }),
-			apiGet<TimelineEvent[]>('/api/db/timeline_events', { projectId }),
+export async function buildContext(
+	task: AiTask,
+	projectId: string,
+	options?: { fetch?: typeof globalThis.fetch },
+): Promise<AiContext> {
+	const fetchFn = options?.fetch ?? globalThis.fetch;
+
+	async function get<T>(path: string, params?: Record<string, string>): Promise<T> {
+		let url = path;
+		if (params) url += '?' + new URLSearchParams(params).toString();
+		const res = await fetchFn(url);
+		if (!res.ok) throw new ApiError(res.statusText, res.status);
+		return res.json() as Promise<T>;
+	}
+
+	async function getOptional<T>(path: string): Promise<T | undefined> {
+		try {
+			return await get<T>(path);
+		} catch (err) {
+			if (err instanceof ApiError && err.status === 404) return undefined;
+			throw err;
+		}
+	}
+
+	async function countSafe(endpoint: string): Promise<number> {
+		try {
+			const rows = await get<unknown[]>(endpoint, { projectId });
+			return rows.length;
+		} catch {
+			return 0;
+		}
+	}
+
+	async function getProjectCounts(): Promise<ProjectContextCounts> {
+		const [
+			chapters, scenes, beats, characters, characterRelationships, locations,
+			loreEntries, plotThreads, timelineEvents, acts, arcs, milestones, writingStyles,
+		] = await Promise.all([
+			countSafe('/api/db/chapters'), countSafe('/api/db/scenes'), countSafe('/api/db/beats'),
+			countSafe('/api/db/characters'), countSafe('/api/db/character_relationships'),
+			countSafe('/api/db/locations'), countSafe('/api/db/lore_entries'),
+			countSafe('/api/db/plot_threads'), countSafe('/api/db/timeline_events'),
+			countSafe('/api/db/acts'), countSafe('/api/db/arcs'), countSafe('/api/db/milestones'),
+			countSafe('/api/db/writing_styles'),
 		]);
+		return {
+			chapters, scenes, beats, characters, characterRelationships, locations,
+			loreEntries, plotThreads, timelineEvents, acts, arcs, milestones, writingStyles,
+		};
+	}
 
-	return {
-		characters: sanitizeWorldbuildCharacters(characters),
-		factions: limitList(factions, MAX_WORLDBUILD_FACTIONS),
-		locations: sanitizeWorldbuildLocations(locations),
-		loreEntries: sanitizeWorldbuildLoreEntries(loreEntries),
-		plotThreads: sanitizeWorldbuildPlotThreads(plotThreads),
-		timelineEvents: sanitizeWorldbuildTimeline(timelineEvents),
-	};
-}
+	async function fetchChars(ids: string[], limit: number): Promise<Character[]> {
+		const results = await Promise.all(
+			ids.slice(0, limit).map((id) => getOptional<Character>(`/api/db/characters/${id}`)),
+		);
+		return results.filter((c): c is Character => c !== undefined);
+	}
 
-export async function buildContext(task: AiTask, projectId: string): Promise<AiContext> {
+	async function fetchLocs(ids: string[], limit: number): Promise<Location[]> {
+		const results = await Promise.all(
+			ids.slice(0, limit).map((id) => getOptional<Location>(`/api/db/locations/${id}`)),
+		);
+		return results.filter((l): l is Location => l !== undefined);
+	}
+
+	async function getBeats(sceneId: string): Promise<Beat[]> {
+		const beats = await get<Beat[]>('/api/db/beats', { sceneId });
+		return [...beats].sort((a, b) => a.order - b.order);
+	}
+
+	async function getScenes(chapterId: string): Promise<Scene[]> {
+		const scenes = await get<Scene[]>('/api/db/scenes', { chapterId });
+		return [...scenes].sort((a, b) => a.order - b.order);
+	}
+
+	async function getSceneData(sceneId: string): Promise<{ scene: Scene; beats: Beat[]; characters: Character[]; locations: Location[] } | null> {
+		const scene = await getOptional<Scene>(`/api/db/scenes/${sceneId}`);
+		if (!scene) return null;
+		const [beats, characters, locations] = await Promise.all([
+			getBeats(sceneId),
+			fetchChars(scene.characterIds, MAX_CHARACTERS),
+			fetchLocs(scene.locationIds, MAX_LOCATIONS),
+		]);
+		return { scene, beats, characters, locations };
+	}
+
+	async function getOutlineHierarchy() {
+		const [arcs, acts, milestones, chapters, scenes, beats, stages] = await Promise.all([
+			get<Arc[]>('/api/db/arcs', { projectId }),
+			get<Act[]>('/api/db/acts', { projectId }),
+			get<Milestone[]>('/api/db/milestones', { projectId }),
+			get<Chapter[]>('/api/db/chapters', { projectId }),
+			get<Scene[]>('/api/db/scenes', { projectId }),
+			get<Beat[]>('/api/db/beats', { projectId }),
+			get<Stage[]>('/api/db/stages', { projectId }),
+		]);
+		return normalizeSevenLayerOutline({ arcs, acts, milestones, chapters, scenes, beats, stages });
+	}
+
+	async function getWorldbuildingSnapshot() {
+		const [characters, factions, locations, loreEntries, plotThreads, timelineEvents] = await Promise.all([
+			get<Character[]>('/api/db/characters', { projectId }),
+			get<Faction[]>('/api/db/factions', { projectId }),
+			get<Location[]>('/api/db/locations', { projectId }),
+			get<LoreEntry[]>('/api/db/lore_entries', { projectId }),
+			get<PlotThread[]>('/api/db/plot_threads', { projectId }),
+			get<TimelineEvent[]>('/api/db/timeline_events', { projectId }),
+		]);
+		return {
+			characters: sanitizeWorldbuildCharacters(characters),
+			factions: limitList(factions, MAX_WORLDBUILD_FACTIONS),
+			locations: sanitizeWorldbuildLocations(locations),
+			loreEntries: sanitizeWorldbuildLoreEntries(loreEntries),
+			plotThreads: sanitizeWorldbuildPlotThreads(plotThreads),
+			timelineEvents: sanitizeWorldbuildTimeline(timelineEvents),
+		};
+	}
+
 	switch (task.contextPolicy) {
 		case 'project_summary': {
 			const [project, storyFrames, projectCounts] = await Promise.all([
-				getOrUndefined<Project>(`/api/db/projects/${projectId}`),
-				apiGet<StoryFrame[]>('/api/db/story_frames', { projectId }),
-				fetchProjectContextCounts(projectId),
+				getOptional<Project>(`/api/db/projects/${projectId}`),
+				get<StoryFrame[]>('/api/db/story_frames', { projectId }),
+				getProjectCounts(),
 			]);
 
 			return {
@@ -292,7 +274,7 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 
 		case 'scene_only': {
 			if (!task.targetEntityId) return emptyContext('scene_only');
-			const data = await buildSceneOnlyData(task.targetEntityId);
+			const data = await getSceneData(task.targetEntityId);
 			if (!data) return emptyContext('scene_only');
 			return {
 				policy: 'scene_only',
@@ -316,10 +298,10 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 
 		case 'scene_plus_adjacent': {
 			if (!task.targetEntityId) return emptyContext('scene_plus_adjacent');
-			const data = await buildSceneOnlyData(task.targetEntityId);
+			const data = await getSceneData(task.targetEntityId);
 			if (!data) return emptyContext('scene_plus_adjacent');
 
-			const allScenesInChapter = await getScenesByChapterId(data.scene.chapterId);
+			const allScenesInChapter = await getScenes(data.scene.chapterId);
 
 			const sceneIndex = allScenesInChapter.findIndex((s) => s.id === task.targetEntityId);
 			const adjacentScenes: Scene[] = [];
@@ -355,9 +337,9 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 
 		case 'worldbuilding_scope': {
 			const [project, storyFrames, snapshot] = await Promise.all([
-				getOrUndefined<Project>(`/api/db/projects/${projectId}`),
-				apiGet<StoryFrame[]>('/api/db/story_frames', { projectId }),
-				loadWorldbuildingSnapshot(projectId),
+				getOptional<Project>(`/api/db/projects/${projectId}`),
+				get<StoryFrame[]>('/api/db/story_frames', { projectId }),
+				getWorldbuildingSnapshot(),
 			]);
 
 			return {
@@ -389,7 +371,7 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 			// targetEntityId may be a scene id or chapter id — try scene first
 			let chapterId: string | null = null;
 			if (task.targetEntityId) {
-				const scene = await getOrUndefined<Scene>(`/api/db/scenes/${task.targetEntityId}`);
+				const scene = await getOptional<Scene>(`/api/db/scenes/${task.targetEntityId}`);
 				chapterId = scene ? scene.chapterId : task.targetEntityId;
 			}
 
@@ -397,17 +379,17 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 			// chapter_scope we still require a chapter to anchor against.
 			const includeHierarchy = task.contextPolicy === 'outline_scope' || isAuthorFamily;
 			const [hierarchy, project, storyFrames, plotThreads, worldbuildingSnapshot] = await Promise.all([
-				includeHierarchy ? buildOutlineHierarchy(projectId) : Promise.resolve(undefined),
+				includeHierarchy ? getOutlineHierarchy() : Promise.resolve(undefined),
 				includeProjectContext
-					? getOrUndefined<Project>(`/api/db/projects/${projectId}`)
+					? getOptional<Project>(`/api/db/projects/${projectId}`)
 					: Promise.resolve(undefined),
 				includeProjectContext
-					? apiGet<StoryFrame[]>('/api/db/story_frames', { projectId })
+					? get<StoryFrame[]>('/api/db/story_frames', { projectId })
 					: Promise.resolve([]),
 				includeProjectContext
-					? apiGet<PlotThread[]>('/api/db/plot_threads', { projectId })
+					? get<PlotThread[]>('/api/db/plot_threads', { projectId })
 					: Promise.resolve([]),
-				includeWorldbuildContext ? loadWorldbuildingSnapshot(projectId) : Promise.resolve(null),
+				includeWorldbuildContext ? getWorldbuildingSnapshot() : Promise.resolve(null),
 			]);
 
 			if (!chapterId) {
@@ -426,7 +408,7 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 				};
 			}
 
-			const chapter = await getOrUndefined<Chapter>(`/api/db/chapters/${chapterId}`);
+			const chapter = await getOptional<Chapter>(`/api/db/chapters/${chapterId}`);
 			if (!chapter) {
 				const empty = emptyContext(task.contextPolicy);
 				return {
@@ -443,22 +425,22 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 				};
 			}
 
-			const rawScenes = await getScenesByChapterId(chapterId);
+			const rawScenes = await getScenes(chapterId);
 			const scenes = rawScenes.map((s) => ({
 				...s,
 				content:
 					task.contextPolicy === 'outline_scope' ? '' : s.content.slice(0, MAX_CHAPTER_SCENE_CHARS),
 			}));
 
-			const allBeatsArrays = await Promise.all(scenes.map((s) => getBeatsBySceneId(s.id)));
+			const allBeatsArrays = await Promise.all(scenes.map((s) => getBeats(s.id)));
 			const beats = allBeatsArrays.flat();
 
 			const allCharacterIds = [...new Set(rawScenes.flatMap((s) => s.characterIds))];
 			const allLocationIds = [...new Set(rawScenes.flatMap((s) => s.locationIds))];
 
 			const [characters, locations] = await Promise.all([
-				fetchCharactersByIds(allCharacterIds, MAX_CHAPTER_CHARACTERS),
-				fetchLocationsByIds(allLocationIds, MAX_CHAPTER_LOCATIONS),
+				fetchChars(allCharacterIds, MAX_CHAPTER_CHARACTERS),
+				fetchLocs(allLocationIds, MAX_CHAPTER_LOCATIONS),
 			]);
 			const contextCharacters = includeWorldbuildContext
 				? (worldbuildingSnapshot?.characters ?? [])
@@ -509,12 +491,12 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 				task.taskType === 'pipeline' && task.pipelineTask?.family === 'vibe-author';
 			const [chapters, rawScenes, characters, locations, loreEntries, plotThreads] =
 				await Promise.all([
-					apiGet<Chapter[]>('/api/db/chapters', { projectId }),
-					apiGet<Scene[]>('/api/db/scenes', { projectId }),
-					apiGet<Character[]>('/api/db/characters', { projectId }),
-					apiGet<Location[]>('/api/db/locations', { projectId }),
-					apiGet<LoreEntry[]>('/api/db/lore_entries', { projectId }),
-					apiGet<PlotThread[]>('/api/db/plot_threads', { projectId }),
+					get<Chapter[]>('/api/db/chapters', { projectId }),
+					get<Scene[]>('/api/db/scenes', { projectId }),
+					get<Character[]>('/api/db/characters', { projectId }),
+					get<Location[]>('/api/db/locations', { projectId }),
+					get<LoreEntry[]>('/api/db/lore_entries', { projectId }),
+					get<PlotThread[]>('/api/db/plot_threads', { projectId }),
 				]);
 
 			const [
@@ -527,25 +509,25 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 				glossaryTerms,
 			] = await Promise.all([
 				includeWorldbuildContext
-					? getOrUndefined<Project>(`/api/db/projects/${projectId}`)
+					? getOptional<Project>(`/api/db/projects/${projectId}`)
 					: Promise.resolve(undefined),
 				includeWorldbuildContext
-					? apiGet<StoryFrame[]>('/api/db/story_frames', { projectId })
+					? get<StoryFrame[]>('/api/db/story_frames', { projectId })
 					: Promise.resolve([]),
 				includeWorldbuildContext
-					? apiGet<TimelineEvent[]>('/api/db/timeline_events', { projectId })
+					? get<TimelineEvent[]>('/api/db/timeline_events', { projectId })
 					: Promise.resolve([]),
 				includeWorldbuildContext
-					? apiGet<CharacterRelationship[]>('/api/db/character_relationships', { projectId })
+					? get<CharacterRelationship[]>('/api/db/character_relationships', { projectId })
 					: Promise.resolve([]),
 				includeWorldbuildContext
-					? apiGet<Faction[]>('/api/db/factions', { projectId })
+					? get<Faction[]>('/api/db/factions', { projectId })
 					: Promise.resolve([]),
 				includeWorldbuildContext
-					? apiGet<Theme[]>('/api/db/themes', { projectId })
+					? get<Theme[]>('/api/db/themes', { projectId })
 					: Promise.resolve([]),
 				includeWorldbuildContext
-					? apiGet<GlossaryTerm[]>('/api/db/glossary_terms', { projectId })
+					? get<GlossaryTerm[]>('/api/db/glossary_terms', { projectId })
 					: Promise.resolve([]),
 			]);
 
@@ -588,7 +570,7 @@ export async function buildContext(task: AiTask, projectId: string): Promise<AiC
 				themes,
 				glossaryTerms,
 				...(includeOutlineHierarchy
-					? { outlineHierarchy: await buildOutlineHierarchy(projectId) }
+					? { outlineHierarchy: await getOutlineHierarchy() }
 					: {}),
 			};
 		}

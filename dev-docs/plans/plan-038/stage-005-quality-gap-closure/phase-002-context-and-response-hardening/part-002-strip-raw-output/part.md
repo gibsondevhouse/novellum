@@ -2,7 +2,7 @@
 title: Strip rawOutput from Generate Response
 slug: part-002-strip-raw-output
 part_number: 2
-status: draft
+status: complete
 owner: Backend Agent
 assigned_to: Backend Agent
 phase: phase-002-context-and-response-hardening

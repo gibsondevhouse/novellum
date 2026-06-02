@@ -1,6 +1,6 @@
 # Dev Workflow
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 
 ## Prerequisites
 

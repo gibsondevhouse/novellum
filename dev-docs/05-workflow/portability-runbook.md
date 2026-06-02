@@ -1,6 +1,6 @@
 # Portability Runbook
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 
 Novellum stores everything in a single SQLite file. Portability comes from `.novellum.zip` bundles produced by the backup pipeline. This runbook covers expected operations and recovery procedures.
 

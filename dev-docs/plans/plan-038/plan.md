@@ -2,7 +2,7 @@
 title: Novel Engine v1 — Draft From Outline (Guided Pipeline)
 slug: plan-038-novel-engine-v1
 version: 1.0.0
-status: in-progress
+status: complete
 owner: Planner Agent
 created: 2026-06-01
 last_updated: 2026-06-01
@@ -55,20 +55,20 @@ This makes Novellum feel like a real long-form "novel engine" without needing on
 
 | #   | Stage                                                                 | Status        | Est. Duration |
 | --- | --------------------------------------------------------------------- | ------------- | ------------- |
-| 001 | [Agentic Surface Stabilization](stage-001-agentic-surface/stage.md)  | `in-progress` | 0.5d          |
-| 002 | [Context Fetch Injection](stage-002-context-fetch-injection/stage.md)| `draft`       | 0.5d          |
+| 001 | [Agentic Surface Stabilization](stage-001-agentic-surface/stage.md)  | `complete`    | 0.5d          |
+| 002 | [Context Fetch Injection](stage-002-context-fetch-injection/stage.md)| `complete`    | 0.5d          |
 | 003 | [Checkpoint + Apply Pipeline](stage-003-checkpoint-pipeline/stage.md) | `complete`   | 2d            |
 | 004 | [Chapter Draft Runner](stage-004-chapter-draft-runner/stage.md)      | `complete`    | 1d            |
-| 005 | [Quality & Gap Closure](stage-005-quality-gap-closure/stage.md)      | `draft`       | 1d            |
+| 005 | [Quality & Gap Closure](stage-005-quality-gap-closure/stage.md)      | `complete`    | 1d            |
 
 ## Quality Gates
 
 All stages must pass the following gates before the plan is marked `complete`:
 
-- [ ] **typecheck** — `pnpm check` reports 0 errors
-- [ ] **lint** — `pnpm lint` passes (pre-existing violations documented and deferred)
-- [ ] **tests** — `pnpm test` passes all suites
-- [ ] **check:tokens** — `pnpm check:tokens` 0 violations
+- [x] **typecheck** — `pnpm check` reports 0 errors
+- [x] **lint** — `pnpm lint` passes (pre-existing `lint:css` violation in `IndividualsWorkspaceShell.svelte` is unrelated to this plan)
+- [x] **tests** — `pnpm test` passes all suites (212 files / 1575 tests)
+- [x] **check:tokens** — `pnpm check:tokens` 0 violations
 
 ## Risks & Mitigations
 

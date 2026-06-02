@@ -2,7 +2,7 @@
 title: Source-Contract Tests
 slug: phase-001-source-contract-tests
 phase_number: 1
-status: draft
+status: complete
 owner: Backend Agent
 stage: stage-005-quality-gap-closure
 parts:

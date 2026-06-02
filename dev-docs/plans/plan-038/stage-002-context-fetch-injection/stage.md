@@ -2,7 +2,7 @@
 title: Context Fetch Injection
 slug: stage-002-context-fetch-injection
 stage_number: 2
-status: draft
+status: complete
 owner: Backend Agent
 plan: plan-038-novel-engine-v1
 phases:

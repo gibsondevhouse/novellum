@@ -1,10 +1,10 @@
 # FAQ
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 
 ## Is Novellum free?
 
-Read [LICENSE](../../LICENSE), [EULA.md](../../EULA.md), and [TERMS.md](../../TERMS.md) for the authoritative answer. Licensing is being formalized as part of [plan-018-v1-product-experience](../../dev-docs/plans/plan-018-v1-product-experience/plan.md).
+Read [LICENSE](../../LICENSE), [EULA.md](../../EULA.md), and [TERMS.md](../../TERMS.md) for the authoritative answer.
 
 ## Do I need an internet connection?
 

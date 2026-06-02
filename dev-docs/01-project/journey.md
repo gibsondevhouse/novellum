@@ -1,6 +1,6 @@
 # Journey: How Novellum got to where it is
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 > Audience: a collaborator joining now who wants to trace the workflow from inception to today.
 
 This is the chronological narrative built from [plans/MASTER-PLAN.md](../plans/MASTER-PLAN.md), [plans/archive/](../plans/archive/), and [../../CHANGELOG.md](../../CHANGELOG.md). Read it top-down to see the order in which the codebase was built.

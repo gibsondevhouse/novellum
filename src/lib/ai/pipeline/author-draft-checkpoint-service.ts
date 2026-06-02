@@ -203,7 +203,7 @@ function findActiveCheckpointForScene(
 			(r) =>
 				r.taskKey === AUTHOR_DRAFT_TASK_KEY &&
 				r.sceneId === sceneId &&
-				(r.lifecycle === 'draft' || r.lifecycle === 'review'),
+				r.lifecycle === 'review',
 		)
 		.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 	return active[0];

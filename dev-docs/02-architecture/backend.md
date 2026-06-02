@@ -1,6 +1,6 @@
 # Backend
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 
 The "backend" is a SvelteKit server (Node adapter) that runs either via `pnpm dev` or as a Tauri sidecar. There is no separate backend service.
 

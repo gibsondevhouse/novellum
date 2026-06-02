@@ -1,6 +1,6 @@
 # Tauri Desktop Shell
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 
 Novellum ships as a Tauri 2 desktop app. Instead of running the SvelteKit server in-process or shelling out to a browser, Tauri **spawns the SvelteKit Node server as a sidecar** and points its WebView at the loopback port.
 

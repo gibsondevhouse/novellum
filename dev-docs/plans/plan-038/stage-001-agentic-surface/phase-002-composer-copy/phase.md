@@ -2,7 +2,7 @@
 title: Composer UX Copy — Agent Mode Labels
 slug: phase-002-composer-copy
 phase_number: 2
-status: draft
+status: complete
 owner: Stylist Agent
 stage: stage-001-agentic-surface
 parts:

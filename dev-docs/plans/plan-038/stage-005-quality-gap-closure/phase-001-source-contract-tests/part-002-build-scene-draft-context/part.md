@@ -2,7 +2,7 @@
 title: buildSceneDraftContext Unit Test
 slug: part-002-build-scene-draft-context
 part_number: 2
-status: draft
+status: complete
 owner: Backend Agent
 assigned_to: Backend Agent
 phase: phase-001-source-contract-tests

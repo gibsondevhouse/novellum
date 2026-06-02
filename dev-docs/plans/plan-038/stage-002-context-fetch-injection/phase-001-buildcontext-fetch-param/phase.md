@@ -2,7 +2,7 @@
 title: buildContext Fetch Parameter
 slug: phase-001-buildcontext-fetch-param
 phase_number: 1
-status: draft
+status: complete
 owner: Backend Agent
 stage: stage-002-context-fetch-injection
 parts:

@@ -2,7 +2,7 @@
 title: Fetch Dependency Injection for buildContext
 slug: part-001-fetch-di
 part_number: 1
-status: draft
+status: complete
 owner: Backend Agent
 assigned_to: Backend Agent
 phase: phase-001-buildcontext-fetch-param

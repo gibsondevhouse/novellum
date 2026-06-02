@@ -2,7 +2,7 @@
 title: Resolve draft Lifecycle Dead Code
 slug: part-004-draft-lifecycle
 part_number: 4
-status: draft
+status: complete
 owner: Backend Agent
 assigned_to: Backend Agent
 phase: phase-002-context-and-response-hardening

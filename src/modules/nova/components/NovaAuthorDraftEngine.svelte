@@ -36,6 +36,8 @@
 	let runnerError = $state<string | null>(null);
 	let regenerateExisting = $state(false);
 	let activeIndex = $state(0);
+	let generatedCount = $state(0);
+	let totalToGenerate = $state(0);
 	let abortController = $state<AbortController | null>(null);
 
 	const orderedScenes = $derived.by(() => {
@@ -57,9 +59,8 @@
 
 		const rank: Record<AuthorDraftCheckpoint['lifecycle'], number> = {
 			review: 0,
-			draft: 1,
-			accepted: 2,
-			rejected: 3,
+			accepted: 1,
+			rejected: 2,
 		};
 
 		return candidates
@@ -120,6 +121,7 @@
 
 		runnerError = null;
 		runnerState = 'generating';
+		generatedCount = 0;
 
 		const controller = new AbortController();
 		abortController = controller;
@@ -134,27 +136,30 @@
 				return;
 			}
 
-			for (let i = 0; i < orderedScenes.length; i++) {
+			const scenesToGenerate = regenerateExisting
+				? orderedScenes
+				: orderedScenes.filter((s) => {
+						const existing = bestCheckpointForScene(s.id);
+						return !(existing && existing.lifecycle === 'review');
+					});
+
+			totalToGenerate = scenesToGenerate.length;
+
+			for (let i = 0; i < scenesToGenerate.length; i++) {
 				if (controller.signal.aborted) {
 					runnerState = 'aborted';
 					return;
 				}
 
 				activeIndex = i;
-				const scene = orderedScenes[i]!;
-				const existing = bestCheckpointForScene(scene.id);
-				const hasActive =
-					existing && (existing.lifecycle === 'draft' || existing.lifecycle === 'review');
-
-				if (hasActive && !regenerateExisting) {
-					continue;
-				}
+				const scene = scenesToGenerate[i]!;
 
 				const result = await generateSceneDraftCheckpoint(projectId, scene.id, {
 					forceRegenerate: regenerateExisting,
 					signal: controller.signal,
 				});
 				upsertCheckpoint(result.checkpoint);
+				generatedCount = i + 1;
 			}
 
 			runnerState = controller.signal.aborted ? 'aborted' : 'done';
@@ -226,8 +231,7 @@
 	{:else}
 		{#if runnerState === 'generating'}
 			<p class="engine-muted" aria-live="polite">
-				Generating {Math.min(activeIndex + 1, orderedScenes.length)} / {orderedScenes.length}
-				— {orderedScenes[activeIndex]?.title ?? `Scene ${activeIndex + 1}`}
+				Generating {generatedCount + 1} of {totalToGenerate}…
 			</p>
 		{:else if runnerState === 'aborted'}
 			<p class="engine-muted" aria-live="polite">Aborted. Saved drafts remain available below.</p>

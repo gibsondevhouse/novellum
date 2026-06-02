@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-const mockApiGet = vi.fn();
 class MockApiError extends Error {
 	status: number;
 	constructor(message: string, status: number) {
@@ -11,7 +10,7 @@ class MockApiError extends Error {
 }
 
 vi.mock('$lib/api-client.js', () => ({
-	apiGet: (...args: unknown[]) => mockApiGet(...args),
+	apiGet: vi.fn(),
 	apiPost: vi.fn(),
 	apiPut: vi.fn(),
 	apiDel: vi.fn(),
@@ -24,7 +23,7 @@ import type { AiTask } from '../../../src/lib/ai/types.js';
 const projectId = 'proj-1';
 const now = '2026-05-26T00:00:00Z';
 
-// Endpoint routing — context-engine fans out to /api/db/* via apiGet.
+// Endpoint routing — context-engine fans out to /api/db/* via injected fetch.
 // We dispatch by path + qs to keep individual tests readable.
 type Layer =
 	| 'arcs'
@@ -90,27 +89,44 @@ function blankFixture(): Fixture {
 	};
 }
 
-function installRouter(fixture: Fixture) {
-	mockApiGet.mockImplementation(async (path: string, _qs?: Record<string, string>) => {
-		const singleMatch = path.match(/^\/api\/db\/([a-z_]+)\/([\w-]+)$/);
+function makeMockFetch(fixture: Fixture): typeof globalThis.fetch {
+	return async (input: RequestInfo | URL) => {
+		const url = typeof input === 'string' ? input : input.toString();
+		// Strip query string to get path
+		const [path] = url.split('?');
+
+		const singleMatch = path?.match(/^\/api\/db\/([a-z_]+)\/([\w-]+)$/);
 		if (singleMatch) {
 			const [, resource, id] = singleMatch;
-			if (resource === 'projects') return fixture.project;
-			const bucket = (fixture as unknown as Record<string, unknown[]>)[resource];
-			if (!bucket) throw new MockApiError(`Not found ${path}`, 404);
-			const hit = (bucket as Array<{ id: string }>).find((row) => row.id === id);
-			if (!hit) throw new MockApiError(`Not found ${path}`, 404);
-			return hit;
+			let data: unknown;
+			if (resource === 'projects') {
+				data = fixture.project;
+			} else {
+				const bucket = (fixture as unknown as Record<string, unknown[]>)[resource ?? ''];
+				if (!bucket) return new Response(null, { status: 404 });
+				const hit = (bucket as Array<{ id: string }>).find((row) => row.id === id);
+				if (!hit) return new Response(null, { status: 404 });
+				data = hit;
+			}
+			return new Response(JSON.stringify(data), { status: 200, headers: { 'content-type': 'application/json' } });
 		}
-		const listMatch = path.match(/^\/api\/db\/([a-z_]+)$/);
+
+		const listMatch = path?.match(/^\/api\/db\/([a-z_]+)$/);
 		if (listMatch) {
 			const [, resource] = listMatch;
 			const key = resource as Layer;
-			const bucket = (fixture as unknown as Record<string, unknown[]>)[key];
-			return bucket ?? [];
+			const bucket = (fixture as unknown as Record<string, unknown[]>)[key] ?? [];
+			return new Response(JSON.stringify(bucket), { status: 200, headers: { 'content-type': 'application/json' } });
 		}
-		throw new MockApiError(`Unexpected path ${path}`, 500);
-	});
+
+		return new Response(JSON.stringify({ error: `Unexpected path ${path}` }), { status: 500 });
+	};
+}
+
+let mockFetch: ReturnType<typeof makeMockFetch>;
+
+function installRouter(fixture: Fixture) {
+	mockFetch = makeMockFetch(fixture);
 }
 
 const baseChapter = { projectId, title: 'Ch', order: 1, summary: '', wordCount: 0, createdAt: now, updatedAt: now };
@@ -132,7 +148,7 @@ const baseScene = {
 };
 
 beforeEach(() => {
-	mockApiGet.mockReset();
+	mockFetch = makeMockFetch(blankFixture());
 });
 
 describe('context-engine seven-layer hierarchy mapping', () => {
@@ -164,7 +180,7 @@ describe('context-engine seven-layer hierarchy mapping', () => {
 			pipelineTask: { key: 'vibe-author.outline', family: 'vibe-author', stage: 'outline' },
 		};
 
-		const ctx = await buildContext(task, projectId);
+		const ctx = await buildContext(task, projectId, { fetch: mockFetch });
 		expect(ctx.outlineHierarchy).toBeDefined();
 		expect(ctx.outlineHierarchy!.arcs.map((a) => a.id)).toEqual(['arc1']);
 		expect(ctx.outlineHierarchy!.acts.map((a) => a.id)).toEqual(['act1']);
@@ -195,7 +211,7 @@ describe('context-engine seven-layer hierarchy mapping', () => {
 			pipelineTask: { key: 'vibe-author.premise', family: 'vibe-author', stage: 'premise' },
 		};
 
-		const ctx = await buildContext(task, projectId);
+		const ctx = await buildContext(task, projectId, { fetch: mockFetch });
 		expect(ctx.outlineHierarchy).toBeDefined();
 		expect(ctx.outlineHierarchy!.milestones).toHaveLength(1);
 		expect(ctx.outlineHierarchy!.stages).toHaveLength(1);
@@ -213,7 +229,7 @@ describe('context-engine seven-layer hierarchy mapping', () => {
 			pipelineTask: { key: 'vibe-worldbuild.lore', family: 'vibe-worldbuild', stage: 'lore' },
 		};
 
-		const ctx = await buildContext(task, projectId);
+		const ctx = await buildContext(task, projectId, { fetch: mockFetch });
 		expect(ctx.outlineHierarchy).toBeUndefined();
 	});
 
@@ -231,7 +247,7 @@ describe('context-engine seven-layer hierarchy mapping', () => {
 			outputFormat: 'json',
 		};
 
-		const ctx = await buildContext(task, projectId);
+		const ctx = await buildContext(task, projectId, { fetch: mockFetch });
 		expect(ctx.outlineHierarchy).toBeUndefined();
 	});
 
@@ -250,7 +266,7 @@ describe('context-engine seven-layer hierarchy mapping', () => {
 			outputFormat: 'json',
 			pipelineTask: { key: 'vibe-author.outline', family: 'vibe-author', stage: 'outline' },
 		};
-		const ctx = await buildContext(task, projectId);
+		const ctx = await buildContext(task, projectId, { fetch: mockFetch });
 		// If the implementation regressed and dropped milestones, this would be []
 		expect(ctx.outlineHierarchy?.milestones).toEqual([
 			expect.objectContaining({ id: 'm1' }),
@@ -272,7 +288,7 @@ describe('context-engine seven-layer hierarchy mapping', () => {
 			outputFormat: 'json',
 			pipelineTask: { key: 'vibe-author.outline', family: 'vibe-author', stage: 'outline' },
 		};
-		const ctx = await buildContext(task, projectId);
+		const ctx = await buildContext(task, projectId, { fetch: mockFetch });
 		expect(ctx.outlineHierarchy?.stages).toEqual([
 			expect.objectContaining({ id: 'st1', status: 'completed' }),
 		]);

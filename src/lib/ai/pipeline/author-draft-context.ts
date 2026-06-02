@@ -29,15 +29,25 @@ function loadChapter(chapterId: string): Chapter | null {
 	return (db.prepare('SELECT * FROM chapters WHERE id = ?').get(chapterId) as Chapter | undefined) ?? null;
 }
 
+function parseSceneRow(row: unknown): Scene {
+	const r = row as Record<string, unknown>;
+	return {
+		...(row as Scene),
+		characterIds: JSON.parse((r.characterIds as string | null) ?? '[]') as string[],
+		locationIds: JSON.parse((r.locationIds as string | null) ?? '[]') as string[],
+	};
+}
+
 function loadScene(sceneId: string): Scene | null {
-	return (db.prepare('SELECT * FROM scenes WHERE id = ?').get(sceneId) as Scene | undefined) ?? null;
+	const row = db.prepare('SELECT * FROM scenes WHERE id = ?').get(sceneId);
+	return row ? parseSceneRow(row) : null;
 }
 
 function loadScenesInChapter(chapterId: string): Scene[] {
-	const scenes = db
+	const rows = db
 		.prepare('SELECT * FROM scenes WHERE chapterId = ? ORDER BY "order" ASC')
-		.all(chapterId) as Scene[];
-	return scenes ?? [];
+		.all(chapterId);
+	return rows.map(parseSceneRow);
 }
 
 function loadSceneMetadata(
@@ -109,6 +119,17 @@ function loadCanonRefs(projectId: string, scene: Scene): string[] {
 	return refs;
 }
 
+function loadUnresolvedThreads(projectId: string): string[] {
+	const rows = db
+		.prepare(
+			`SELECT title, description FROM plot_threads WHERE projectId = ? AND status != 'resolved' ORDER BY createdAt ASC`,
+		)
+		.all(projectId) as Array<{ title: string; description: string }>;
+	return rows.map((r) =>
+		r.description?.trim() ? `${r.title}: ${r.description.trim()}` : r.title,
+	);
+}
+
 export function buildSceneDraftContext(projectId: string, sceneId: string): SceneDraftContext | null {
 	const scene = loadScene(sceneId);
 	if (!scene || scene.projectId !== projectId) return null;
@@ -171,7 +192,7 @@ export function buildSceneDraftContext(projectId: string, sceneId: string): Scen
 		continuity: {
 			relevantCanonRefs: loadCanonRefs(projectId, scene),
 			priorSceneSummary: priorScene?.summary?.trim() || undefined,
-			unresolvedThreads: [],
+			unresolvedThreads: loadUnresolvedThreads(projectId),
 		},
 	};
 }

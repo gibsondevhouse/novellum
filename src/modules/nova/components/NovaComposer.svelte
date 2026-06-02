@@ -31,7 +31,7 @@
 		{
 			value: 'agent',
 			label: 'Agent',
-			description: 'Multi-step planning — coming soon.',
+			description: 'Bounded tool loop — gathers context and takes app actions via tool calls.',
 		},
 	];
 
@@ -60,7 +60,7 @@
 	const composerPlaceholder = $derived.by(() => {
 		if (isStreaming) return 'Nova is responding…';
 		if (currentMode === 'write') return 'Ask Write mode to build an outline or propose a revision…';
-		if (currentMode === 'agent') return 'Agent mode coming soon — routed to Ask for now…';
+		if (currentMode === 'agent') return 'Describe a multi-step task — Nova will use tools to gather context and act…';
 		return 'Brainstorm, ask questions, or explore story ideas…';
 	});
 	const canSubmit = $derived(draft.trim().length > 0 && !isStreaming);

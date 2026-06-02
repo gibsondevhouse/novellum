@@ -140,7 +140,7 @@ function providerErrorResponse(err: AiProviderError): Response {
 	);
 }
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, fetch: eventFetch }) => {
 	let body: unknown = null;
 	try {
 		body = await request.json();
@@ -151,7 +151,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	if (isProxyShape(body)) {
 		return handleProxy(body, request.signal);
 	}
-	return handleTask(body as TaskBody, request.signal);
+	return handleTask(body as TaskBody, request.signal, eventFetch);
 };
 
 async function handleProxy(body: ProxyBody, signal: AbortSignal): Promise<Response> {
@@ -277,7 +277,7 @@ async function handleProxy(body: ProxyBody, signal: AbortSignal): Promise<Respon
 	}
 }
 
-async function handleTask(body: TaskBody, signal: AbortSignal): Promise<Response> {
+async function handleTask(body: TaskBody, signal: AbortSignal, eventFetch?: typeof fetch): Promise<Response> {
 	if (!body?.action || typeof body.action !== 'string') {
 		error(400, 'Missing or invalid "action" field');
 	}
@@ -293,7 +293,7 @@ async function handleTask(body: TaskBody, signal: AbortSignal): Promise<Response
 	};
 
 	const task = resolveTask(body.action as string, uiCtx);
-	const ctx = await buildContext(task, body.projectId as string);
+	const ctx = await buildContext(task, body.projectId as string, { fetch: eventFetch });
 
 	const writingStyles = db
 		.prepare(`SELECT * FROM writing_styles WHERE projectId = ?`)

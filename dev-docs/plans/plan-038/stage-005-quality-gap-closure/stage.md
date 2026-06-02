@@ -2,7 +2,7 @@
 title: Quality Gap Closure
 slug: stage-005-quality-gap-closure
 stage_number: 5
-status: draft
+status: complete
 owner: Backend Agent
 plan: plan-038-novel-engine-v1
 phases:

@@ -2,7 +2,7 @@
 title: Populate unresolvedThreads from plot_threads
 slug: part-001-unresolved-threads
 part_number: 1
-status: draft
+status: complete
 owner: Backend Agent
 assigned_to: Backend Agent
 phase: phase-002-context-and-response-hardening

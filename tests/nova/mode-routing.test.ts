@@ -6,6 +6,8 @@
  * AI I/O and OpenRouter are mocked so no network calls are made.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 const streamCompleteMock = vi.fn();
 const buildRagContextMock = vi.fn();
@@ -59,6 +61,21 @@ const defaultRagResult = {
 	includedScopes: [],
 	warnings: [],
 };
+
+describe('NovaComposer source — agent mode copy', () => {
+	it('does not label agent mode as coming soon', () => {
+		const src = readFileSync(
+			resolve(process.cwd(), 'src/modules/nova/components/NovaComposer.svelte'),
+			'utf-8',
+		);
+		// Agent mode description must not claim it is coming soon
+		expect(src).not.toMatch(/agent[^>]*coming soon/i);
+		// Placeholder must not say agent is routed to Ask
+		expect(src).not.toContain('routed to Ask');
+		// The MODE_OPTIONS agent description must not literally contain the old stale phrase
+		expect(src).not.toContain("Multi-step planning — coming soon.");
+	});
+});
 
 describe('Nova mode routing — sendNovaChat', () => {
 	beforeEach(() => {

@@ -2,7 +2,7 @@
 title: Agentic Surface Stabilization
 slug: stage-001-agentic-surface
 stage_number: 1
-status: in-progress
+status: complete
 owner: AI Agent
 plan: plan-038-novel-engine-v1
 phases:

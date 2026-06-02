@@ -1,4 +1,5 @@
 import { json, error } from '@sveltejs/kit';
+import { dev } from '$app/environment';
 import type { RequestHandler } from './$types';
 import { getPreference } from '$lib/server/preferences/preferences-service.js';
 import { createCredentialService } from '$lib/server/credentials/credential-service.js';
@@ -114,7 +115,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	const existingActive =
 		listAuthorDraftCheckpoints(projectId)
 			.filter((checkpoint) => checkpoint.sceneId === sceneId)
-			.filter((checkpoint) => checkpoint.lifecycle === 'draft' || checkpoint.lifecycle === 'review')
+			.filter((checkpoint) => checkpoint.lifecycle === 'review')
 			.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0] ?? null;
 
 	if (existingActive && !forceRegenerate) {
@@ -313,7 +314,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		forceRegenerate,
 	});
 
-	return json({ checkpoint, rawOutput });
+	return json(dev ? { checkpoint, rawOutput } : { checkpoint });
 };
 
 function buildRepairPrompt(prompt: string, failure: string | null): string {

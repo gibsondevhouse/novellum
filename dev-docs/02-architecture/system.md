@@ -1,6 +1,6 @@
 # System Architecture
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 
 Novellum is a **single-user, local-first desktop app** wrapping a SvelteKit web app over a server-side SQLite database. The desktop shell (Tauri 2) ships a Node.js binary and runs the SvelteKit server as a sidecar process. The browser variant exists for development.
 
