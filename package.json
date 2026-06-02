@@ -102,7 +102,7 @@
 		"clsx": "^2.1.1",
 		"dexie": "^4.4.2",
 		"diff": "^8.0.4",
-		"docx": "^9.6.1",
+		"docx": "^9.7.1",
 		"epub-gen-memory": "^1.1.2",
 		"isomorphic-dompurify": "^3.8.0",
 		"jszip": "^3.10.1",
