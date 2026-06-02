@@ -239,6 +239,15 @@ describe('parseAuthorOutput — scene-draft prose+sidecar', () => {
 		expect(payload.sidecar.usedCanonRefs.characterIds).toEqual(['iri', 'voss']);
 	});
 
+	it('accepts a ```json sidecar fence label variant', () => {
+		const raw = `Prose body.\n\n\`\`\`json sidecar\n${JSON.stringify(validSidecar)}\n\`\`\``;
+		const result = parseAuthorOutput(PIPELINE_TASK_KEYS.AUTHOR_SCENE_DRAFT, raw);
+		expect(result.ok).toBe(true);
+		if (!result.ok) throw new Error('expected success');
+		const payload = result.payload as AuthorSceneDraftPayload;
+		expect(payload.sidecar.sceneId).toBe('sc-1');
+	});
+
 	it('flags missing_scene_sidecar when no fenced JSON block is present', () => {
 		const raw = 'Prose only, no sidecar at all.';
 		const result = parseAuthorOutput(PIPELINE_TASK_KEYS.AUTHOR_SCENE_DRAFT, raw);
@@ -266,14 +275,15 @@ describe('parseAuthorOutput — scene-draft prose+sidecar', () => {
 		expect(result.error.details.join(' ')).toContain('sceneId');
 	});
 
-	it('flags missing_required_fields when sidecar lacks povCharacterId', () => {
+	it('allows missing povCharacterId and normalizes to null', () => {
 		const incomplete: Record<string, unknown> = { ...validSidecar };
 		delete incomplete.povCharacterId;
 		const raw = `prose body\n\n\`\`\`json\n${JSON.stringify(incomplete)}\n\`\`\``;
 		const result = parseAuthorOutput(PIPELINE_TASK_KEYS.AUTHOR_SCENE_DRAFT, raw);
-		expect(result.ok).toBe(false);
-		if (result.ok) throw new Error('expected failure');
-		expect(result.error.code).toBe('missing_required_fields');
+		expect(result.ok).toBe(true);
+		if (!result.ok) throw new Error('expected success');
+		const payload = result.payload as AuthorSceneDraftPayload;
+		expect(payload.sidecar.povCharacterId).toBeNull();
 	});
 
 	it('flags invalid_json_object when the sidecar fence holds bad JSON', () => {

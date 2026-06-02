@@ -88,6 +88,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		model,
 		messages,
 		max_tokens: MAX_OUTPUT_TOKENS,
+		parallel_tool_calls: false,
 	};
 	if (tools && tools.length > 0) {
 		openRouterBody.tools = tools;

@@ -140,6 +140,30 @@ export async function flushNow(): Promise<void> {
 	await runFlush();
 }
 
+/**
+ * Clears any pending autosave state for the currently mounted scene and
+ * resets the status to `saved`. Used when another workflow overwrites
+ * `scenes.content` and the editor must not later flush an outdated
+ * pending draft back into the database.
+ */
+export function acknowledgeExternalOverwrite(sceneId: string, savedAt: string): void {
+	if (!state) return;
+	if (state.sceneId !== sceneId) return;
+
+	clearTimers();
+	pending = null;
+	attempt = 0;
+	lastSavedAt = savedAt;
+	clearPendingDraft(sceneId);
+	emit({
+		status: 'saved',
+		savedAt,
+		error: null,
+		pendingDraft: null,
+		attempt: 0,
+	});
+}
+
 async function runFlush(): Promise<void> {
 	if (inflight) {
 		await inflight;

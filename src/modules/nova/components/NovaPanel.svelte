@@ -17,6 +17,7 @@
 	import ContextDisclosurePill from './ContextDisclosurePill.svelte';
 	import NovaMessageLog from './NovaMessageLog.svelte';
 	import NovaComposer from './NovaComposer.svelte';
+	import NovaAuthorDraftEngine from './NovaAuthorDraftEngine.svelte';
 
 	interface Props {
 		projectId?: string | null;
@@ -53,9 +54,10 @@
 	const aiLoading = $derived(aiSession.loading);
 	const aiChecked = $derived(aiSession.checked);
 	const hasProjectContext = $derived(Boolean(projectId));
+	const isEditorRoute = $derived(/^\/projects\/[^/]+\/editor$/.test(page.url.pathname));
 	const hasSubheader = $derived(
 		page.url.pathname.includes('/world-building') ||
-		(/^\/projects\/[^/]+\/editor$/.test(page.url.pathname)),
+		isEditorRoute,
 	);
 	const panelStatusLabel = $derived.by(() => {
 		if (aiLoading) return 'Checking AI configuration';
@@ -338,6 +340,9 @@
 					{/snippet}
 				</EmptyStatePanel>
 			{:else}
+				{#if hasProjectContext && isEditorRoute}
+					<NovaAuthorDraftEngine projectId={projectId} activeChapterId={activeChapterId} />
+				{/if}
 				{#if messages.length === 0}
 					<div class="nova-greeting">
 						<p class="nova-greeting-eyebrow">Nova</p>

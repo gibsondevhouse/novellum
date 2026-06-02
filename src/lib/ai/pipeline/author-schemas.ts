@@ -2,6 +2,15 @@ import { z } from 'zod';
 
 const trimmedString = z.string().transform((value) => value.trim());
 
+const optionalNullableTrimmedString = z
+	.union([z.string(), z.null()])
+	.optional()
+	.transform((value) => {
+		if (typeof value !== 'string') return null;
+		const trimmed = value.trim();
+		return trimmed.length > 0 ? trimmed : null;
+	});
+
 const stringListField = z
 	.union([z.array(z.string()), z.string()])
 	.transform((value) => (Array.isArray(value) ? value : [value]))
@@ -68,7 +77,7 @@ export const authorSceneSidecarSchema = z
 	.object({
 		sceneId: trimmedString,
 		chapterId: trimmedString,
-		povCharacterId: trimmedString,
+		povCharacterId: optionalNullableTrimmedString,
 		wordCount: z
 			.union([z.number(), z.string()])
 			.transform((value) =>

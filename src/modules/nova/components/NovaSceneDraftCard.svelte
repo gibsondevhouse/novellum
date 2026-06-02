@@ -71,7 +71,7 @@
 			·
 			<span aria-label="Word count">{sidecar.wordCount} words</span>
 			·
-			<span aria-label="POV character">POV <code>{sidecar.povCharacterId}</code></span>
+			<span aria-label="POV character">POV <code>{sidecar.povCharacterId ?? 'unset'}</code></span>
 		</p>
 		<p class="scene-draft-provenance" aria-label="Artifact provenance">
 			<span>Task <code>{envelope.taskKey}</code></span>

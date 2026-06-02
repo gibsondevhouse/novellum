@@ -1,0 +1,20 @@
+Test run: pnpm test — 2026-06-01
+Files: 210 passed (210)
+Tests: 1554 passed (1554)
+Duration: ~22s
+
+Relevant test file: tests/ai/pipeline/author-draft-checkpoint-service.test.ts
+
+Test suites in scope:
+  - "author-draft checkpoint contracts" (2 tests) — Zod schema validation
+  - "author-draft checkpoint service" (8 tests):
+    - createCheckpoint stores in project_metadata
+    - listCheckpoints returns by projectId and filters
+    - accept is idempotent and applies prose to scenes.content
+    - accept sets wordCount on scenes table
+    - reject blocks accept until regenerated
+    - stale write guard returns stale_target unless forced
+    - accept validation rejects empty prose and mismatched scene ids
+    - regeneration supersedes prior active checkpoint (lifecycle -> rejected)
+
+pnpm check: 0 errors, 11 pre-existing warnings (unchanged from baseline).

@@ -11,11 +11,11 @@
 	};
 
 	let {
-		projectId,
-		topSection,
-		ariaLabel,
-		title,
-		description,
+		projectId: _projectId,
+		topSection: _topSection,
+		ariaLabel: _ariaLabel,
+		title: _title,
+		description: _description,
 		orientationTitle,
 		orientation,
 		links,

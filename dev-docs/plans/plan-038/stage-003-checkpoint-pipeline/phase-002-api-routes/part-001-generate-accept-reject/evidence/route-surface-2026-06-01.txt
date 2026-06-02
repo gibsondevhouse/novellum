@@ -1,0 +1,18 @@
+Route surface as of 2026-06-01:
+
+GET    /api/author-draft/checkpoints?projectId=&sceneId=
+POST   /api/author-draft/checkpoints/generate
+POST   /api/author-draft/checkpoints/accept
+POST   /api/author-draft/checkpoints/reject
+GET    /api/db/author-draft/scene-draft-context?projectId=&sceneId=
+
+Client wrappers in src/modules/nova/services/author-draft-api.ts:
+  - listAuthorDraftCheckpoints(projectId, sceneId?)
+  - generateSceneDraftCheckpoint(projectId, sceneId)
+  - acceptSceneDraftCheckpoint(checkpointId, { forceOverwrite? })
+  - rejectSceneDraftCheckpoint(checkpointId, { reason? })
+  - fetchSceneById(projectId, sceneId)
+  - getSceneDraftContext(projectId, sceneId)
+
+Known issue: generate response includes rawOutput field (raw LLM text).
+To be stripped in stage-005.

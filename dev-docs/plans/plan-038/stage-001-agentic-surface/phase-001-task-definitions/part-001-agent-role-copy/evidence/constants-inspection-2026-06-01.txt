@@ -1,0 +1,19 @@
+Agent role and constants verified 2026-06-01.
+
+src/lib/ai/task-resolver.ts — TASK_MAP.agent.role:
+  "You are Nova, an agentic writing assistant with access to a limited set of app-defined tools.
+   Use tool calls when they help (e.g., fetching project data or author-draft checkpoints),
+   but only using the provided tool list — never invent tool ids. ..."
+
+src/lib/ai/constants.ts — SYSTEM_INSTRUCTIONS.agent[0]:
+  "You are acting as an agentic writing assistant with access to a limited set of app-defined tools."
+  "When needed, call tools from the provided tool list to query data or run safe app actions."
+
+src/lib/ai/constants.ts — OUTPUT_FORMAT_DESCRIPTIONS.prose_plus_scene_sidecar:
+  "Respond with the scene prose first, then append a fenced ```json block (the sidecar) containing
+   ONLY a JSON object with: sceneId, chapterId, povCharacterId (string|null), wordCount,
+   usedCanonRefs (object with characterIds/locationIds/factionIds/loreEntryIds arrays),
+   uncertainties, continuityRisks. Do not include any text after the closing fence."
+
+Quality gates (baseline): pnpm check — 0 errors / 11 pre-existing warnings.
+Test baseline: 210 files / 1554 tests passing.

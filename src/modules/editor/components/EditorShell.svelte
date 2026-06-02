@@ -5,6 +5,11 @@
 	import { page } from '$app/state';
 	import { novaPanel } from '$modules/nova';
 	import { sceneIntent } from '$lib/stores/scene-intent.svelte.js';
+	import { editorDirty } from '$lib/stores/editor-dirty.svelte.js';
+	import {
+		SCENE_CONTENT_APPLIED_EVENT,
+		type SceneContentAppliedDetail,
+	} from '$lib/events/scene-content.js';
 	import { editorState } from '../stores/editor.svelte.js';
 	import * as autosaveService from '../services/autosave-service.js';
 	import ManuscriptEditorPane from './ManuscriptEditorPane.svelte';
@@ -74,6 +79,20 @@
 	let tipTapEditor = $state<any | null>(null);
 	let editorTick = $state(0);
 	let spellcheckEnabled = $state(true);
+
+	function handleSceneContentApplied(detail: SceneContentAppliedDetail): void {
+		const scene = data.scenes.find((s: Scene) => s.id === detail.sceneId);
+		if (!scene) return;
+
+		scene.content = detail.content;
+		scene.wordCount = detail.wordCount;
+		scene.updatedAt = detail.updatedAt;
+
+		if (editorState.activeSceneId === detail.sceneId) {
+			autosaveService.acknowledgeExternalOverwrite(detail.sceneId, detail.updatedAt);
+			activeContent = detail.content;
+		}
+	}
 
 	// Phase 2: hydrate editor preferences when project is available
 	$effect(() => {
@@ -150,6 +169,17 @@
 		};
 	});
 
+	$effect(() => {
+		if (typeof window === 'undefined') return;
+		const handler = (event: Event) => {
+			const detail = (event as CustomEvent<SceneContentAppliedDetail>).detail;
+			if (!detail) return;
+			handleSceneContentApplied(detail);
+		};
+		window.addEventListener(SCENE_CONTENT_APPLIED_EVENT, handler);
+		return () => window.removeEventListener(SCENE_CONTENT_APPLIED_EVENT, handler);
+	});
+
 	const totalCurrentWords = $derived.by(() => {
 		return data.scenes.reduce(
 			(sum: number, scene: Scene) => sum + countWords(scene.content ?? ''),
@@ -218,7 +248,14 @@
 			sceneDefinition = { ...EMPTY_DEFINITION };
 			quickIntent = { ...EMPTY_QUICK_INTENT, goal: scene.summary ?? '' };
 			locationTag = scene.locationId ?? '';
-			autosaveService.mount(scene.id, scene.projectId);
+			autosaveService.mount(scene.id, scene.projectId, (result) => {
+				editorDirty.setSnapshot({
+					sceneId: scene.id,
+					status: result.status,
+					pendingDraft: result.pendingDraft,
+					updatedAt: new Date().toISOString(),
+				});
+			});
 			// Reconcile with SQLite-canonical store (clarity is shared with the outliner).
 			const pid = scene.projectId;
 			const sid = scene.id;
@@ -267,6 +304,7 @@
 		return () => {
 			autosaveService.flushNow();
 			autosaveService.unmount();
+			editorDirty.clear();
 		};
 	});
 

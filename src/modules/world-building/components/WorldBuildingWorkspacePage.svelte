@@ -15,9 +15,9 @@
 
 	let {
 		projectId,
-		topSection,
-		activeId,
-		ariaLabel,
+		topSection: _topSection,
+		activeId: _activeId,
+		ariaLabel: _ariaLabel,
 		options,
 		selectedId,
 		onSelect,

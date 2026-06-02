@@ -6,7 +6,7 @@
 
 ## Current
 
-No active plan. Await user direction for next work.
+[plan-038-novel-engine-v1](./plan-038/plan.md) — Novel Engine v1: Draft From Outline guided pipeline. Stages 001 (partial), 002 (draft), 003 (complete), 004 (complete), 005 (draft). Context fetch injection and quality gap closure remaining.
 
 ## Recently completed
 

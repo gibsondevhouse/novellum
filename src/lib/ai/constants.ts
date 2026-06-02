@@ -110,9 +110,11 @@ export const CONSTRAINTS_BY_TYPE: Record<string, string[]> = {
 		'Do not invent canonical facts about the world or characters that contradict the provided context.',
 	],
 	agent: [
-		'You are acting as an agentic writing assistant. Multi-step tool use is not yet enabled.',
-		'Describe what actions you would take and which tools you would invoke, but do not fabricate tool outputs.',
-		'Treat every proposed change as a proposal requiring explicit author acceptance.',
+		'You are acting as an agentic writing assistant with access to a limited set of app-defined tools.',
+		'When needed, call tools from the provided tool list to query data or run safe app actions. Do not invent tool ids.',
+		'Never fabricate tool outputs. If a tool fails, report the failure and choose a safer next step.',
+		'Tool calls are app-defined server actions (not arbitrary browser access). Never expose API keys.',
+		'Do not silently edit the manuscript; any applied prose changes must go through explicit accept/reject flows.',
 	],
 };
 
@@ -127,7 +129,7 @@ export const TASK_DESCRIPTIONS: Record<string, string> = {
 	write:
 		'Generate a structured writing proposal — outline, scene draft, or revision plan — based on the author\'s request and project context. Every output is a proposal the author reviews; nothing is auto-applied.',
 	agent:
-		'Plan and describe the multi-step actions you would take as an agentic writing assistant. Tool dispatch is not yet enabled — return a structured plan of proposed actions instead.',
+		'Use a bounded tool loop to gather context and take app-defined actions via tool calls, then return a concise final response. Never fabricate tool outputs.',
 };
 
 export const OUTPUT_FORMAT_DESCRIPTIONS: Record<string, string> = {
@@ -156,7 +158,7 @@ export const OUTPUT_FORMAT_DESCRIPTIONS: Record<string, string> = {
 	json_author_outline:
 		'Return a JSON object with nested arrays: arcs[], acts[], milestones[], chapters[], scenes[], beats[]. Scenes must include povCharacterId, locationId, threadIds, goal, conflict, turn, outcome, and arcRefs.',
 	prose_plus_scene_sidecar:
-		'Respond with the scene prose first, followed by a fenced ---SIDECAR--- block containing a JSON object with: sceneId, assignedBeatIds, povCharacterId, locationId, characterIds, threadIds, factsIntroduced, continuityRisks, wordCountEstimate, draftStatus.',
+		'Respond with the scene prose first, then append a fenced ```json block (the sidecar) containing ONLY a JSON object with: sceneId, chapterId, povCharacterId (string|null), wordCount, usedCanonRefs (object with characterIds/locationIds/factionIds/loreEntryIds arrays), uncertainties, continuityRisks. Do not include any text after the closing fence.',
 	json_author_revision_pack:
 		'Return a JSON object with an `issues[]` array. Each issue must have: severity, type, evidenceSpan, problemExplanation, minimalFix, deeperRewriteOption, requiresCanonDecision, relatedEntityIds, approvalChecklist.',
 	json_worldbuild_domain_personae:

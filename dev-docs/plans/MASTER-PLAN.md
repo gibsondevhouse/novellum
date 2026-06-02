@@ -1,10 +1,10 @@
 # MASTER PLAN: Novellum Development
 
-> Last reconciled: 2026-06-01 (plan-037 scan execution wired; no active plan)
+> Last reconciled: 2026-06-01 (plan-038 artifacts generated; in-progress)
 
 ## Active Plans
 
-No active plans. Await user direction for next work.
+- **[plan-038-novel-engine-v1](./plan-038/plan.md)** — Novel Engine v1: Draft From Outline guided pipeline. Status: `in-progress`. Stages: 001 (partial — composer copy draft), 002 (draft — fetch DI), 003 (complete — checkpoint pipeline), 004 (complete — chapter draft runner), 005 (draft — quality gap closure). Quality baseline: pnpm check (0 errors / 11 pre-existing warnings), pnpm test (210 files / 1554 tests), pnpm check:tokens (0 violations).
 
 ## Deferred (not yet scheduled)
 

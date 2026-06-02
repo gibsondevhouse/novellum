@@ -98,7 +98,9 @@ type JsonExtractionResult =
 	| { ok: true; rawJson: string; jsonValue: unknown }
 	| { ok: false; error: AuthorParseError; rawJson: string | null };
 
-const SIDECAR_FENCE_PATTERN = /```(?:json)?\s*\n([\s\S]*?)\n```/gi;
+// Matches a fenced JSON sidecar block at the end of scene-draft outputs.
+// Accepts both ```json and ```json sidecar (as described in OUTPUT_FORMAT_DESCRIPTIONS).
+const SIDECAR_FENCE_PATTERN = /```json(?:\s+sidecar)?\s*\n([\s\S]*?)\n```/gim;
 
 function normalizeAuthorOutline(payload: AuthorOutline): AuthorOutline {
 	const milestones = Array.isArray(payload.milestones) ? payload.milestones : [];
@@ -123,7 +125,7 @@ function formatZodIssues(issues: ZodIssue[]): string[] {
 function getFallbackMessage(taskKey: string, code: AuthorParseErrorCode): string {
 	switch (code) {
 		case 'missing_scene_sidecar':
-			return `Scene-draft output for ${taskKey} is missing the required sidecar JSON block. Ask the model to append a fenced \`\`\`json sidecar with sceneId/chapterId/povCharacterId.`;
+			return `Scene-draft output for ${taskKey} is missing the required sidecar JSON block. Ask the model to append a fenced \`\`\`json sidecar with at least sceneId and chapterId (povCharacterId may be null).`;
 		case 'missing_scene_prose':
 			return `Scene-draft output for ${taskKey} is missing prose. Ask the model to draft the scene before the sidecar block.`;
 		case 'missing_required_fields':
@@ -282,8 +284,7 @@ function parseSceneDraft(rawOutput: string): AuthorParseResult {
 			(issue) =>
 				issue.path.length === 1 &&
 				(issue.path[0] === 'sceneId' ||
-					issue.path[0] === 'chapterId' ||
-					issue.path[0] === 'povCharacterId'),
+					issue.path[0] === 'chapterId'),
 		);
 		const code: AuthorParseErrorCode = missingRequired
 			? 'missing_required_fields'
@@ -294,7 +295,7 @@ function parseSceneDraft(rawOutput: string): AuthorParseResult {
 			error: {
 				code,
 				message: missingRequired
-					? 'Scene-draft sidecar is missing required identifiers (sceneId, chapterId, povCharacterId).'
+					? 'Scene-draft sidecar is missing required identifiers (sceneId, chapterId).'
 					: 'Scene-draft sidecar failed schema validation.',
 				details,
 			},
@@ -308,14 +309,13 @@ function parseSceneDraft(rawOutput: string): AuthorParseResult {
 	const missing: string[] = [];
 	if (!sidecar.sceneId) missing.push('sceneId is required for persistence.');
 	if (!sidecar.chapterId) missing.push('chapterId is required for persistence.');
-	if (!sidecar.povCharacterId) missing.push('povCharacterId is required for persistence.');
 	if (missing.length > 0) {
 		return {
 			ok: false,
 			taskKey,
 			error: {
 				code: 'missing_required_fields',
-				message: 'Scene-draft sidecar is missing required identifiers (sceneId, chapterId, povCharacterId).',
+				message: 'Scene-draft sidecar is missing required identifiers (sceneId, chapterId).',
 				details: missing,
 			},
 			rawJson: split.split.sidecarJson,

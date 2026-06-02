@@ -1,0 +1,26 @@
+Component inspection 2026-06-01:
+
+NovaAuthorDraftEngine.svelte key behaviors:
+  - runChapterDraft() iterates orderedScenes (sorted by order field)
+  - calls generateSceneDraftCheckpoint(projectId, scene.id) per scene
+  - calls upsertCheckpoint(checkpoint) after each successful generate
+  - skips scenes with existing active checkpoint when !regenerateExisting
+  - AbortSignal: checks signal.aborted before each generate call
+  - Progress display: `${activeIndex + 1} / ${orderedScenes.length}`
+
+NovaAuthorDraftCheckpointCard.svelte key behaviors:
+  - accept(): checks editorDirty store — shows conflict warning if true
+  - accept(): calls acceptSceneDraftCheckpoint({ forceOverwrite }) on confirm
+  - accept(): stale_target response triggers force-overwrite confirmation dialog
+  - accept(): calls dispatchSceneContentApplied() after success
+  - reject(): calls rejectSceneDraftCheckpoint with optional reason
+  - regenerate(): dispatches 'regenerate' event up to parent runner
+
+EditorShell.svelte listener (novellum:scene-content-applied event):
+  - Updates activeContent store
+  - Calls autosaveService.acknowledgeExternalOverwrite()
+
+Quality baseline:
+  pnpm check  : 0 errors, 11 warnings (pre-existing)
+  pnpm test   : 210 files, 1554 tests — all pass
+  pnpm check:tokens : 0 violations

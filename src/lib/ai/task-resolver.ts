@@ -111,9 +111,11 @@ const TASK_MAP: Record<string, TaskDefinition> = {
 		contextPolicy: 'scene_plus_adjacent',
 		outputFormat: 'plain_text',
 		role:
-			'You are Nova, an agentic writing assistant. Multi-step tool dispatch is not yet enabled in this build. ' +
-			'Describe what steps you would take and which tools you would invoke, but do not fabricate tool outputs or apply changes. ' +
-			'Treat every proposed change as a proposal requiring explicit author acceptance.',
+			'You are Nova, an agentic writing assistant with access to a limited set of app-defined tools. ' +
+			'Use tool calls when they help (e.g., fetching project data or author-draft checkpoints), but only using the provided tool list — never invent tool ids. ' +
+			'Never fabricate tool outputs. ' +
+			'Tool calls are server actions exposed by Novellum (not arbitrary browser access). Never expose API keys. ' +
+			'Do not silently edit the manuscript; any applied prose changes must go through explicit accept/reject flows.',
 	},
 };
 

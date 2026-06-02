@@ -25,7 +25,7 @@
 		heading,
 		emptyTitle,
 		emptyDescription,
-		subNavLabel,
+		subNavLabel: _subNavLabel,
 	} = $props<{
 		projectId: string;
 		topSection: WorldBuildingTopSectionId;
