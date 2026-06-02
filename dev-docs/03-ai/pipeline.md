@@ -250,6 +250,6 @@ Both routes:
 
 ## See also
 
-- [agents-map.md](./agents-map.md) — shipped vs planned agents.
+- [agents-map.md](./agents-map.md) — shipped agents and the agents cut from internal V1.
 - [context-engine.md](./context-engine.md) — scoping policies.
 - [prompt-system.md](./prompt-system.md) — prompt construction details.

@@ -1,9 +1,12 @@
-# Novellum V1 — Manual smoke checklist (packaged build)
+# Novellum — Manual smoke checklist (packaged build)
 
-> Last verified: 2026-05-13 (plan-025)
+> Last verified: 2026-06-01
+>
+> Originally cut for the internal V1 desktop checkpoint (plan-025). Still the
+> canonical smoke checklist for any packaged Tauri build.
 
 Run this checklist on the **packaged Tauri `.app`** (output of
-`pnpm desktop:build`) before every V1 release. The vitest suite plus
+`pnpm desktop:build`) before any release. The vitest suite plus
 `pnpm smoke:built` exercise everything that can be probed automatically;
 this list covers what only the bundled desktop shell can prove.
 

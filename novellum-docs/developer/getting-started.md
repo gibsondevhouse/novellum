@@ -1,6 +1,6 @@
 # Getting Started (Developers)
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 
 This is the **fast path** for a new contributor. The deeper reference lives under [../../dev-docs/](../../dev-docs/) — read [../../dev-docs/01-project/journey.md](../../dev-docs/01-project/journey.md) for the project's history once you're set up.
 

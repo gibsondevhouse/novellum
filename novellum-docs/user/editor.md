@@ -1,6 +1,6 @@
 # The Editor
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 
 Novellum's editor is a **scene-focused** rich-text editor built on TipTap. It is designed for long-form fiction — quiet UI, autosave, and snapshot history so you never lose a draft.
 

@@ -1,6 +1,6 @@
 # World Building
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 
 The **World Building** surface gathers everything that isn't manuscript prose: who's in your story, where it happens, what they know, what's brewing, and when it all unfolds.
 

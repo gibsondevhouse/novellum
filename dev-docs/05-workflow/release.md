@@ -79,5 +79,6 @@ If a packaging issue ships:
 
 ## Plans relevant to release
 
-- [plan-017-v1-trust-foundation](../plans/plan-017-v1-trust-foundation/plan.md) — desktop packaging stage (complete).
-- [plan-018-v1-product-experience](../plans/plan-018-v1-product-experience/plan.md) — CI/release stage and licensing stage (in flight).
+- [plan-017-v1-trust-foundation](../plans/archive/plan-017-v1-trust-foundation/plan.md) — desktop packaging stage (complete 2026-04-30).
+- [plan-018-v1-product-experience](../plans/archive/plan-018-v1-product-experience/plan.md) — CI/release and licensing scaffolding (complete 2026-05-06).
+- [qa-docs/v1.1-release-engineering/](../qa-docs/v1.1-release-engineering/) — outstanding human-required release tasks (signing, notarisation, brand icons, CI/tag wiring). Deferred until release engineering is actively scheduled.

@@ -26,7 +26,7 @@ This directory houses critical configuration and definitions for the Gemini CLI 
 ### 2. Product Agent Layer (`src/lib/ai/`)
 Runtime agents that power the Novellum application features.
 - **Shipped agents**: `ContinuityAgent`, `EditAgent`, `RewriteAgent`, `StyleAgent`.
-- **Planned agents**: `BrainstormAgent`, `OutlineAgent`, `DraftAgent`, `SummaryAgent`.
+- **Cut from internal V1 (2026-05-13, plan-025):** `BrainstormAgent`, `OutlineAgent`, `DraftAgent`, `SummaryAgent` were declared TaskTypes but never wired to a parser. Re-introducing any is a new feature plan (see plan-040 for Outline). See [`AGENTS.md`](./AGENTS.md).
 - **Infrastructure**: `ContextEngine`, `PromptBuilder`, `ModelRouter`, `OpenRouterClient` (streaming HTTP via the `/api/ai` proxy).
 - **See also**: [`AGENTS.md`](./AGENTS.md) for the dual-layer agent reference.
 

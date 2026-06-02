@@ -1,6 +1,6 @@
 # Testing
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 
 Three tiers. All three should pass before a release.
 

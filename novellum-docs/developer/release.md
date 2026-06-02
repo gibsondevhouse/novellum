@@ -1,6 +1,6 @@
 # Release
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 
 Quick reference. Full procedure: [../../dev-docs/05-workflow/release.md](../../dev-docs/05-workflow/release.md).
 

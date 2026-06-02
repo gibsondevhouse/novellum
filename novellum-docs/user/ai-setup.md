@@ -1,6 +1,6 @@
 # AI Setup (BYOK)
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 
 Novellum is **bring-your-own-key** for AI. We don't host a model; we don't broker tokens. You sign up with [OpenRouter](https://openrouter.ai), generate an API key, and paste it into Novellum.
 

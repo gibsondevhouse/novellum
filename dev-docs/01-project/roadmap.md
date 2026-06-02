@@ -28,8 +28,8 @@ not started**. It does not promise dates.
 
 ### Internal V1.1 milestones
 
-- Internal V1.1 fiction pipeline (pipeline foundation, Vibe-Worldbuild, Vibe-Author) — closed by [plan-027-v1.1-scoping](../plans/plan-027-v1.1-scoping/plan.md) (closed 2026-05-27).
-- Hierarchical pipeline UI (outline traversal, worldbuild run flow, checkpoint review console) — closed by [plan-028-v1.1-hierarchical-pipeline-ui](../plans/plan-028/plan.md) (closed 2026-05-26).
+- Internal V1.1 fiction pipeline (pipeline foundation, Vibe-Worldbuild, Vibe-Author) — closed by [plan-027-v1.1-scoping](../plans/archive/plan-027-v1.1-scoping/plan.md) (closed 2026-05-27).
+- Hierarchical pipeline UI (outline traversal, worldbuild run flow, checkpoint review console) — closed by [plan-028-v1.1-hierarchical-pipeline-ui](../plans/archive/plan-028/plan.md) (closed 2026-05-26).
 - Internal V1.1 unfinished-work closeout — closed by [plan-029-v1.1-unfinished-work-closeout](../plans/archive/plan-029-v1.1-unfinished-work-closeout/plan.md) (closed 2026-05-27).
 
 ### UI and design system (internal v2)
@@ -48,12 +48,12 @@ not started**. It does not promise dates.
 
 - 4 internal AI agents wired into Nova: Continuity, Edit, Rewrite, Style — see [03-ai/agents-map.md](../03-ai/agents-map.md).
 - Local Ollama provider as a second AI backend (provider, launcher, settings panel, API route resolution, Settings → AI toggle with persistence) — shipped via plan-029 closeout (originally plan-024 stage-003).
-- Nova production refactor (trust repair, 4 stages) — closed by [plan-030-nova-production-refactor](../plans/plan-030-nova-production-refactor/plan.md) (closed 2026-05-28).
-- Nova VS Code Copilot parity (compact sidepanel, Ask/Write/Agent modes, real attachments, bounded agentic tool loop) — closed by [plan-031-nova-vscode-copilot-parity](../plans/plan-031-nova-vscode-copilot-parity/plan.md) (closed 2026-05-28).
-- Worldbuilding generation engine + help disclosure (one-click AI entity generation across 7 entity kinds, review modal, AppShell fix) — closed by [plan-032-worldbuilding-generation-engine](../plans/plan-032-worldbuilding-generation-engine/plan.md) (closed 2026-05-29).
+- Nova production refactor (trust repair, 4 stages) — closed by [plan-030-nova-production-refactor](../plans/archive/plan-030-nova-production-refactor/plan.md) (closed 2026-05-28).
+- Nova VS Code Copilot parity (compact sidepanel, Ask/Write/Agent modes, real attachments, bounded agentic tool loop) — closed by [plan-031-nova-vscode-copilot-parity](../plans/archive/plan-031-nova-vscode-copilot-parity/plan.md) (closed 2026-05-28).
+- Worldbuilding generation engine + help disclosure (one-click AI entity generation across 7 entity kinds, review modal, AppShell fix) — closed by [plan-032-worldbuilding-generation-engine](../plans/archive/plan-032-worldbuilding-generation-engine/plan.md) (closed 2026-05-29).
 - World Building workflow refactor (foundation, UI integration, generation pipeline, hardening) — closed by [plan-034](../plans/archive/plan-034/plan.md) (closed 2026-05-30).
-- World-building draft JSON encoding fix — closed by [plan-035-fix-json-double-encoding](../plans/plan-035-fix-json-double-encoding/plan.md) (closed 2026-05-30).
-- Context-priority generation (typed target/avoid hints, expanded character draft fields, faction/lineage extension) — closed by [plan-036-context-priority-generation](../plans/plan-036-context-priority-generation/plan.md) (closed 2026-05-30).
+- World-building draft JSON encoding fix — closed by [plan-035-fix-json-double-encoding](../plans/archive/plan-035-fix-json-double-encoding/plan.md) (closed 2026-05-30).
+- Context-priority generation (typed target/avoid hints, expanded character draft fields, faction/lineage extension) — closed by [plan-036-context-priority-generation](../plans/archive/plan-036-context-priority-generation/plan.md) (closed 2026-05-30).
 - Agentic worldbuild scan + review-gated proposal flow (scan contract, proposal schema, pending notification UI, atomic accept/reject) — closed by [plan-037-agentic-worldbuild-scan](../plans/archive/plan-037-agentic-worldbuild-scan/plan.md) (closed 2026-05-31; scan execution wired 2026-06-01).
 - Novel Engine v1 — Draft From Outline (guided checkpointed pipeline: outline → scene drafts → reviewable artifacts → explicit accept writes to `scenes.content`) — closed by [plan-038-novel-engine-v1](../plans/plan-038/plan.md) (closed 2026-06-01).
 

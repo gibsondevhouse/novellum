@@ -1,6 +1,6 @@
 # Nova — Your AI Copilot
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 
 **Nova** is Novellum's AI assistant. Chat-style. Project-aware. BYOK (you bring your own OpenRouter key).
 

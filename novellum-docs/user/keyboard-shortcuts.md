@@ -1,6 +1,6 @@
 # Keyboard Shortcuts
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 
 Novellum is keyboard-friendly. The full shortcut list is configurable from **Settings → Shortcuts** (rebuild in flight under [plan-022-settings-ia](../../dev-docs/plans/plan-022-settings-ia/plan.md)).
 

@@ -1,6 +1,6 @@
 # Local-First
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 
 Novellum is **local-first**. That's a small word that does a lot of work. Here's what it means concretely.
 

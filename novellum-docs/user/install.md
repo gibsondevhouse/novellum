@@ -1,6 +1,6 @@
 # Install Novellum
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 
 Novellum is distributed as a desktop application for **macOS**, **Windows**, and **Linux**. There is no cloud account; nothing to sign up for.
 

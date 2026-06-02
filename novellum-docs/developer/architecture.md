@@ -1,6 +1,6 @@
 # Architecture (One-Pager)
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 
 This page is a quick map. The full reference is [../../dev-docs/02-architecture/](../../dev-docs/02-architecture/).
 

@@ -72,32 +72,42 @@ The first plan to ship the full Arc → Act → Chapter → Scene UI on top of t
 
 - [plan-013-workspace-hierarchy-flow](../plans/plan-013-workspace-hierarchy-flow/plan.md) — Build the Arc → Act → Chapter → Scene navigable UI on top of the already-shipped SQLite hierarchy. Adds `act-repository`, a Svelte 5 hierarchy store, replaces the `/projects/[id]/arcs` placeholder with a real workspace, and ships drilldown routes into the editor. **Status:** complete, v2.0.0, rewritten 2026-04-28.
 
-## Era 7 — V1 trust foundation
+## Era 7 — Internal V1 trust foundation
 
-The "stop the bleeding" foundation for a sellable product.
+The "stop the bleeding" foundation for the internal V1 desktop milestone.
 
 - [plan-system-refactoring](../plans/archive/plan-system-refactoring/plan-system-refactoring.md) — Strategic anchor for system refactoring. **Superseded** 2026-04-28 by plan-017.
-- [plan-017-v1-trust-foundation](../plans/plan-017-v1-trust-foundation/plan.md) — V1 sellable trust, storage, credential, backup, packaging foundation. 8 stages: stop-the-bleeding, SQLite source-of-truth, versioned migrations, backup/restore, BYOK security, app-data path, autosave/recovery, desktop packaging. **Status:** complete (closed 2026-04-30).
+- [plan-017-v1-trust-foundation](../plans/archive/plan-017-v1-trust-foundation/plan.md) — Internal V1 trust, storage, credential, backup, packaging foundation. 8 stages: stop-the-bleeding, SQLite source-of-truth, versioned migrations, backup/restore, BYOK security, app-data path, autosave/recovery, desktop packaging. **Status:** complete (closed 2026-04-30).
 
-## Era 8 — V1 product experience (closed 2026-05-06)
+## Era 8 — Internal V1 product experience (closed 2026-05-06)
 
-Bringing the app to a v1 sellable state on top of the trust foundation.
+Bringing the app to an internal V1 product milestone on top of the trust foundation.
 
-- [plan-018-v1-product-experience](../plans/plan-018-v1-product-experience/plan.md) — V1 sellable product experience and release. 12 stages: export quality, editor writing-first refactor, hub trust cards, settings trust center, AI assistant V1 scope, onboarding, worldbuilding audit, design-system freeze, doc tracks, CI/release, licensing, QA + beta + V1 DoD. **Status:** complete.
-- [plan-020-fixes-and-nova-identity](../plans/plan-020-fixes-and-nova-identity/plan.md) — Three trust-restoring bug fixes (Nova identity prompt, OpenRouter key persistence, hub word count). **Status:** complete.
-- [plan-022-settings-ia](../plans/plan-022-settings-ia/plan.md) — Categorized PillNav settings shell (Appearance, Defaults, Shortcuts, AI, Data) and typed `/api/db/preferences` foundation. **Status:** complete.
-- [plan-023-editor-redesign-and-nova-copilot](../plans/plan-023-editor-redesign-and-nova-copilot/plan.md) — Word-processor-style editor + right-panel Nova copilot (chat + RAG, agentic stubs, view-in-reader handoff). **Status:** complete.
+- [plan-018-v1-product-experience](../plans/archive/plan-018-v1-product-experience/plan.md) — Internal V1 product experience and release. 12 stages: export quality, editor writing-first refactor, hub trust cards, settings trust center, AI assistant V1 scope, onboarding, worldbuilding audit, design-system freeze, doc tracks, CI/release, licensing, QA + beta + V1 DoD. **Status:** complete.
+- [plan-020-fixes-and-nova-identity](../plans/archive/plan-020-fixes-and-nova-identity/plan.md) — Three trust-restoring bug fixes (Nova identity prompt, OpenRouter key persistence, hub word count). **Status:** complete.
+- [plan-022-settings-ia](../plans/archive/plan-022-settings-ia/plan.md) — Categorized PillNav settings shell (Appearance, Defaults, Shortcuts, AI, Data) and typed `/api/db/preferences` foundation. **Status:** complete.
+- [plan-023-editor-redesign-and-nova-copilot](../plans/archive/plan-023-editor-redesign-and-nova-copilot/plan.md) — Word-processor-style editor + right-panel Nova copilot (chat + RAG, agentic stubs, view-in-reader handoff). **Status:** complete.
 
-## Era 9 — Cleanup before next era
+## Era 9 — V1.1 fiction pipeline & cleanup (closed 2026-05-27)
 
-Two narrowly-scoped plans remain open. Neither blocks the v1 desktop rebuild.
+Closed out the leftover narrowly-scoped plans and shipped the staged fiction pipeline.
 
-- [plan-019-naming-consistency](../plans/plan-019-naming-consistency/plan.md) — Codebase-wide naming alignment between routes, modules, components, and dev-docs. **Status:** draft.
-- [plan-021-reader-pagination](../plans/plan-021-reader-pagination/plan.md) — Reader empty state, page margins/typography, pagination engine. **Status:** draft.
+- [plan-019-naming-consistency](../plans/archive/plan-019-naming-consistency/plan.md) — Codebase-wide naming alignment. **Status:** retired (2026-05-27 via plan-029) — superseded by organic evolution through plans 020–028.
+- [plan-021-reader-pagination](../plans/archive/plan-021-reader-pagination/plan.md) — Reader empty state + pagination engine. **Status:** retired (2026-05-27 via plan-029) — fully shipped via plans 027/028.
+- [plan-024-v1-final-mile](../plans/archive/plan-024-v1-final-mile/plan.md) — Internal V1 Definition-of-Done closure. **Status:** complete (47/47 DoD, closed 2026-05-26).
+- [plan-027-v1.1-scoping](../plans/archive/plan-027-v1.1-scoping/plan.md) — Internal V1.1 staged fiction pipeline (foundation, Vibe-Worldbuild, Vibe-Author). **Status:** complete (closed 2026-05-27).
+- [plan-028-v1.1-hierarchical-pipeline-ui](../plans/archive/plan-028/plan.md) — Outline-first hierarchical pipeline UI. **Status:** complete (closed 2026-05-26).
+- [plan-029-v1.1-unfinished-work-closeout](../plans/archive/plan-029-v1.1-unfinished-work-closeout/plan.md) — Closeout umbrella that retired plans 019/021 and deferred release engineering to a dedicated track. **Status:** complete (closed 2026-05-27).
 
-## Era 10 — Next: full AI integration
+## Era 10 — Nova production & worldbuild generation (closed 2026-06-01)
 
-The next development era opens with **full AI integration**, including **API-based image-generation models** alongside the existing text agents (Continuity, Edit, Rewrite, Style + the four planned agents Brainstorm/Outline/Draft/Summary). New plans will be drafted under [../plans/](../plans/).
+Nova production refactor, VS Code Copilot parity, worldbuilding generation pipeline, and the novel engine v1 draft loop.
+
+- [plan-030-nova-production-refactor](../plans/archive/plan-030-nova-production-refactor/plan.md), [plan-031-nova-vscode-copilot-parity](../plans/archive/plan-031-nova-vscode-copilot-parity/plan.md), [plan-032-worldbuilding-generation-engine](../plans/archive/plan-032-worldbuilding-generation-engine/plan.md), [plan-034](../plans/archive/plan-034/plan.md), [plan-035-fix-json-double-encoding](../plans/archive/plan-035-fix-json-double-encoding/plan.md), [plan-036-context-priority-generation](../plans/archive/plan-036-context-priority-generation/plan.md), [plan-037-agentic-worldbuild-scan](../plans/archive/plan-037-agentic-worldbuild-scan/plan.md), [plan-038-novel-engine-v1](../plans/plan-038/plan.md), [plan-041-docs-rebaseline-internal-version](../plans/plan-041-docs-rebaseline-internal-version/plan.md). All complete. See [../01-project/roadmap.md](./roadmap.md) for the per-plan summary.
+
+## Era 11 — Next: full AI integration
+
+The next development era opens with **full AI integration**, including **API-based image-generation models** alongside the existing text agents (Continuity, Edit, Rewrite, Style). Two skeleton plans — [plan-039-manuscript-export-ui](../plans/plan-039-manuscript-export-ui/plan.md) and [plan-040-outline-generation](../plans/plan-040-outline-generation/plan.md) — are drafted and ready to be picked up. New plans will be drafted under [../plans/](../plans/).
 
 ---
 

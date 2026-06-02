@@ -1,6 +1,6 @@
 # Backup & Restore
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 
 Your work lives in a single SQLite file on your machine. Backups are explicit `.novellum.zip` bundles you control.
 

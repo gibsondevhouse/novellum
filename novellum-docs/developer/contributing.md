@@ -1,6 +1,6 @@
 # Contributing
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-01
 
 ## Before you write code
 
