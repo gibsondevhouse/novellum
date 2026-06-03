@@ -67,15 +67,14 @@ export type ScanErrorCode =
  * These strings are safe to surface directly in the UI. They must never
  * contain provider keys, internal stack traces, or raw model output.
  */
-export const SCAN_ERROR_USER_COPY: Record<ScanErrorCode, string> = {
+const SCAN_ERROR_USER_COPY: Record<ScanErrorCode, string> = {
 	invalid_request: 'Invalid scan request.',
 	no_credentials: 'No AI provider credentials configured.',
 	invalid_key: 'Invalid API key. Check your provider settings.',
 	rate_limit: 'AI provider rate limit reached. Try again shortly.',
 	context_insufficient:
 		'Project context is incomplete. Add a title, logline, and synopsis before scanning.',
-	schema_validation_failed:
-		'The scan response was not in the expected format. Try again.',
+	schema_validation_failed: 'The scan response was not in the expected format. Try again.',
 	provider_error: 'AI provider error. Try again or check your provider settings.',
 };
 
@@ -121,15 +120,22 @@ function scanError(
 // HTTP status mapping for scan error codes
 // ---------------------------------------------------------------------------
 
-export function statusForScanCode(code: ScanErrorCode): number {
+function statusForScanCode(code: ScanErrorCode): number {
 	switch (code) {
-		case 'invalid_request': return 400;
-		case 'no_credentials': return 401;
-		case 'invalid_key': return 401;
-		case 'rate_limit': return 429;
-		case 'context_insufficient': return 422;
-		case 'schema_validation_failed': return 422;
-		case 'provider_error': return 502;
+		case 'invalid_request':
+			return 400;
+		case 'no_credentials':
+			return 401;
+		case 'invalid_key':
+			return 401;
+		case 'rate_limit':
+			return 429;
+		case 'context_insufficient':
+			return 422;
+		case 'schema_validation_failed':
+			return 422;
+		case 'provider_error':
+			return 502;
 	}
 }
 
@@ -191,7 +197,12 @@ const DOMAIN_CONFIG: Record<WorldbuildingDomainId, ProposalDraftConfig> = {
 };
 
 type ProviderLoadResult =
-	| { kind: 'ok'; provider: ReturnType<typeof createOpenRouterProvider>; apiKey: string; modelOverride?: string }
+	| {
+			kind: 'ok';
+			provider: ReturnType<typeof createOpenRouterProvider>;
+			apiKey: string;
+			modelOverride?: string;
+	  }
 	| { kind: 'mock' }
 	| { kind: 'no_creds' };
 
@@ -614,11 +625,9 @@ export const POST: RequestHandler = async ({ request }) => {
 		const proposals = normalizeAndDedupeProposals(rawDrafts, scanRequest);
 
 		if (proposals.length === 0) {
-			return scanError(
-				'schema_validation_failed',
-				statusForScanCode('schema_validation_failed'),
-				{ issue: 'No valid, non-duplicate proposals returned by provider.' },
-			);
+			return scanError('schema_validation_failed', statusForScanCode('schema_validation_failed'), {
+				issue: 'No valid, non-duplicate proposals returned by provider.',
+			});
 		}
 
 		persistProposals(proposals);

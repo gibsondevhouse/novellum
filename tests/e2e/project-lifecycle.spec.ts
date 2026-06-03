@@ -63,7 +63,10 @@ async function deleteProject(request: APIRequestContext, projectId: string): Pro
 }
 
 test.describe('Project lifecycle', () => {
-	test('creates a project, opens the editor, and navigates to export', async ({ page, request }) => {
+	test('creates a project, opens the editor, and navigates to export', async ({
+		page,
+		request,
+	}) => {
 		await setOnboardingCompleted(request);
 		const projectId = await createProject(request, `E2E Test Novel ${Date.now()}`);
 		try {
@@ -81,6 +84,10 @@ test.describe('Project lifecycle', () => {
 
 			await page.goto(`/projects/${projectId}`);
 			await page.getByRole('button', { name: /export manuscript/i }).click();
+			await expect(page.getByRole('dialog', { name: /export manuscript/i })).toBeVisible();
+			await page.getByRole('button', { name: /close/i }).click();
+
+			await page.getByRole('button', { name: /project json/i }).click();
 			await expect(page.getByRole('dialog', { name: /export json options/i })).toBeVisible();
 		} finally {
 			await deleteProject(request, projectId);

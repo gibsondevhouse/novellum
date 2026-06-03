@@ -16,15 +16,24 @@
 
 	let showEditForm = $state(false);
 	let showDeleteDialog = $state(false);
-	let showExportModal = $state(false);
+	let showManuscriptExportDialog = $state(false);
+	let showJsonExportModal = $state(false);
 	let lastExportFlag = $state<string | null>(null);
 
 	let ExportModal = $state<
-		typeof import('$modules/export/components/ExportModal.svelte')['default'] | undefined
+		(typeof import('$modules/export/components/ExportModal.svelte'))['default'] | undefined
+	>(undefined);
+	let ManuscriptExportDialog = $state<
+		| (typeof import('$modules/export/components/ManuscriptExportDialog.svelte'))['default']
+		| undefined
 	>(undefined);
 	onMount(async () => {
-		const mod = await import('$modules/export/components/ExportModal.svelte');
-		ExportModal = mod.default;
+		const [jsonMod, manuscriptMod] = await Promise.all([
+			import('$modules/export/components/ExportModal.svelte'),
+			import('$modules/export/components/ManuscriptExportDialog.svelte'),
+		]);
+		ExportModal = jsonMod.default;
+		ManuscriptExportDialog = manuscriptMod.default;
 	});
 
 	const project = $derived(data.project);
@@ -37,7 +46,7 @@
 	$effect(() => {
 		const exportFlag = page.url.searchParams.get('export');
 		if (exportFlag === '1' && lastExportFlag !== '1') {
-			showExportModal = true;
+			showManuscriptExportDialog = true;
 		}
 		lastExportFlag = exportFlag;
 	});
@@ -51,8 +60,8 @@
 		return filtered.length > 0 ? `?${filtered.join('&')}` : '';
 	}
 
-	function closeExportModal(): void {
-		showExportModal = false;
+	function closeManuscriptExportDialog(): void {
+		showManuscriptExportDialog = false;
 		if (!page.url.searchParams.has('export')) return;
 
 		void goto(`${page.url.pathname}${removeExportFlag(page.url.search)}`, {
@@ -60,6 +69,10 @@
 			keepFocus: true,
 			noScroll: true,
 		});
+	}
+
+	function closeJsonExportModal(): void {
+		showJsonExportModal = false;
 	}
 
 	// Expose utility triggers to child routes via context
@@ -71,13 +84,15 @@
 			showDeleteDialog = true;
 		},
 		openExport: () => {
-			showExportModal = true;
+			showManuscriptExportDialog = true;
+		},
+		openJsonExport: () => {
+			showJsonExportModal = true;
 		},
 		openImport: () => {
 			goto('/settings/data');
-		}
+		},
 	});
-
 </script>
 
 <svelte:head>
@@ -104,12 +119,17 @@
 	<DeleteProjectDialog projectId={project.id} oncancel={() => (showDeleteDialog = false)} />
 {/if}
 
-{#if showExportModal && ExportModal}
-	<ExportModal
+{#if showManuscriptExportDialog && ManuscriptExportDialog}
+	<ManuscriptExportDialog
 		projectId={project.id}
-		open={showExportModal}
-		onClose={closeExportModal}
+		projectTitle={project.title}
+		open={showManuscriptExportDialog}
+		onClose={closeManuscriptExportDialog}
 	/>
+{/if}
+
+{#if showJsonExportModal && ExportModal}
+	<ExportModal projectId={project.id} open={showJsonExportModal} onClose={closeJsonExportModal} />
 {/if}
 
 <style>

@@ -14,7 +14,9 @@
 		AIStatusCard,
 	} from '$modules/project';
 
-	let { data }: {
+	let {
+		data,
+	}: {
 		data: {
 			project: Project;
 			currentWordCount: number;
@@ -25,7 +27,9 @@
 
 	const project = $derived(data.project);
 
-	const projectActions = getContext<{ openExport: () => void }>('projectActions');
+	const projectActions = getContext<{ openExport: () => void; openJsonExport?: () => void }>(
+		'projectActions',
+	);
 </script>
 
 <div class="hub">
@@ -50,6 +54,7 @@
 			wordCount={data.health.wordCount}
 			projectId={project.id}
 			onExportRequest={() => projectActions.openExport()}
+			onJsonExportRequest={() => projectActions.openJsonExport?.()}
 		/>
 		<AIStatusCard apiKeyConfigured={data.health.apiKeyConfigured} />
 	</div>

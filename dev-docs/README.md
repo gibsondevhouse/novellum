@@ -1,22 +1,22 @@
 # Novellum Dev Docs
 
-> Last verified: 2026-06-01
+> Last verified: 2026-06-02
 > Source of truth for the Novellum codebase. Audience: contributors, reviewers, and the AI agents in `.github/agents/`.
 
 This directory is a **living developer reference**, not marketing copy. Every page is anchored to real files in [src/](../src) and [src-tauri/](../src-tauri). When code and docs disagree, the code wins — open a PR to fix the doc.
 
 ## How to navigate
 
-| If you want to… | Read… |
-| --- | --- |
-| Understand what Novellum is and where it's going | [01-project/](./01-project/) |
-| Understand how the system is built | [02-architecture/](./02-architecture/) |
-| Work on the AI layer | [03-ai/](./03-ai/) |
-| Modify or extend a feature module | [04-modules/](./04-modules/) |
-| Run, test, package, or release the app | [05-workflow/](./05-workflow/) |
-| Trace how the project got to its current state | [01-project/journey.md](./01-project/journey.md) |
-| See active and historical work plans | [plans/MASTER-PLAN.md](./plans/MASTER-PLAN.md) |
-| Review past audits, checklists, QA notes | [audits/](./audits/), [checklists/](./checklists/), [qa-docs/](./qa-docs/) |
+| If you want to…                                  | Read…                                                                      |
+| ------------------------------------------------ | -------------------------------------------------------------------------- |
+| Understand what Novellum is and where it's going | [01-project/](./01-project/)                                               |
+| Understand how the system is built               | [02-architecture/](./02-architecture/)                                     |
+| Work on the AI layer                             | [03-ai/](./03-ai/)                                                         |
+| Modify or extend a feature module                | [04-modules/](./04-modules/)                                               |
+| Run, test, package, or release the app           | [05-workflow/](./05-workflow/)                                             |
+| Trace how the project got to its current state   | [01-project/journey.md](./01-project/journey.md)                           |
+| See active and historical work plans             | [plans/MASTER-PLAN.md](./plans/MASTER-PLAN.md)                             |
+| Review past audits, checklists, QA notes         | [audits/](./audits/), [checklists/](./checklists/), [qa-docs/](./qa-docs/) |
 
 ## Directory map
 

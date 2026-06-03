@@ -2,6 +2,7 @@
 	import GhostButton from '$lib/components/ui/GhostButton.svelte';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 	import { buildPortabilitySnapshot } from '../services/portability/snapshot-service.js';
+	import { downloadBlobToBrowser } from '../services/export-delivery.js';
 
 	let {
 		projectId,
@@ -73,7 +74,7 @@
 		actionError = null;
 		actionSuccess = null;
 		try {
-			downloadBlob(new Blob([jsonPayload], { type: 'application/json' }), jsonFilename);
+			downloadBlobToBrowser(new Blob([jsonPayload], { type: 'application/json' }), jsonFilename);
 			actionSuccess = `Downloaded ${jsonFilename}`;
 		} catch (err) {
 			actionError = err instanceof Error ? err.message : 'Failed to export JSON file.';
@@ -95,17 +96,6 @@
 		} finally {
 			copying = false;
 		}
-	}
-
-	function downloadBlob(blob: Blob, filename: string) {
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = filename;
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-		URL.revokeObjectURL(url);
 	}
 </script>
 
@@ -142,7 +132,10 @@
 								Best when you need a file for backups, handoff, versioning, or import flows in other
 								tools.
 							</p>
-							<PrimaryButton onclick={handleExportJson} disabled={!jsonPayload || exporting || copying}>
+							<PrimaryButton
+								onclick={handleExportJson}
+								disabled={!jsonPayload || exporting || copying}
+							>
 								{exporting ? 'Exporting...' : 'Export JSON'}
 							</PrimaryButton>
 						</section>
@@ -170,7 +163,8 @@
 			{/if}
 
 			<div class="modal-footer">
-				<GhostButton onclick={onClose} disabled={loading || exporting || copying}>Close</GhostButton>
+				<GhostButton onclick={onClose} disabled={loading || exporting || copying}>Close</GhostButton
+				>
 			</div>
 		</div>
 	</div>
@@ -252,7 +246,11 @@
 		padding: var(--space-4);
 		border: 1px solid var(--color-border-default);
 		border-radius: var(--radius-md);
-		background: linear-gradient(145deg, var(--color-surface-raised) 0%, var(--color-surface-overlay) 100%);
+		background: linear-gradient(
+			145deg,
+			var(--color-surface-raised) 0%,
+			var(--color-surface-overlay) 100%
+		);
 	}
 
 	.pane-title {

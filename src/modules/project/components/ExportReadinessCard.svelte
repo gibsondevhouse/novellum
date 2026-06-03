@@ -1,16 +1,18 @@
 <script lang="ts">
-	import { SurfaceCard, SecondaryButton } from '$lib/components/ui/index.js';
+	import { SurfaceCard, SecondaryButton, GhostButton } from '$lib/components/ui/index.js';
 
 	let {
 		sceneCount,
 		wordCount,
 		projectId,
 		onExportRequest,
+		onJsonExportRequest,
 	}: {
 		sceneCount: number;
 		wordCount: number;
 		projectId: string;
 		onExportRequest: () => void;
+		onJsonExportRequest?: () => void;
 	} = $props();
 </script>
 
@@ -20,6 +22,9 @@
 	<span class="hub-card__sub">{sceneCount} scene{sceneCount === 1 ? '' : 's'}</span>
 	<div class="hub-card__actions">
 		<SecondaryButton onclick={onExportRequest}>Export manuscript</SecondaryButton>
+		{#if onJsonExportRequest}
+			<GhostButton onclick={onJsonExportRequest}>Project JSON</GhostButton>
+		{/if}
 	</div>
 </SurfaceCard>
 
@@ -57,5 +62,8 @@
 
 	.hub-card__actions {
 		margin-top: var(--space-3);
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2);
 	}
 </style>

@@ -45,6 +45,14 @@ export interface ManuscriptCompileOptions {
 	includeBackMatter: boolean;
 }
 
+export type ExportDeliveryPreference = 'browser_download' | 'desktop_save' | 'auto';
+
+export interface ManuscriptExportRequest {
+	exportOptions: ExportOptions;
+	compileOptions: ManuscriptCompileOptions;
+	deliveryPreference?: ExportDeliveryPreference;
+}
+
 export interface AssembledScene {
 	id: string;
 	title: string;

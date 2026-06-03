@@ -109,6 +109,26 @@ describe('Hub status cards', () => {
 			btn?.click();
 			expect(handler).toHaveBeenCalledOnce();
 		});
+
+		it('renders and calls the separate project JSON action when provided', () => {
+			const handler = vi.fn();
+			mount(ExportReadinessCard, {
+				target,
+				props: {
+					sceneCount: 2,
+					wordCount: 100,
+					projectId: 'proj1',
+					onExportRequest: () => {},
+					onJsonExportRequest: handler,
+				},
+			});
+			flushSync();
+			const jsonButton = Array.from(target.querySelectorAll('button')).find((button) =>
+				button.textContent?.includes('Project JSON'),
+			);
+			jsonButton?.click();
+			expect(handler).toHaveBeenCalledOnce();
+		});
 	});
 
 	// ── SaveStatusCard ────────────────────────────────────────────────────────
