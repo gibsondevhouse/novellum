@@ -74,34 +74,56 @@ Functionality is organized by **vertical domain slices** (e.g., `project`, `worl
 
 ## Recent Accomplishments
 
-- **Plan-013 (Workspace Hierarchy Flow)**: Arc → Act → Chapter → Scene → Beat fully wired across all workspace modes.
-- **Plan-017 (V1 Trust Foundation)**: SQLite source-of-truth, versioned migrations, backup/restore, BYOK security via OS keyring, autosave/recovery, desktop packaging.
-- **Plan-018 (V1 Product Experience)**: Export quality, editor writing-first refactor, hub trust cards, settings trust center, AI assistant V1 scope, onboarding, worldbuilding scope audit, design-system freeze, doc tracks, CI/release pipeline, licensing, QA + beta DoD.
-- **Plan-020 (Quick Fixes & Nova Identity)**: Nova identity prompt, OpenRouter key persistence fix, hub word count accuracy.
-- **Plan-022 (Settings IA)**: Categorized PillNav settings shell — Appearance, Defaults, Shortcuts, AI, Data — with typed preferences via `/api/db/preferences`.
-- **Plan-023 (Editor Redesign & Nova Copilot)**: Word-processor-style editor with toolbar PillNav, view-in-reader handoff, Nova right-panel copilot with chat + RAG and agentic stubs.
-- **Documentation Refactor (2026-05-07)**: Full IA reset under `dev-docs/`, user/developer split under `novellum-docs/`, archive snapshots preserved, project journey written for collaborators.
+- **Plan-040 (Outline Generation)**: Worldbuilding-to-Outline review-gated proposal flow (Closed 2026-06-04).
+- **Plan-039 (Manuscript Export UI)**: Chapter subset selector and delivery helper for browser/desktop (Closed 2026-06-03).
+- **Plan-041 (Docs Rebaseline)**: Reframed milestones and reconciled dev-docs (Closed 2026-06-01).
+- **Plan-038 (Novel Engine v1)**: Draft-from-Outline agentic pipeline (Closed 2026-06-01).
+- **Plan-037 (Agentic Worldbuild Scan)**: Review-gated scan + proposal flow for worldbuilding (Closed 2026-06-01).
+- **Plan-031 (Nova VS Code Parity)**: Sidebar copilot with Ask/Write/Agent modes and bounded tool loop (Closed 2026-05-28).
+- **Plan-029 (V1.1 Closeout)**: Retired legacy plans (019, 021) and finalized v1.1 scoping (Closed 2026-05-27).
+- **Plan-013 through Plan-028**: Foundational V1/V1.1 features (SQLite, UI refactor, Nova identity, settings IA) — see [`dev-docs/01-project/journey.md`](./dev-docs/01-project/journey.md).
 
 ## Current Focus (Active Plans)
 
-Two plans remain open. Neither blocks the next desktop build.
+No active plan. Choose the next priority explicitly from [`dev-docs/plans/MASTER-PLAN.md`](./dev-docs/plans/MASTER-PLAN.md).
 
-- **Plan-019 (Naming Consistency)** — `draft`. Codebase-wide alignment of route segments, module folders, and component names with `dev-docs/` terminology.
-- **Plan-021 (Reader Pagination)** — `draft`. Reader empty state, page margins/typography, and pagination engine.
+Next candidate priorities:
+- **Release Engineering**: Code signing, notarization, and brand icons (Deferred from Plan-024).
+- **Domain feature deepening**: Image-generation models and cinematic media expansion.
 
-Next era of development: **full AI integration including image-generation models**. New plans will be drafted under `dev-docs/plans/` and tracked in [`dev-docs/plans/MASTER-PLAN.md`](./dev-docs/plans/MASTER-PLAN.md).
+## Planning Standards
+- Define the required plan hierarchy: Plan -> Stage -> Phase -> Part.
+- Require YAML frontmatter in every plan artifact.
+- Require measurable acceptance criteria per part.
+- Require quality gates before closure: lint, typecheck, tests, docs sync.
+- Require explicit evidence links: commits, PRs, test output, QA notes.
+
+## Development Paths
+- Path 1: UI and interaction model evolution.
+- Path 2: Service-layer and state architecture hardening.
+- Path 3: Domain feature deepening and workflow parity.
+- Path 4: Local-first data, indexing, and retrieval capabilities.
+- Path 5: Observability, reliability, and model-budget optimization.
 
 ## Vulnerabilities and Fragilities
-
+- **Type Safety**: ~11 pre-existing warnings in `pnpm check`. Impact: Potential runtime regressions. Detection: `pnpm check`.
+- **Visual Drift**: Pre-existing cross-surface snapshot drift in Playwright tests. Impact: Unreliable visual regression testing. Detection: `pnpm run test:visual`.
+- **Linting**: Known unrelated `lint:css` error in `IndividualsWorkspaceShell.svelte:183`. Impact: CI noise.
 - **Legacy Persistence**: Dexie remains in `src/lib/db` and `src/modules/export` strictly for portability snapshots. Do not use for new live reads/writes.
 - **Sidebar/active-project detection**: Path parsing is brittle on routes outside `/projects/<id>/...`. Verified gotcha — see `dev-docs/02-architecture/routing.md`.
 - **`+server.ts` export discipline**: ESLint restricts to handlers / `config` / `_`-prefixed exports. Helpers must live in sibling files.
-- **Naming drift** (covered by plan-019): some route segments and module folders disagree with current `dev-docs/` terminology. Cosmetic but worth closing before a major release.
 
 ## Plan Completion and Continuity Checklist
-
 - [ ] All plan parts marked complete with evidence links.
-- [ ] Required quality gates (`lint`, `check`, `test`, `check:tokens`) passed.
-- [ ] Documentation (`dev-docs/`) synchronized with code changes.
-- [ ] `GEMINI.md` and `AGENTS.md` updated if architectural shifts occurred.
+- [ ] Required quality gates passed.
+- [ ] Documentation mirror synchronized.
+- [ ] Security and data-boundary checks passed.
+- [ ] Manual QA scenarios executed and captured.
+- [ ] MASTER-PLAN updated with completion status.
 - [ ] Next candidate plan identified and queued.
+
+Continuity rule:
+- When all checklist items are checked, revise planning artifacts to keep delivery flowing:
+  - Mark completed work as closed or archived.
+  - Promote or generate the next highest-priority plan.
+  - Update dependencies and target milestones.
