@@ -1,6 +1,6 @@
 # Module: `nova`
 
-> Last verified: 2026-05-28 (plan-031 stage-005 docs sync)
+> Last verified: 2026-06-04 (plan-040 outline generation closeout)
 > Source: [src/modules/nova/](../../src/modules/nova/)
 
 ## Purpose
@@ -15,10 +15,10 @@ The embedded editor sidepanel (`src/modules/nova/*`) is the canonical Nova runti
 
 ```text
 src/modules/nova/
-├── components/    # NovaPanel, message log, composer, mode picker, attachment popover, model picker
-├── stores/        # panel open/close, session messages, nova mode
+├── components/    # NovaPanel, message log, composer, outline generation/review cards
+├── stores/        # panel open/close, session messages, nova mode, outline generation state
 ├── services/      # chat-service, context-hooks, tool-registry, tool-router,
-│                  # agent-loop, agent-tools, author-pipeline-runner
+│                  # agent-loop, agent-tools, author-pipeline-runner, outline checkpoint/generation runners
 ├── utils/         # attachment-validator, classify-nova-error
 ├── types.ts
 └── index.ts
@@ -87,6 +87,40 @@ Invalid files (wrong extension, too large, empty content) are rejected at both c
 - Baseline grounding is present even when `activeSceneId` is null (no-scene fallback).
 - Baseline fields include project title, genre, status, project type, target word count, logline, synopsis, style preset id, updated timestamp, entity counts, and first story-frame summary when available.
 - Full manuscript text is never sent by default.
+
+## Outline Generation Surface
+
+Plan-040 adds the Nova outline generation panel:
+
+- `NovaOutlineGenerationPanel.svelte` checks outline context readiness through `buildRagContext({ policy: 'outline_scope' })`, then drives generation through `outlineGenerationState`.
+- `outline-generation-runner.ts` calls `POST /api/ai/outline/generate` and exposes safe result variants for success, low context, schema failure, provider/credential failure, abort, and conflict warnings.
+- `NovaOutlineDraftCheckpointCard.svelte` renders the proposed Arc -> Act -> Chapter -> Scene tree with scene intent fields and source context metadata.
+- `outline-checkpoint-actions.ts` uses the generic project-metadata route for reject and the dedicated materialization route for accept.
+
+Panel states:
+
+| State | Meaning |
+| --- | --- |
+| `empty` | No project is selected. |
+| `loading` | Nova is checking context readiness. |
+| `blocked` | Required project/worldbuilding signals are missing. |
+| `ready` | Context is sufficient; generation can run. |
+| `running` | Provider request is in progress. |
+| `failed` | Safe failure copy is shown and retry is available where possible. |
+| `cancelled` | Abort completed without mutating project data. |
+| `review-ready` | A proposed checkpoint is ready for author review. |
+| `accepted` | The server accepted and materialized the checkpoint. |
+| `rejected` | The checkpoint was rejected. |
+
+Review-card guardrails:
+
+- Accept is enabled only for `review` checkpoints.
+- Accept sends `expectedUpdatedAt` and `expectedVersion` so stale checkpoints return `stale_checkpoint`.
+- Existing outline hierarchy returns conflict copy and does not change the checkpoint lifecycle.
+- `materialization_failed` is shown as rollback-safe copy and leaves the proposal pending review.
+- Reject requires a reason and never writes hierarchy rows.
+
+Nova does not merge generated outlines into existing outline data, regenerate in place, or auto-start manuscript drafting after accept.
 
 ## Ownership Guardrails
 

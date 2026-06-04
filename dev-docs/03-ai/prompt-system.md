@@ -1,6 +1,6 @@
 # Prompt System
 
-> Last verified: 2026-05-07
+> Last verified: 2026-06-03 (plan-040 outline generation prompt)
 
 Every prompt Novellum sends to an LLM follows a fixed five-section template. This is enforced by [prompt-builder.ts](../../src/lib/ai/prompt-builder.ts) and tested per agent.
 
@@ -48,6 +48,20 @@ Each agent file owns its own parser:
 - Returns the typed output or throws a typed parser error.
 
 Parser errors do **not** retry silently. They surface to the UI so the author knows the model misbehaved.
+
+## Outline Generation Prompt (plan-040)
+
+[outline-generation-prompt.ts](../../src/lib/ai/pipeline/outline-generation-prompt.ts) defines the Vibe-Author outline generation prompt bundle:
+
+- fixed `ROLE`, `TASK`, `CONTEXT`, `CONSTRAINTS`, and `OUTPUT FORMAT` sections
+- context from the deterministic `outlineContextPacket`
+- explicit author-agency constraints: generated outlines are proposals only
+- direct prohibitions on canonical writes, hierarchy mutation, and manuscript edits
+- two-pass intent encoded in one response: structure spine first, then scene-intent cards
+- OpenRouter/OpenAI-compatible JSON schema response format for `OutlineDraft`
+- one bounded repair prompt that reuses the same context hash and fixes only schema validation issues
+
+The prompt schema requires nested `arcs[] -> acts[] -> chapters[] -> scenes[]`, and each scene must include `intent.goal`, `intent.conflict`, `intent.turn`, and `intent.outcome`.
 
 ## Style presets
 

@@ -1,12 +1,10 @@
 # MASTER PLAN: Novellum Development
 
-> Last reconciled: 2026-06-03
+> Last reconciled: 2026-06-04
 
 ## Active Plans
 
-One skeleton plan is drafted and ready to be picked up:
-
-- [plan-040-outline-generation](./plan-040-outline-generation/plan.md) — Worldbuild → Outline → Draft loop closure.
+No plan is active.
 
 ## Deferred (not yet scheduled)
 
@@ -14,6 +12,7 @@ One skeleton plan is drafted and ready to be picked up:
 
 ## Completed Plans (Archived)
 
+- [plan-040-outline-generation](./plan-040-outline-generation/plan.md): Outline Generation — Worldbuilding to Outline. Status: `complete` (closed 2026-06-04). Review-gated outline proposal generation from worldbuilding context; strict `OutlineDraft` schema, context sufficiency, provider route, Nova review UI, explicit reject/accept actions, atomic accept materialization, conflict/stale/rollback safety, scene intent metadata for draft compatibility, docs sync, and closeout evidence. Quality gates: check (0 errors, 11 pre-existing warnings), lint (clean), lint:css waived for known unrelated `IndividualsWorkspaceShell.svelte:183`, test (237 files / 1722 tests), tokens (347 files / 0 violations), targeted e2e (2 tests).
 - [plan-039-manuscript-export-ui](./plan-039-manuscript-export-ui/plan.md): Manuscript Export UI — `ManuscriptExportDialog` wired to export services; chapter subset selector (all / range / selected, empty blocked); delivery helper (browser download + desktop cancel-safe); profile / format / metadata / formatting controls; `openJsonExport` context preserves legacy JSON portability flow. 6 stages. Status: `complete` (closed 2026-06-03). Quality gates: check (0 errors, 11 pre-existing warnings), lint (clean), test (219 files / 1615 tests), check:tokens (345 files / 0 violations).
 - [plan-041-docs-rebaseline-internal-version](./plan-041-docs-rebaseline-internal-version/plan.md): Docs rebaseline — reframe V1/V1.1/V2 as **internal development milestones** (Novellum has not cut a public release yet), absorb plans 030–038 into the roadmap, drop closed plan-018 reference and the four cut-agents claim from user docs, and roll `Last verified` across content-accurate dev-docs. Status: `complete` (closed 2026-06-01).
 

@@ -8,3 +8,7 @@ export function selectModel(taskType: TaskType): string {
 export function overrideModel(taskType: TaskType, model: string): void {
 	MODEL_MAP[taskType] = model;
 }
+
+export function selectOutlineGenerationModel(): string {
+	return selectModel('pipeline');
+}

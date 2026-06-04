@@ -24,6 +24,7 @@ import type {
 	WritingStyle
 } from '$lib/db/domain-types';
 import type { SceneIntentSnapshot } from '$lib/stores/scene-intent.svelte.js';
+import type { OutlineContextPacket } from './pipeline/outline-context-builder.js';
 
 export type ContextPolicy =
 	| 'scene_only'
@@ -168,6 +169,11 @@ export interface AiContext {
 	 * prose they have produced so far.
 	 */
 	sceneIntent?: SceneIntentSnapshot;
+	/**
+	 * Deterministic project/worldbuilding packet for plan-040 outline generation.
+	 * Present for `outline_scope` contexts; excludes full manuscript text.
+	 */
+	outlineContextPacket?: OutlineContextPacket;
 }
 
 // Legacy types — kept for backward compatibility with existing consumers

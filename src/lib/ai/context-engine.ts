@@ -20,6 +20,8 @@ import type {
 	TimelineEvent,
 } from '$lib/db/domain-types';
 import { normalizeSevenLayerOutline } from '$modules/outline/services/seven-layer-outline.js';
+import { WORLDBUILD_CHECKPOINT_OWNER_ID } from './pipeline/checkpoint-contract.js';
+import { buildOutlineContextPacketFromAiContext } from './pipeline/outline-context-builder.js';
 import type {
 	AiContext,
 	AiTask,
@@ -243,6 +245,37 @@ export async function buildContext(
 		};
 	}
 
+	async function getAcceptedWorldbuildCheckpoints(): Promise<unknown[]> {
+		try {
+			const response = await get<{ data: Record<string, unknown> }>(
+				`/api/db/project-metadata/${encodeURIComponent(projectId)}/pipeline/${encodeURIComponent(WORLDBUILD_CHECKPOINT_OWNER_ID)}`,
+			);
+			return Object.values(response.data ?? {}).filter((value) => {
+				if (typeof value === 'string') {
+					try {
+						const parsed = JSON.parse(value) as unknown;
+						return (
+							typeof parsed === 'object' &&
+							parsed !== null &&
+							!Array.isArray(parsed) &&
+							(parsed as { lifecycle?: unknown }).lifecycle === 'accepted'
+						);
+					} catch {
+						return false;
+					}
+				}
+				return (
+					typeof value === 'object' &&
+					value !== null &&
+					!Array.isArray(value) &&
+					(value as { lifecycle?: unknown }).lifecycle === 'accepted'
+				);
+			});
+		} catch {
+			return [];
+		}
+	}
+
 	switch (task.contextPolicy) {
 		case 'project_summary': {
 			const [project, storyFrames, projectCounts] = await Promise.all([
@@ -378,7 +411,14 @@ export async function buildContext(
 			// outline_scope can run without a target (whole-project outline). For
 			// chapter_scope we still require a chapter to anchor against.
 			const includeHierarchy = task.contextPolicy === 'outline_scope' || isAuthorFamily;
-			const [hierarchy, project, storyFrames, plotThreads, worldbuildingSnapshot] = await Promise.all([
+			const [
+				hierarchy,
+				project,
+				storyFrames,
+				plotThreads,
+				worldbuildingSnapshot,
+				acceptedWorldbuildCheckpoints,
+			] = await Promise.all([
 				includeHierarchy ? getOutlineHierarchy() : Promise.resolve(undefined),
 				includeProjectContext
 					? getOptional<Project>(`/api/db/projects/${projectId}`)
@@ -390,11 +430,22 @@ export async function buildContext(
 					? get<PlotThread[]>('/api/db/plot_threads', { projectId })
 					: Promise.resolve([]),
 				includeWorldbuildContext ? getWorldbuildingSnapshot() : Promise.resolve(null),
+				task.contextPolicy === 'outline_scope' ? getAcceptedWorldbuildCheckpoints() : Promise.resolve([]),
 			]);
+
+			function withOutlinePacket(context: AiContext): AiContext {
+				if (task.contextPolicy !== 'outline_scope') return context;
+				return {
+					...context,
+					outlineContextPacket: buildOutlineContextPacketFromAiContext(context, {
+						acceptedCheckpoints: acceptedWorldbuildCheckpoints,
+					}),
+				};
+			}
 
 			if (!chapterId) {
 				const empty = emptyContext(task.contextPolicy);
-				return {
+				return withOutlinePacket({
 					...empty,
 					characters: worldbuildingSnapshot?.characters ?? [],
 					locations: worldbuildingSnapshot?.locations ?? [],
@@ -405,13 +456,13 @@ export async function buildContext(
 					timelineEvents: worldbuildingSnapshot?.timelineEvents ?? [],
 					factions: worldbuildingSnapshot?.factions ?? [],
 					...(hierarchy ? { outlineHierarchy: hierarchy } : {}),
-				};
+				});
 			}
 
 			const chapter = await getOptional<Chapter>(`/api/db/chapters/${chapterId}`);
 			if (!chapter) {
 				const empty = emptyContext(task.contextPolicy);
-				return {
+				return withOutlinePacket({
 					...empty,
 					characters: worldbuildingSnapshot?.characters ?? [],
 					locations: worldbuildingSnapshot?.locations ?? [],
@@ -422,7 +473,7 @@ export async function buildContext(
 					timelineEvents: worldbuildingSnapshot?.timelineEvents ?? [],
 					factions: worldbuildingSnapshot?.factions ?? [],
 					...(hierarchy ? { outlineHierarchy: hierarchy } : {}),
-				};
+				});
 			}
 
 			const rawScenes = await getScenes(chapterId);
@@ -461,7 +512,7 @@ export async function buildContext(
 				? (worldbuildingSnapshot?.factions ?? [])
 				: [];
 
-			return {
+			return withOutlinePacket({
 				policy: task.contextPolicy,
 				scene: null,
 				adjacentScenes: scenes,
@@ -479,7 +530,7 @@ export async function buildContext(
 				themes: [],
 				glossaryTerms: [],
 				...(hierarchy ? { outlineHierarchy: hierarchy } : {}),
-			};
+			});
 		}
 
 		case 'continuity_scope': {

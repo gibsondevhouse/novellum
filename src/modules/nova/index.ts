@@ -36,11 +36,19 @@ export { default as ModelPickerDropdown } from './components/ModelPickerDropdown
 export { default as NovaErrorBoundary } from './components/NovaErrorBoundary.svelte';
 export { default as NovaSceneDraftCard } from './components/NovaSceneDraftCard.svelte';
 export { default as NovaOutlineCard } from './components/NovaOutlineCard.svelte';
+export { default as NovaOutlineGenerationPanel } from './components/NovaOutlineGenerationPanel.svelte';
+export { default as NovaOutlineDraftCheckpointCard } from './components/NovaOutlineDraftCheckpointCard.svelte';
 export { default as NovaRevisionPackCard } from './components/NovaRevisionPackCard.svelte';
 export { novaPanel } from './stores/nova-panel.svelte.js';
 export { novaSession } from './stores/nova-session.svelte.js';
 export { novaMode } from './stores/nova-mode.svelte.js';
 export type { ContextDisclosureState } from './stores/nova-session.svelte.js';
+export {
+	outlineGenerationState,
+	OutlineGenerationStateStore,
+	type OutlineGenerationStateDeps,
+	type OutlineGenerationStateStatus,
+} from './stores/outline-generation-state.svelte.js';
 export { aiSession, AiSessionStore } from './services/ai-session-service.svelte.js';
 export { buildRagContext } from './services/context-hooks.js';
 export { sendNovaChat, type SendChatInput } from './services/chat-service.js';
@@ -49,6 +57,36 @@ export {
 	type AuthorPipelineRunInput,
 	type AuthorPipelineRunResult,
 } from './services/author-pipeline-runner.js';
+export {
+	OUTLINE_GENERATION_ENDPOINT,
+	OutlineGenerationRunner,
+	createOutlineGenerationRunner,
+	type OutlineGenerationRunnerError,
+	type OutlineGenerationRunnerFailure,
+	type OutlineGenerationRunnerInput,
+	type OutlineGenerationRunnerOptions,
+	type OutlineGenerationRunnerResult,
+	type OutlineGenerationRunnerRunOptions,
+	type OutlineGenerationRunnerState,
+	type OutlineGenerationRunnerStatus,
+	type OutlineGenerationRunnerSuccess,
+	type OutlineGenerationRunnerCancellation,
+} from './services/outline-generation-runner.js';
+export {
+	OutlineCheckpointActionError,
+	createOutlineCheckpointActions,
+	acceptOutlineDraftCheckpointAction,
+	rejectOutlineDraftCheckpointAction,
+	reviewOutlineDraftCheckpointAction,
+	type AcceptOutlineCheckpointActionInput,
+	type AcceptOutlineCheckpointActionResult,
+	type OutlineCheckpointActionBaseInput,
+	type OutlineCheckpointActionDeps,
+	type OutlineCheckpointActionResult,
+	type OutlineCheckpointActions,
+	type RejectOutlineCheckpointActionInput,
+	type ReviewOutlineCheckpointActionInput,
+} from './services/outline-checkpoint-actions.js';
 export { dispatchTool } from './services/tool-router.js';
 export { runAgentLoop, MAX_AGENT_STEPS, type AgentLoopInput } from './services/agent-loop.js';
 export { registerAgentTools, type ProposalEnvelope } from './services/agent-tools.js';

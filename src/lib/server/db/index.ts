@@ -1,3 +1,5 @@
+import type Database from 'better-sqlite3';
+
 export { encodeJson, decodeJson } from './serialize.js';
 export {
 	runMigrations,
@@ -11,3 +13,4 @@ export { writePreMigrationSnapshot } from './snapshot.js';
 export type { SnapshotInfo, WriteSnapshotOptions } from './snapshot.js';
 export { SCHEMA_SQL, INDEX_SQL } from './schema.js';
 export { db } from './client.js';
+export type SqliteDatabase = Database.Database;

@@ -6,10 +6,11 @@
 
 ## Current
 
-No active plan. Pick up [plan-040-outline-generation](./plan-040-outline-generation/plan.md) next.
+No active plan. Plan 040 is complete; choose the next plan explicitly before resuming implementation work.
 
 ## Recently completed
 
+- [plan-040-outline-generation](./plan-040-outline-generation/plan.md) — Outline Generation: Worldbuilding to Outline. Shipped review-gated outline proposal generation from worldbuilding context, Nova review UI, atomic accept materialization, conflict/stale/rollback safety, docs sync, and closeout evidence. Closed 2026-06-04. Quality gates: check (0 errors, 11 pre-existing warnings), lint (clean), lint:css waived for known unrelated `IndividualsWorkspaceShell.svelte:183`, test (237 files / 1722 tests), tokens (347 files / 0 violations), targeted e2e (2 tests).
 - [plan-039-manuscript-export-ui](./plan-039-manuscript-export-ui/plan.md) — Manuscript Export UI: wired `ManuscriptExportDialog` to existing export services, chapter subset selector, delivery helper, profile/format selectors, metadata fields, `openJsonExport` context preserving legacy JSON portability flow. 6 stages, all quality gates passed (check 0 errors, lint clean, 219 tests / 1615, tokens 345 files / 0 violations). Closed 2026-06-03.
 - [plan-041-docs-rebaseline-internal-version](./plan-041-docs-rebaseline-internal-version/plan.md) — Docs rebaseline: reframe V1/V1.1/V2 references as **internal development milestones** (Novellum has not cut a public release yet), absorb plans 030–038 into the roadmap, drop the closed plan-018 reference and the four cut-agents claim from user docs, and roll `Last verified` across content-accurate dev-docs. Closed 2026-06-01.
 - [plan-038-novel-engine-v1](./plan-038/plan.md) — Novel Engine v1: Draft From Outline guided pipeline. Closed 2026-06-01 with all 5 stages complete. Agentic surface copy fixes, fetch DI for buildContext, author-draft checkpoint service with stale-guard, chapter draft runner, quality gap closure (unresolvedThreads, rawOutput strip, progress counter fix, draft lifecycle removal). Quality gates: check (0 errors), lint (clean), test (212 files / 1575 tests), tokens (0 violations). Pre-existing lint:css error in IndividualsWorkspaceShell documented.

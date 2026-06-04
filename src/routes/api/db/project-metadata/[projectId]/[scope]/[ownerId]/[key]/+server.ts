@@ -12,6 +12,13 @@ import {
 	upsertWorldbuildCheckpoint,
 	WorldbuildCheckpointError,
 } from '$lib/ai/pipeline/checkpoint-service.js';
+import { OUTLINE_CHECKPOINT_OWNER_ID } from '$lib/ai/pipeline/outline-checkpoint-contract.js';
+import {
+	OutlineCheckpointError,
+	rejectOutlineDraftCheckpoint,
+	reviewOutlineDraftCheckpoint,
+	upsertOutlineDraftCheckpoint,
+} from '$lib/ai/pipeline/outline-checkpoint-service.js';
 import type { RequestHandler } from './$types';
 
 const ALLOWED: ReadonlySet<MetadataScope> = new Set(['scene', 'chapter', 'project', 'pipeline']);
@@ -79,6 +86,19 @@ function statusForCheckpointError(error: WorldbuildCheckpointError): number {
 	}
 }
 
+function statusForOutlineCheckpointError(error: OutlineCheckpointError): number {
+	switch (error.code) {
+		case 'not_found':
+			return 404;
+		case 'invalid_transition':
+			return 409;
+		case 'invalid_version':
+		case 'invalid_payload':
+		default:
+			return 400;
+	}
+}
+
 export const GET: RequestHandler = async ({ params }) => {
 	const v = validate(params);
 	if (!v.ok) return v.response;
@@ -101,6 +121,46 @@ export const PUT: RequestHandler = async ({ params, request }) => {
 	if (v.scope === 'pipeline') {
 		try {
 			const operation = parsePipelineOperation(body.operation);
+
+			if (v.ownerId === OUTLINE_CHECKPOINT_OWNER_ID) {
+				switch (operation) {
+					case 'upsert': {
+						if (body.value === undefined) {
+							return json({ error: 'value is required for upsert operation' }, { status: 400 });
+						}
+						const checkpoint = upsertOutlineDraftCheckpoint(
+							v.projectId,
+							v.ownerId,
+							v.key,
+							body.value,
+						);
+						return json({ ok: true, checkpoint });
+					}
+					case 'review': {
+						const checkpoint = reviewOutlineDraftCheckpoint(v.projectId, v.ownerId, v.key, {
+							reviewer: asOptionalString(body.reviewer),
+							note: asOptionalString(body.note),
+						});
+						return json({ ok: true, checkpoint });
+					}
+					case 'reject': {
+						const checkpoint = rejectOutlineDraftCheckpoint(v.projectId, v.ownerId, v.key, {
+							rejectedBy: asOptionalString(body.rejectedBy),
+							reason: asOptionalString(body.reason) ?? '',
+						});
+						return json({ ok: true, checkpoint });
+					}
+					case 'accept':
+						return json(
+							{
+								error:
+									'Outline checkpoint acceptance requires the outline materialization route.',
+								code: 'invalid_transition',
+							},
+							{ status: 409 },
+						);
+				}
+			}
 
 			switch (operation) {
 				case 'upsert': {
@@ -142,6 +202,12 @@ export const PUT: RequestHandler = async ({ params, request }) => {
 				return json(
 					{ error: error.message, code: error.code },
 					{ status: statusForCheckpointError(error) },
+				);
+			}
+			if (error instanceof OutlineCheckpointError) {
+				return json(
+					{ error: error.message, code: error.code },
+					{ status: statusForOutlineCheckpointError(error) },
 				);
 			}
 			throw error;

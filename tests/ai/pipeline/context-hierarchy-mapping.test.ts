@@ -64,6 +64,7 @@ interface Fixture {
 	themes: unknown[];
 	glossary_terms: unknown[];
 	project: unknown | null;
+	project_metadata: Record<string, unknown>;
 }
 
 function blankFixture(): Fixture {
@@ -86,6 +87,7 @@ function blankFixture(): Fixture {
 		themes: [],
 		glossary_terms: [],
 		project: null,
+		project_metadata: {},
 	};
 }
 
@@ -94,6 +96,13 @@ function makeMockFetch(fixture: Fixture): typeof globalThis.fetch {
 		const url = typeof input === 'string' ? input : input.toString();
 		// Strip query string to get path
 		const [path] = url.split('?');
+
+		if (path?.match(/^\/api\/db\/project-metadata\/[^/]+\/pipeline\/[^/]+$/)) {
+			return new Response(JSON.stringify({ data: fixture.project_metadata }), {
+				status: 200,
+				headers: { 'content-type': 'application/json' },
+			});
+		}
 
 		const singleMatch = path?.match(/^\/api\/db\/([a-z_]+)\/([\w-]+)$/);
 		if (singleMatch) {
@@ -147,6 +156,28 @@ const baseScene = {
 	updatedAt: now,
 };
 
+function acceptedWorldbuildCheckpoint(taskKey: string, payload: Record<string, unknown>) {
+	return {
+		id: `checkpoint-${taskKey}`,
+		projectId,
+		ownerId: 'vibe-worldbuild',
+		version: '1.0.0',
+		lifecycle: 'accepted',
+		taskKey,
+		artifact: {
+			id: `artifact-${taskKey}`,
+			taskKey,
+			payload,
+			lifecycle: 'accepted',
+		},
+		createdAt: now,
+		updatedAt: now,
+		review: null,
+		acceptance: null,
+		rejection: null,
+	};
+}
+
 beforeEach(() => {
 	mockFetch = makeMockFetch(blankFixture());
 });
@@ -189,6 +220,53 @@ describe('context-engine seven-layer hierarchy mapping', () => {
 		expect(ctx.outlineHierarchy!.scenes.map((s) => s.id)).toEqual(['s1']);
 		expect(ctx.outlineHierarchy!.beats.map((b) => b.id)).toEqual(['b1']);
 		expect(ctx.outlineHierarchy!.stages.map((s) => s.id)).toEqual(['st1']);
+	});
+
+	it('outline_scope attaches an outline context packet with accepted worldbuild checkpoints', async () => {
+		const fixture = blankFixture();
+		fixture.project = {
+			id: projectId,
+			title: 'Storm Ledger',
+			genre: 'climate noir',
+			logline: 'A courier must outrun a civil war to deliver the last weather map.',
+			synopsis: 'The city survives by rationing rain.',
+			targetWordCount: 85000,
+			status: 'planning',
+			projectType: 'novel',
+			createdAt: now,
+			updatedAt: now,
+		};
+		fixture.characters = [{ id: 'char-1', projectId, name: 'Iri Vale', role: 'Courier', createdAt: now, updatedAt: now }];
+		fixture.scenes = [
+			{
+				id: 'scene-1',
+				...baseScene,
+				content: 'SECRET MANUSCRIPT TEXT SHOULD NOT LEAK',
+			},
+		];
+		fixture.project_metadata = {
+			'checkpoint-threads': acceptedWorldbuildCheckpoint('vibe-worldbuild.domain.threads', {
+				majorArcs: [{ title: 'Steal the storm ledger' }],
+				subplots: [],
+				motivations: [],
+			}),
+		};
+		installRouter(fixture);
+
+		const task: AiTask = {
+			taskType: 'pipeline',
+			role: 'author',
+			targetEntityId: null,
+			contextPolicy: 'outline_scope',
+			outputFormat: 'json',
+			pipelineTask: { key: 'vibe-author.outline', family: 'vibe-author', stage: 'outline' },
+		};
+
+		const ctx = await buildContext(task, projectId, { fetch: mockFetch });
+		expect(ctx.outlineContextPacket?.readiness.ok).toBe(true);
+		expect(ctx.outlineContextPacket?.worldbuilding.plotThreads[0]?.sourceKind).toBe('checkpoint');
+		expect(ctx.outlineContextPacket?.sourceReferences.some((ref) => ref.kind === 'checkpoint')).toBe(true);
+		expect(JSON.stringify(ctx.outlineContextPacket)).not.toContain('SECRET MANUSCRIPT TEXT SHOULD NOT LEAK');
 	});
 
 	it('vibe-author continuity_scope attaches the seven-layer outlineHierarchy', async () => {

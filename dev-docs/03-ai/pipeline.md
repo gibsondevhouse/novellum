@@ -1,6 +1,6 @@
 # AI Pipeline
 
-> Last verified: 2026-05-28 (plan-031 stage-005 docs sync)
+> Last verified: 2026-06-04 (plan-040 closeout docs sync)
 
 Every AI feature in Novellum follows the same pipeline. The runtime
 agents (continuity / edit / rewrite / style) live in [src/lib/ai/](../../src/lib/ai/)
@@ -81,8 +81,13 @@ checkpoints.
 | File | Purpose |
 | --- | --- |
 | `contracts.ts` | `OUTLINE_HIERARCHY` 7-tuple, `PipelineTaskContract`, `PipelineArtifactEnvelope<T>`, `createPipelineArtifactEnvelope()`. |
+| `index.ts` | Public barrel for pipeline contracts introduced by plan-040. |
 | `task-catalog.ts` | `PIPELINE_TASK_KEYS`, `PIPELINE_TASK_CATALOG`, `PIPELINE_TASK_FAMILIES`, `resolvePipelineAction()`. |
 | `prompt-library.ts` / `prompt-library-seeds.ts` | Per-stage prompt scaffolds (ROLE / TASK / CONSTRAINTS / OUTPUT). |
+| `outline-context-builder.ts` / `outline-context-sufficiency.ts` | Deterministic context packet and readiness gate for plan-040 outline generation. |
+| `outline-generation-prompt.ts` | ROLE / TASK / CONTEXT / CONSTRAINTS / OUTPUT prompt bundle and bounded repair prompt for outline generation. |
+| `outline-draft-contract.ts` | `OutlineDraft`, `OutlineDraftCheckpointRecord`, `outlineDraftSchema`, and validation helpers for plan-040 outline generation checkpoints. |
+| `outline-checkpoint-service.ts` / `outline-checkpoint-contract.ts` | Metadata-route lifecycle helpers and typed client actions for outline draft checkpoints. |
 | `worldbuild-schemas.ts` | Zod schemas for the four `vibe-worldbuild.*` payloads (premise / worldspec / research / populated-bible). |
 | `worldbuild-agent.ts` | `parseWorldbuildOutput()`, `createWorldbuildArtifactFromModelOutput()`, populated-bible normalizer. |
 | `checkpoint-contract.ts` | `PIPELINE_CHECKPOINT_SCHEMA_VERSION='1.0.0'`, `WorldbuildCheckpointRecord`, lifecycle guards. |
@@ -107,8 +112,8 @@ preserves it on the record without touching canon.
 The HTTP surface is
 `/api/db/project-metadata/{projectId}/pipeline/{ownerId}/{key}` with a
 discriminated `operation` payload (`upsert | review | accept | reject`).
-The vibe-author family is scaffolded but not yet parser-wired; it ships
-in stage-003.
+The vibe-author review-gate surface ships separately from this
+worldbuild checkpoint flow.
 
 ### vibe-author review-gate flow
 
@@ -156,6 +161,42 @@ The review-gate guardrail is enforced at three layers:
 later editor accept-pipeline can ledger the provenance (`taskKey`,
 `family`, `stage`, `model`, `createdAt`). That integration is out of
 scope for plan-027.
+
+### vibe-outline generation flow (plan-040)
+
+Plan-040 ships AI-assisted outline generation as a review-gated
+pipeline surface. Generated outlines are proposals, not canon, until
+the author explicitly accepts them.
+
+- `OUTLINE_DRAFT_TASK_KEY` is `vibe-outline.draft`.
+- Outline checkpoints use owner id `outlineDraftCheckpoints.v1` and
+  lifecycle `draft | review | accepted | rejected`.
+- `POST /api/ai/outline/generate` builds an `OutlineContextPacket`,
+  blocks low-context requests with `context_not_ready`, calls the
+  selected provider with a strict JSON schema response format, validates
+  `OutlineDraft`, performs one bounded repair attempt on schema failure,
+  and stores the valid result as a `review` checkpoint.
+- `OutlineDraft` requires nested Arc -> Act -> Chapter -> Scene nodes.
+  Every node has a stable `id`, `slug`, `title`, and `order`.
+- Every generated scene includes intent fields: `goal`, `conflict`,
+  `turn`, and `outcome`. These are stored on accept for downstream
+  `SceneDraftContext` compatibility.
+- `sourceContext` records the summarized worldbuilding context, included
+  domains, entity counts, context hash, and prompt version.
+- The generic project metadata route supports outline upsert, review,
+  and reject. It deliberately rejects outline accept operations.
+- Canon materialization is only available through
+  `POST /api/outline/checkpoints/{checkpointId}/accept` with
+  `expectedUpdatedAt` and `expectedVersion` stale preconditions.
+- Accept writes hierarchy rows and scene intent metadata in one
+  transaction, then updates checkpoint lifecycle as the final write.
+  Failed materialization rolls back and returns safe
+  `materialization_failed` copy.
+- Existing hierarchy rows return `outline_conflict`; plan-040 does not
+  merge, overwrite, or regenerate existing outlines in place.
+
+See [outline-generation.md](./outline-generation.md) for the complete
+contract, route surface, Nova states, and limitations.
 
 ### Nova mode/workflow boundaries (plan-031)
 

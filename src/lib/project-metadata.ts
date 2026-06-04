@@ -1,5 +1,22 @@
 import type { WorldbuildCheckpointRecord } from '$lib/ai/pipeline/checkpoint-contract.js';
 import { WORLDBUILD_CHECKPOINT_OWNER_ID } from '$lib/ai/pipeline/checkpoint-contract.js';
+import type { OutlineDraftCheckpointRecord } from '$lib/ai/pipeline/outline-draft-contract.js';
+import {
+	OUTLINE_CHECKPOINT_OWNER_ID,
+	assertOutlineCheckpointCanAccept,
+	assertOutlineCheckpointCanReject,
+	createOutlineCheckpointAcceptBody,
+	createOutlineCheckpointRejectBody,
+	createOutlineCheckpointReviewBody,
+	createOutlineCheckpointUpsertBody,
+	normalizeOutlineCheckpointId,
+	type OutlineCheckpointAcceptInput,
+	type OutlineCheckpointAcceptTarget,
+	type OutlineCheckpointRejectInput,
+	type OutlineCheckpointRejectTarget,
+	type OutlineCheckpointReviewInput,
+	type OutlineCheckpointUpsertValue,
+} from '$lib/ai/pipeline/outline-checkpoint-contract.js';
 
 /**
  * Client wrapper for the SQLite-canonical project metadata store.
@@ -24,6 +41,10 @@ function url(projectId: string, scope: MetadataScope, ownerId: string, key?: str
 	const segments = [projectId, scope, ownerId];
 	if (key !== undefined) segments.push(key);
 	return `${BASE}/${segments.map(encodeURIComponent).join('/')}`;
+}
+
+function outlineAcceptUrl(checkpointId: string): string {
+	return `/api/outline/checkpoints/${encodeURIComponent(checkpointId)}/accept`;
 }
 
 export async function getProjectMetadata<T>(
@@ -86,7 +107,21 @@ async function mutatePipelineCheckpoint(
 	checkpointId: string,
 	operation: PipelineOperation,
 	body: Record<string, unknown>,
-): Promise<WorldbuildCheckpointRecord> {
+): Promise<WorldbuildCheckpointRecord>;
+async function mutatePipelineCheckpoint<TCheckpoint>(
+	projectId: string,
+	ownerId: string,
+	checkpointId: string,
+	operation: PipelineOperation,
+	body: Record<string, unknown>,
+): Promise<TCheckpoint>;
+async function mutatePipelineCheckpoint<TCheckpoint>(
+	projectId: string,
+	ownerId: string,
+	checkpointId: string,
+	operation: PipelineOperation,
+	body: Record<string, unknown>,
+): Promise<TCheckpoint> {
 	if (!isBrowser()) {
 		throw new Error('Pipeline checkpoint mutations require a browser context.');
 	}
@@ -102,7 +137,7 @@ async function mutatePipelineCheckpoint(
 		throw new Error(payload.error ?? `Pipeline checkpoint mutation failed: ${res.status}`);
 	}
 
-	const payload = (await res.json()) as { checkpoint: WorldbuildCheckpointRecord };
+	const payload = (await res.json()) as { checkpoint: TCheckpoint };
 	return payload.checkpoint;
 }
 
@@ -140,6 +175,101 @@ export async function rejectWorldbuildCheckpoint(
 	ownerId = WORLDBUILD_CHECKPOINT_OWNER_ID,
 ): Promise<WorldbuildCheckpointRecord> {
 	return mutatePipelineCheckpoint(projectId, ownerId, checkpointId, 'reject', input);
+}
+
+export async function listOutlineCheckpoints(
+	projectId: string,
+	ownerId = OUTLINE_CHECKPOINT_OWNER_ID,
+): Promise<Record<string, OutlineDraftCheckpointRecord>> {
+	const entries = await listProjectMetadata(projectId, 'pipeline', ownerId);
+	return Object.fromEntries(
+		Object.entries(entries).map(([key, value]) => [key, value as OutlineDraftCheckpointRecord]),
+	);
+}
+
+export async function upsertOutlineCheckpoint(
+	projectId: string,
+	checkpointId: string,
+	value: OutlineCheckpointUpsertValue,
+	ownerId = OUTLINE_CHECKPOINT_OWNER_ID,
+): Promise<OutlineDraftCheckpointRecord> {
+	const body = createOutlineCheckpointUpsertBody(value);
+	return mutatePipelineCheckpoint<OutlineDraftCheckpointRecord>(
+		projectId,
+		ownerId,
+		normalizeOutlineCheckpointId(checkpointId),
+		body.operation,
+		{ value: body.value },
+	);
+}
+
+export async function reviewOutlineCheckpoint(
+	projectId: string,
+	checkpointId: string,
+	input: OutlineCheckpointReviewInput = {},
+	ownerId = OUTLINE_CHECKPOINT_OWNER_ID,
+): Promise<OutlineDraftCheckpointRecord> {
+	const body = createOutlineCheckpointReviewBody(input);
+	return mutatePipelineCheckpoint<OutlineDraftCheckpointRecord>(
+		projectId,
+		ownerId,
+		normalizeOutlineCheckpointId(checkpointId),
+		body.operation,
+		body,
+	);
+}
+
+export async function acceptOutlineCheckpoint(
+	projectId: string,
+	checkpoint: OutlineCheckpointAcceptTarget,
+	input: OutlineCheckpointAcceptInput = {},
+	ownerId = OUTLINE_CHECKPOINT_OWNER_ID,
+): Promise<OutlineDraftCheckpointRecord> {
+	assertOutlineCheckpointCanAccept(checkpoint);
+	if (ownerId !== OUTLINE_CHECKPOINT_OWNER_ID) {
+		throw new Error('Outline checkpoint acceptance requires the outline checkpoint owner.');
+	}
+	const bodyWithPrecondition = createOutlineCheckpointAcceptBody({
+		...input,
+		expectedUpdatedAt: input.expectedUpdatedAt ?? checkpoint.updatedAt,
+		expectedVersion: input.expectedVersion ?? checkpoint.version,
+	});
+	if (!isBrowser()) {
+		throw new Error('Pipeline checkpoint mutations require a browser context.');
+	}
+
+	const { operation: _operation, ...requestBody } = bodyWithPrecondition;
+	const checkpointId = normalizeOutlineCheckpointId(checkpoint.id);
+	const res = await fetch(outlineAcceptUrl(checkpointId), {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ projectId, ...requestBody }),
+	});
+
+	if (!res.ok) {
+		const payload = (await res.json().catch(() => ({}))) as { error?: string };
+		throw new Error(payload.error ?? `Pipeline checkpoint mutation failed: ${res.status}`);
+	}
+
+	const payload = (await res.json()) as { checkpoint: OutlineDraftCheckpointRecord };
+	return payload.checkpoint;
+}
+
+export async function rejectOutlineCheckpoint(
+	projectId: string,
+	checkpoint: OutlineCheckpointRejectTarget,
+	input: OutlineCheckpointRejectInput,
+	ownerId = OUTLINE_CHECKPOINT_OWNER_ID,
+): Promise<OutlineDraftCheckpointRecord> {
+	assertOutlineCheckpointCanReject(checkpoint);
+	const body = createOutlineCheckpointRejectBody(input);
+	return mutatePipelineCheckpoint<OutlineDraftCheckpointRecord>(
+		projectId,
+		ownerId,
+		normalizeOutlineCheckpointId(checkpoint.id),
+		body.operation,
+		body,
+	);
 }
 
 export async function deleteProjectMetadata(

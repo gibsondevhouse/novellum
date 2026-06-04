@@ -17,6 +17,7 @@
 		listAuthorDraftCheckpoints,
 	} from '../services/author-draft-api.js';
 	import NovaAuthorDraftCheckpointCard from './NovaAuthorDraftCheckpointCard.svelte';
+	import NovaOutlineGenerationPanel from './NovaOutlineGenerationPanel.svelte';
 
 	interface Props {
 		projectId?: string | null;
@@ -189,6 +190,8 @@
 </script>
 
 <section class="author-draft-engine" aria-label="Draft engine" data-testid="author-draft-engine">
+	<NovaOutlineGenerationPanel {projectId} />
+
 	<header class="engine-header">
 		<div class="engine-title">
 			<p class="engine-eyebrow">Draft engine</p>

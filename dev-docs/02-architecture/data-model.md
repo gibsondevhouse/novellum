@@ -1,6 +1,6 @@
 # Data Model
 
-> Last verified: 2026-05-26 (plan-028 UI shipped)
+> Last verified: 2026-06-04 (plan-040 closeout docs sync)
 
 The single source of truth is the SQLite schema in [src/lib/server/db/schema.ts](../../src/lib/server/db/schema.ts). The Dexie mirror in [src/lib/db/](../../src/lib/db/) (currently schema **v11**) is used **only** for `.novellum.zip` portability — never for live reads/writes.
 
@@ -56,7 +56,7 @@ The single source of truth is the SQLite schema in [src/lib/server/db/schema.ts]
 These are not in the "16 core" count but are first-class:
 
 - **`preferences`** — typed user preferences keyed by string. Foundation for [plan-022-settings-ia](../plans/plan-022-settings-ia/plan.md). REST under `/api/db/preferences/[key]`.
-- **`project_metadata`** — per-project flexible metadata (scoped by `projectId`/`scope`/`ownerId`/`key`). REST under `/api/db/project-metadata/...`. Supported scopes: `'scene' | 'chapter' | 'project' | 'pipeline'`. The `'pipeline'` scope stores `WorldbuildCheckpointRecord` JSON keyed by checkpoint id (owner `'vibe-worldbuild'`); accepted populated-bible checkpoints atomically project into `factions`, `characters`, `locations`, `themes`, `glossary_terms`, `lore_entries`, `plot_threads`, and `timeline_events`. See [ADR-0027](./adr/adr-0027-pipeline-entity-scope.md) and [pipeline.md](../03-ai/pipeline.md).
+- **`project_metadata`** — per-project flexible metadata (scoped by `projectId`/`scope`/`ownerId`/`key`). REST under `/api/db/project-metadata/...`. Supported scopes: `'scene' | 'chapter' | 'project' | 'pipeline'`. The `'pipeline'` scope stores `WorldbuildCheckpointRecord` JSON keyed by checkpoint id (owner `'vibe-worldbuild'`) and plan-040 `OutlineDraftCheckpointRecord` JSON keyed by checkpoint id (owner `'outlineDraftCheckpoints.v1'`). Accepted populated-bible checkpoints atomically project into worldbuilding canon tables. Accepted outline checkpoints atomically project into `arcs`, `acts`, `milestones`, `chapters`, `scenes`, and scene-scoped metadata through the dedicated outline accept route. See [ADR-0027](./adr/adr-0027-pipeline-entity-scope.md), [pipeline.md](../03-ai/pipeline.md), and [outline-generation.md](../03-ai/outline-generation.md).
 
 The complete count, including auxiliary tables, is **16 shipped narrative + AI tables + 5 auxiliary** (preferences, project-metadata, etc.) — see [schema.ts](../../src/lib/server/db/schema.ts) for the canonical list.
 
@@ -82,6 +82,21 @@ The full seven-layer narrative spine (`arcs → acts → milestones → chapters
 - `AiContext.outlineHierarchy` is populated whenever the active pipeline task is in the `vibe-author` family OR the `contextPolicy` is `outline_scope`.
 - `filterOutlineByStageStatus` enforces the `Stage` lifecycle (`planned | in_progress | completed`) at retrieval time so author-stage tasks only see the slices they should act on.
 - `getSevenLayerOutline(projectId)` in [`outline-data-service.ts`](../../src/modules/outline/services/outline-data-service.ts) is the public traversal entry point for non-AI consumers (export, telemetry, etc.).
+
+### Outline Draft Materialization Map
+
+Plan-040 outline checkpoints use [`buildOutlineMaterializationMap`](../../src/lib/server/outline/outline-materialization-map.ts) before any accept transaction writes hierarchy rows. The mapper is pure and deterministic: it emits row-shaped data for `arcs`, `acts`, default `milestones`, `chapters`, and `scenes`, plus scene metadata sidecars; it does not import the database or execute writes.
+
+V1 outline drafts generate Arc → Act → Chapter → Scene. To preserve seven-layer compatibility without inventing weak leaf work:
+
+- `arcs`, `acts`, `chapters`, and `scenes` preserve the generated node ids as canonical row ids.
+- One default milestone bucket is emitted per act with `chapterIds` for the act's generated chapters.
+- No beat or stage rows are invented by the mapper. Later contracts may add generated beats explicitly; until then `beats` and `stages` remain empty.
+- Scene intent is stored as scene-scoped `project_metadata` sidecars for plan-038 draft compatibility:
+  - key `quickIntent` and compatibility alias `quick-intent`: `{ goal, obstacle, conflict, turn, outcome }`
+  - key `clarity`: `{ sceneGoal, immediateObstacle, turningPoint, outcome }`
+
+The accept route owns conflict checks, stale preconditions, transaction boundaries, JSON encoding, and lifecycle mutation. The mapper only defines what would be written. Accept is blocked when existing hierarchy rows are present; plan-040 does not merge or overwrite existing outlines.
 
 ## Repositories
 
