@@ -6,7 +6,7 @@
 
 ## Current
 
-No active plan.
+[plan-043-brainstorm-agent](./plan-043-brainstorm-agent/plan.md) — Brainstorm Agent. Scaffolded 2026-06-04.
 
 ## Recently completed
 
