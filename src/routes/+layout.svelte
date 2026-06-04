@@ -18,7 +18,9 @@
 
 	let { children } = $props();
 
-	const activeProjectId = $derived(page.params.id ?? null);
+	const activeProjectId = $derived(
+		page.url.pathname.startsWith('/projects/') ? (page.params.id ?? null) : null,
+	);
 	const activeSceneId = $derived(page.url.searchParams.get('sceneId'));
 	const activeChapterId = $derived(page.url.searchParams.get('chapterId'));
 

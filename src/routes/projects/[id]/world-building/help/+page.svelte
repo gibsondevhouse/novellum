@@ -229,57 +229,6 @@
 		margin: 0 auto;
 	}
 
-	.hero {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-4);
-		padding: var(--space-6);
-		border: 1px solid var(--color-border-subtle);
-		background: color-mix(in srgb, var(--color-surface-overlay) 92%, black 8%);
-		border-radius: var(--radius-lg);
-	}
-
-	.hero-actions {
-		position: sticky;
-		top: calc(48px + var(--space-2));
-		z-index: 3;
-		display: flex;
-		gap: var(--space-3);
-		flex-wrap: wrap;
-		padding: var(--space-3);
-		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-lg);
-		background: color-mix(in srgb, var(--color-surface-base) 88%, transparent);
-		backdrop-filter: blur(8px);
-	}
-
-	.hero-jump {
-		display: inline-flex;
-		align-items: center;
-		padding: var(--space-1) var(--space-4);
-		border-radius: var(--radius-full);
-		font-size: var(--text-xs);
-		font-weight: var(--font-weight-semibold);
-		text-decoration: none;
-		background: transparent;
-		border: 1px solid var(--color-border-default);
-		color: var(--color-text-secondary);
-	}
-
-	.hero-jump--nova {
-		cursor: pointer;
-		border-color: color-mix(in srgb, var(--color-nova-blue) 55%, var(--color-border-default));
-		background: color-mix(in srgb, var(--color-nova-blue) 14%, transparent);
-		color: var(--color-text-primary);
-	}
-
-	.hero-jump:hover {
-		background: var(--color-surface-overlay);
-		border-color: var(--color-border-focus);
-		color: var(--color-text-primary);
-		text-decoration: none;
-	}
-
 	.domain-grid {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -582,11 +531,6 @@
 	@media (max-width: 768px) {
 		.domain-grid {
 			grid-template-columns: 1fr;
-		}
-
-		.hero-actions {
-			overflow-x: visible;
-			flex-wrap: wrap;
 		}
 
 		.lane-heading {

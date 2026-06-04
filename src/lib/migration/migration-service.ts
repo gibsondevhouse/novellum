@@ -41,6 +41,7 @@ const MIGRATION_TABLES: { table: keyof typeof db; apiPath: string }[] = [
 	{ table: 'story_frames', apiPath: '/api/db/story_frames' },
 	{ table: 'acts', apiPath: '/api/db/acts' },
 	{ table: 'arcs', apiPath: '/api/db/arcs' },
+	{ table: 'assets', apiPath: '/api/db/assets' },
 ];
 
 export async function preCheck(): Promise<PreCheckResult[]> {

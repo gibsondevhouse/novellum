@@ -6,9 +6,11 @@
 
 ## Current
 
-No active plan. Plan 040 is complete; choose the next plan explicitly before resuming implementation work.
+No active plan.
 
 ## Recently completed
+
+- [plan-042-quality-gates-closure](./plan-042-quality-gates-closure/plan.md) — Quality Gates Closure. Eliminated all 11 pre-existing `pnpm check` warnings (unused CSS selectors + a11y autofocus), fixed the `lint:css` duplicate `text-align` error in `IndividualsWorkspaceShell.svelte`, hardened sidebar active-project detection to guard against non-`/projects/` routes (with 6 new unit tests), and audited Dexie boundary (all imports correct; assets module documented as known exception pending dedicated migration). Closed 2026-06-04. Quality gates: check (0 errors, 0 warnings, 1833 files), lint (clean), lint:css (clean), test (237 files / 1728 tests), tokens (347 files / 0 violations).
 
 - [plan-040-outline-generation](./plan-040-outline-generation/plan.md) — Outline Generation: Worldbuilding to Outline. Shipped review-gated outline proposal generation from worldbuilding context, Nova review UI, atomic accept materialization, conflict/stale/rollback safety, docs sync, and closeout evidence. Closed 2026-06-04. Quality gates: check (0 errors, 11 pre-existing warnings), lint (clean), lint:css waived for known unrelated `IndividualsWorkspaceShell.svelte:183`, test (237 files / 1722 tests), tokens (347 files / 0 violations), targeted e2e (2 tests).
 - [plan-039-manuscript-export-ui](./plan-039-manuscript-export-ui/plan.md) — Manuscript Export UI: wired `ManuscriptExportDialog` to existing export services, chapter subset selector, delivery helper, profile/format selectors, metadata fields, `openJsonExport` context preserving legacy JSON portability flow. 6 stages, all quality gates passed (check 0 errors, lint clean, 219 tests / 1615, tokens 345 files / 0 violations). Closed 2026-06-03.
