@@ -4,7 +4,7 @@
 
 ## Active Plans
 
-No plan is active.
+- [plan-042-quality-gates-closure](./plan-042-quality-gates-closure/plan.md): Quality Gates Closure — eliminate accumulated pre-existing exceptions from plans 030–040. Status: `draft` (scaffolded 2026-06-04). Stages: TypeScript warning resolution, CSS lint fix & visual baseline stabilization, routing sidebar path-detection fix, Dexie boundary audit.
 
 ## Deferred (not yet scheduled)
 

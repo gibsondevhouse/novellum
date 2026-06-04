@@ -6,7 +6,7 @@
 
 ## Current
 
-No active plan. Plan 040 is complete; choose the next plan explicitly before resuming implementation work.
+[plan-042-quality-gates-closure](./plan-042-quality-gates-closure/plan.md) — Quality Gates Closure. Scaffolded 2026-06-04.
 
 ## Recently completed
 
