@@ -2,7 +2,7 @@
 title: CSS Lint Fix & Visual Baseline
 slug: stage-002-css-visual
 stage_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-042-quality-gates-closure
 phases:

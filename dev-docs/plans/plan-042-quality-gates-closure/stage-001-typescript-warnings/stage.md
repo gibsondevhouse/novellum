@@ -2,7 +2,7 @@
 title: TypeScript Warning Resolution
 slug: stage-001-typescript-warnings
 stage_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-042-quality-gates-closure
 phases:

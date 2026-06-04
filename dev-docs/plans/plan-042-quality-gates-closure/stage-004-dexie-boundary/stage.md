@@ -2,7 +2,7 @@
 title: Dexie Boundary Audit
 slug: stage-004-dexie-boundary
 stage_number: 4
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-042-quality-gates-closure
 phases:

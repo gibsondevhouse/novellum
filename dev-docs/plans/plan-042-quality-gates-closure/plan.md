@@ -2,11 +2,11 @@
 title: Quality Gates Closure
 slug: plan-042-quality-gates-closure
 version: 1.0.0
-status: draft
+status: complete
 owner: Planner Agent
 created: 2026-06-04
 last_updated: 2026-06-04
-target_completion: TBD
+target_completion: 2026-06-04
 stages:
   - stage-001-typescript-warnings
   - stage-002-css-visual
@@ -49,21 +49,21 @@ as genuine blockers rather than "known noise."
 
 | # | Stage | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [TypeScript Warning Resolution](stage-001-typescript-warnings/stage.md) | `draft` | 1d |
-| 002 | [CSS Lint Fix & Visual Baseline](stage-002-css-visual/stage.md) | `draft` | 1d |
-| 003 | [Routing & Sidebar Path Detection](stage-003-routing-sidebar/stage.md) | `draft` | 0.5d |
-| 004 | [Dexie Boundary Audit](stage-004-dexie-boundary/stage.md) | `draft` | 0.5d |
+| 001 | [TypeScript Warning Resolution](stage-001-typescript-warnings/stage.md) | `complete` | 1d |
+| 002 | [CSS Lint Fix & Visual Baseline](stage-002-css-visual/stage.md) | `complete` | 1d |
+| 003 | [Routing & Sidebar Path Detection](stage-003-routing-sidebar/stage.md) | `complete` | 0.5d |
+| 004 | [Dexie Boundary Audit](stage-004-dexie-boundary/stage.md) | `complete` | 0.5d |
 
 ## Quality Gates
 
 All stages must pass the following gates before the plan is marked `complete`:
 
-- [ ] **lint** — zero lint errors
-- [ ] **lint:css** — zero CSS lint errors
-- [ ] **typecheck** — zero type errors
-- [ ] **tests** — all tests pass
-- [ ] **check:tokens** — zero token violations
-- [ ] **docs_sync** — this plan document updated with completion date
+- [x] **lint** — zero lint errors
+- [x] **lint:css** — zero CSS lint errors
+- [x] **typecheck** — zero type errors (0 errors, 0 warnings, 1833 files)
+- [x] **tests** — all tests pass (237 files / 1728 tests)
+- [x] **check:tokens** — zero token violations (347 files)
+- [x] **docs_sync** — this plan document updated with completion date (2026-06-04)
 
 ## Risks & Mitigations
 

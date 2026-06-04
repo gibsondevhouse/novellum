@@ -1,29 +1,31 @@
-import { db, type Asset } from '$lib/legacy/dexie/db';
-import type { Project } from '$lib/db/domain-types';
+import type { Asset, Project } from '$lib/db/domain-types';
+import { apiGet, apiPost, apiDel } from '$lib/api-client.js';
 import { getAllProjects } from '$modules/project/services/project-repository';
 
 export interface Album {
 	id: string;
 	title: string;
-	coverUrl?: string; // e.g. project cover image
+	coverUrl?: string;
 	assets: Asset[];
 }
 
 export function createAssetsStore(getProjectId: () => string | undefined) {
-    let assets = $state<Asset[]>([]);
+	let assets = $state<Asset[]>([]);
 	let projects = $state<Project[]>([]);
 	let loading = $state(true);
 
 	const albums = $derived.by(() => {
 		const pid = getProjectId();
 		if (pid) {
-			const activeProject = projects.find(p => p.id === pid);
-			return [{
-				id: pid,
-				title: activeProject?.title || 'Current Project',
-				coverUrl: activeProject?.coverUrl,
-				assets: assets
-			}] as Album[];
+			const activeProject = projects.find((p) => p.id === pid);
+			return [
+				{
+					id: pid,
+					title: activeProject?.title || 'Current Project',
+					coverUrl: activeProject?.coverUrl,
+					assets: assets,
+				},
+			] as Album[];
 		}
 
 		// Global grouping
@@ -32,7 +34,7 @@ export function createAssetsStore(getProjectId: () => string | undefined) {
 		map.set('global', {
 			id: 'global',
 			title: 'Global Assets',
-			assets: []
+			assets: [],
 		});
 
 		for (const p of projects) {
@@ -40,7 +42,7 @@ export function createAssetsStore(getProjectId: () => string | undefined) {
 				id: p.id,
 				title: p.title,
 				coverUrl: p.coverUrl,
-				assets: []
+				assets: [],
 			});
 		}
 
@@ -49,58 +51,55 @@ export function createAssetsStore(getProjectId: () => string | undefined) {
 			map.get(targetId)!.assets.push(a);
 		}
 
-		// Filter to albums that have assets or at least a coverUrl
-		return Array.from(map.values()).filter(album => album.assets.length > 0 || album.coverUrl);
+		return Array.from(map.values()).filter((album) => album.assets.length > 0 || album.coverUrl);
 	});
 
-    async function load() {
-        loading = true;
-        try {
+	async function load() {
+		loading = true;
+		try {
 			const pid = getProjectId();
 			projects = await getAllProjects();
-            if (pid) {
-                assets = await db.assets.where('projectId').equals(pid).sortBy('createdAt');
-            } else {
-                assets = await db.assets.orderBy('createdAt').reverse().toArray();
-            }
-        } catch (err) {
-            console.error('Failed to load assets', err);
-        } finally {
-            loading = false;
-        }
-    }
-
-	async function getAsset(id: string) {
-		return db.assets.get(id);
+			const params = pid ? { projectId: pid } : undefined;
+			assets = await apiGet<Asset[]>('/api/db/assets', params);
+		} catch (err) {
+			console.error('Failed to load assets', err);
+		} finally {
+			loading = false;
+		}
 	}
 
-    async function addAsset(asset: Omit<Asset, 'id' | 'createdAt' | 'updatedAt'>) {
-        const id = crypto.randomUUID();
-        // eslint-disable-next-line svelte/prefer-svelte-reactivity
-        const now = new Date().toISOString();
-        const newAsset: Asset = {
-            ...asset,
-            id,
-            createdAt: now,
-            updatedAt: now
-        };
-        await db.assets.add(newAsset);
-        assets = [newAsset, ...assets];
-        return newAsset;
-    }
+	async function getAsset(id: string): Promise<Asset | undefined> {
+		try {
+			return await apiGet<Asset>(`/api/db/assets/${encodeURIComponent(id)}`);
+		} catch {
+			return undefined;
+		}
+	}
 
-    async function removeAsset(id: string) {
-        await db.assets.delete(id);
-        assets = assets.filter(a => a.id !== id);
-    }
+	async function addAsset(asset: Omit<Asset, 'id' | 'createdAt' | 'updatedAt'>): Promise<Asset> {
+		const newAsset = await apiPost<Asset>('/api/db/assets', asset);
+		assets = [newAsset, ...assets];
+		return newAsset;
+	}
 
-    return {
-        get assets() { return assets; },
-		get albums() { return albums; },
-		get loading() { return loading; },
-        load,
-        addAsset,
-        removeAsset,
-		getAsset
-    };
+	async function removeAsset(id: string) {
+		await apiDel(`/api/db/assets/${encodeURIComponent(id)}`);
+		assets = assets.filter((a) => a.id !== id);
+	}
+
+	return {
+		get assets() {
+			return assets;
+		},
+		get albums() {
+			return albums;
+		},
+		get loading() {
+			return loading;
+		},
+		load,
+		addAsset,
+		removeAsset,
+		getAsset,
+	};
 }

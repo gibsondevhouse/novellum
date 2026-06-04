@@ -192,6 +192,14 @@ export const BACKUP_TABLE_REGISTRY: readonly BackupTableEntry[] = [
 		reason: 'Outline tier — milestones.',
 		projectIdColumn: 'projectId',
 	},
+	// --- project media ---
+	{
+		name: 'assets',
+		scope: 'project',
+		include: true,
+		reason: 'Project-owned image and media assets (base64 data).',
+		projectIdColumn: 'projectId',
+	},
 	// --- style / prompt assets owned by the project ---
 	{
 		name: 'writing_styles',

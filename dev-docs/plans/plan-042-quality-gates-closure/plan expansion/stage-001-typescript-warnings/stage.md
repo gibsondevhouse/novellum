@@ -1,0 +1,9 @@
+# stage-001-typescript-warnings — TypeScript check warning audit and closure
+
+## Stage gates
+- `pnpm check` — zero errors and zero warnings
+- `pnpm lint` — zero errors
+- `pnpm lint:css` — zero errors; no new disables
+- `pnpm test` — pass
+- `pnpm check:tokens` — pass
+- `pnpm test:visual` — pass OR drift ledger updated with rationale/owner

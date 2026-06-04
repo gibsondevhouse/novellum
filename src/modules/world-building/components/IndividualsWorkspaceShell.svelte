@@ -180,7 +180,6 @@
 		width: 100%;
 		display: grid;
 		justify-items: start;
-		text-align: left;
 		justify-content: start !important;
 		gap: 0.2rem;
 		padding: var(--space-2) var(--space-3);

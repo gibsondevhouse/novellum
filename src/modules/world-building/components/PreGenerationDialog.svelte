@@ -52,6 +52,11 @@
 	let existingNames = $state<string[]>([]);
 	let targets = $state<string[]>([]);
 	let manualInput = $state('');
+	let nameInputEl = $state<HTMLInputElement | null>(null);
+
+	$effect(() => {
+		nameInputEl?.focus();
+	});
 
 	$effect(() => {
 		loading = true;
@@ -164,8 +169,8 @@
 						class="pregen-manual-input"
 						placeholder="Type a name and press Enter…"
 						bind:value={manualInput}
+						bind:this={nameInputEl}
 						onkeydown={handleManualKeydown}
-						autofocus
 						maxlength="120"
 					/>
 					<button

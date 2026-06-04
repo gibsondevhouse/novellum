@@ -377,6 +377,17 @@ CREATE TABLE IF NOT EXISTS app_preferences (
 	updatedAt TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS assets (
+	id TEXT PRIMARY KEY,
+	projectId TEXT NOT NULL,
+	name TEXT NOT NULL,
+	mimeType TEXT NOT NULL DEFAULT '',
+	data TEXT NOT NULL DEFAULT '',
+	sizeBytes INTEGER NOT NULL DEFAULT 0,
+	createdAt TEXT NOT NULL,
+	updatedAt TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS project_metadata (
 	projectId TEXT NOT NULL,
 	scope TEXT NOT NULL,
@@ -433,6 +444,7 @@ CREATE INDEX IF NOT EXISTS idx_milestones_projectId ON milestones(projectId);
 CREATE INDEX IF NOT EXISTS idx_factions_projectId ON factions(projectId);
 CREATE INDEX IF NOT EXISTS idx_themes_projectId ON themes(projectId);
 CREATE INDEX IF NOT EXISTS idx_glossary_terms_projectId ON glossary_terms(projectId);
+CREATE INDEX IF NOT EXISTS idx_assets_projectId ON assets(projectId);
 CREATE INDEX IF NOT EXISTS idx_project_metadata_owner ON project_metadata(projectId, scope, ownerId);
 `;
 

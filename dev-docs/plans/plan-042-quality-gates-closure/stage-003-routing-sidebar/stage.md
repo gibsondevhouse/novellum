@@ -2,7 +2,7 @@
 title: Routing & Sidebar Path Detection
 slug: stage-003-routing-sidebar
 stage_number: 3
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-042-quality-gates-closure
 phases:
