@@ -4,14 +4,20 @@
 
 ## Active Plans
 
-- [plan-042-quality-gates-closure](./plan-042-quality-gates-closure/plan.md): Quality Gates Closure — eliminate accumulated pre-existing exceptions from plans 030–040. Status: `draft` (scaffolded 2026-06-04). Stages: TypeScript warning resolution, CSS lint fix & visual baseline stabilization, routing sidebar path-detection fix, Dexie boundary audit.
+- No active plan. See [ACTIVE-PLAN.md](./ACTIVE-PLAN.md).
 
 ## Deferred (not yet scheduled)
 
 - **Release engineering** — code signing, notarization, brand icons, formal smoke/keyring verification. Infrastructure exists; requires external procurement. Originally plan-024 stage-002.
+- [plan-043-outline-pipeline-consolidation](./plan-043-outline-pipeline-consolidation/plan.md): Outline Pipeline Consolidation — retire legacy direct outline apply behavior and make review-gated outline checkpoints the sole supported generation/materialization path. Status: `draft` (full plan tree scaffolded 2026-06-09).
+- [plan-044-nova-active-context-routing](./plan-044-nova-active-context-routing/plan.md): Nova Active Context Routing — resolve Nova project/scene/chapter context from normal route/page state instead of query params only. Status: `draft` (full plan tree scaffolded 2026-06-09).
+- [plan-045-agent-tool-mutation-boundary](./plan-045-agent-tool-mutation-boundary/plan.md): Agent Tool Mutation Boundary — ensure model-callable Agent tools can read/generate review artifacts but cannot directly apply manuscript or canon mutations. Status: `draft` (full plan tree scaffolded 2026-06-09).
+- [plan-046-pipeline-checkpoint-contract-reconciliation](./plan-046-pipeline-checkpoint-contract-reconciliation/plan.md): Pipeline Checkpoint Contract Reconciliation — align checkpoint routes, schemas, tests, and docs around canonical pipeline contracts. Status: `draft` (full plan tree scaffolded 2026-06-09).
+- [plan-047-worldbuilding-canon-merge-diff](./plan-047-worldbuilding-canon-merge-diff/plan.md): Worldbuilding Canon Merge Diff — upgrade worldbuilding proposal acceptance from insert-only projection to reviewable canon diff/merge behavior. Status: `draft` (full plan tree scaffolded 2026-06-09).
 
 ## Completed Plans (Archived)
 
+- [plan-042-quality-gates-closure](./plan-042-quality-gates-closure/plan.md): Quality Gates Closure — eliminated accumulated quality-gate exceptions from plans 030–040 and restored clean check/lint/lint:css/test/token baselines. Status: `complete` (closed 2026-06-04).
 - [plan-040-outline-generation](./plan-040-outline-generation/plan.md): Outline Generation — Worldbuilding to Outline. Status: `complete` (closed 2026-06-04). Review-gated outline proposal generation from worldbuilding context; strict `OutlineDraft` schema, context sufficiency, provider route, Nova review UI, explicit reject/accept actions, atomic accept materialization, conflict/stale/rollback safety, scene intent metadata for draft compatibility, docs sync, and closeout evidence. Quality gates: check (0 errors, 11 pre-existing warnings), lint (clean), lint:css waived for known unrelated `IndividualsWorkspaceShell.svelte:183`, test (237 files / 1722 tests), tokens (347 files / 0 violations), targeted e2e (2 tests).
 - [plan-039-manuscript-export-ui](./plan-039-manuscript-export-ui/plan.md): Manuscript Export UI — `ManuscriptExportDialog` wired to export services; chapter subset selector (all / range / selected, empty blocked); delivery helper (browser download + desktop cancel-safe); profile / format / metadata / formatting controls; `openJsonExport` context preserves legacy JSON portability flow. 6 stages. Status: `complete` (closed 2026-06-03). Quality gates: check (0 errors, 11 pre-existing warnings), lint (clean), test (219 files / 1615 tests), check:tokens (345 files / 0 violations).
 - [plan-041-docs-rebaseline-internal-version](./plan-041-docs-rebaseline-internal-version/plan.md): Docs rebaseline — reframe V1/V1.1/V2 as **internal development milestones** (Novellum has not cut a public release yet), absorb plans 030–038 into the roadmap, drop closed plan-018 reference and the four cut-agents claim from user docs, and roll `Last verified` across content-accurate dev-docs. Status: `complete` (closed 2026-06-01).
