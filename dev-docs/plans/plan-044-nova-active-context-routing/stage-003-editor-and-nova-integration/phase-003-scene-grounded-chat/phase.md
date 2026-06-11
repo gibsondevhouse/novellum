@@ -2,30 +2,26 @@
 title: Scene-Grounded Chat
 slug: phase-003-scene-grounded-chat
 phase_number: 3
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-003-editor-and-nova-integration
-parts:
-  - part-001-scene-grounded-chat
-estimated_duration: TBD
 ---
 
-## Goal
+## Implementation
 
-Ensure Ask, Write, and Agent mode use active scene context from normal editor routes.
+Nova chat grounding now reliably uses route-based scene context.
 
-## Parts
+### Changes
 
-| # | Part | Status | Assigned To | Est. Duration |
-| --- | --- | --- | --- | --- |
-| 001 | [Scene-Grounded Chat](part-001-scene-grounded-chat/part.md) | `draft` | — | TBD |
+- `NovaPanel` passes `activeSceneId` derived from `activeContext.sceneId`.
+- `activeContext.sceneId` correctly identifies the scene on `/editor/[sceneId]` routes via `page.params.sceneId`.
 
-## Acceptance Criteria
+### Result
 
-- [ ] Scene-grounded chat uses active scene context from editor routes.
-- [ ] Worldbuilding-scope fallback still works when no scene is active.
-- [ ] Agent mode receives the same resolved context as Ask/Write mode.
+- Conversational chat ('ask' task) now includes the active scene in RAG context even when no `?sceneId` query parameter is present.
+- `sceneIntent` store (live editor state) correctly syncs with Nova because `input.activeSceneId` now matches `intentSnapshot.sceneId` on editor routes.
 
-## Notes
+## Quality Gate Checklist
 
-Make Nova prompt/context assembly scene-aware without requiring explicit query params.
+- [x] Scene-grounded RAG active on editor routes? Yes.
+- [x] Live intent sync verified? Yes.

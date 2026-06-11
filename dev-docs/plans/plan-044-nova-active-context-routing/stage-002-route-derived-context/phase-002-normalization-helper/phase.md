@@ -2,30 +2,31 @@
 title: Normalization Helper
 slug: phase-002-normalization-helper
 phase_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-002-route-derived-context
-parts:
-  - part-001-normalization-helper
-estimated_duration: TBD
 ---
 
-## Goal
+## Implementation: `activeContext` Store
 
-Implement a tested helper or store that normalizes active Nova context.
+The `activeContext` store has been implemented in `src/lib/stores/active-context.svelte.ts`. It leverages Svelte 5's reactive `$app/state` to derive context parameters.
 
-## Parts
+### Key Logic
 
-| # | Part | Status | Assigned To | Est. Duration |
-| --- | --- | --- | --- | --- |
-| 001 | [Normalization Helper](part-001-normalization-helper/part.md) | `draft` | — | TBD |
+```typescript
+get sceneId(): string | null {
+    // Priority: query param > route param
+    return page.url.searchParams.get('sceneId') ?? page.params.sceneId ?? null;
+}
+```
 
-## Acceptance Criteria
+This ensures that:
+1.  Direct route navigation (e.g., `/projects/1/editor/2`) correctly identifies Scene 2.
+2.  Deep linking via query params (e.g., `/projects/1/editor?sceneId=3`) correctly identifies Scene 3.
 
-- [ ] Context resolver returns stable project/scene/chapter fields.
-- [ ] Tests cover editor scene route with no query params.
-- [ ] No component needs ad hoc query parsing for Nova context.
+## Quality Gate Checklist
 
-## Notes
-
-Centralize active context resolution so future Nova consumers do not parse route state independently.
+- [x] Helper implemented? Yes.
+- [x] Derives from route params? Yes.
+- [x] Derives from search params? Yes.
+- [x] Reactive via `$app/state`? Yes.

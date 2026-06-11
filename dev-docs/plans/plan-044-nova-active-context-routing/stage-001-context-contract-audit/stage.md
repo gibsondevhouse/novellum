@@ -2,7 +2,7 @@
 title: Context Contract Audit
 slug: stage-001-context-contract-audit
 stage_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-044-nova-active-context-routing
 phases:
@@ -20,8 +20,8 @@ Define what Nova needs to know about the active project, scene, chapter, and out
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Route Context Inventory](phase-001-route-context-inventory/phase.md) | `draft` | TBD |
-| 002 | [Consumer Contract Map](phase-002-consumer-contract-map/phase.md) | `draft` | TBD |
+| 001 | [Route Context Inventory](phase-001-route-context-inventory/phase.md) | `complete` | TBD |
+| 002 | [Consumer Contract Map](phase-002-consumer-contract-map/phase.md) | `complete` | TBD |
 
 ## Entry Criteria
 
@@ -29,11 +29,11 @@ Define what Nova needs to know about the active project, scene, chapter, and out
 
 ## Exit Criteria
 
-- All Nova context consumers are listed.
-- Required and optional context fields are documented by route family.
-- Query-param-only context dependencies are identified.
+- [x] All Nova context consumers are listed.
+- [x] Required and optional context fields are documented by route family.
+- [x] Query-param-only context dependencies are identified.
 
 ## Notes
 
 Focus on `projectId`, `activeSceneId`, `activeChapterId`, author draft engine availability, and scene-grounded prompt behavior.
-
+Audit complete. Identified root layout as the primary source of context brittleness.

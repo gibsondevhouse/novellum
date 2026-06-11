@@ -88,6 +88,14 @@ Invalid files (wrong extension, too large, empty content) are rejected at both c
 - Baseline fields include project title, genre, status, project type, target word count, logline, synopsis, style preset id, updated timestamp, entity counts, and first story-frame summary when available.
 - Full manuscript text is never sent by default.
 
+### Context Resolution (Plan-044)
+
+Nova relies on the `activeContext` store (`src/lib/stores/active-context.svelte.ts`) to stay synchronized with the active project, scene, and chapter. 
+
+- **Resolution Order**: Query Params > Route Params > Page Data (`page.data`).
+- **Visibility**: The `NovaAuthorDraftEngine` is automatically enabled on any route identifying an `activeChapterId` (including deep editor routes and chapter outline details).
+- **Grounding**: The `ask` and `write` modes use the resolved `activeSceneId` to attach live editor intent and adjacent scene context even when navigating via route paths (e.g., `/projects/[id]/editor/[sceneId]`).
+
 ## Outline Generation Surface
 
 Plan-040 adds the Nova outline generation panel:

@@ -15,17 +15,12 @@
 	import { appearance } from '$lib/stores/appearance.svelte.js';
 	import { installGlobalShortcuts } from '$lib/keyboard/global-handler.js';
 	import { persistLastProjectId } from '$lib/navigation-state.js';
+	import { activeContext } from '$lib/stores/active-context.svelte.js';
 
 	let { children } = $props();
 
-	const activeProjectId = $derived(
-		page.url.pathname.startsWith('/projects/') ? (page.params.id ?? null) : null,
-	);
-	const activeSceneId = $derived(page.url.searchParams.get('sceneId'));
-	const activeChapterId = $derived(page.url.searchParams.get('chapterId'));
-
 	$effect(() => {
-		if (activeProjectId) void persistLastProjectId(activeProjectId);
+		if (activeContext.projectId) void persistLastProjectId(activeContext.projectId);
 	});
 
 	onMount(() => {
@@ -88,9 +83,9 @@
 </AppShell>
 
 <NovaPanel
-	projectId={activeProjectId}
-	activeSceneId={activeSceneId}
-	activeChapterId={activeChapterId}
+	projectId={activeContext.projectId}
+	activeSceneId={activeContext.sceneId}
+	activeChapterId={activeContext.chapterId}
 />
 
 <OnboardingModal />

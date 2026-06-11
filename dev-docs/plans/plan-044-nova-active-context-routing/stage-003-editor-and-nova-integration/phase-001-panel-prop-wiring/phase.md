@@ -2,30 +2,30 @@
 title: Panel Prop Wiring
 slug: phase-001-panel-prop-wiring
 phase_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-003-editor-and-nova-integration
-parts:
-  - part-001-panel-prop-wiring
-estimated_duration: TBD
 ---
 
-## Goal
+## Implementation
 
-Wire resolved active context into the global Nova panel and composer.
+`src/routes/+layout.svelte` has been updated to use the `activeContext` store for prop-drilling into `NovaPanel`.
 
-## Parts
+### Changes
 
-| # | Part | Status | Assigned To | Est. Duration |
-| --- | --- | --- | --- | --- |
-| 001 | [Panel Prop Wiring](part-001-panel-prop-wiring/part.md) | `draft` | — | TBD |
+- Removed local `$derived` variables for `activeProjectId`, `activeSceneId`, and `activeChapterId`.
+- Imported `activeContext` store.
+- Updated `NovaPanel` mount to use store properties.
 
-## Acceptance Criteria
+```html
+<NovaPanel
+	projectId={activeContext.projectId}
+	activeSceneId={activeContext.sceneId}
+	activeChapterId={activeContext.chapterId}
+/>
+```
 
-- [ ] Nova receives route-derived active scene/chapter context.
-- [ ] Existing project ID persistence still works.
-- [ ] Composer sends normalized context to chat service.
+## Quality Gate Checklist
 
-## Notes
-
-Replace query-only prop wiring with the resolved context contract.
+- [x] Props wired to `activeContext`? Yes.
+- [x] Project ID persistence effect updated? Yes.

@@ -54,10 +54,12 @@
 	const aiLoading = $derived(aiSession.loading);
 	const aiChecked = $derived(aiSession.checked);
 	const hasProjectContext = $derived(Boolean(projectId));
-	const isEditorRoute = $derived(/^\/projects\/[^/]+\/editor$/.test(page.url.pathname));
+	const isEditorRoute = $derived(/^\/projects\/[^/]+\/editor(\/|$)/.test(page.url.pathname));
+	const isChapterRoute = $derived(/\/chapters\/[^/]+$/.test(page.url.pathname));
 	const hasSubheader = $derived(
 		page.url.pathname.includes('/world-building') ||
-		isEditorRoute,
+		isEditorRoute ||
+		isChapterRoute,
 	);
 	const panelStatusLabel = $derived.by(() => {
 		if (aiLoading) return 'Checking AI configuration';
@@ -340,7 +342,7 @@
 					{/snippet}
 				</EmptyStatePanel>
 			{:else}
-				{#if hasProjectContext && isEditorRoute}
+				{#if hasProjectContext && (isEditorRoute || isChapterRoute)}
 					<NovaAuthorDraftEngine projectId={projectId} activeChapterId={activeChapterId} />
 				{/if}
 				{#if messages.length === 0}

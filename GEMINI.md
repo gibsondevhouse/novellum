@@ -98,11 +98,27 @@ Functionality is organized by **vertical domain slices** (e.g., `project`, `worl
 
 ## Current Focus (Active Plans)
 
-No active plan. Choose the next priority explicitly from [`dev-docs/plans/MASTER-PLAN.md`](./dev-docs/plans/MASTER-PLAN.md).
+No active plan. See the **Roadmap Execution Order** below for the recommended sequence of work.
 
-Next candidate priorities:
-- **Release Engineering**: Code signing, notarization, and brand icons (Deferred from Plan-024).
-- **Domain feature deepening**: Image-generation models and cinematic media expansion.
+### Roadmap Execution Order (Draft Queue)
+
+To ensure system stability and logical dependency management, execute pending plans in the following sequence:
+
+1.  **Phase 1: Context & Safety Foundations**
+    - [x] **Plan-044 (Active Context Routing)**: Resolved Nova/AI context from routes; fixed brittle query-param detection (Closed 2026-06-11).
+    - [ ] **Plan-045 (Agent Mutation Boundary)**: Enforce strict separation between AI reading and manuscript mutation.
+
+2.  **Phase 2: Pipeline Standardization**
+    - [ ] **Plan-043 (Outline Consolidation)**: Retire legacy direct apply paths; make checkpoints the sole materialization path.
+    - [ ] **Plan-046 (Pipeline Reconciliation)**: Align schemas and routes across all generation pipelines.
+    - [ ] **Plan-047 (Worldbuilding Canon Merge Diff)**: Upgrade worldbuilding from "insert-only" to a full diff/merge flow.
+
+3.  **Phase 3: Infrastructure & Coherence**
+    - [ ] **Plan-049 (Runtime Hardening)**: SQLite job queue, durable runs, token budgeting, and AI traces.
+    - [ ] **Plan-048 (Frontend Coherence)**: Final UX pass for navigation, review gates, and visual state unification.
+
+4.  **Phase 4: Release Engineering**
+    - [ ] **Release Engineering**: Code signing, notarization, brand icons, and production smoke tests.
 
 ## Planning Standards
 - Define the required plan hierarchy: Plan -> Stage -> Phase -> Part.

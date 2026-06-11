@@ -2,11 +2,11 @@
 title: Nova Active Context Routing
 slug: plan-044-nova-active-context-routing
 version: 1.0.0
-status: draft
+status: complete
 owner: Planner Agent
 created: 2026-06-09
-last_updated: 2026-06-09
-target_completion: ~
+last_updated: 2026-06-11
+target_completion: 2026-06-11
 stages:
   - stage-001-context-contract-audit
   - stage-002-route-derived-context

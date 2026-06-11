@@ -2,30 +2,58 @@
 title: Context Source Design
 slug: phase-001-context-source-design
 phase_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-002-route-derived-context
-parts:
-  - part-001-context-source-design
-estimated_duration: TBD
 ---
 
-## Goal
+## Proposed Design: `activeContext` Store
 
-Choose the canonical source and precedence rules for active Nova context.
+We will implement a centralized reactive store in `src/lib/stores/active-context.svelte.ts` that consolidates context resolution logic.
 
-## Parts
+### Store Specification
 
-| # | Part | Status | Assigned To | Est. Duration |
-| --- | --- | --- | --- | --- |
-| 001 | [Context Source Design](part-001-context-source-design/part.md) | `draft` | — | TBD |
+```typescript
+import { page } from '$app/state';
 
-## Acceptance Criteria
+class ActiveContextStore {
+	/**
+	 * Canonical Project ID.
+	 * Derived from /projects/[id] route parameter.
+	 */
+	get projectId(): string | null {
+		return page.url.pathname.startsWith('/projects/') ? (page.params.id ?? null) : null;
+	}
 
-- [ ] Context precedence is explicit.
-- [ ] The design handles editor scene routes without query params.
-- [ ] Implementation files are identified.
+	/**
+	 * Canonical Scene ID.
+	 * Derived from ?sceneId query param (override) or [sceneId] route parameter.
+	 */
+	get sceneId(): string | null {
+		return page.url.searchParams.get('sceneId') ?? page.params.sceneId ?? null;
+	}
 
-## Notes
+	/**
+	 * Canonical Chapter ID.
+	 * Derived from ?chapterId query param (override) or [chapterId] route parameter.
+	 */
+	get chapterId(): string | null {
+		return page.url.searchParams.get('chapterId') ?? page.params.chapterId ?? null;
+	}
+}
 
-Design how route params, page data, stores, and query params combine into one resolved context object.
+export const activeContext = new ActiveContextStore();
+```
+
+### Implementation Strategy
+
+1.  **Create Store**: Implement `src/lib/stores/active-context.svelte.ts`.
+2.  **Layout Refactor**: Update `src/routes/+layout.svelte` to use `activeContext` for passing props to `NovaPanel`.
+3.  **Component Hardening**: Update `NovaPanel` and `NovaComposer` to optionally use the store directly or accept props (for flexibility/testing).
+4.  **Legacy Cleanup**: Deprecate `src/lib/stores/active-project.svelte.ts` in favor of `activeContext.projectId`.
+
+## Benefits
+
+- **Consistency**: Nova will now stay grounded when navigating to `/projects/[id]/editor/[sceneId]` without needing `?sceneId=...`.
+- **Centralization**: One place to update if route patterns change.
+- **Testability**: The store can be tested by mocking `$app/state`.

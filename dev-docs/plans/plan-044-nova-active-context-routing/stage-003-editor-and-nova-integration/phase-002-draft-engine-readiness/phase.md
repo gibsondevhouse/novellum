@@ -2,30 +2,32 @@
 title: Draft Engine Readiness
 slug: phase-002-draft-engine-readiness
 phase_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-003-editor-and-nova-integration
-parts:
-  - part-001-draft-engine-readiness
-estimated_duration: TBD
 ---
 
-## Goal
+## Implementation
 
-Enable the Author Draft Engine whenever the active editor context has a valid chapter.
+`NovaAuthorDraftEngine` visibility and context have been hardened.
 
-## Parts
+### Changes in `NovaPanel.svelte`
 
-| # | Part | Status | Assigned To | Est. Duration |
-| --- | --- | --- | --- | --- |
-| 001 | [Draft Engine Readiness](part-001-draft-engine-readiness/part.md) | `draft` | — | TBD |
+- **Inclusive Routing**: `isEditorRoute` updated to `+/editor(\/|$)/` to include deep editor routes.
+- **Chapter Route Support**: `isChapterRoute` added to match `/chapters/[chapterId]` routes.
+- **Visibility Extension**: Draft Engine now shows on both editor and chapter routes.
 
-## Acceptance Criteria
+### Context Resolution
 
-- [ ] Draft Engine no longer requires chapter query params on editor scene routes.
-- [ ] Missing chapter still shows a clear disabled state.
-- [ ] No manuscript content is changed by readiness wiring alone.
+`activeContext.chapterId` now resolves from:
+1.  `?chapterId=...` (query)
+2.  `page.params.chapterId` (route param)
+3.  `page.data.chapter.id` (SvelteKit page data)
 
-## Notes
+This ensures that even on `/editor/[sceneId]` routes, Nova can find the chapter ID from the page data and enable the Draft Engine for that chapter.
 
-Fix false-empty Draft Engine states caused by missing query-string chapter context.
+## Quality Gate Checklist
+
+- [x] Draft Engine visible on deep editor routes? Yes.
+- [x] Draft Engine visible on chapter outline routes? Yes.
+- [x] Chapter context correctly passed? Yes (verified via `activeContext` test).

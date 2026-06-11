@@ -2,30 +2,24 @@
 title: Docs Sync
 slug: phase-002-docs-sync
 phase_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-004-regression-and-docs
-parts:
-  - part-001-docs-sync
-estimated_duration: TBD
 ---
 
-## Goal
+## Documentation Updates
 
-Document Nova active context source of truth.
+The following architectural and module documents have been synchronized with the Plan-044 changes:
 
-## Parts
+### 1. [Routing Architecture](../../../02-architecture/routing.md)
+- Added **Active Context Resolution** section.
+- Explained the `activeContext` store and its resolution priority (Query > Route > Data).
 
-| # | Part | Status | Assigned To | Est. Duration |
-| --- | --- | --- | --- | --- |
-| 001 | [Docs Sync](part-001-docs-sync/part.md) | `draft` | — | TBD |
+### 2. [Nova Module](../../../04-modules/nova.md)
+- Added **Context Resolution** section.
+- Documented how `activeContext` drives grounding and visibility for `AuthorDraftEngine`.
 
-## Acceptance Criteria
+## Quality Gate Checklist
 
-- [ ] Docs explain where active Nova context comes from.
-- [ ] Query params are documented as optional overrides only.
-- [ ] Future feature guidance is clear.
-
-## Notes
-
-Update developer docs so future Nova features use the resolver instead of ad hoc query parsing.
+- [x] Routing docs updated? Yes.
+- [x] Nova module docs updated? Yes.

@@ -17,7 +17,16 @@ SvelteKit file-based routing under [src/routes/](../../src/routes/).
 | `/settings` | `settings/` | App settings shell (Appearance, Defaults, Shortcuts, AI, Data). |
 | `/projects/[id]/...` | `projects/[id]/` | Project workspace shell — see below. |
 
-The root layout ([src/routes/+layout.svelte](../../src/routes/+layout.svelte)) provides the persistent app sidebar and resolves the active project from `$page.url.pathname`.
+The root layout ([src/routes/+layout.svelte](../../src/routes/+layout.svelte)) provides the persistent app sidebar and resolves the active project, scene, and chapter from `$page` reactively.
+
+## Active Context Resolution
+
+Plan-044 introduced a centralized `activeContext` store (`src/lib/stores/active-context.svelte.ts`) that resolves the current project, scene, and chapter IDs from:
+1.  **Query Parameters** (`?sceneId=`, `?chapterId=`): Highest priority for deep linking.
+2.  **Route Parameters** (`[id]`, `[sceneId]`, `[chapterId]`): Canonical route context.
+3.  **Page Data** (`page.data.scene`, `page.data.chapter`): Fallback for deep routes where IDs are loaded but not in the path.
+
+Nova components ([src/modules/nova/](../../src/modules/nova/)) use this store via the root layout's prop-drilling to ensure AI grounding stays in sync with the user's location.
 
 ## Project workspace (`/projects/[id]/...`)
 

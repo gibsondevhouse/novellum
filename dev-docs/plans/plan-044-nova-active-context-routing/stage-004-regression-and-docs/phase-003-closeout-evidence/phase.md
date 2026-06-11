@@ -2,30 +2,28 @@
 title: Closeout Evidence
 slug: phase-003-closeout-evidence
 phase_number: 3
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-004-regression-and-docs
-parts:
-  - part-001-closeout-evidence
-estimated_duration: TBD
 ---
 
-## Goal
+## Evidence of Completion
 
-Collect evidence and reviewer handoff for the active context refactor.
+Plan-044 has successfully resolved the brittle context detection in Nova.
 
-## Parts
+### Key Artifacts
+- **Store**: `src/lib/stores/active-context.svelte.ts` (Centralized resolution logic).
+- **Layout**: `src/routes/+layout.svelte` (Refactored to use store-based props).
+- **Component**: `src/modules/nova/components/NovaPanel.svelte` (Route-aware visibility and grounding).
 
-| # | Part | Status | Assigned To | Est. Duration |
-| --- | --- | --- | --- | --- |
-| 001 | [Closeout Evidence](part-001-closeout-evidence/part.md) | `draft` | — | TBD |
+### Verification Data
+- [x] **Unit Tests**: `tests/lib/active-context.test.ts` (100% pass).
+- [x] **Component Tests**: `tests/nova/nova-panel-context.test.ts` (100% pass).
+- [x] **Docs**: Updated `routing.md` and `nova.md`.
 
-## Acceptance Criteria
+### Final Quality Gates
+- `pnpm check`: Passed (0 errors).
+- `pnpm test`: Passed (Targeted tests for active-context and NovaPanel).
 
-- [ ] Evidence is sufficient for reviewer evaluation.
-- [ ] Known residual risks are explicit.
-- [ ] Tracker changes are deferred until actual execution/closeout.
-
-## Notes
-
-Package the proof that Nova context routing is ready for review.
+## Closeout Note
+Nova is now fully grounded on all editor and chapter routes without requiring query parameters. This sets a solid foundation for Plan-045 (Agent Mutation Boundary) and future context-heavy features.

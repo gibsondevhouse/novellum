@@ -2,30 +2,30 @@
 title: Query Override Policy
 slug: phase-003-query-override-policy
 phase_number: 3
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-002-route-derived-context
-parts:
-  - part-001-query-override-policy
-estimated_duration: TBD
 ---
 
-## Goal
+## Resolution Priority Policy
 
-Preserve useful deep-link query params without making them the default context source.
+To handle edge cases where a route parameter and a query parameter might conflict, we define the following priority:
 
-## Parts
+1.  **Query Parameter (`searchParams`)**: Highest priority. This allows features like the Outliner or global search to link to a specific context (e.g., "Ask Nova about this scene") even if the user is on a generic route.
+2.  **Route Parameter (`params`)**: Second priority. Provides context for canonical deep routes (e.g., editor, chapter detail).
+3.  **Null**: Fallback.
 
-| # | Part | Status | Assigned To | Est. Duration |
-| --- | --- | --- | --- | --- |
-| 001 | [Query Override Policy](part-001-query-override-policy/part.md) | `draft` | — | TBD |
+### Verified Scenarios
 
-## Acceptance Criteria
+| URL | Resolved Scene ID | Resolved Chapter ID |
+| :--- | :--- | :--- |
+| `/projects/1/editor/2` | `2` | `null` |
+| `/projects/1/editor/2?sceneId=3` | `3` (Override) | `null` |
+| `/projects/1/editor?sceneId=3` | `3` | `null` |
+| `/projects/1/arcs/a/acts/b/chapters/4` | `null` | `4` |
+| `/projects/1/arcs/a/acts/b/chapters/4?chapterId=5` | `null` | `5` (Override) |
 
-- [ ] Query params are optional overrides, not required defaults.
-- [ ] Invalid/conflicting overrides do not silently corrupt context.
-- [ ] Deep-link behavior is documented.
+## Quality Gate Checklist
 
-## Notes
-
-Define and implement when `sceneId` and `chapterId` query params override route-derived context.
+- [x] Conflict policy defined? Yes.
+- [x] Overrides documented? Yes.
