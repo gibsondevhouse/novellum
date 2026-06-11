@@ -1,0 +1,51 @@
+# Frontend Experience Coherence Manifest
+
+Generated scaffold manifest for plan-048-frontend-experience-coherence.
+
+- `dev-docs/plans/plan-048-frontend-experience-coherence/MANIFEST.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/README.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/plan.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-001-experience-inventory-and-principles/phase-001-route-surface-inventory/part-001-route-surface-inventory/checklist.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-001-experience-inventory-and-principles/phase-001-route-surface-inventory/part-001-route-surface-inventory/evidence/README.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-001-experience-inventory-and-principles/phase-001-route-surface-inventory/part-001-route-surface-inventory/impl.log.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-001-experience-inventory-and-principles/phase-001-route-surface-inventory/part-001-route-surface-inventory/part.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-001-experience-inventory-and-principles/phase-001-route-surface-inventory/phase.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-001-experience-inventory-and-principles/phase-002-workflow-coherence-map/part-001-workflow-coherence-map/checklist.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-001-experience-inventory-and-principles/phase-002-workflow-coherence-map/part-001-workflow-coherence-map/evidence/README.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-001-experience-inventory-and-principles/phase-002-workflow-coherence-map/part-001-workflow-coherence-map/impl.log.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-001-experience-inventory-and-principles/phase-002-workflow-coherence-map/part-001-workflow-coherence-map/part.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-001-experience-inventory-and-principles/phase-002-workflow-coherence-map/phase.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-001-experience-inventory-and-principles/stage.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-002-navigation-and-context-contract/phase-001-route-state-contract/part-001-route-state-contract/checklist.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-002-navigation-and-context-contract/phase-001-route-state-contract/part-001-route-state-contract/evidence/README.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-002-navigation-and-context-contract/phase-001-route-state-contract/part-001-route-state-contract/impl.log.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-002-navigation-and-context-contract/phase-001-route-state-contract/part-001-route-state-contract/part.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-002-navigation-and-context-contract/phase-001-route-state-contract/phase.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-002-navigation-and-context-contract/phase-002-shell-and-panel-model/part-001-shell-and-panel-model/checklist.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-002-navigation-and-context-contract/phase-002-shell-and-panel-model/part-001-shell-and-panel-model/evidence/README.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-002-navigation-and-context-contract/phase-002-shell-and-panel-model/part-001-shell-and-panel-model/impl.log.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-002-navigation-and-context-contract/phase-002-shell-and-panel-model/part-001-shell-and-panel-model/part.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-002-navigation-and-context-contract/phase-002-shell-and-panel-model/phase.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-002-navigation-and-context-contract/stage.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-003-author-workflow-unification/phase-001-drafting-planning-worldbuilding-journeys/part-001-drafting-planning-worldbuilding-journeys/checklist.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-003-author-workflow-unification/phase-001-drafting-planning-worldbuilding-journeys/part-001-drafting-planning-worldbuilding-journeys/evidence/README.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-003-author-workflow-unification/phase-001-drafting-planning-worldbuilding-journeys/part-001-drafting-planning-worldbuilding-journeys/impl.log.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-003-author-workflow-unification/phase-001-drafting-planning-worldbuilding-journeys/part-001-drafting-planning-worldbuilding-journeys/part.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-003-author-workflow-unification/phase-001-drafting-planning-worldbuilding-journeys/phase.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-003-author-workflow-unification/phase-002-review-and-mutation-surfaces/part-001-review-and-mutation-surfaces/checklist.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-003-author-workflow-unification/phase-002-review-and-mutation-surfaces/part-001-review-and-mutation-surfaces/evidence/README.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-003-author-workflow-unification/phase-002-review-and-mutation-surfaces/part-001-review-and-mutation-surfaces/impl.log.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-003-author-workflow-unification/phase-002-review-and-mutation-surfaces/part-001-review-and-mutation-surfaces/part.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-003-author-workflow-unification/phase-002-review-and-mutation-surfaces/phase.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-003-author-workflow-unification/stage.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-004-design-system-and-release-evidence/phase-001-design-system-cleanup/part-001-design-system-cleanup/checklist.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-004-design-system-and-release-evidence/phase-001-design-system-cleanup/part-001-design-system-cleanup/evidence/README.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-004-design-system-and-release-evidence/phase-001-design-system-cleanup/part-001-design-system-cleanup/impl.log.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-004-design-system-and-release-evidence/phase-001-design-system-cleanup/part-001-design-system-cleanup/part.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-004-design-system-and-release-evidence/phase-001-design-system-cleanup/phase.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-004-design-system-and-release-evidence/phase-002-responsive-a11y-regression/part-001-responsive-a11y-regression/checklist.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-004-design-system-and-release-evidence/phase-002-responsive-a11y-regression/part-001-responsive-a11y-regression/evidence/README.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-004-design-system-and-release-evidence/phase-002-responsive-a11y-regression/part-001-responsive-a11y-regression/impl.log.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-004-design-system-and-release-evidence/phase-002-responsive-a11y-regression/part-001-responsive-a11y-regression/part.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-004-design-system-and-release-evidence/phase-002-responsive-a11y-regression/phase.md`
+- `dev-docs/plans/plan-048-frontend-experience-coherence/stage-004-design-system-and-release-evidence/stage.md`

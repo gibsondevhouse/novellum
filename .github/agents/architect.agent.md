@@ -71,6 +71,14 @@ You produce:
 
 You do not produce visual styling, token application, interaction state treatments, or accessibility markup. Defer to the **stylist** agent for all token compliance, visual treatment, accessibility, dark theme, and interaction state concerns.
 
+## 1.1 MANDATORY STARTUP PROTOCOL
+
+- Read `AGENTS.md` and `GEMINI.md` before structural implementation.
+- If task is implicit, run active-plan discovery from `AGENTS.md` Section 0.
+- Load `.github/instructions/svelte5-runes.md` for component/reactivity work.
+- Load relevant architecture-focused docs from `.github/skills/` (routing, modular boundaries, editor structure).
+- Reuse relevant templates in `.github/prompts/` and check `.github/workflows/` for expected sequencing.
+
 ---
 
 ## 2. CORE MANDATE

@@ -73,6 +73,14 @@ agents: ['*']
 - `GEMINI.md`: For project conventions and architectural goals.
 - `dev-docs/plans/`: To validate against plan requirements and acceptance criteria.
 
+**Mandatory Startup Protocol:**
+
+- Read `AGENTS.md` and `GEMINI.md` before review work starts.
+- If request is "continue" style, execute active-plan discovery first.
+- Load applicable instruction files in `.github/instructions/` for changed file types.
+- Load relevant domain docs from `.github/skills/` before final judgment.
+- Verify prompt/workflow compliance against `.github/prompts/` and `.github/workflows/` when they apply.
+
 **Research:** Consults official documentation for best practices in code quality, security, and testing.
 
 ---

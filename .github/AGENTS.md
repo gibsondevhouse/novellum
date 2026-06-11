@@ -21,6 +21,24 @@ Agents collaborate via:
 - **Prompts:** Templated instructions in `.github/prompts/`.
 - **Shared Context:** `GEMINI.md` and `dev-docs` provide overarching project knowledge.
 
+## Mandatory Bootstrap (All Agents)
+
+Before planning or coding, every agent must load and follow this context chain:
+
+1. Read [`AGENTS.md`](../AGENTS.md) and [`GEMINI.md`](../GEMINI.md).
+2. If no explicit task is provided, execute active-plan discovery from [`AGENTS.md`](../AGENTS.md#0-resuming-work--active-plan-discovery).
+3. Load instruction files in [instructions](./instructions/) that apply to the target files.
+4. Load relevant skill docs from [skills](./skills/) based on domain.
+5. Reuse templates from [prompts](./prompts/) and sequences from [workflows](./workflows/) when applicable.
+
+Required instruction mapping:
+
+- [instructions/svelte5-runes.md](./instructions/svelte5-runes.md) for Svelte reactivity/component work.
+- [instructions/sqlite-best-practices.md](./instructions/sqlite-best-practices.md) for DB and `/api/db/*` work.
+- [instructions/plan-conventions.instructions.md](./instructions/plan-conventions.instructions.md) for files in `dev-docs/plans/**`.
+
+This keeps Gemini CLI, Claude Code, and Copilot behavior aligned.
+
 ## VS Code Integration
 
 All agents are designed to leverage VS Code's native tools for efficient development, debugging, and quality assurance.

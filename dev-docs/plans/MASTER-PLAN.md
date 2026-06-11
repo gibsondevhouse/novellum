@@ -14,6 +14,8 @@
 - [plan-045-agent-tool-mutation-boundary](./plan-045-agent-tool-mutation-boundary/plan.md): Agent Tool Mutation Boundary — ensure model-callable Agent tools can read/generate review artifacts but cannot directly apply manuscript or canon mutations. Status: `draft` (full plan tree scaffolded 2026-06-09).
 - [plan-046-pipeline-checkpoint-contract-reconciliation](./plan-046-pipeline-checkpoint-contract-reconciliation/plan.md): Pipeline Checkpoint Contract Reconciliation — align checkpoint routes, schemas, tests, and docs around canonical pipeline contracts. Status: `draft` (full plan tree scaffolded 2026-06-09).
 - [plan-047-worldbuilding-canon-merge-diff](./plan-047-worldbuilding-canon-merge-diff/plan.md): Worldbuilding Canon Merge Diff — upgrade worldbuilding proposal acceptance from insert-only projection to reviewable canon diff/merge behavior. Status: `draft` (full plan tree scaffolded 2026-06-09).
+- [plan-048-frontend-experience-coherence](./plan-048-frontend-experience-coherence/plan.md): Frontend Experience Coherence — final frontend pass to make route context, navigation, author workflows, review gates, and visual states read as one production app. Status: `draft` (full plan tree scaffolded 2026-06-09).
+- [plan-049-agent-runtime-stack-hardening](./plan-049-agent-runtime-stack-hardening/plan.md): Agent Runtime Stack Hardening — local-first infrastructure for durable agent runs, job execution, model capabilities, budgets, search memory, traces, evals, and diagnostics. Status: `draft` (full plan tree authored 2026-06-11).
 
 ## Completed Plans (Archived)
 

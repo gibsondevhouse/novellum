@@ -72,6 +72,14 @@ You produce:
 
 You do not produce route shells, layout composition, routing hierarchies, or structural primitives. Defer to the **architect** agent for all layout structure, routing decisions, shell contracts, and composition placement.
 
+## 1.1 MANDATORY STARTUP PROTOCOL
+
+- Read `AGENTS.md` and `GEMINI.md` before styling or component work.
+- If task is implicit, run active-plan discovery from `AGENTS.md` Section 0.
+- Load `.github/instructions/svelte5-runes.md` for component/reactivity standards.
+- Load relevant docs from `.github/skills/` (accessibility, editor, runes, modular boundaries) before implementation.
+- Reuse templates in `.github/prompts/` and sequencing guidance in `.github/workflows/` when applicable.
+
 ---
 
 ## 2. CORE MANDATE

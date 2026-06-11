@@ -19,6 +19,21 @@ Short version:
 
 The full prompt template is at [`.github/prompts/continue-plan.prompt.md`](./.github/prompts/continue-plan.prompt.md).
 
+## Startup context protocol
+
+Before implementing any task, load context in this order:
+
+- Read [`AGENTS.md`](./AGENTS.md) for cross-assistant rules.
+- Read [`GEMINI.md`](./GEMINI.md) for architecture, priorities, and quality constraints.
+- Load applicable instruction files from [`.github/instructions/`](./.github/instructions/):
+- [`.github/instructions/svelte5-runes.md`](./.github/instructions/svelte5-runes.md) for Svelte files.
+- [`.github/instructions/sqlite-best-practices.md`](./.github/instructions/sqlite-best-practices.md) for DB and `/api/db/*` work.
+- [`.github/instructions/plan-conventions.instructions.md`](./.github/instructions/plan-conventions.instructions.md) for `dev-docs/plans/**`.
+- Load relevant skill docs from [`.github/skills/`](./.github/skills/) based on task domain.
+- Reuse templates in [`.github/prompts/`](./.github/prompts/) and process guidance in [`.github/workflows/`](./.github/workflows/) when present.
+
+This keeps Claude behavior aligned with Gemini CLI and Copilot Chat.
+
 ## Project conventions
 
 - Svelte 5 Runes only (`$state`, `$derived`, `$effect`). No Svelte 4

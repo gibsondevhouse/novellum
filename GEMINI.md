@@ -9,6 +9,19 @@
 
 ## GEMINI.md for Novellum Project
 
+## Agent Startup Protocol (Gemini, Claude, Copilot)
+
+All assistants should bootstrap context consistently before implementing work:
+
+- Read [`AGENTS.md`](./AGENTS.md) first for the canonical agent ecosystem and resumption rules.
+- Read [`GEMINI.md`](./GEMINI.md) for active project conventions, priorities, and known fragilities.
+- If no explicit task is provided, run the active-plan discovery process from [`AGENTS.md`](./AGENTS.md#0-resuming-work--active-plan-discovery).
+- Load relevant instruction files from [`.github/instructions/`](./.github/instructions/) for the files being modified.
+- Load relevant skill docs from [`.github/skills/`](./.github/skills/) to follow domain-specific implementation patterns.
+- Reuse prompt templates in [`.github/prompts/`](./.github/prompts/) and workflow guidance in [`.github/workflows/`](./.github/workflows/) where applicable.
+
+This protocol is mandatory to keep Gemini, Claude, and Copilot behavior aligned.
+
 ## Project Overview
 
 Novellum is an AI-assisted novel production system designed to be integrated with the Gemini CLI. Its primary purpose is to empower users to leverage AI capabilities for novel writing and related tasks directly from their terminal and a modern web interface. The project utilizes a structured system of agents, skills, and workflows, with a strong emphasis on documentation and modular architecture.
@@ -97,6 +110,7 @@ Next candidate priorities:
 - Require measurable acceptance criteria per part.
 - Require quality gates before closure: lint, typecheck, tests, docs sync.
 - Require explicit evidence links: commits, PRs, test output, QA notes.
+- Follow [`.github/instructions/plan-conventions.instructions.md`](./.github/instructions/plan-conventions.instructions.md) for any edits under `dev-docs/plans/**`.
 
 ## Development Paths
 - Path 1: UI and interaction model evolution.

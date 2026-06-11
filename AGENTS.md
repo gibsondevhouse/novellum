@@ -20,6 +20,22 @@ Any agent (Codex CLI, Claude Code, Gemini CLI, GitHub Copilot Chat) starting a s
 
 The full prompt lives at [`.github/prompts/continue-plan.prompt.md`](./.github/prompts/continue-plan.prompt.md). It is the canonical entry point for "continue whatever plan is active" across every supported assistant.
 
+## 0.1 Startup Context Protocol (All Assistants)
+
+Before planning or implementation, every assistant (Codex CLI, Claude Code, Gemini CLI, GitHub Copilot Chat) must bootstrap context in this order:
+
+1. Read [`AGENTS.md`](./AGENTS.md) for canonical dual-layer agent rules.
+2. Read [`GEMINI.md`](./GEMINI.md) for project conventions, current priorities, and fragilities.
+3. If no explicit task is provided, run the resuming workflow in Section 0.
+4. Load relevant instruction files in [`.github/instructions/`](./.github/instructions/) based on the target files being modified:
+   - [`.github/instructions/svelte5-runes.md`](./.github/instructions/svelte5-runes.md) for Svelte component/reactivity work.
+   - [`.github/instructions/sqlite-best-practices.md`](./.github/instructions/sqlite-best-practices.md) for database and `/api/db/*` work.
+   - [`.github/instructions/plan-conventions.instructions.md`](./.github/instructions/plan-conventions.instructions.md) for plan artifacts in `dev-docs/plans/**`.
+5. Load relevant skill docs in [`.github/skills/`](./.github/skills/) before execution (routing, runes, AI context, modular boundaries, editor, testing).
+6. Reuse prompt templates from [`.github/prompts/`](./.github/prompts/) and any task sequence in [`.github/workflows/`](./.github/workflows/) when applicable.
+
+This protocol keeps assistant behavior aligned across Gemini, Claude, and Copilot.
+
 ---
 
 ## 1. System Meta-Agents (Development Layer)

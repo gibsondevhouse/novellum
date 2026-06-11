@@ -74,6 +74,14 @@ agents: ['*']
 - Skills: `ai-context`, `story-bible` (if AI interacts with narrative elements).
 - Prompts: `generate-schema.prompt.md`, `build-feature.prompt.md`.
 
+**Mandatory Startup Protocol:**
+
+- Read `AGENTS.md` and `GEMINI.md` before AI implementation.
+- If task is implicit, run active-plan discovery from `AGENTS.md` Section 0.
+- Load applicable instruction files from `.github/instructions/` for the touched files.
+- Load relevant docs from `.github/skills/` (especially `ai-context` and `openrouter-ai`) before coding.
+- Reuse `.github/prompts/` templates and `.github/workflows/` process sequences where applicable.
+
 **Research:** Consults official documentation for AI/ML models, libraries, and best practices for prompt engineering.
 
 ---

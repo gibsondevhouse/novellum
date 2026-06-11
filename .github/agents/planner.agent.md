@@ -22,6 +22,14 @@ agents: ['*']
 - `GEMINI.md`: For high-level project context, architecture, and conventions.
 - `dev-docs/plans/`: To create, read, and manage plan files.
 
+**Mandatory Startup Protocol:**
+
+- Read `AGENTS.md` and `GEMINI.md` at task start.
+- If task is implicit, run active-plan discovery from `AGENTS.md` Section 0.
+- Load `.github/instructions/plan-conventions.instructions.md` for `dev-docs/plans/**` edits.
+- Load relevant docs from `.github/skills/` before drafting or updating plans.
+- Reuse templates in `.github/prompts/` and process guidance in `.github/workflows/`.
+
 **Research:** Consults project documentation for planning best practices.
 
 ---

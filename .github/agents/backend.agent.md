@@ -74,6 +74,14 @@ agents: ['*']
 - Skills: `editor`, `ai-context`.
 - Prompts: `build-feature.prompt.md`, `refactor.prompt.md`, `fix-bug.prompt.md`, `generate-schema.prompt.md`.
 
+**Mandatory Startup Protocol:**
+
+- Read `AGENTS.md` and `GEMINI.md` at task start.
+- If task is implicit, run active-plan discovery from `AGENTS.md` Section 0.
+- Load `.github/instructions/sqlite-best-practices.md` for DB and `/api/db/*` changes.
+- Load relevant docs from `.github/skills/` (ai-context, modular-boundaries, testing) before implementation.
+- Reuse templates in `.github/prompts/` and `.github/workflows/` when applicable.
+
 **Research:** Consults official documentation for backend languages, frameworks, databases, and APIs.
 
 ---
