@@ -2,12 +2,12 @@
 title: Registry Inventory
 slug: part-001-registry-inventory
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: —
 phase: phase-001-registry-inventory
-started_at: ~
-completed_at: ~
+started_at: 2026-06-11
+completed_at: 2026-06-11
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Create the tool registry baseline needed to identify unsafe model-callable mutat
 
 **Create:**
 
-- `evidence/registry-inventory-evidence-2026-06-09.md`
+- `evidence/registry-inventory-evidence-2026-06-11.md`
 
 **Update:**
 
@@ -57,9 +57,9 @@ Create the tool registry baseline needed to identify unsafe model-callable mutat
 
 ## Acceptance Criteria
 
-- [ ] Every registered tool is listed.
-- [ ] Each tool includes route/API reachability.
-- [ ] Mutation-suspect tools are flagged.
+- [x] Every registered tool is listed.
+- [x] Each tool includes route/API reachability.
+- [x] Mutation-suspect tools are flagged.
 
 ## Edge Cases
 

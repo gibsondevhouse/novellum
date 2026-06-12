@@ -18,7 +18,7 @@ function readSource(relPath: string): string {
 	return fs.readFileSync(path.join(SRC_ROOT, relPath), 'utf8');
 }
 
-// Paths to agent-mode tool files
+// Paths to model-callable agent-mode tool files
 const AGENT_FILES = [
 	'modules/nova/services/agent-tools.ts',
 	'modules/nova/services/agent-loop.ts',
@@ -49,6 +49,11 @@ const FORBIDDEN_PATTERNS: Array<{ pattern: RegExp; reason: string }> = [
 	{
 		pattern: /applyProposal|applyArtifact|writeManuscript|mutateScene/,
 		reason: 'manuscript mutation function names',
+	},
+	{
+		pattern:
+			/acceptSceneDraftCheckpoint|rejectSceneDraftCheckpoint|authorDraft\.accept_checkpoint|authorDraft\.reject_checkpoint/,
+		reason: 'author-draft accept/reject mutation helpers or tool ids',
 	},
 ];
 
@@ -87,6 +92,11 @@ describe('Agent tools are registered at module load', () => {
 	it('agent-tools.ts exports ProposalEnvelope', () => {
 		const source = readSource('modules/nova/services/agent-tools.ts');
 		expect(source).toContain('export interface ProposalEnvelope');
+	});
+
+	it('agent-mutation-tools.ts exports registerAgentMutationTools', () => {
+		const source = readSource('modules/nova/services/agent-mutation-tools.ts');
+		expect(source).toContain('export function registerAgentMutationTools');
 	});
 
 	it('agent-loop.ts exports MAX_AGENT_STEPS = 8', () => {

@@ -9,7 +9,14 @@
 import type { ToolInvocation, ToolResult } from '../types.js';
 import { getTool } from './tool-registry.js';
 
-export async function dispatchTool(invocation: ToolInvocation): Promise<ToolResult> {
+interface DispatchToolOptions {
+	allowMutationCommands?: boolean;
+}
+
+export async function dispatchTool(
+	invocation: ToolInvocation,
+	options: DispatchToolOptions = {},
+): Promise<ToolResult> {
 	const tool = getTool(invocation.toolId);
 	if (!tool) {
 		return {
@@ -17,6 +24,15 @@ export async function dispatchTool(invocation: ToolInvocation): Promise<ToolResu
 			toolId: invocation.toolId,
 			status: 'unimplemented',
 			error: `Tool ${invocation.toolId} is not registered.`,
+			completedAt: new Date().toISOString(),
+		};
+	}
+	if (tool.definition.capability === 'mutation_command' && options.allowMutationCommands !== true) {
+		return {
+			invocationId: invocation.invocationId,
+			toolId: invocation.toolId,
+			status: 'error',
+			error: `Tool ${invocation.toolId} is a mutation command and cannot be dispatched from the model tool loop.`,
 			completedAt: new Date().toISOString(),
 		};
 	}
@@ -40,4 +56,3 @@ export async function dispatchTool(invocation: ToolInvocation): Promise<ToolResu
 		};
 	}
 }
-

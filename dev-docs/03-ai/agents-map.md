@@ -1,6 +1,6 @@
 # Agents Map
 
-> Last verified: 2026-05-26 (plan-028 UI shipped)
+> Last verified: 2026-06-11 (plan-045 mutation boundary)
 
 Authoritative status of all Novellum runtime agents. Anchored to [src/lib/ai/](../../src/lib/ai/).
 The V1.1 staged pipeline (`vibe-worldbuild` / `vibe-author`) is
@@ -85,6 +85,34 @@ Author-in-the-loop guarantee: every accept path emits a typed callback;
 no card component imports the editor store or calls `insertText` /
 `applyEdit`. The contract is enforced by source-string tests under
 [`tests/ai/pipeline/`](../../tests/ai/pipeline/).
+
+## Agent Tool Mutation Boundary (plan-045)
+
+Nova Agent mode separates model-callable tools from author-issued mutation
+commands.
+
+Model-callable tool definitions live in
+[`agent-tools.ts`](../../src/modules/nova/services/agent-tools.ts) and are
+selected for model payloads through `listModelCallableTools()`. These tools may
+read project context or create review artifacts, but they must not accept,
+reject, apply, or project artifacts into manuscript/canon state.
+
+Mutation command registrations live in
+[`agent-mutation-tools.ts`](../../src/modules/nova/services/agent-mutation-tools.ts)
+with `capability: 'mutation_command'`. They are excluded from model
+advertisement, and the generic `dispatchTool()` path rejects mutation commands
+unless a trusted app caller explicitly opts in with `allowMutationCommands`.
+
+| Pipeline family | Model-callable surface | UI-issued mutation owner | Server guard |
+| --- | --- | --- | --- |
+| Author draft checkpoints | `authorDraft.get_scene_draft_context`, `authorDraft.generate_scene_draft_checkpoint`, `authorDraft.list_checkpoints` | [`NovaAuthorDraftCheckpointCard.svelte`](../../src/modules/nova/components/NovaAuthorDraftCheckpointCard.svelte) buttons call `acceptSceneDraftCheckpoint` / `rejectSceneDraftCheckpoint`. | `/api/author-draft/checkpoints/*` routes keep lifecycle, stale-target, and scene ownership guards in `author-draft-checkpoint-service.ts`. |
+| Outline draft checkpoints | Outline generation/checkpoint review cards surface generated outline drafts for review. | [`NovaOutlineDraftCheckpointCard.svelte`](../../src/modules/nova/components/NovaOutlineDraftCheckpointCard.svelte) calls [`outline-checkpoint-actions.ts`](../../src/modules/nova/services/outline-checkpoint-actions.ts) for accept/reject. | `/api/outline/checkpoints/[checkpointId]/accept` and project-metadata lifecycle routes keep version, conflict, and rollback guards. |
+| Worldbuilding checkpoints/proposals | Worldbuilding scan and generation routes create pending proposals/checkpoints. | Worldbuilding proposal cards and the outline review console call worldbuilding store/proposal services for accept/reject. | Worldbuild checkpoint/proposal routes keep atomic accept/reject and validation behavior before canon projection. |
+
+Rejecting a review artifact is still a mutation because it records an author
+decision and changes lifecycle state. Generation-only checkpoint tools remain
+model-callable only while they create review artifacts and do not project into
+manuscript or canon state.
 
 ## Cross-references
 

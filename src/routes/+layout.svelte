@@ -2,7 +2,6 @@
 	import '../app.css';
 	import { onMount } from 'svelte';
 	import { onNavigate } from '$app/navigation';
-	import { page } from '$app/state';
 	import favicon from '$lib/assets/favicon.svg';
 
 	import AppSidebar from '$lib/components/AppSidebar.svelte';

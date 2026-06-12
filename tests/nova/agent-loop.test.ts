@@ -118,6 +118,7 @@ describe('runAgentLoop', () => {
 			{
 				id: 'test.echo',
 				description: 'Echoes input.',
+				capability: 'read_only',
 				inputSchema: { type: 'object', properties: { value: { type: 'string' } }, required: ['value'] },
 			},
 			async (inv) => {
@@ -152,11 +153,69 @@ describe('runAgentLoop', () => {
 		expect(finalNova?.content).toBe('Echo: ping');
 	});
 
+	it('advertises only model-callable tools to /api/nova/agent', async () => {
+		registerTool(
+			{
+				id: 'test.read',
+				description: 'Reads.',
+				capability: 'read_only',
+				inputSchema: { type: 'object', properties: {} },
+			},
+			async () => ({ status: 'success', output: null }),
+		);
+		registerTool(
+			{
+				id: 'test.review-artifact',
+				description: 'Creates a review artifact.',
+				capability: 'review_artifact_generation',
+				inputSchema: { type: 'object', properties: {} },
+			},
+			async () => ({ status: 'success', output: null }),
+		);
+		registerTool(
+			{
+				id: 'authorDraft.accept_checkpoint',
+				description: 'Applies prose.',
+				capability: 'mutation_command',
+				inputSchema: { type: 'object', properties: {} },
+			},
+			async () => ({ status: 'success', output: null }),
+		);
+		registerTool(
+			{
+				id: 'authorDraft.reject_checkpoint',
+				description: 'Rejects a checkpoint.',
+				capability: 'mutation_command',
+				inputSchema: { type: 'object', properties: {} },
+			},
+			async () => ({ status: 'success', output: null }),
+		);
+
+		fetchMock.mockResolvedValueOnce(agentResponse('Done.'));
+		novaSession.append({ role: 'user', content: 'Use tools safely' });
+
+		await runAgentLoop({
+			prompt: 'Use tools safely',
+			projectId: null,
+			activeSceneId: null,
+			activeChapterId: null,
+		});
+
+		const request = JSON.parse((fetchMock.mock.calls[0]?.[1] as RequestInit).body as string) as {
+			tools: Array<{ function: { name: string } }>;
+		};
+		const advertisedIds = request.tools.map((tool) => tool.function.name).sort();
+		expect(advertisedIds).toEqual(['test.read', 'test.review-artifact']);
+		expect(advertisedIds).not.toContain('authorDraft.accept_checkpoint');
+		expect(advertisedIds).not.toContain('authorDraft.reject_checkpoint');
+	});
+
 	it('stops at MAX_AGENT_STEPS and appends a cap-exhaustion message', async () => {
 		registerTool(
 			{
 				id: 'test.loop',
 				description: 'Loops forever.',
+				capability: 'read_only',
 				inputSchema: { type: 'object', properties: {} },
 			},
 			async () => ({ status: 'success', output: 'step' }),

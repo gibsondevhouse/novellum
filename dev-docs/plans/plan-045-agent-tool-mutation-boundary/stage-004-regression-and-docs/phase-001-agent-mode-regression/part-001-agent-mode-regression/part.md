@@ -2,12 +2,12 @@
 title: Agent Mode Regression
 slug: part-001-agent-mode-regression
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-agent-mode-regression
-started_at: ~
-completed_at: ~
+started_at: 2026-06-11
+completed_at: 2026-06-11
 estimated_duration: TBD
 ---
 
@@ -58,9 +58,9 @@ Verify read and generation tools still work while mutation tools are excluded.
 
 ## Acceptance Criteria
 
-- [ ] Agent mode can still call read/generate tools.
-- [ ] Mutation tools are absent from advertised payloads.
-- [ ] Command output evidence is captured.
+- [x] Agent mode can still call read/generate tools.
+- [x] Mutation tools are absent from advertised payloads.
+- [x] Command output evidence is captured.
 
 ## Edge Cases
 

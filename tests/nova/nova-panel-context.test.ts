@@ -3,6 +3,10 @@ import { mount, unmount, flushSync } from 'svelte';
 import { page } from '$app/state';
 import { NovaPanel, novaPanel, novaSession, aiSession } from '$modules/nova';
 
+function setPageUrl(url: string): void {
+	page.url = new URL(url) as typeof page.url;
+}
+
 describe('NovaPanel.svelte — context-aware rendering', () => {
 	let target: HTMLElement;
 
@@ -14,7 +18,7 @@ describe('NovaPanel.svelte — context-aware rendering', () => {
 		novaSession.clear();
 		aiSession.__resetForTests();
 		// Reset page mock
-		page.url = new URL('http://localhost/');
+		setPageUrl('http://localhost/');
 		page.params = {};
 		page.data = {};
 	});
@@ -26,12 +30,12 @@ describe('NovaPanel.svelte — context-aware rendering', () => {
 	});
 
 	it('renders AuthorDraftEngine on base editor route', () => {
-		page.url = new URL('http://localhost/projects/123/editor');
+		setPageUrl('http://localhost/projects/123/editor');
 		page.params = { id: '123' };
-		
-		const cmp = mount(NovaPanel, { 
-			target, 
-			props: { projectId: '123', activeChapterId: 'chap-1' } 
+
+		const cmp = mount(NovaPanel, {
+			target,
+			props: { projectId: '123', activeChapterId: 'chap-1' },
 		});
 		novaPanel.open();
 		flushSync();
@@ -41,12 +45,12 @@ describe('NovaPanel.svelte — context-aware rendering', () => {
 	});
 
 	it('renders AuthorDraftEngine on deep editor routes', () => {
-		page.url = new URL('http://localhost/projects/123/editor/scene-456');
+		setPageUrl('http://localhost/projects/123/editor/scene-456');
 		page.params = { id: '123', sceneId: 'scene-456' };
-		
-		const cmp = mount(NovaPanel, { 
-			target, 
-			props: { projectId: '123', activeChapterId: 'chap-1' } 
+
+		const cmp = mount(NovaPanel, {
+			target,
+			props: { projectId: '123', activeChapterId: 'chap-1' },
 		});
 		novaPanel.open();
 		flushSync();
@@ -56,12 +60,12 @@ describe('NovaPanel.svelte — context-aware rendering', () => {
 	});
 
 	it('renders AuthorDraftEngine on chapter outline routes', () => {
-		page.url = new URL('http://localhost/projects/123/arcs/1/acts/1/chapters/chap-1');
+		setPageUrl('http://localhost/projects/123/arcs/1/acts/1/chapters/chap-1');
 		page.params = { id: '123', chapterId: 'chap-1' };
-		
-		const cmp = mount(NovaPanel, { 
-			target, 
-			props: { projectId: '123', activeChapterId: 'chap-1' } 
+
+		const cmp = mount(NovaPanel, {
+			target,
+			props: { projectId: '123', activeChapterId: 'chap-1' },
 		});
 		novaPanel.open();
 		flushSync();
@@ -71,12 +75,12 @@ describe('NovaPanel.svelte — context-aware rendering', () => {
 	});
 
 	it('does NOT render AuthorDraftEngine on world-building routes', () => {
-		page.url = new URL('http://localhost/projects/123/world-building');
+		setPageUrl('http://localhost/projects/123/world-building');
 		page.params = { id: '123' };
-		
-		const cmp = mount(NovaPanel, { 
-			target, 
-			props: { projectId: '123' } 
+
+		const cmp = mount(NovaPanel, {
+			target,
+			props: { projectId: '123' },
 		});
 		novaPanel.open();
 		flushSync();

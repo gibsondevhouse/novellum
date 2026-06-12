@@ -2,7 +2,7 @@
 title: Capability Classification
 slug: phase-002-capability-classification
 phase_number: 2
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-001-tool-capability-audit
 parts:
@@ -18,13 +18,13 @@ Classify tools into read-only, review-artifact generation, and mutation capabili
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Capability Classification](part-001-capability-classification/part.md) | `draft` | — | TBD |
+| 001 | [Capability Classification](part-001-capability-classification/part.md) | `review` | — | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Every tool has one capability class.
-- [ ] `authorDraft.accept_checkpoint` is classified as mutation.
-- [ ] Generation-only checkpoint tools are distinguished from accept/apply tools.
+- [x] Every tool has one capability class.
+- [x] `authorDraft.accept_checkpoint` is classified as mutation.
+- [x] Generation-only checkpoint tools are distinguished from accept/apply tools.
 
 ## Notes
 

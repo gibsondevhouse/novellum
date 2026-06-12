@@ -2,7 +2,7 @@
 title: Registry Inventory
 slug: phase-001-registry-inventory
 phase_number: 1
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-001-tool-capability-audit
 parts:
@@ -18,13 +18,13 @@ Inventory every registered Nova Agent mode tool and the APIs each handler can re
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Registry Inventory](part-001-registry-inventory/part.md) | `draft` | — | TBD |
+| 001 | [Registry Inventory](part-001-registry-inventory/part.md) | `review` | — | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Every registered tool is listed.
-- [ ] Each tool includes route/API reachability.
-- [ ] Mutation-suspect tools are flagged.
+- [x] Every registered tool is listed.
+- [x] Each tool includes route/API reachability.
+- [x] Mutation-suspect tools are flagged.
 
 ## Notes
 

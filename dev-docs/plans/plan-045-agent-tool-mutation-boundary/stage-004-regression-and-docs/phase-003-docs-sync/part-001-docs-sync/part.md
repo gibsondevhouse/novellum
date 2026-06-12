@@ -2,12 +2,12 @@
 title: Docs Sync
 slug: part-001-docs-sync
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-003-docs-sync
-started_at: ~
-completed_at: ~
+started_at: 2026-06-11
+completed_at: 2026-06-11
 estimated_duration: TBD
 ---
 
@@ -59,9 +59,9 @@ Make the read/generate versus accept/apply distinction explicit in Nova and AI d
 
 ## Acceptance Criteria
 
-- [ ] Docs no longer imply the model can silently apply manuscript/canon changes.
-- [ ] Mutation boundary policy is clear for future tools.
-- [ ] Verification evidence is recorded.
+- [x] Docs no longer imply the model can silently apply manuscript/canon changes.
+- [x] Mutation boundary policy is clear for future tools.
+- [x] Verification evidence is recorded.
 
 ## Edge Cases
 

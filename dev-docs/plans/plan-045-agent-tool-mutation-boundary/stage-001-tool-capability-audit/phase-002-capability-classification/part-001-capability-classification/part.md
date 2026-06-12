@@ -2,12 +2,12 @@
 title: Capability Classification
 slug: part-001-capability-classification
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: —
 phase: phase-002-capability-classification
-started_at: ~
-completed_at: ~
+started_at: 2026-06-11
+completed_at: 2026-06-11
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Define which tools may be model-callable and which must move behind author UI in
 
 **Create:**
 
-- `evidence/capability-classification-evidence-2026-06-09.md`
+- `evidence/capability-classification-evidence-2026-06-11.md`
 
 **Update:**
 
@@ -57,9 +57,9 @@ Define which tools may be model-callable and which must move behind author UI in
 
 ## Acceptance Criteria
 
-- [ ] Every tool has one capability class.
-- [ ] `authorDraft.accept_checkpoint` is classified as mutation.
-- [ ] Generation-only checkpoint tools are distinguished from accept/apply tools.
+- [x] Every tool has one capability class.
+- [x] `authorDraft.accept_checkpoint` is classified as mutation.
+- [x] Generation-only checkpoint tools are distinguished from accept/apply tools.
 
 ## Edge Cases
 

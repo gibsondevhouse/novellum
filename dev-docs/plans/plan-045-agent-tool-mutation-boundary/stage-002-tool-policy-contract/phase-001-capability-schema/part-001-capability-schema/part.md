@@ -2,12 +2,12 @@
 title: Capability Schema
 slug: part-001-capability-schema
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: —
 phase: phase-001-capability-schema
-started_at: ~
-completed_at: ~
+started_at: 2026-06-11
+completed_at: 2026-06-11
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Make mutation boundaries enforceable by code rather than convention.
 
 **Create:**
 
-- None
+- `evidence/capability-schema-evidence-2026-06-11.md`
 
 **Update:**
 
@@ -60,9 +60,9 @@ Make mutation boundaries enforceable by code rather than convention.
 
 ## Acceptance Criteria
 
-- [ ] All product tools declare capability class.
-- [ ] Registry tests enforce metadata.
-- [ ] Existing read/generate tools remain callable.
+- [x] All product tools declare capability class.
+- [x] Registry tests enforce metadata.
+- [x] Existing read/generate tools remain callable.
 
 ## Edge Cases
 

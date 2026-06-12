@@ -2,12 +2,12 @@
 title: Command Boundary Design
 slug: part-001-command-boundary-design
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: —
 phase: phase-001-command-boundary-design
-started_at: ~
-completed_at: ~
+started_at: 2026-06-11
+completed_at: 2026-06-11
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Separate model-generated review artifacts from explicit author accept/reject com
 
 **Create:**
 
-- `evidence/command-boundary-design-evidence-2026-06-09.md`
+- `evidence/command-boundary-design-evidence-2026-06-11.md`
 
 **Update:**
 
@@ -57,9 +57,9 @@ Separate model-generated review artifacts from explicit author accept/reject com
 
 ## Acceptance Criteria
 
-- [ ] Mutation command ownership is explicit by pipeline family.
-- [ ] UI buttons remain the accept/reject source of truth.
-- [ ] Server-side stale guards remain in place.
+- [x] Mutation command ownership is explicit by pipeline family.
+- [x] UI buttons remain the accept/reject source of truth.
+- [x] Server-side stale guards remain in place.
 
 ## Edge Cases
 

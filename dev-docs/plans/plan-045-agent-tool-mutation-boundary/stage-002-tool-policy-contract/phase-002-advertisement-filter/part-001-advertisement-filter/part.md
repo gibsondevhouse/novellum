@@ -2,12 +2,12 @@
 title: Advertisement Filter
 slug: part-001-advertisement-filter
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: —
 phase: phase-002-advertisement-filter
-started_at: ~
-completed_at: ~
+started_at: 2026-06-11
+completed_at: 2026-06-11
 estimated_duration: TBD
 ---
 
@@ -39,13 +39,15 @@ Prevent Agent mode from presenting accept/apply mutation tools to the model.
 
 **Create:**
 
-- None
+- `evidence/advertisement-filter-evidence-2026-06-11.md`
 
 **Update:**
 
 - `src/modules/nova/services/tool-registry.ts`
 - `src/modules/nova/services/chat-service.ts`
 - `src/modules/nova/services/agent-loop.ts`
+- `src/modules/nova/index.ts`
+- `tests/nova/tool-registry.test.ts`
 - `tests/nova/agent-loop.test.ts`
 - `tests/nova/chat-service.test.ts`
 
@@ -61,9 +63,9 @@ Prevent Agent mode from presenting accept/apply mutation tools to the model.
 
 ## Acceptance Criteria
 
-- [ ] Mutation tools are not advertised to the model.
-- [ ] Read and review-artifact generation tools remain advertised.
-- [ ] Tests assert excluded IDs by name.
+- [x] Mutation tools are not advertised to the model.
+- [x] Read and review-artifact generation tools remain advertised.
+- [x] Tests assert excluded IDs by name.
 
 ## Edge Cases
 

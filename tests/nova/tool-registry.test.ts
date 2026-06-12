@@ -10,6 +10,7 @@ import {
 	registerTool,
 	getTool,
 	listTools,
+	listModelCallableTools,
 	clearTools,
 } from '$modules/nova/services/tool-registry.js';
 import type { ToolDefinition, ToolHandler } from '$modules/nova/types.js';
@@ -17,6 +18,7 @@ import type { ToolDefinition, ToolHandler } from '$modules/nova/types.js';
 const sampleDef: ToolDefinition = {
 	id: 'sample.tool',
 	description: 'A sample tool.',
+	capability: 'read_only',
 	inputSchema: { type: 'object' },
 };
 
@@ -58,6 +60,44 @@ describe('tool-registry', () => {
 		expect(entry?.definition.description).toBe('Updated.');
 		expect(entry?.handler).toBe(newHandler);
 		expect(listTools()).toHaveLength(1);
+	});
+
+	it('requires explicit capability metadata', () => {
+		expect(() =>
+			registerTool(
+				{
+					id: 'sample.invalid',
+					description: 'Missing valid capability.',
+					capability: 'invalid' as ToolDefinition['capability'],
+					inputSchema: { type: 'object' },
+				},
+				noopHandler,
+			),
+		).toThrow('must declare a valid capability');
+	});
+
+	it('listModelCallableTools excludes mutation commands', () => {
+		registerTool(sampleDef, noopHandler);
+		registerTool(
+			{
+				...sampleDef,
+				id: 'sample.review-artifact',
+				capability: 'review_artifact_generation',
+			},
+			noopHandler,
+		);
+		registerTool(
+			{ ...sampleDef, id: 'sample.mutation', capability: 'mutation_command' },
+			noopHandler,
+		);
+
+		const ids = listModelCallableTools().map((d) => d.id).sort();
+		expect(ids).toEqual(['sample.review-artifact', 'sample.tool']);
+		expect(listTools().map((d) => d.id).sort()).toEqual([
+			'sample.mutation',
+			'sample.review-artifact',
+			'sample.tool',
+		]);
 	});
 
 	it('clearTools empties the registry', () => {

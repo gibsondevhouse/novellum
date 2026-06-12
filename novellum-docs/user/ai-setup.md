@@ -1,6 +1,6 @@
 # AI Setup (BYOK)
 
-> Last verified: 2026-06-01
+> Last verified: 2026-06-11
 
 Novellum is **bring-your-own-key** for AI. We don't host a model; we don't broker tokens. You sign up with [OpenRouter](https://openrouter.ai), generate an API key, and paste it into Novellum.
 
@@ -39,6 +39,14 @@ After saving the key, open **Nova** and ask anything. If you see a reply, you're
 - AI calls only happen when you trigger them. There is no background polling.
 - Continuity checks and style scans send scoped context, not the full manuscript.
 - For drafting, prefer shorter prompts and smaller context windows when possible.
+
+## Review-gated changes
+
+Nova can use Agent mode tools to read project context and generate review
+artifacts, including draft checkpoints and proposals. Those tools cannot accept,
+reject, apply, or project changes into your manuscript or canon. Any manuscript
+or worldbuilding mutation still goes through an explicit Novellum UI action,
+such as an accept or reject button on the review card.
 
 ## Privacy
 

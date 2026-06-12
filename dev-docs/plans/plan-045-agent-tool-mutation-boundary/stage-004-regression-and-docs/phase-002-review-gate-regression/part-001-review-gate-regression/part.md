@@ -2,12 +2,12 @@
 title: Review Gate Regression
 slug: part-001-review-gate-regression
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-002-review-gate-regression
-started_at: ~
-completed_at: ~
+started_at: 2026-06-11
+completed_at: 2026-06-11
 estimated_duration: TBD
 ---
 
@@ -59,9 +59,9 @@ Verify the mutation boundary preserves existing checkpoint and proposal acceptan
 
 ## Acceptance Criteria
 
-- [ ] Explicit UI accept can still apply valid drafts.
-- [ ] Model-callable paths cannot apply drafts.
-- [ ] Stale/dirty/force-overwrite protections remain intact.
+- [x] Explicit UI accept can still apply valid drafts.
+- [x] Model-callable paths cannot apply drafts.
+- [x] Stale/dirty/force-overwrite protections remain intact.
 
 ## Edge Cases
 

@@ -6,7 +6,7 @@
 
 ## Current
 
-No active plan.
+[plan-045-agent-tool-mutation-boundary](./plan-045-agent-tool-mutation-boundary/plan.md) — Agent Tool Mutation Boundary. Current focus: Reviewer Agent sign-off for all stages. Status: `review`. Activated 2026-06-11 from the roadmap queue after plan-044 closure. Implementation gates passed 2026-06-11; do not advance to the next plan until review is accepted.
 
 ## Recently completed
 

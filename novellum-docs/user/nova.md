@@ -1,6 +1,6 @@
 # Nova — Your AI Copilot
 
-> Last verified: 2026-06-01
+> Last verified: 2026-06-11
 
 **Nova** is Novellum's AI assistant. Chat-style. Project-aware. BYOK (you bring your own OpenRouter key).
 
@@ -9,10 +9,12 @@
 - **Answer questions** about your project, grounded in your characters, locations, lore, and the current scene.
 - **Suggest** edits, rewrites, continuity checks, and stylistic adjustments via specialized agents under the hood.
 - **Draft** ideas for you to copy/paste into the editor.
+- **Create review artifacts** such as draft checkpoints or proposals that you can inspect before accepting.
 
 ## What Nova will not do
 
 - **Edit your manuscript silently.** Every change to your scenes goes through your hands.
+- **Accept, reject, or apply checkpoints on its own.** Agent mode tools can read project context and generate review artifacts, but lifecycle decisions require explicit UI actions from you.
 - **Send your full manuscript to the model.** Nova uses scoped context — only what the agent needs for the task.
 - **Keep your work on a server.** Your data stays local. Only the messages you explicitly send go to OpenRouter.
 
@@ -33,6 +35,9 @@ Open the **Nova** workspace from the sidebar (or, in upcoming editor changes, th
 - *"What hasn't paid off from the threads we set up in chapter 3?"*
 
 Nova will reply with structured suggestions you can review and apply manually.
+When Agent mode creates a checkpoint or proposal, it appears as a review card
+with explicit accept/reject controls. Accepting or rejecting that artifact is a
+trusted app action, not a model tool call.
 
 ## The agents behind Nova
 

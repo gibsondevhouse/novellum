@@ -2,12 +2,12 @@
 title: Author Draft Actions
 slug: part-001-author-draft-actions
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: —
 phase: phase-002-author-draft-actions
-started_at: ~
-completed_at: ~
+started_at: 2026-06-11
+completed_at: 2026-06-11
 estimated_duration: TBD
 ---
 
@@ -39,12 +39,13 @@ Ensure scene prose can only be applied by explicit author action through `NovaAu
 
 **Create:**
 
-- None
+- `evidence/author-draft-actions-evidence-2026-06-11.md`
 
 **Update:**
 
 - `src/modules/nova/services/agent-tools.ts`
-- `src/modules/nova/components/NovaAuthorDraftCheckpointCard.svelte`
+- `src/modules/nova/services/agent-mutation-tools.ts`
+- `src/modules/nova/services/tool-router.ts`
 - `tests/ai/pipeline/author-draft-checkpoint-service.test.ts`
 - `tests/nova/agent-tool-mutation-boundary.test.ts`
 
@@ -60,9 +61,9 @@ Ensure scene prose can only be applied by explicit author action through `NovaAu
 
 ## Acceptance Criteria
 
-- [ ] Model-callable tool list cannot apply scene prose.
-- [ ] UI accept still updates scene content after confirmation/stale guards.
-- [ ] Reject/regenerate behavior remains intact.
+- [x] Model-callable tool list cannot apply scene prose.
+- [x] UI accept still updates scene content after confirmation/stale guards.
+- [x] Reject/regenerate behavior remains intact.
 
 ## Edge Cases
 

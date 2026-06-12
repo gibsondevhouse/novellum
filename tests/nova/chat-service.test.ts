@@ -44,7 +44,7 @@ import { novaSession } from '$modules/nova/stores/nova-session.svelte.js';
 import { setNovaAgenticFlag } from '$modules/nova/services/feature-flags.js';
 import {
 	clearTools,
-	listTools,
+	listModelCallableTools,
 	registerTool,
 } from '$modules/nova/services/tool-registry.js';
 
@@ -322,6 +322,16 @@ describe('sendNovaChat', () => {
 				{
 					id: 'test.fake-tool',
 					description: 'Inline tool used only by this test.',
+					capability: 'read_only',
+					inputSchema: { type: 'object', properties: {} },
+				},
+				async () => ({ status: 'success', output: null }),
+			);
+			registerTool(
+				{
+					id: 'authorDraft.accept_checkpoint',
+					description: 'Mutation command used only by this test.',
+					capability: 'mutation_command',
 					inputSchema: { type: 'object', properties: {} },
 				},
 				async () => ({ status: 'success', output: null }),
@@ -346,7 +356,7 @@ describe('sendNovaChat', () => {
 			expect(payload.tools).toBeUndefined();
 		});
 
-		it('attaches tools = listTools() when the agentic flag is on', async () => {
+		it('attaches model-callable tools when the agentic flag is on', async () => {
 			setNovaAgenticFlag(true);
 			streamCompleteMock.mockReturnValueOnce(yieldChunks(['ok']));
 			await sendNovaChat({
@@ -357,9 +367,10 @@ describe('sendNovaChat', () => {
 			});
 			const [payload] = streamCompleteMock.mock.calls[0];
 			expect(Array.isArray(payload.tools)).toBe(true);
-			expect(payload.tools).toHaveLength(listTools().length);
+			expect(payload.tools).toHaveLength(listModelCallableTools().length);
 			const ids = (payload.tools as { id: string }[]).map((t) => t.id).sort();
 			expect(ids).toEqual(['test.fake-tool']);
+			expect(ids).not.toContain('authorDraft.accept_checkpoint');
 		});
 	});
 });

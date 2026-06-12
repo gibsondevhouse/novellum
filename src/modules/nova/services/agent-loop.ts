@@ -23,7 +23,7 @@ import type { AiContext, AiTask, UiContext } from '$lib/ai/types.js';
 import { novaSession } from '../stores/nova-session.svelte.js';
 import { buildRagContext } from './context-hooks.js';
 import { dispatchTool } from './tool-router.js';
-import { listTools } from './tool-registry.js';
+import { listModelCallableTools } from './tool-registry.js';
 import type { ToolDefinition, ToolInvocation } from '../types.js';
 
 export const MAX_AGENT_STEPS = 8;
@@ -162,7 +162,7 @@ export async function runAgentLoop(input: AgentLoopInput): Promise<void> {
 	});
 
 	// Build tool list for OpenRouter
-	const toolDefs = listTools();
+	const toolDefs = listModelCallableTools();
 	const openRouterTools = toolDefs.map(toOpenRouterTool);
 
 	// Build initial message history (last 10 complete turns)

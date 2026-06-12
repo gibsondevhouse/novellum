@@ -18,3 +18,15 @@ part: part-001-agent-mode-regression
 **Notes:** No implementation work has started. Keep this log append-only when the part is executed.
 
 ---
+
+### [2026-06-11 20:27 EDT] Agent: Codex
+
+**Action:** Verified Agent mode regression coverage after mutation commands were excluded from model-callable payloads.
+
+**Result:** Confirmed `listModelCallableTools()` preserves read-only and review-artifact generation tools while excluding `mutation_command` definitions. Added `evidence/agent-mode-regression-evidence-2026-06-11.md`.
+
+**Validation:** `pnpm check`, `pnpm lint`, `pnpm lint:css`, `pnpm test`, `pnpm check:tokens`, targeted mutation-boundary Vitest suite, and targeted review-gate e2e all passed.
+
+**Notes:** Part is ready for Reviewer Agent sign-off. No reviewer sign-off has been recorded.
+
+---

@@ -2,7 +2,7 @@
 title: Capability Schema
 slug: phase-001-capability-schema
 phase_number: 1
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-002-tool-policy-contract
 parts:
@@ -18,13 +18,13 @@ Add explicit capability metadata to tool definitions.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Capability Schema](part-001-capability-schema/part.md) | `draft` | — | TBD |
+| 001 | [Capability Schema](part-001-capability-schema/part.md) | `review` | — | TBD |
 
 ## Acceptance Criteria
 
-- [ ] All product tools declare capability class.
-- [ ] Registry tests enforce metadata.
-- [ ] Existing read/generate tools remain callable.
+- [x] All product tools declare capability class.
+- [x] Registry tests enforce metadata.
+- [x] Existing read/generate tools remain callable.
 
 ## Notes
 

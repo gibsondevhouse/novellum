@@ -41,7 +41,7 @@ describe('dispatchTool (registry-driven)', () => {
 			output: { ok: true },
 		});
 		registerTool(
-			{ id: 'sample.tool', description: 'x', inputSchema: {} },
+			{ id: 'sample.tool', description: 'x', capability: 'read_only', inputSchema: {} },
 			handler,
 		);
 		const result = await dispatchTool(baseInvocation());
@@ -59,7 +59,7 @@ describe('dispatchTool (registry-driven)', () => {
 			error: 'planned for plan-XXX',
 		});
 		registerTool(
-			{ id: 'sample.tool', description: 'x', inputSchema: {} },
+			{ id: 'sample.tool', description: 'x', capability: 'read_only', inputSchema: {} },
 			handler,
 		);
 		const result = await dispatchTool(baseInvocation());
@@ -73,7 +73,7 @@ describe('dispatchTool (registry-driven)', () => {
 			throw new Error('handler exploded');
 		};
 		registerTool(
-			{ id: 'sample.tool', description: 'x', inputSchema: {} },
+			{ id: 'sample.tool', description: 'x', capability: 'read_only', inputSchema: {} },
 			handler,
 		);
 		const result = await dispatchTool(baseInvocation());
@@ -82,12 +82,56 @@ describe('dispatchTool (registry-driven)', () => {
 		expect(result.invocationId).toBe('inv-1');
 	});
 
+	it('blocks mutation commands by default', async () => {
+		const handler: ToolHandler = async () => ({
+			status: 'success',
+			output: { mutated: true },
+		});
+		registerTool(
+			{
+				id: 'authorDraft.accept_checkpoint',
+				description: 'Applies prose.',
+				capability: 'mutation_command',
+				inputSchema: {},
+			},
+			handler,
+		);
+
+		const result = await dispatchTool(baseInvocation({ toolId: 'authorDraft.accept_checkpoint' }));
+		expect(result.status).toBe('error');
+		expect(result.error).toContain('mutation command');
+		expect(result.output).toBeUndefined();
+	});
+
+	it('can dispatch mutation commands only when explicitly allowed', async () => {
+		const handler: ToolHandler = async () => ({
+			status: 'success',
+			output: { mutated: true },
+		});
+		registerTool(
+			{
+				id: 'authorDraft.reject_checkpoint',
+				description: 'Rejects checkpoint.',
+				capability: 'mutation_command',
+				inputSchema: {},
+			},
+			handler,
+		);
+
+		const result = await dispatchTool(
+			baseInvocation({ toolId: 'authorDraft.reject_checkpoint' }),
+			{ allowMutationCommands: true },
+		);
+		expect(result.status).toBe('success');
+		expect(result.output).toEqual({ mutated: true });
+	});
+
 	it('reports a generic message when a handler throws a non-Error value', async () => {
 		const handler: ToolHandler = async () => {
 			throw 'string-thrown';
 		};
 		registerTool(
-			{ id: 'sample.tool', description: 'x', inputSchema: {} },
+			{ id: 'sample.tool', description: 'x', capability: 'read_only', inputSchema: {} },
 			handler,
 		);
 		const result = await dispatchTool(baseInvocation());

@@ -4,14 +4,13 @@
 
 ## Active Plans
 
-- No active plan. See [ACTIVE-PLAN.md](./ACTIVE-PLAN.md).
+- [plan-045-agent-tool-mutation-boundary](./plan-045-agent-tool-mutation-boundary/plan.md): Agent Tool Mutation Boundary — ensure model-callable Agent tools can read/generate review artifacts but cannot directly apply manuscript or canon mutations. Status: `review` (activated 2026-06-11; all four stages implemented, quality gates passed, pending Reviewer Agent sign-off).
 
 ## Deferred (not yet scheduled)
 
 - **Release engineering** — code signing, notarization, brand icons, formal smoke/keyring verification. Infrastructure exists; requires external procurement. Originally plan-024 stage-002.
 - [plan-043-outline-pipeline-consolidation](./plan-043-outline-pipeline-consolidation/plan.md): Outline Pipeline Consolidation — retire legacy direct outline apply behavior and make review-gated outline checkpoints the sole supported generation/materialization path. Status: `draft` (full plan tree scaffolded 2026-06-09).
 - [plan-044-nova-active-context-routing](./plan-044-nova-active-context-routing/plan.md): Nova Active Context Routing — resolve Nova project/scene/chapter context from normal route/page state instead of query params only. Status: `draft` (full plan tree scaffolded 2026-06-09).
-- [plan-045-agent-tool-mutation-boundary](./plan-045-agent-tool-mutation-boundary/plan.md): Agent Tool Mutation Boundary — ensure model-callable Agent tools can read/generate review artifacts but cannot directly apply manuscript or canon mutations. Status: `draft` (full plan tree scaffolded 2026-06-09).
 - [plan-046-pipeline-checkpoint-contract-reconciliation](./plan-046-pipeline-checkpoint-contract-reconciliation/plan.md): Pipeline Checkpoint Contract Reconciliation — align checkpoint routes, schemas, tests, and docs around canonical pipeline contracts. Status: `draft` (full plan tree scaffolded 2026-06-09).
 - [plan-047-worldbuilding-canon-merge-diff](./plan-047-worldbuilding-canon-merge-diff/plan.md): Worldbuilding Canon Merge Diff — upgrade worldbuilding proposal acceptance from insert-only projection to reviewable canon diff/merge behavior. Status: `draft` (full plan tree scaffolded 2026-06-09).
 - [plan-048-frontend-experience-coherence](./plan-048-frontend-experience-coherence/plan.md): Frontend Experience Coherence — final frontend pass to make route context, navigation, author workflows, review gates, and visual states read as one production app. Status: `draft` (full plan tree scaffolded 2026-06-09).

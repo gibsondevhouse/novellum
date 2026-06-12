@@ -36,11 +36,25 @@ function buildPopulatedBibleArtifact(taskKey = PIPELINE_TASK_KEY) {
 	return {
 		id: randomUUID(),
 		taskKey,
-		family: 'vibe-worldbuild',
+		pipeline: 'vibe-worldbuild',
 		stage: 'populated-world-bible',
+		model: null,
 		parserVersion: '1.0.0',
 		producedAt: new Date().toISOString(),
 		lifecycle: 'draft',
+		hierarchy: {
+			order: ['arcs', 'acts', 'milestones', 'chapters', 'scenes', 'beats', 'stages'],
+			references: {
+				arcs: [],
+				acts: [],
+				milestones: [],
+				chapters: [],
+				scenes: [],
+				beats: [],
+				stages: ['stage-worldbuild-e2e'],
+			},
+			stageStatusById: {},
+		},
 		payload: {
 			canonical: {
 				characters: [{ name: 'Vesper Ardent' }],
@@ -126,6 +140,7 @@ function buildPopulatedBibleArtifact(taskKey = PIPELINE_TASK_KEY) {
 				],
 			},
 		},
+		notes: [],
 	};
 }
 

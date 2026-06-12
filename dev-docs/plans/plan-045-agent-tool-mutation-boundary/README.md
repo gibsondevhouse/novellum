@@ -4,9 +4,9 @@ Separate model-callable tools from UI-issued manuscript and canon mutation comma
 
 ## Status
 
-- Plan status: `draft`
-- Tracker status: not activated
-- Scope: full draft plan tree scaffolded for future execution
+- Plan status: `review`
+- Tracker status: activated 2026-06-11
+- Scope: implementation complete through Stage 004; pending Reviewer Agent sign-off
 
 ## Execution Notes
 
@@ -15,6 +15,12 @@ Separate model-callable tools from UI-issued manuscript and canon mutation comma
 3. Follow each part checklist before editing source files.
 4. Add dated evidence under the part's `evidence/` directory before moving a part to review.
 5. Do not mark reviewer sign-off complete without a real review.
+
+## Review Handoff
+
+- All stages are `review`.
+- Quality gates passed: `pnpm check`, `pnpm lint`, `pnpm lint:css`, `pnpm test`, `pnpm check:tokens`, and targeted Playwright review-gate coverage.
+- Reviewer must verify the mutation boundary before this plan can be marked `complete`.
 
 ## Canonical Quality Gates
 

@@ -2,7 +2,7 @@
 title: Command Boundary Design
 slug: phase-001-command-boundary-design
 phase_number: 1
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-003-ui-issued-mutation-commands
 parts:
@@ -18,13 +18,13 @@ Design the UI-issued command boundary for checkpoint and proposal mutations.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Command Boundary Design](part-001-command-boundary-design/part.md) | `draft` | — | TBD |
+| 001 | [Command Boundary Design](part-001-command-boundary-design/part.md) | `review` | — | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Mutation command ownership is explicit by pipeline family.
-- [ ] UI buttons remain the accept/reject source of truth.
-- [ ] Server-side stale guards remain in place.
+- [x] Mutation command ownership is explicit by pipeline family.
+- [x] UI buttons remain the accept/reject source of truth.
+- [x] Server-side stale guards remain in place.
 
 ## Notes
 

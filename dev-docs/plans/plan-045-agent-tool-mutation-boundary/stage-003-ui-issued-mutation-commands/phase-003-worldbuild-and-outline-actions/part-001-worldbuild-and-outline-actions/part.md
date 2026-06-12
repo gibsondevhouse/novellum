@@ -2,12 +2,12 @@
 title: Worldbuild & Outline Actions
 slug: part-001-worldbuild-and-outline-actions
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: —
 phase: phase-003-worldbuild-and-outline-actions
-started_at: ~
-completed_at: ~
+started_at: 2026-06-11
+completed_at: 2026-06-11
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Ensure canon and outline mutations are invoked by review UI or trusted app comma
 
 **Create:**
 
-- `evidence/worldbuild-and-outline-actions-evidence-2026-06-09.md`
+- `evidence/worldbuild-and-outline-actions-evidence-2026-06-11.md`
 
 **Update:**
 
@@ -60,9 +60,9 @@ Ensure canon and outline mutations are invoked by review UI or trusted app comma
 
 ## Acceptance Criteria
 
-- [ ] Canon and outline mutations are excluded from model-callable tool advertisement.
-- [ ] Review UI actions still work.
-- [ ] Docs identify allowed mutation callers.
+- [x] Canon and outline mutations are excluded from model-callable tool advertisement.
+- [x] Review UI actions still work.
+- [x] Docs identify allowed mutation callers.
 
 ## Edge Cases
 

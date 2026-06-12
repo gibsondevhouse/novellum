@@ -2,7 +2,7 @@
 title: UI-Issued Mutation Commands
 slug: stage-003-ui-issued-mutation-commands
 stage_number: 3
-status: draft
+status: review
 owner: Planner Agent
 plan: plan-045-agent-tool-mutation-boundary
 phases:
@@ -21,9 +21,9 @@ Keep accept/reject/apply functionality available to authors through explicit UI 
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Command Boundary Design](phase-001-command-boundary-design/phase.md) | `draft` | TBD |
-| 002 | [Author Draft Actions](phase-002-author-draft-actions/phase.md) | `draft` | TBD |
-| 003 | [Worldbuild & Outline Actions](phase-003-worldbuild-and-outline-actions/phase.md) | `draft` | TBD |
+| 001 | [Command Boundary Design](phase-001-command-boundary-design/phase.md) | `review` | TBD |
+| 002 | [Author Draft Actions](phase-002-author-draft-actions/phase.md) | `review` | TBD |
+| 003 | [Worldbuild & Outline Actions](phase-003-worldbuild-and-outline-actions/phase.md) | `review` | TBD |
 
 ## Entry Criteria
 
@@ -32,11 +32,10 @@ Keep accept/reject/apply functionality available to authors through explicit UI 
 
 ## Exit Criteria
 
-- UI review cards can still accept and reject checkpoints/proposals.
-- Model-callable Agent mode can surface review artifacts without applying them.
-- Author intent is explicit at every manuscript or canon mutation boundary.
+- [x] UI review cards can still accept and reject checkpoints/proposals.
+- [x] Model-callable Agent mode can surface review artifacts without applying them.
+- [x] Author intent is explicit at every manuscript or canon mutation boundary.
 
 ## Notes
 
 Do not remove server-side stale guards or atomic transactions. This stage changes who can invoke mutation actions, not the safety checks themselves.
-

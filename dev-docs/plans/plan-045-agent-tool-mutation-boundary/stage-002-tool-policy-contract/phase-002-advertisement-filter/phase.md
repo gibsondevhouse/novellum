@@ -2,7 +2,7 @@
 title: Advertisement Filter
 slug: phase-002-advertisement-filter
 phase_number: 2
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-002-tool-policy-contract
 parts:
@@ -18,13 +18,13 @@ Filter model-advertised tools to exclude mutation capabilities.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Advertisement Filter](part-001-advertisement-filter/part.md) | `draft` | — | TBD |
+| 001 | [Advertisement Filter](part-001-advertisement-filter/part.md) | `review` | — | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Mutation tools are not advertised to the model.
-- [ ] Read and review-artifact generation tools remain advertised.
-- [ ] Tests assert excluded IDs by name.
+- [x] Mutation tools are not advertised to the model.
+- [x] Read and review-artifact generation tools remain advertised.
+- [x] Tests assert excluded IDs by name.
 
 ## Notes
 

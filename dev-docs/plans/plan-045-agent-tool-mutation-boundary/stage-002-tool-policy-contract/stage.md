@@ -2,7 +2,7 @@
 title: Tool Policy Contract
 slug: stage-002-tool-policy-contract
 stage_number: 2
-status: draft
+status: review
 owner: Planner Agent
 plan: plan-045-agent-tool-mutation-boundary
 phases:
@@ -21,9 +21,9 @@ Define and enforce the policy that model-callable tools cannot directly apply ma
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Capability Schema](phase-001-capability-schema/phase.md) | `draft` | TBD |
-| 002 | [Advertisement Filter](phase-002-advertisement-filter/phase.md) | `draft` | TBD |
-| 003 | [Source Contract Tests](phase-003-source-contract-tests/phase.md) | `draft` | TBD |
+| 001 | [Capability Schema](phase-001-capability-schema/phase.md) | `review` | TBD |
+| 002 | [Advertisement Filter](phase-002-advertisement-filter/phase.md) | `review` | TBD |
+| 003 | [Source Contract Tests](phase-003-source-contract-tests/phase.md) | `review` | TBD |
 
 ## Entry Criteria
 
@@ -32,11 +32,10 @@ Define and enforce the policy that model-callable tools cannot directly apply ma
 
 ## Exit Criteria
 
-- Tool definitions expose enough metadata to enforce read/generate/mutate boundaries.
-- Tool advertisement excludes mutation tools from model-callable surfaces.
-- Tests fail if a model-callable tool imports or invokes mutation APIs directly.
+- [x] Tool definitions expose enough metadata to enforce read/generate/mutate boundaries.
+- [x] Tool advertisement excludes mutation tools from model-callable surfaces.
+- [x] Tests fail if a model-callable tool imports or invokes mutation APIs directly.
 
 ## Notes
 
 The policy should be mechanical enough that future tool registrations cannot accidentally bypass it.
-

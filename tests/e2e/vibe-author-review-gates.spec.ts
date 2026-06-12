@@ -1,26 +1,40 @@
 import { test, expect, type APIRequestContext } from '@playwright/test';
-import { randomUUID } from 'node:crypto';
+import Database from 'better-sqlite3';
+import { createHash, randomUUID } from 'node:crypto';
+import { homedir, platform } from 'node:os';
+import { join } from 'node:path';
 
 /**
- * End-to-end coverage for the vibe-author review-gate flow shipped in
- * plan-027-v1.1-scoping / stage-003 / phase-003.
+ * End-to-end coverage for the current author-draft review-gate flow.
  *
- * The cards rendered by part-002 (`NovaSceneDraftCard`,
- * `NovaRevisionPackCard`) MUST NOT mutate manuscript content — Accept
- * surfaces an envelope to the future editor accept-pipeline, Reject is
- * local-only, and Copy uses the clipboard. This spec mirrors
- * `vibe-worldbuild-checkpoints.spec.ts` and exercises the shared
- * `/api/db/project-metadata/{projectId}/pipeline/{ownerId}/{key}`
- * lifecycle for both author task keys, then asserts that neither
- * `chapters` nor `scenes` were touched as a side effect.
+ * Agent mode may create review artifacts, but manuscript mutation happens
+ * through the trusted author-draft accept route. This spec seeds canonical
+ * review checkpoints, then verifies explicit accept applies prose while
+ * explicit reject leaves the target scene untouched.
  *
  * Prerequisites:
  *   - Preview server running at http://localhost:4173 (Playwright launches it).
  */
 
-const OWNER_ID = 'vibe-author';
-const SCENE_DRAFT_KEY = 'vibe-author.scene-draft';
-const REVISION_PACK_KEY = 'vibe-author.revision-pack';
+const AUTHOR_DRAFT_OWNER_ID = 'authorDraftCheckpoints.v1';
+const AUTHOR_DRAFT_TASK_KEY = 'vibe-author.scene-draft';
+const AUTHOR_DRAFT_ARTIFACT_TYPE = 'vibe-author.scene-draft';
+const AUTHOR_DRAFT_ARTIFACT_VERSION = 1;
+
+function resolvePreviewDatabasePath(): string {
+	if (process.env.NOVELLUM_DB_PATH) return process.env.NOVELLUM_DB_PATH;
+	if (process.env.NOVELLUM_APP_DATA_DIR) {
+		return join(process.env.NOVELLUM_APP_DATA_DIR, 'novellum.db');
+	}
+	const home = homedir();
+	if (platform() === 'darwin') {
+		return join(home, 'Library', 'Application Support', 'Novellum', 'novellum.db');
+	}
+	if (platform() === 'win32') {
+		return join(process.env.APPDATA ?? join(home, 'AppData', 'Roaming'), 'Novellum', 'novellum.db');
+	}
+	return join(process.env.XDG_DATA_HOME ?? join(home, '.local', 'share'), 'Novellum', 'novellum.db');
+}
 
 async function createProject(request: APIRequestContext, title: string): Promise<string> {
 	const response = await request.post('/api/db/projects', { data: { title } });
@@ -34,192 +48,213 @@ async function deleteProject(request: APIRequestContext, projectId: string): Pro
 	expect(response.ok()).toBe(true);
 }
 
-function buildSceneDraftArtifact() {
-	return {
-		id: randomUUID(),
-		taskKey: SCENE_DRAFT_KEY,
-		family: 'vibe-author' as const,
-		stage: 'scene-draft',
-		parserVersion: '1.0.0',
-		producedAt: new Date().toISOString(),
-		lifecycle: 'draft' as const,
-		payload: {
-			prose:
-				'The lantern guttered once before Vesper steadied the wick. She would not let it die tonight.',
-			sidecar: {
-				sceneId: 'scene-001',
-				chapterId: 'chapter-001',
-				povCharacterId: 'character-vesper',
-				wordCount: 18,
-				usedCanonRefs: {
-					characterIds: ['character-vesper'],
-					locationIds: ['location-bell-tower'],
-					factionIds: [],
-					loreEntryIds: [],
-				},
-				uncertainties: ['Confirm whether the bell tower is half-flooded in this scene.'],
-				continuityRisks: [],
-			},
-		},
-	};
+async function createChapter(request: APIRequestContext, projectId: string, title: string): Promise<string> {
+	const response = await request.post('/api/db/chapters', {
+		data: { projectId, title, order: 0 },
+	});
+	expect(response.ok()).toBe(true);
+	const payload = (await response.json()) as { id: string };
+	return payload.id;
 }
 
-function buildRevisionPackArtifact() {
-	return {
-		id: randomUUID(),
-		taskKey: REVISION_PACK_KEY,
-		family: 'vibe-author' as const,
-		stage: 'revision-pack',
-		parserVersion: '1.0.0',
-		producedAt: new Date().toISOString(),
-		lifecycle: 'draft' as const,
-		payload: {
-			summary: 'Two continuity nudges and one pacing tweak.',
-			issues: [
-				{
-					id: 'issue-low-001',
-					severity: 'low',
-					kind: 'style',
-					location: 'chapter-001/scene-001',
-					description: 'Repeated adverb in opening paragraph.',
-					recommendation: 'Tighten the second sentence.',
-				},
-				{
-					id: 'issue-crit-001',
-					severity: 'critical',
-					kind: 'continuity',
-					location: 'chapter-001/scene-001',
-					description: 'Lantern was already extinguished two scenes prior.',
-					recommendation: 'Reconcile the lantern timeline before publishing.',
-				},
-				{
-					id: 'issue-high-001',
-					severity: 'high',
-					kind: 'character',
-					location: 'chapter-001/scene-001',
-					description: 'POV character knows information not yet introduced.',
-					recommendation: 'Move the reveal earlier or recast the POV.',
-				},
-			],
-		},
-	};
+async function createScene(
+	request: APIRequestContext,
+	projectId: string,
+	chapterId: string,
+	title: string,
+	content = '',
+): Promise<string> {
+	const response = await request.post('/api/db/scenes', {
+		data: { projectId, chapterId, title, order: 0, content },
+	});
+	expect(response.ok()).toBe(true);
+	const payload = (await response.json()) as { id: string };
+	return payload.id;
 }
 
-interface CheckpointEnvelope {
-	ok: boolean;
+interface SceneRecord {
+	id: string;
+	content: string;
+}
+
+interface AuthorDraftCheckpointEnvelope {
 	checkpoint: {
 		id: string;
-		lifecycle: 'draft' | 'review' | 'accepted' | 'rejected';
+		sceneId: string;
+		lifecycle: 'review' | 'accepted' | 'rejected';
 	};
 }
 
-async function putCheckpoint(
-	request: APIRequestContext,
-	projectId: string,
-	key: string,
-	checkpointId: string,
-	body: Record<string, unknown>,
-): Promise<CheckpointEnvelope> {
-	const url = `/api/db/project-metadata/${projectId}/pipeline/${OWNER_ID}/${key}/${checkpointId}`;
-	const response = await request.put(url, { data: body });
-	expect(response.ok(), `PUT ${url} failed: ${response.status()}`).toBe(true);
-	return (await response.json()) as CheckpointEnvelope;
+function sha256Hex(value: string): string {
+	return createHash('sha256').update(value, 'utf8').digest('hex');
 }
 
-async function fetchScenes(
+function wordCount(text: string): number {
+	const trimmed = text.trim();
+	if (!trimmed) return 0;
+	return trimmed.split(/\s+/).filter(Boolean).length;
+}
+
+function seedAuthorDraftCheckpoint(input: {
+	projectId: string;
+	sceneId: string;
+	prose: string;
+}): { id: string; lifecycle: 'review' } {
+	const database = new Database(resolvePreviewDatabasePath(), { timeout: 5000 });
+	try {
+		database.pragma('foreign_keys = ON');
+		const scene = database
+			.prepare('SELECT id, projectId, chapterId, title, content, updatedAt FROM scenes WHERE id = ?')
+			.get(input.sceneId) as
+			| {
+					id: string;
+					projectId: string;
+					chapterId: string;
+					title: string;
+					content: string;
+					updatedAt: string;
+			  }
+			| undefined;
+
+		if (!scene) {
+			throw new Error(`Scene ${input.sceneId} was not found for author-draft checkpoint seed.`);
+		}
+		expect(scene.projectId).toBe(input.projectId);
+
+		const now = new Date().toISOString();
+		const checkpointId = randomUUID();
+		const count = wordCount(input.prose);
+		const record = {
+			id: checkpointId,
+			projectId: input.projectId,
+			taskKey: AUTHOR_DRAFT_TASK_KEY,
+			sceneId: input.sceneId,
+			chapterId: scene.chapterId,
+			artifactEnvelope: {
+				type: AUTHOR_DRAFT_ARTIFACT_TYPE,
+				version: AUTHOR_DRAFT_ARTIFACT_VERSION,
+				projectId: input.projectId,
+				chapterId: scene.chapterId,
+				sceneId: input.sceneId,
+				title: scene.title,
+				prose: input.prose,
+				wordCount: count,
+				sidecar: {
+					sceneId: input.sceneId,
+					chapterId: scene.chapterId,
+					povCharacterId: null,
+					wordCount: count,
+					usedCanonRefs: [],
+					uncertainties: [],
+					continuityRisks: [],
+				},
+			},
+			lifecycle: 'review',
+			createdAt: now,
+			updatedAt: now,
+			baseSceneUpdatedAt: scene.updatedAt,
+			baseSceneContentHash: sha256Hex(scene.content ?? ''),
+		};
+
+		database
+			.prepare(
+				`INSERT INTO project_metadata (projectId, scope, ownerId, key, value, updatedAt)
+				 VALUES (@projectId, 'pipeline', @ownerId, @key, @value, @updatedAt)`,
+			)
+			.run({
+				projectId: input.projectId,
+				ownerId: AUTHOR_DRAFT_OWNER_ID,
+				key: checkpointId,
+				value: JSON.stringify(record),
+				updatedAt: now,
+			});
+		return { id: checkpointId, lifecycle: 'review' };
+	} finally {
+		database.close();
+	}
+}
+
+async function acceptCheckpoint(
 	request: APIRequestContext,
 	projectId: string,
-): Promise<unknown[]> {
+	sceneId: string,
+	checkpointId: string,
+): Promise<AuthorDraftCheckpointEnvelope> {
+	const response = await request.post(`/api/author-draft/checkpoints/${checkpointId}/accept`, {
+		data: { projectId, sceneId },
+	});
+	expect(response.ok(), `accept checkpoint failed: ${response.status()}`).toBe(true);
+	return (await response.json()) as AuthorDraftCheckpointEnvelope;
+}
+
+async function rejectCheckpoint(
+	request: APIRequestContext,
+	projectId: string,
+	checkpointId: string,
+	reason: string,
+): Promise<AuthorDraftCheckpointEnvelope> {
+	const response = await request.post(`/api/author-draft/checkpoints/${checkpointId}/reject`, {
+		data: { projectId, reason },
+	});
+	expect(response.ok(), `reject checkpoint failed: ${response.status()}`).toBe(true);
+	return (await response.json()) as AuthorDraftCheckpointEnvelope;
+}
+
+async function fetchScene(request: APIRequestContext, projectId: string, sceneId: string): Promise<SceneRecord> {
 	const response = await request.get(`/api/db/scenes?projectId=${projectId}`);
 	expect(response.ok()).toBe(true);
-	return (await response.json()) as unknown[];
-}
-
-async function fetchChapters(
-	request: APIRequestContext,
-	projectId: string,
-): Promise<unknown[]> {
-	const response = await request.get(`/api/db/chapters?projectId=${projectId}`);
-	expect(response.ok()).toBe(true);
-	return (await response.json()) as unknown[];
+	const scenes = (await response.json()) as SceneRecord[];
+	const scene = scenes.find((row) => row.id === sceneId);
+	expect(scene).toBeDefined();
+	return scene as SceneRecord;
 }
 
 test.describe('vibe-author review-gate flow', () => {
-	test('drafts, reviews, accepts and rejects scene-draft + revision-pack envelopes without mutating manuscript content', async ({
+	test('generates, explicitly accepts, and rejects scene-draft checkpoints through trusted routes', async ({
 		request,
 	}) => {
 		const projectId = await createProject(request, `E2E Author Review ${Date.now()}`);
 		try {
-			// Baseline: manuscript is empty for a freshly created project.
-			const scenesBefore = await fetchScenes(request, projectId);
-			const chaptersBefore = await fetchChapters(request, projectId);
-			expect(scenesBefore).toEqual([]);
-			expect(chaptersBefore).toEqual([]);
+			const chapterId = await createChapter(request, projectId, 'Chapter One');
+			const acceptSceneId = await createScene(request, projectId, chapterId, 'Accept Scene');
+			const rejectSceneId = await createScene(request, projectId, chapterId, 'Reject Scene');
 
-			// ── scene-draft: draft → review → accept ────────────────────
-			const sceneDraft = buildSceneDraftArtifact();
-			const sceneCheckpointId = sceneDraft.id;
+			const draft = seedAuthorDraftCheckpoint({
+				projectId,
+				sceneId: acceptSceneId,
+				prose: `Drafted prose for accepted scene ${acceptSceneId}.`,
+			});
+			expect(draft.lifecycle).toBe('review');
+			expect(await fetchScene(request, projectId, acceptSceneId)).toMatchObject({ content: '' });
 
-			const draftedScene = await putCheckpoint(
+			const acceptedScene = await acceptCheckpoint(
 				request,
 				projectId,
-				SCENE_DRAFT_KEY,
-				sceneCheckpointId,
-				{ operation: 'upsert', value: { artifact: sceneDraft, version: '1.0.0' } },
-			);
-			expect(draftedScene.checkpoint.lifecycle).toBe('draft');
-
-			const reviewedScene = await putCheckpoint(
-				request,
-				projectId,
-				SCENE_DRAFT_KEY,
-				sceneCheckpointId,
-				{ operation: 'review', reviewer: 'author-qa' },
-			);
-			expect(reviewedScene.checkpoint.lifecycle).toBe('review');
-
-			const acceptedScene = await putCheckpoint(
-				request,
-				projectId,
-				SCENE_DRAFT_KEY,
-				sceneCheckpointId,
-				{ operation: 'accept', acceptedBy: 'author-qa' },
+				acceptSceneId,
+				draft.id,
 			);
 			expect(acceptedScene.checkpoint.lifecycle).toBe('accepted');
+			const acceptedTarget = await fetchScene(request, projectId, acceptSceneId);
+			expect(acceptedTarget.content).toContain(`Drafted prose for accepted scene ${acceptSceneId}.`);
 
-			// Guardrail: accept must NOT auto-write into the manuscript.
-			expect(await fetchScenes(request, projectId)).toEqual([]);
-			expect(await fetchChapters(request, projectId)).toEqual([]);
+			const rejectDraft = seedAuthorDraftCheckpoint({
+				projectId,
+				sceneId: rejectSceneId,
+				prose: `Drafted prose for rejected scene ${rejectSceneId}.`,
+			});
+			expect(rejectDraft.lifecycle).toBe('review');
+			const rejectedSceneBefore = await fetchScene(request, projectId, rejectSceneId);
 
-			// ── revision-pack: draft → reject ───────────────────────────
-			const revisionPack = buildRevisionPackArtifact();
-			const revisionCheckpointId = revisionPack.id;
-
-			const draftedRevision = await putCheckpoint(
+			const rejectedRevision = await rejectCheckpoint(
 				request,
 				projectId,
-				REVISION_PACK_KEY,
-				revisionCheckpointId,
-				{ operation: 'upsert', value: { artifact: revisionPack, version: '1.0.0' } },
-			);
-			expect(draftedRevision.checkpoint.lifecycle).toBe('draft');
-
-			const rejectedRevision = await putCheckpoint(
-				request,
-				projectId,
-				REVISION_PACK_KEY,
-				revisionCheckpointId,
-				{
-					operation: 'reject',
-					rejectedBy: 'author-qa',
-					reason: 'Issue prioritisation needs another pass.',
-				},
+				rejectDraft.id,
+				'Scene draft needs another pass.',
 			);
 			expect(rejectedRevision.checkpoint.lifecycle).toBe('rejected');
-
-			// Reject must also leave the manuscript pristine.
-			expect(await fetchScenes(request, projectId)).toEqual([]);
-			expect(await fetchChapters(request, projectId)).toEqual([]);
+			expect(await fetchScene(request, projectId, rejectSceneId)).toMatchObject({
+				content: rejectedSceneBefore.content,
+			});
 		} finally {
 			await deleteProject(request, projectId);
 		}

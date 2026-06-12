@@ -22,7 +22,7 @@ import { sceneIntent } from '$lib/stores/scene-intent.svelte.js';
 import { novaSession } from '../stores/nova-session.svelte.js';
 import { buildRagContext } from './context-hooks.js';
 import { isNovaAgenticEnabled } from './feature-flags.js';
-import { listTools } from './tool-registry.js';
+import { listModelCallableTools } from './tool-registry.js';
 import { runAuthorPipelineTask } from './author-pipeline-runner.js';
 import { runAgentLoop } from './agent-loop.js';
 import { validateAttachment } from '../utils/attachment-validator.js';
@@ -302,7 +302,7 @@ export async function sendNovaChat(input: SendChatInput): Promise<void> {
 	// The streaming loop does not yet parse tool_use blocks — enabling
 	// this flag is intentionally experimental until the parse loop lands.
 	if (isNovaAgenticEnabled()) {
-		payload.tools = listTools();
+		payload.tools = listModelCallableTools();
 	}
 
 	const client = new OpenRouterClient();

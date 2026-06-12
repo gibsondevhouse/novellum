@@ -86,10 +86,17 @@ export type NovaArtifact =
 
 /* ── Tool-call interfaces (stage-006 wires real dispatch) ───────────── */
 
+export type ToolCapability =
+	| 'read_only'
+	| 'review_artifact_generation'
+	| 'mutation_command';
+
 export interface ToolDefinition {
 	/** Stable identifier, e.g. `editor.insertText`. */
 	id: string;
 	description: string;
+	/** Capability class used to decide whether the model may call this tool. */
+	capability: ToolCapability;
 	/** JSONSchema-shaped; typed as `unknown` until stage-006. */
 	inputSchema: unknown;
 }

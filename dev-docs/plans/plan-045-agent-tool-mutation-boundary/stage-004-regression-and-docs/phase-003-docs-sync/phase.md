@@ -2,7 +2,7 @@
 title: Docs Sync
 slug: phase-003-docs-sync
 phase_number: 3
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-004-regression-and-docs
 parts:
@@ -18,13 +18,13 @@ Document Agent mode capability boundaries for users and developers.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Docs Sync](part-001-docs-sync/part.md) | `draft` | — | TBD |
+| 001 | [Docs Sync](part-001-docs-sync/part.md) | `review` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Docs no longer imply the model can silently apply manuscript/canon changes.
-- [ ] Mutation boundary policy is clear for future tools.
-- [ ] Verification evidence is recorded.
+- [x] Docs no longer imply the model can silently apply manuscript/canon changes.
+- [x] Mutation boundary policy is clear for future tools.
+- [x] Verification evidence is recorded.
 
 ## Notes
 

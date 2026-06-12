@@ -18,11 +18,9 @@
 import { registerTool } from './tool-registry.js';
 import type { ToolInvocation } from '../types.js';
 import {
-	acceptSceneDraftCheckpoint,
 	generateSceneDraftCheckpoint,
 	getSceneDraftContext,
 	listAuthorDraftCheckpoints,
-	rejectSceneDraftCheckpoint,
 } from './author-draft-api.js';
 
 // --------------------------------------------------------------------------
@@ -39,6 +37,7 @@ registerTool(
 	{
 		id: 'project.get_summary',
 		description: 'Get the project title, genre, logline, and synopsis. Use this first to understand what the project is about.',
+		capability: 'read_only',
 		inputSchema: {
 			type: 'object',
 			properties: {
@@ -81,6 +80,7 @@ registerTool(
 	{
 		id: 'project.list_scenes',
 		description: 'List all scenes in the project with their titles, summaries, and chapter grouping. Use to understand the current scene structure.',
+		capability: 'read_only',
 		inputSchema: {
 			type: 'object',
 			properties: {
@@ -122,6 +122,7 @@ registerTool(
 	{
 		id: 'project.list_characters',
 		description: 'List all characters in the project with their names and summaries.',
+		capability: 'read_only',
 		inputSchema: {
 			type: 'object',
 			properties: {
@@ -159,6 +160,7 @@ registerTool(
 	{
 		id: 'project.list_locations',
 		description: 'List all locations in the project with their names and summaries.',
+		capability: 'read_only',
 		inputSchema: {
 			type: 'object',
 			properties: {
@@ -196,6 +198,7 @@ registerTool(
 	{
 		id: 'project.get_scene',
 		description: 'Get the full content and details of a specific scene by its ID.',
+		capability: 'read_only',
 		inputSchema: {
 			type: 'object',
 			properties: {
@@ -283,6 +286,7 @@ registerTool(
 		description:
 			'Generate a structured outline proposal for the project. Returns a detailed chapter and scene breakdown. ' +
 			'The proposal is NOT automatically applied — it requires explicit author acceptance.',
+		capability: 'review_artifact_generation',
 		inputSchema: {
 			type: 'object',
 			properties: {
@@ -323,6 +327,7 @@ registerTool(
 		description:
 			'Generate a scene draft proposal. Returns prose for a specific scene. ' +
 			'The draft is NOT automatically applied — it requires explicit author acceptance.',
+		capability: 'review_artifact_generation',
 		inputSchema: {
 			type: 'object',
 			properties: {
@@ -367,13 +372,14 @@ export function registerAgentTools(): void {
 }
 
 // --------------------------------------------------------------------------
-// Plan-038 — Author Draft Engine tools (app-defined actions)
+// Plan-038 — Author Draft Engine model-callable tools
 // --------------------------------------------------------------------------
 
 registerTool(
 	{
 		id: 'authorDraft.get_scene_draft_context',
 		description: 'Fetch the scene draft context (project/chapter/scene intent + continuity hints) used for scene drafting.',
+		capability: 'read_only',
 		inputSchema: {
 			type: 'object',
 			properties: {
@@ -399,6 +405,7 @@ registerTool(
 		id: 'authorDraft.generate_scene_draft_checkpoint',
 		description:
 			'Generate a persisted scene-draft checkpoint for a scene. This stores a review artifact only; it does not apply content to the manuscript.',
+		capability: 'review_artifact_generation',
 		inputSchema: {
 			type: 'object',
 			properties: {
@@ -430,6 +437,7 @@ registerTool(
 	{
 		id: 'authorDraft.list_checkpoints',
 		description: 'List author-draft checkpoints for a project (optionally filtered by chapter/scene/lifecycle).',
+		capability: 'read_only',
 		inputSchema: {
 			type: 'object',
 			properties: {
@@ -457,69 +465,6 @@ registerTool(
 			return { status: 'success', output: { count: checkpoints.length, checkpoints } };
 		} catch (err) {
 			return { status: 'error', error: err instanceof Error ? err.message : 'Failed to list checkpoints.' };
-		}
-	},
-);
-
-registerTool(
-	{
-		id: 'authorDraft.accept_checkpoint',
-		description:
-			'Accept a checkpoint and apply its prose to the target scene. This updates scenes.content only after validation gates pass.',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				projectId: { type: 'string', description: 'The project ID.' },
-				checkpointId: { type: 'string', description: 'The checkpoint ID.' },
-				sceneId: { type: 'string', description: 'The scene ID to apply into.' },
-				forceOverwrite: { type: 'boolean', description: 'If true, override stale-target protection.' },
-			},
-			required: ['projectId', 'checkpointId', 'sceneId'],
-		},
-	},
-	async (invocation: ToolInvocation) => {
-		const { projectId, checkpointId, sceneId, forceOverwrite } = invocation.input as {
-			projectId: string;
-			checkpointId: string;
-			sceneId: string;
-			forceOverwrite?: boolean;
-		};
-		try {
-			const result = await acceptSceneDraftCheckpoint(projectId, checkpointId, sceneId, {
-				forceOverwrite: forceOverwrite === true,
-			});
-			return { status: 'success', output: result.checkpoint };
-		} catch (err) {
-			return { status: 'error', error: err instanceof Error ? err.message : 'Accept failed.' };
-		}
-	},
-);
-
-registerTool(
-	{
-		id: 'authorDraft.reject_checkpoint',
-		description: 'Reject a checkpoint with a reason. The checkpoint is retained for audit and review history.',
-		inputSchema: {
-			type: 'object',
-			properties: {
-				projectId: { type: 'string', description: 'The project ID.' },
-				checkpointId: { type: 'string', description: 'The checkpoint ID.' },
-				reason: { type: 'string', description: 'Why the draft was rejected.' },
-			},
-			required: ['projectId', 'checkpointId', 'reason'],
-		},
-	},
-	async (invocation: ToolInvocation) => {
-		const { projectId, checkpointId, reason } = invocation.input as {
-			projectId: string;
-			checkpointId: string;
-			reason: string;
-		};
-		try {
-			const result = await rejectSceneDraftCheckpoint(projectId, checkpointId, reason);
-			return { status: 'success', output: result.checkpoint };
-		} catch (err) {
-			return { status: 'error', error: err instanceof Error ? err.message : 'Reject failed.' };
 		}
 	},
 );

@@ -2,10 +2,10 @@
 title: Agent Tool Mutation Boundary
 slug: plan-045-agent-tool-mutation-boundary
 version: 1.0.0
-status: draft
+status: review
 owner: Planner Agent
 created: 2026-06-09
-last_updated: 2026-06-09
+last_updated: 2026-06-11
 target_completion: ~
 stages:
   - stage-001-tool-capability-audit
@@ -50,22 +50,22 @@ Agent mode may read context and create review artifacts, but accept/apply/reject
 
 | # | Stage | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Tool Capability Audit](stage-001-tool-capability-audit/stage.md) | `draft` | TBD |
-| 002 | [Tool Policy Contract](stage-002-tool-policy-contract/stage.md) | `draft` | TBD |
-| 003 | [UI-Issued Mutation Commands](stage-003-ui-issued-mutation-commands/stage.md) | `draft` | TBD |
-| 004 | [Regression & Docs](stage-004-regression-and-docs/stage.md) | `draft` | TBD |
+| 001 | [Tool Capability Audit](stage-001-tool-capability-audit/stage.md) | `review` | TBD |
+| 002 | [Tool Policy Contract](stage-002-tool-policy-contract/stage.md) | `review` | TBD |
+| 003 | [UI-Issued Mutation Commands](stage-003-ui-issued-mutation-commands/stage.md) | `review` | TBD |
+| 004 | [Regression & Docs](stage-004-regression-and-docs/stage.md) | `review` | TBD |
 
 ## Quality Gates
 
 All stages must pass the following gates before the plan is marked `complete`:
 
-- [ ] **lint** — zero lint errors
-- [ ] **lint:css** — zero CSS lint errors
-- [ ] **typecheck** — zero type errors and zero warnings
-- [ ] **tests** — Vitest suite passes
-- [ ] **e2e** — author draft review gates prove no model-callable path applies manuscript changes
-- [ ] **check:tokens** — zero token violations
-- [ ] **docs_sync** — Agent mode docs state the mutation boundary clearly
+- [x] **lint** — zero lint errors
+- [x] **lint:css** — zero CSS lint errors
+- [x] **typecheck** — zero type errors and zero warnings
+- [x] **tests** — Vitest suite passes
+- [x] **e2e** — author draft review gates prove no model-callable path applies manuscript changes
+- [x] **check:tokens** — zero token violations
+- [x] **docs_sync** — Agent mode docs state the mutation boundary clearly
 
 ## Risks & Mitigations
 
@@ -77,5 +77,4 @@ All stages must pass the following gates before the plan is marked `complete`:
 
 ## Notes
 
-The full draft plan tree has been scaffolded through stages, phases, parts, checklists, implementation logs, and evidence README files. Status remains `draft`; no implementation work has started and tracker files have not been changed.
-
+All four stages are implemented and ready for Reviewer Agent sign-off as of 2026-06-11. Do not mark the plan `complete` or advance `ACTIVE-PLAN.md` until a real reviewer accepts the plan.

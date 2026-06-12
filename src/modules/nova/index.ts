@@ -15,6 +15,8 @@ import { registerStubTools } from './services/stub-tools.js';
 import { novaSession } from './stores/nova-session.svelte.js';
 // plan-031 stage-004: import agent-tools to trigger tool registrations at module-load.
 import './services/agent-tools.js';
+// plan-045: mutation commands register separately and are never model-callable.
+import './services/agent-mutation-tools.js';
 
 registerStubTools();
 
@@ -90,10 +92,12 @@ export {
 export { dispatchTool } from './services/tool-router.js';
 export { runAgentLoop, MAX_AGENT_STEPS, type AgentLoopInput } from './services/agent-loop.js';
 export { registerAgentTools, type ProposalEnvelope } from './services/agent-tools.js';
+export { registerAgentMutationTools } from './services/agent-mutation-tools.js';
 export {
 	registerTool,
 	getTool,
 	listTools,
+	listModelCallableTools,
 } from './services/tool-registry.js';
 export { registerStubTools, STUB_TOOLS } from './services/stub-tools.js';
 export { classifyNovaError } from './utils/classify-nova-error.js';

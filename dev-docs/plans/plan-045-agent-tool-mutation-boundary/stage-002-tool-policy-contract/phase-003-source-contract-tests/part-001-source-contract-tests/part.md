@@ -2,12 +2,12 @@
 title: Source Contract Tests
 slug: part-001-source-contract-tests
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: —
 phase: phase-003-source-contract-tests
-started_at: ~
-completed_at: ~
+started_at: 2026-06-11
+completed_at: 2026-06-11
 estimated_duration: TBD
 ---
 
@@ -40,9 +40,15 @@ Make it mechanically hard to register model-callable tools that import or invoke
 **Create:**
 
 - `tests/nova/agent-tool-mutation-boundary.test.ts`
+- `src/modules/nova/services/agent-mutation-tools.ts`
+- `evidence/source-contract-tests-evidence-2026-06-11.md`
 
 **Update:**
 
+- `src/modules/nova/services/agent-tools.ts`
+- `src/modules/nova/services/tool-router.ts`
+- `src/modules/nova/index.ts`
+- `tests/nova/tool-router.test.ts`
 - `tests/nova/agent-source-contracts.test.ts`
 
 **Reference:**
@@ -57,9 +63,9 @@ Make it mechanically hard to register model-callable tools that import or invoke
 
 ## Acceptance Criteria
 
-- [ ] Tests fail if `authorDraft.accept_checkpoint` is model-callable.
-- [ ] Tests fail if a mutation tool omits mutation metadata.
-- [ ] Source-contract coverage is documented.
+- [x] Tests fail if `authorDraft.accept_checkpoint` is model-callable.
+- [x] Tests fail if a mutation tool omits mutation metadata.
+- [x] Source-contract coverage is documented.
 
 ## Edge Cases
 
