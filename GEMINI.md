@@ -99,7 +99,7 @@ Functionality is organized by **vertical domain slices** (e.g., `project`, `worl
 
 ## Current Focus (Active Plans)
 
-Active plan: **None**. Phase 2 implementation is closed out: Plan-046 and Plan-047 are both awaiting plan-level Reviewer evaluation.
+Active plan: **Plan-046 (Pipeline Reconciliation)**. Current focus: implementation is closed out with route/schema/test/docs reconciliation complete; plan-level Reviewer evaluation is next.
 
 ### Roadmap Execution Order (Draft Queue)
 
@@ -111,8 +111,8 @@ To ensure system stability and logical dependency management, execute pending pl
 
 2.  **Phase 2: Pipeline Standardization**
     - [x] **Plan-043 (Outline Consolidation)**: Retire legacy direct apply paths; make checkpoints the sole materialization path. (Closed 2026-06-12)
-    - [ ] **Plan-046 (Pipeline Reconciliation)**: Align schemas and routes across all generation pipelines. (Implementation closed out; reviewer pending)
-    - [ ] **Plan-047 (Worldbuilding Canon Merge Diff)**: Upgrade worldbuilding from "insert-only" to a full diff/merge flow. (Implementation closed out; reviewer pending)
+    - [x] **Plan-046 (Pipeline Reconciliation)**: Align schemas and routes across all generation pipelines. (Implementation closed out; reviewer pending)
+    - [ ] **Plan-047 (Worldbuilding Canon Merge Diff)**: Upgrade worldbuilding from "insert-only" to a full diff/merge flow.
 
 3.  **Phase 3: Infrastructure & Coherence**
     - [ ] **Plan-049 (Runtime Hardening)**: SQLite job queue, durable runs, token budgeting, and AI traces.
