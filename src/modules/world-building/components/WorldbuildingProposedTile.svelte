@@ -9,8 +9,8 @@
 
 	interface Props {
 		categoryId: WorldbuildingDomainId;
-		onAccept?: (proposalId: string) => void;
-		onReject?: (proposalId: string, reason: string) => void;
+		onAccept?: (proposalId: string, projectId: string) => void;
+		onReject?: (proposalId: string, reason: string, projectId: string) => void;
 	}
 
 	let { categoryId, onAccept, onReject }: Props = $props();

@@ -2,12 +2,12 @@
 title: Field Diff Review
 slug: part-001-field-diff-review
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-field-diff-review
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -58,9 +58,9 @@ Let authors inspect proposed creates, updates, merges, and links before acceptin
 
 ## Acceptance Criteria
 
-- [ ] Authors can see what will be created or changed.
-- [ ] Duplicate candidates are visible before acceptance.
-- [ ] UI tests cover create and update/merge displays.
+- [x] Authors can see what will be created or changed.
+- [x] Duplicate candidates are visible before acceptance.
+- [x] UI tests cover create and update/merge displays.
 
 ## Edge Cases
 

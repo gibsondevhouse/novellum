@@ -2,7 +2,7 @@
 title: Canon Projection Audit
 slug: stage-001-canon-projection-audit
 stage_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-047-worldbuilding-canon-merge-diff
 phases:
@@ -21,9 +21,9 @@ Map how worldbuilding proposals and checkpoints currently project into canon tab
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Current Write Map](phase-001-current-write-map/phase.md) | `draft` | TBD |
-| 002 | [Entity Field Coverage](phase-002-entity-field-coverage/phase.md) | `draft` | TBD |
-| 003 | [Duplicate & Relationship Gap Map](phase-003-duplicate-and-relationship-gap-map/phase.md) | `draft` | TBD |
+| 001 | [Current Write Map](phase-001-current-write-map/phase.md) | `complete` | TBD |
+| 002 | [Entity Field Coverage](phase-002-entity-field-coverage/phase.md) | `complete` | TBD |
+| 003 | [Duplicate & Relationship Gap Map](phase-003-duplicate-and-relationship-gap-map/phase.md) | `complete` | TBD |
 
 ## Entry Criteria
 
@@ -38,4 +38,3 @@ Map how worldbuilding proposals and checkpoints currently project into canon tab
 ## Notes
 
 Start with `applyProposalProjection`, `applyPopulatedBibleProjection`, worldbuilding scan dedupe, and proposal review UI.
-

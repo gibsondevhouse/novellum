@@ -2,7 +2,7 @@
 title: Diff Schema
 slug: phase-001-diff-schema
 phase_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-002-diff-and-merge-contract
 parts:
@@ -18,13 +18,13 @@ Define a typed canon diff schema for create, update, merge, link, and no-op prop
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Diff Schema](part-001-diff-schema/part.md) | `draft` | — | TBD |
+| 001 | [Diff Schema](part-001-diff-schema/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Diff schema validates all intended decision types.
-- [ ] Schema includes enough evidence for author review.
-- [ ] Malformed diffs fail safely.
+- [x] Diff schema validates all intended decision types.
+- [x] Schema includes enough evidence for author review.
+- [x] Malformed diffs fail safely.
 
 ## Notes
 

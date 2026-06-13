@@ -16,14 +16,13 @@ import { OpenRouterClient } from '$lib/ai/openrouter.js';
 import { buildPrompt } from '$lib/ai/prompt-builder.js';
 import { resolveTask } from '$lib/ai/task-resolver.js';
 import type { AiContext, AiTask, AIRequestPayload, UiContext } from '$lib/ai/types.js';
-import { PIPELINE_TASK_KEYS } from '$lib/ai/pipeline/task-catalog.js';
 import { getSelectedModel } from '$lib/stores/model-selection.svelte.js';
 import { sceneIntent } from '$lib/stores/scene-intent.svelte.js';
 import { novaSession } from '../stores/nova-session.svelte.js';
+import { outlineGenerationState } from '../stores/outline-generation-state.svelte.js';
 import { buildRagContext } from './context-hooks.js';
 import { isNovaAgenticEnabled } from './feature-flags.js';
 import { listModelCallableTools } from './tool-registry.js';
-import { runAuthorPipelineTask } from './author-pipeline-runner.js';
 import { runAgentLoop } from './agent-loop.js';
 import { validateAttachment } from '../utils/attachment-validator.js';
 import type { NovaAttachment, NovaMode, ToolDefinition } from '../types.js';
@@ -131,6 +130,35 @@ function formatMissingFieldsMessage(fields: string[]): string {
 	return `${fields.slice(0, -1).join(', ')}, and ${fields.at(-1) ?? ''}`;
 }
 
+function appendErrorMessage(message: string): void {
+	const errorMessage = novaSession.append({
+		role: 'nova',
+		content: '',
+		status: 'error',
+	});
+	novaSession.fail(errorMessage.id, message);
+}
+
+async function runOutlineCheckpointGeneration(projectId: string, instruction: string): Promise<void> {
+	const result = await outlineGenerationState.generate(projectId, instruction);
+	if (result.ok) {
+		novaSession.append({
+			role: 'nova',
+			status: 'complete',
+			content:
+				`Outline checkpoint ${result.checkpointId} is ready for review. ` +
+				'Use the outline review panel to accept or reject it.',
+			toolPayload: {
+				kind: 'outline-checkpoint-generation',
+				checkpointId: result.checkpointId,
+			},
+		});
+		return;
+	}
+
+	appendErrorMessage(result.error.message);
+}
+
 export async function sendNovaChat(input: SendChatInput): Promise<void> {
 	const trimmed = input.prompt.trim();
 	if (!trimmed || novaSession.isStreaming) return;
@@ -152,26 +180,15 @@ export async function sendNovaChat(input: SendChatInput): Promise<void> {
 		return;
 	}
 
-	// Write mode: route outline-build requests to the author pipeline runner;
+	// Write mode: route outline-build requests to the checkpoint pipeline;
 	// concrete write requests that are not yet supported return an unsupported-action state.
 	if (mode === 'write') {
 		if (isOutlineBuildRequest(trimmed)) {
 			if (!input.projectId) {
-				const errorMessage = novaSession.append({
-					role: 'nova',
-					content: '',
-					status: 'error',
-				});
-				novaSession.fail(errorMessage.id, 'Open a project before asking Write mode to build an outline.');
+				appendErrorMessage('Open a project before asking Write mode to build an outline.');
 				return;
 			}
-			await runAuthorPipelineTask({
-				taskKey: PIPELINE_TASK_KEYS.AUTHOR_OUTLINE,
-				projectId: input.projectId,
-				activeSceneId: input.activeSceneId,
-				activeChapterId: input.activeChapterId,
-				instruction: trimmed,
-			});
+			await runOutlineCheckpointGeneration(input.projectId, trimmed);
 			return;
 		}
 

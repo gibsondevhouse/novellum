@@ -1,6 +1,6 @@
 # Outline Generation
 
-> Last verified: 2026-06-04 (plan-040 closeout)
+> Last verified: 2026-06-12 (plan-043 outline consolidation)
 
 Plan-040 adds the review-gated bridge from worldbuilding context to a canonical project outline.
 
@@ -125,6 +125,11 @@ Generated Arc -> Act -> Chapter -> Scene output maps to:
 The mapper does not invent beats or stages. Those remain empty until a future explicit generation contract produces them.
 
 Rollback behavior: if materialization or the final checkpoint update fails, the transaction rolls back and the route returns safe `500 materialization_failed` copy. Raw SQLite errors are not exposed.
+
+The former `/api/nova/outline/apply` route is retired and returns
+`410 outline_apply_retired`. Generated outlines can no longer replace hierarchy
+rows from a Nova artifact card; acceptance must go through the checkpoint route
+above.
 
 ## Conflict Policy
 

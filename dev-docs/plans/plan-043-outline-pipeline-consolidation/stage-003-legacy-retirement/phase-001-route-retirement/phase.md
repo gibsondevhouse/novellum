@@ -2,7 +2,7 @@
 title: Route Retirement
 slug: phase-001-route-retirement
 phase_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-003-legacy-retirement
 parts:
@@ -18,13 +18,13 @@ Remove or hard-disable the legacy direct outline apply route.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Route Retirement](part-001-route-retirement/part.md) | `draft` | — | TBD |
+| 001 | [Route Retirement](part-001-route-retirement/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Legacy route no longer performs hierarchy replacement.
-- [ ] No active caller expects the retired route.
-- [ ] Failure behavior is explicit if the route remains as unsupported.
+- [x] Legacy route no longer performs hierarchy replacement.
+- [x] No active caller expects the retired route.
+- [x] Failure behavior is explicit if the route remains as unsupported.
 
 ## Notes
 

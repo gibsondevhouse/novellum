@@ -2,7 +2,7 @@
 title: Agent Mode Regression
 slug: phase-001-agent-mode-regression
 phase_number: 1
-status: review
+status: complete
 owner: Planner Agent
 stage: stage-004-regression-and-docs
 parts:
@@ -18,7 +18,7 @@ Prove Agent mode remains useful after mutation tools are removed from model adve
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Agent Mode Regression](part-001-agent-mode-regression/part.md) | `review` | Codex | TBD |
+| 001 | [Agent Mode Regression](part-001-agent-mode-regression/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 

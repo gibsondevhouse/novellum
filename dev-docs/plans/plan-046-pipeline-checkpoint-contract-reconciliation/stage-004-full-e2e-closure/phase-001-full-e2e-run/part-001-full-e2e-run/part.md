@@ -2,12 +2,12 @@
 title: Full E2E Run
 slug: part-001-full-e2e-run
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-full-e2e-run
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Prove route/test reconciliation restores the full e2e baseline.
 
 **Create:**
 
-- `evidence/full-e2e-run-evidence-2026-06-09.md`
+- `evidence/full-e2e-run-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -57,9 +57,9 @@ Prove route/test reconciliation restores the full e2e baseline.
 
 ## Acceptance Criteria
 
-- [ ] Full Chromium e2e suite passes or every remaining failure is a documented blocker.
-- [ ] No stale checkpoint fixture failures remain.
-- [ ] Evidence includes exact command and result.
+- [x] Full Chromium e2e suite passes or every remaining failure is a documented blocker.
+- [x] No stale checkpoint fixture failures remain.
+- [x] Evidence includes exact command and result.
 
 ## Edge Cases
 
@@ -68,4 +68,4 @@ Prove route/test reconciliation restores the full e2e baseline.
 
 ## Notes
 
-Keep this part scoped to Pipeline Checkpoint Contract Reconciliation. If implementation reveals a larger dependency, document it in `impl.log.md` before expanding scope.
+`pnpm test:e2e --project=chromium` passed 19/19 tests after the fixture reconciliation.

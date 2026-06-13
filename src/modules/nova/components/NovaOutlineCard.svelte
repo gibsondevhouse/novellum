@@ -1,12 +1,10 @@
 <!--
-	Renders a parsed `vibe-author.outline` artifact as an explicit draft.
-	Writers can review and apply this draft to the outline workspace.
+	Renders a legacy parsed `vibe-author.outline` artifact as read-only
+	compatibility output. Checkpoint cards own all outline materialization.
 -->
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
 	import type { PipelineArtifactEnvelope } from '$lib/ai/pipeline/contracts.js';
 	import type { AuthorOutline } from '$lib/ai/pipeline/author-schemas.js';
-	import { applyAuthorOutlineArtifact } from '../services/outline-artifact-apply.js';
 
 	interface Props {
 		envelope: PipelineArtifactEnvelope<AuthorOutline>;
@@ -15,9 +13,6 @@
 
 	let { envelope, projectId = null }: Props = $props();
 
-	let applying = $state(false);
-	let applied = $state(false);
-	let applyError = $state<string | null>(null);
 	let copied = $state(false);
 	const payload = $derived(envelope.payload);
 	const counts = $derived({
@@ -27,7 +22,11 @@
 		chapters: payload.chapters.length,
 		scenes: payload.scenes.length,
 	});
-	const hasProject = $derived(Boolean(projectId));
+	const compatibilityNote = $derived(
+		projectId
+			? 'This legacy outline artifact is read-only. Generate a checkpoint proposal to accept outline changes.'
+			: 'This legacy outline artifact is read-only. Open the project and generate a checkpoint proposal to accept outline changes.',
+	);
 	const summaryLine = $derived.by(() => {
 		const actLabel = counts.acts === 1 ? 'act' : 'acts';
 		const chapterLabel = counts.chapters === 1 ? 'chapter' : 'chapters';
@@ -37,22 +36,6 @@
 	function titleOf(value: Record<string, unknown>, fallback: string): string {
 		const candidate = value.title ?? value.name ?? value.label ?? value.id;
 		return typeof candidate === 'string' && candidate.trim() ? candidate.trim() : fallback;
-	}
-
-	async function handleApply(): Promise<void> {
-		if (!projectId || applying) return;
-		applying = true;
-		applied = false;
-		applyError = null;
-		try {
-			await applyAuthorOutlineArtifact(projectId, payload);
-			await invalidateAll();
-			applied = true;
-		} catch (err) {
-			applyError = err instanceof Error ? err.message : 'Could not apply outline draft.';
-		} finally {
-			applying = false;
-		}
 	}
 
 	async function handleCopyJson(): Promise<void> {
@@ -76,7 +59,7 @@
 >
 	<header class="outline-card__header">
 		<div>
-			<p class="outline-card__eyebrow">Draft artifact</p>
+			<p class="outline-card__eyebrow">Legacy artifact</p>
 			<h3 class="outline-card__title">Generated outline</h3>
 		</div>
 		<span class="outline-card__lifecycle">{envelope.lifecycle}</span>
@@ -113,33 +96,22 @@
 		<p class="outline-card__summary">{summaryLine}</p>
 		{#if counts.milestones === 0}
 			<p class="outline-card__summary">
-				Milestones were not provided by the model. Nova will create milestone buckets automatically on apply.
+				Milestones were not provided by the model. Regenerate through the checkpoint flow before accepting hierarchy changes.
 			</p>
 		{/if}
-		{#if !hasProject}
-			<p class="outline-card__error">Open this project before applying the draft to Outline.</p>
-		{/if}
-		{#if applyError}
-			<p class="outline-card__error">{applyError}</p>
-		{/if}
-		{#if applied}
-			<p class="outline-card__success">Outline updated. Your arcs, acts, chapters, scenes, and beats were applied.</p>
-		{/if}
+		<p class="outline-card__note">{compatibilityNote}</p>
 		<div class="outline-card__action-row">
 			<button
 				type="button"
-				class="outline-card__btn outline-card__btn--primary"
-				onclick={handleApply}
-				disabled={!hasProject || applying}
+				class="outline-card__btn"
+				data-testid="nova-outline-copy-json"
+				onclick={handleCopyJson}
 			>
-				{applying ? 'Applying…' : 'Apply To Outline'}
-			</button>
-			<button type="button" class="outline-card__btn" onclick={handleCopyJson}>
 				{copied ? 'Copied' : 'Copy Technical JSON'}
 			</button>
 		</div>
 		<p class="outline-card__note">
-			Applies this draft to your Outline board so you can edit it directly.
+			Only checkpoint proposals can be accepted into the Outline board.
 		</p>
 	</footer>
 </article>
@@ -291,20 +263,4 @@
 		cursor: not-allowed;
 	}
 
-	.outline-card__btn--primary {
-		background: color-mix(in srgb, var(--color-candle) 14%, var(--color-surface-ground));
-		border-color: color-mix(in srgb, var(--color-candle) 46%, var(--color-border-default));
-	}
-
-	.outline-card__success {
-		margin: 0;
-		font-size: var(--text-xs);
-		color: color-mix(in srgb, var(--color-accent-success, #6fcf97) 82%, white);
-	}
-
-	.outline-card__error {
-		margin: 0;
-		font-size: var(--text-xs);
-		color: var(--color-error);
-	}
 </style>

@@ -4,9 +4,9 @@ Separate model-callable tools from UI-issued manuscript and canon mutation comma
 
 ## Status
 
-- Plan status: `review`
+- Plan status: `complete`
 - Tracker status: activated 2026-06-11
-- Scope: implementation complete through Stage 004; pending Reviewer Agent sign-off
+- Scope: closed after Reviewer Agent sign-off on 2026-06-12
 
 ## Execution Notes
 
@@ -18,9 +18,9 @@ Separate model-callable tools from UI-issued manuscript and canon mutation comma
 
 ## Review Handoff
 
-- All stages are `review`.
+- All stages are `complete`.
 - Quality gates passed: `pnpm check`, `pnpm lint`, `pnpm lint:css`, `pnpm test`, `pnpm check:tokens`, and targeted Playwright review-gate coverage.
-- Reviewer must verify the mutation boundary before this plan can be marked `complete`.
+- Reviewer sign-off completed on 2026-06-12 after source review and current quality-gate reruns.
 
 ## Canonical Quality Gates
 

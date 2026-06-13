@@ -2,7 +2,7 @@
 title: Worldbuild & Outline Actions
 slug: phase-003-worldbuild-and-outline-actions
 phase_number: 3
-status: review
+status: complete
 owner: Planner Agent
 stage: stage-003-ui-issued-mutation-commands
 parts:
@@ -18,7 +18,7 @@ Apply the same mutation boundary to worldbuilding and outline accept/reject acti
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Worldbuild & Outline Actions](part-001-worldbuild-and-outline-actions/part.md) | `review` | — | TBD |
+| 001 | [Worldbuild & Outline Actions](part-001-worldbuild-and-outline-actions/part.md) | `complete` | — | TBD |
 
 ## Acceptance Criteria
 

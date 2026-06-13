@@ -2,12 +2,12 @@
 title: Generation Entrypoint
 slug: part-001-generation-entrypoint
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-generation-entrypoint
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,18 +39,20 @@ Ensure all supported outline generation UX uses `/api/ai/outline/generate` and t
 
 **Create:**
 
-- None
+- `evidence/generation-entrypoint-evidence-2026-06-12.md`
 
 **Update:**
 
 - `src/modules/nova/services/chat-service.ts`
-- `src/modules/nova/services/author-pipeline-runner.ts`
 - `src/modules/nova/stores/outline-generation-state.svelte.ts`
 - `tests/nova/chat-service.test.ts`
+- `tests/nova/mode-routing.test.ts`
+- `tests/nova/outline-generation-state.test.ts`
 
 **Reference:**
 
 - `src/routes/api/ai/outline/generate/+server.ts`
+- `src/modules/nova/services/author-pipeline-runner.ts`
 - `src/routes/api/outline/checkpoints/[checkpointId]/accept/+server.ts`
 - `src/lib/server/outline/outline-materialization-service.ts`
 - `src/modules/nova/components/NovaOutlineGenerationPanel.svelte`
@@ -63,9 +65,9 @@ Ensure all supported outline generation UX uses `/api/ai/outline/generate` and t
 
 ## Acceptance Criteria
 
-- [ ] Supported outline generation requests produce checkpoint-backed review artifacts.
-- [ ] No supported path creates a legacy `author-outline` artifact for application.
-- [ ] Existing outline generation review e2e remains meaningful.
+- [x] Supported outline generation requests produce checkpoint-backed review artifacts.
+- [x] No supported path creates a legacy `author-outline` artifact for application.
+- [x] Existing outline generation review e2e remains meaningful.
 
 ## Edge Cases
 

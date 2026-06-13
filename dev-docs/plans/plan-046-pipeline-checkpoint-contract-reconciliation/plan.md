@@ -2,10 +2,10 @@
 title: Pipeline Checkpoint Contract Reconciliation
 slug: plan-046-pipeline-checkpoint-contract-reconciliation
 version: 1.0.0
-status: draft
+status: review
 owner: Planner Agent
 created: 2026-06-09
-last_updated: 2026-06-09
+last_updated: 2026-06-12
 target_completion: ~
 stages:
   - stage-001-contract-and-test-audit
@@ -53,22 +53,22 @@ The full e2e suite currently contains stale checkpoint fixtures and endpoint ass
 
 | # | Stage | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Contract & Test Audit](stage-001-contract-and-test-audit/stage.md) | `draft` | TBD |
-| 002 | [Canonical API Map](stage-002-canonical-api-map/stage.md) | `draft` | TBD |
-| 003 | [Legacy Adapter or Retirement](stage-003-legacy-adapter-or-retirement/stage.md) | `draft` | TBD |
-| 004 | [Full E2E Closure](stage-004-full-e2e-closure/stage.md) | `draft` | TBD |
+| 001 | [Contract & Test Audit](stage-001-contract-and-test-audit/stage.md) | `complete` | TBD |
+| 002 | [Canonical API Map](stage-002-canonical-api-map/stage.md) | `complete` | TBD |
+| 003 | [Legacy Adapter or Retirement](stage-003-legacy-adapter-or-retirement/stage.md) | `complete` | TBD |
+| 004 | [Full E2E Closure](stage-004-full-e2e-closure/stage.md) | `complete` | TBD |
 
 ## Quality Gates
 
 All stages must pass the following gates before the plan is marked `complete`:
 
-- [ ] **lint** — zero lint errors
-- [ ] **lint:css** — zero CSS lint errors
-- [ ] **typecheck** — zero type errors and zero warnings
-- [ ] **tests** — Vitest suite passes
-- [ ] **e2e** — full e2e suite passes under Chromium
-- [ ] **check:tokens** — zero token violations
-- [ ] **docs_sync** — AI pipeline docs and tests agree on route ownership and schema versions
+- [x] **lint** — zero lint errors
+- [x] **lint:css** — zero CSS lint errors
+- [x] **typecheck** — zero type errors and zero warnings
+- [x] **tests** — Vitest suite passes
+- [x] **e2e** — full e2e suite passes under Chromium
+- [x] **check:tokens** — zero token violations
+- [x] **docs_sync** — AI pipeline docs and tests agree on route ownership and schema versions
 
 ## Risks & Mitigations
 
@@ -80,5 +80,4 @@ All stages must pass the following gates before the plan is marked `complete`:
 
 ## Notes
 
-The full draft plan tree has been scaffolded through stages, phases, parts, checklists, implementation logs, and evidence README files. Status remains `draft`; no implementation work has started and tracker files have not been changed.
-
+Activated 2026-06-12 after Plan-043 closeout. Implementation closed out 2026-06-12 with all stages complete and all quality gates passing. Status is `review` pending real plan-level Reviewer evaluation.

@@ -13,17 +13,25 @@ import { getProjectMetadata } from '$lib/server/project-metadata/project-metadat
 import type { WorldbuildCheckpointErrorCode } from '$lib/ai/pipeline/checkpoint-service.js';
 import type { WorldbuildProposalRecord } from '$lib/ai/pipeline/worldbuild-proposal-schema.js';
 
+type AcceptProposalRequestBody = {
+	projectId?: unknown;
+};
+
 function statusForProposalError(code: WorldbuildCheckpointErrorCode): number {
 	if (code === 'not_found') return 404;
 	return 422;
+}
+
+function parseProjectId(body: AcceptProposalRequestBody): string | null {
+	return typeof body.projectId === 'string' && body.projectId.trim() ? body.projectId.trim() : null;
 }
 
 export const POST: RequestHandler = async ({ params, request }) => {
 	const { proposalId } = params;
 	if (!proposalId) error(400, 'proposalId is required');
 
-	const body = await request.json().catch(() => ({})) as Record<string, unknown>;
-	const projectId = typeof body.projectId === 'string' ? body.projectId : null;
+	const body = (await request.json().catch(() => ({}))) as AcceptProposalRequestBody;
+	const projectId = parseProjectId(body);
 
 	if (projectId) {
 		const proposal = getProjectMetadata<WorldbuildProposalRecord>(

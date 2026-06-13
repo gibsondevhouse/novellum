@@ -2,7 +2,7 @@
 title: Source Contract Tests
 slug: part-001-source-contract-tests
 part_number: 1
-status: review
+status: complete
 owner: Planner Agent
 assigned_to: —
 phase: phase-003-source-contract-tests

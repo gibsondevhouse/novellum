@@ -2,7 +2,7 @@
 title: Docs Sync
 slug: part-001-docs-sync
 part_number: 1
-status: review
+status: complete
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-003-docs-sync

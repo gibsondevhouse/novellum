@@ -4,9 +4,9 @@ Consolidate Novellum outline generation and materialization onto the review-gate
 
 ## Status
 
-- Plan status: `draft`
-- Tracker status: not activated
-- Scope: full draft plan tree scaffolded for future execution
+- Plan status: `in-progress`
+- Tracker status: activated 2026-06-12
+- Scope: implementation closed out; ready for plan-level reviewer evaluation
 
 ## Execution Notes
 

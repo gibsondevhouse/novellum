@@ -2,7 +2,7 @@
 title: Contract & Test Audit
 slug: stage-001-contract-and-test-audit
 stage_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-046-pipeline-checkpoint-contract-reconciliation
 phases:
@@ -21,9 +21,9 @@ Classify every pipeline checkpoint route, schema, helper, and failing e2e spec b
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Route Inventory](phase-001-route-inventory/phase.md) | `draft` | TBD |
-| 002 | [Schema Inventory](phase-002-schema-inventory/phase.md) | `draft` | TBD |
-| 003 | [Failing Spec Classification](phase-003-failing-spec-classification/phase.md) | `draft` | TBD |
+| 001 | [Route Inventory](phase-001-route-inventory/phase.md) | `complete` | TBD |
+| 002 | [Schema Inventory](phase-002-schema-inventory/phase.md) | `complete` | TBD |
+| 003 | [Failing Spec Classification](phase-003-failing-spec-classification/phase.md) | `complete` | TBD |
 
 ## Entry Criteria
 
@@ -38,5 +38,4 @@ Classify every pipeline checkpoint route, schema, helper, and failing e2e spec b
 
 ## Notes
 
-Use the current failing generic project-metadata checkpoint specs as evidence, not as an automatic instruction to preserve old contracts.
-
+Stage 001 completed 2026-06-12. Current full Chromium e2e baseline has 15 passing tests and 4 stale plan-028 fixture failures caused by old worldbuild artifact envelope shape.

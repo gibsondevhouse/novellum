@@ -2,12 +2,12 @@
 title: Review Card Wiring
 slug: part-001-review-card-wiring
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-002-review-card-wiring
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Ensure generated outline proposals render through `NovaOutlineDraftCheckpointCar
 
 **Create:**
 
-- None
+- `evidence/review-card-wiring-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -63,9 +63,9 @@ Ensure generated outline proposals render through `NovaOutlineDraftCheckpointCar
 
 ## Acceptance Criteria
 
-- [ ] The only outline UI that can apply hierarchy changes is the checkpoint card.
-- [ ] Reject and accept actions remain explicit and visible.
-- [ ] Legacy cards cannot trigger hierarchy replacement.
+- [x] The only outline UI that can apply hierarchy changes is the checkpoint card.
+- [x] Reject and accept actions remain explicit and visible.
+- [x] Legacy cards cannot trigger hierarchy replacement.
 
 ## Edge Cases
 

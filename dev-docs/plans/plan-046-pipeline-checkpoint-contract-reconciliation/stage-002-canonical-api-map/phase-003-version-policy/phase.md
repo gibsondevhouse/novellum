@@ -2,7 +2,7 @@
 title: Version Policy
 slug: phase-003-version-policy
 phase_number: 3
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-002-canonical-api-map
 parts:
@@ -18,13 +18,13 @@ Define schema version acceptance, migration, and rejection policy.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Version Policy](part-001-version-policy/part.md) | `draft` | — | TBD |
+| 001 | [Version Policy](part-001-version-policy/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Version policy is explicit by family.
-- [ ] Stale fixture update strategy is clear.
-- [ ] Unknown versions fail safely.
+- [x] Version policy is explicit by family.
+- [x] Stale fixture update strategy is clear.
+- [x] Unknown versions fail safely.
 
 ## Notes
 

@@ -2,7 +2,7 @@
 title: Canonical API Map
 slug: stage-002-canonical-api-map
 stage_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-046-pipeline-checkpoint-contract-reconciliation
 phases:
@@ -21,9 +21,9 @@ Define the supported API contract for worldbuild checkpoints, worldbuilding prop
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Family Route Map](phase-001-family-route-map/phase.md) | `draft` | TBD |
-| 002 | [Lifecycle Operation Map](phase-002-lifecycle-operation-map/phase.md) | `draft` | TBD |
-| 003 | [Version Policy](phase-003-version-policy/phase.md) | `draft` | TBD |
+| 001 | [Family Route Map](phase-001-family-route-map/phase.md) | `complete` | TBD |
+| 002 | [Lifecycle Operation Map](phase-002-lifecycle-operation-map/phase.md) | `complete` | TBD |
+| 003 | [Version Policy](phase-003-version-policy/phase.md) | `complete` | TBD |
 
 ## Entry Criteria
 
@@ -38,5 +38,4 @@ Define the supported API contract for worldbuild checkpoints, worldbuilding prop
 
 ## Notes
 
-This stage should produce the reference used by later implementation and test updates.
-
+Family route ownership, lifecycle operation map, and version policy completed 2026-06-12. Stage 003 can now update or retire stale compatibility surfaces against the documented contract.

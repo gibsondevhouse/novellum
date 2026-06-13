@@ -2,7 +2,7 @@
 title: Registry Inventory
 slug: phase-001-registry-inventory
 phase_number: 1
-status: review
+status: complete
 owner: Planner Agent
 stage: stage-001-tool-capability-audit
 parts:
@@ -18,7 +18,7 @@ Inventory every registered Nova Agent mode tool and the APIs each handler can re
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Registry Inventory](part-001-registry-inventory/part.md) | `review` | — | TBD |
+| 001 | [Registry Inventory](part-001-registry-inventory/part.md) | `complete` | — | TBD |
 
 ## Acceptance Criteria
 

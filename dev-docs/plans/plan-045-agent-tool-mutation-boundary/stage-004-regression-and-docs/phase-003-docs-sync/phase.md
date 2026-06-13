@@ -2,7 +2,7 @@
 title: Docs Sync
 slug: phase-003-docs-sync
 phase_number: 3
-status: review
+status: complete
 owner: Planner Agent
 stage: stage-004-regression-and-docs
 parts:
@@ -18,7 +18,7 @@ Document Agent mode capability boundaries for users and developers.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Docs Sync](part-001-docs-sync/part.md) | `review` | Codex | TBD |
+| 001 | [Docs Sync](part-001-docs-sync/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 

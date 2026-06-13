@@ -1,6 +1,6 @@
 # Module: `nova`
 
-> Last verified: 2026-06-04 (plan-040 outline generation closeout)
+> Last verified: 2026-06-12 (plan-043 outline consolidation)
 > Source: [src/modules/nova/](../../src/modules/nova/)
 
 ## Purpose
@@ -29,7 +29,7 @@ src/modules/nova/
 `NovaMode = 'ask' | 'write' | 'agent'` (replaces old `chat | scribe`).
 
 - **Ask** — conversational and grounded; routes through the `ask` task resolver. Single-shot streaming via `OpenRouterClient`. No tools advertised.
-- **Write** — structured proposal generation. Outline requests route to `runAuthorPipelineTask(AUTHOR_OUTLINE)`; other concrete write requests render an explicit limitation card (`unsupported_action`). Supported sub-actions: `outline`, `scene`, `revision` (`WriteSubAction`). No tool calling.
+- **Write** — structured proposal generation. Outline requests route to `outlineGenerationState.generate()` and persist review checkpoints through `POST /api/ai/outline/generate`; other concrete write requests render an explicit limitation card (`unsupported_action`). Supported sub-actions: `outline`, `scene`, `revision` (`WriteSubAction`). No tool calling.
 - **Agent** — real bounded tool-calling loop (`runAgentLoop`). Calls `/api/nova/agent` (server-side, key-hidden). Dispatches tools through `dispatchTool`. Returns proposal envelopes; never auto-applies to manuscript or editor state. Hard cap: `MAX_AGENT_STEPS = 8`. User abort via `novaSession.abort()`.
 
 Mode persists per-project via sessionStorage key `novellum.nova.mode.<projectId>`. Invalid persisted values fall back to `ask`. `Cmd+.` / `Ctrl+.` cycles modes in the composer.
@@ -104,6 +104,7 @@ Plan-040 adds the Nova outline generation panel:
 - `outline-generation-runner.ts` calls `POST /api/ai/outline/generate` and exposes safe result variants for success, low context, schema failure, provider/credential failure, abort, and conflict warnings.
 - `NovaOutlineDraftCheckpointCard.svelte` renders the proposed Arc -> Act -> Chapter -> Scene tree with scene intent fields and source context metadata.
 - `outline-checkpoint-actions.ts` uses the generic project-metadata route for reject and the dedicated materialization route for accept.
+- Legacy `author-outline` artifact cards are compatibility-only. They render read-only payload/copy output and cannot apply hierarchy changes. `/api/nova/outline/apply` is retired with an explicit unsupported response.
 
 Panel states:
 

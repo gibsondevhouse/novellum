@@ -2,12 +2,12 @@
 title: Route or Test Updates
 slug: part-001-route-or-test-updates
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-002-route-or-test-updates
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Update product code or test fixtures so supported contracts pass and retired con
 
 **Create:**
 
-- None
+- `evidence/route-or-test-updates-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -48,6 +48,10 @@ Update product code or test fixtures so supported contracts pass and retired con
 - `tests/e2e/vibe-author-review-gates.spec.ts`
 - `tests/e2e/hierarchical-pipeline-run-and-review.spec.ts`
 - `tests/e2e/hierarchical-pipeline-failure-handling.spec.ts`
+- `src/modules/world-building/services/worldbuilding-proposal-service.ts`
+- `src/modules/world-building/components/WorldbuildingProposalCard.svelte`
+- `src/modules/world-building/components/WorldbuildingProposedTile.svelte`
+- `tests/world-building/worldbuilding-proposal-service.test.ts`
 
 **Reference:**
 
@@ -61,9 +65,9 @@ Update product code or test fixtures so supported contracts pass and retired con
 
 ## Acceptance Criteria
 
-- [ ] Supported checkpoint contracts pass tests.
-- [ ] Retired contracts have explicit failure tests or no longer appear as supported specs.
-- [ ] No tests depend on malformed current fixtures.
+- [x] Supported checkpoint contracts pass tests.
+- [x] Retired contracts have explicit failure tests or no longer appear as supported specs.
+- [x] No tests depend on malformed current fixtures.
 
 ## Edge Cases
 
@@ -72,4 +76,4 @@ Update product code or test fixtures so supported contracts pass and retired con
 
 ## Notes
 
-Keep this part scoped to Pipeline Checkpoint Contract Reconciliation. If implementation reveals a larger dependency, document it in `impl.log.md` before expanding scope.
+Stale worldbuild E2E fixtures now use current envelope fields, proposal decision helpers include project context, and targeted/full E2E validation passed under Chromium.

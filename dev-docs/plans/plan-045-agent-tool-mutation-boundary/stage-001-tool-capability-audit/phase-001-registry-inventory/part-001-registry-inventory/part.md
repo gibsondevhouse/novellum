@@ -2,7 +2,7 @@
 title: Registry Inventory
 slug: part-001-registry-inventory
 part_number: 1
-status: review
+status: complete
 owner: Planner Agent
 assigned_to: —
 phase: phase-001-registry-inventory

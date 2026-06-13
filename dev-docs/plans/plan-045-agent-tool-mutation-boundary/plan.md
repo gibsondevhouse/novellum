@@ -2,10 +2,10 @@
 title: Agent Tool Mutation Boundary
 slug: plan-045-agent-tool-mutation-boundary
 version: 1.0.0
-status: review
+status: complete
 owner: Planner Agent
 created: 2026-06-09
-last_updated: 2026-06-11
+last_updated: 2026-06-12
 target_completion: ~
 stages:
   - stage-001-tool-capability-audit
@@ -50,10 +50,10 @@ Agent mode may read context and create review artifacts, but accept/apply/reject
 
 | # | Stage | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Tool Capability Audit](stage-001-tool-capability-audit/stage.md) | `review` | TBD |
-| 002 | [Tool Policy Contract](stage-002-tool-policy-contract/stage.md) | `review` | TBD |
-| 003 | [UI-Issued Mutation Commands](stage-003-ui-issued-mutation-commands/stage.md) | `review` | TBD |
-| 004 | [Regression & Docs](stage-004-regression-and-docs/stage.md) | `review` | TBD |
+| 001 | [Tool Capability Audit](stage-001-tool-capability-audit/stage.md) | `complete` | TBD |
+| 002 | [Tool Policy Contract](stage-002-tool-policy-contract/stage.md) | `complete` | TBD |
+| 003 | [UI-Issued Mutation Commands](stage-003-ui-issued-mutation-commands/stage.md) | `complete` | TBD |
+| 004 | [Regression & Docs](stage-004-regression-and-docs/stage.md) | `complete` | TBD |
 
 ## Quality Gates
 
@@ -77,4 +77,4 @@ All stages must pass the following gates before the plan is marked `complete`:
 
 ## Notes
 
-All four stages are implemented and ready for Reviewer Agent sign-off as of 2026-06-11. Do not mark the plan `complete` or advance `ACTIVE-PLAN.md` until a real reviewer accepts the plan.
+Reviewer Agent sign-off completed on 2026-06-12 after source review and current quality-gate reruns. Plan-045 is closed and the roadmap may advance to Plan-043.

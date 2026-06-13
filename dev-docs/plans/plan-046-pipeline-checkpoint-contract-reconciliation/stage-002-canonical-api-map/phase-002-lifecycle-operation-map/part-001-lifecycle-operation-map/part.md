@@ -2,12 +2,12 @@
 title: Lifecycle Operation Map
 slug: part-001-lifecycle-operation-map
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-002-lifecycle-operation-map
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Make draft/review/accept/reject transitions consistent where possible and intent
 
 **Create:**
 
-- `evidence/lifecycle-operation-map-evidence-2026-06-09.md`
+- `evidence/lifecycle-operation-map-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -57,9 +57,9 @@ Make draft/review/accept/reject transitions consistent where possible and intent
 
 ## Acceptance Criteria
 
-- [ ] Transition behavior is documented and testable.
-- [ ] Error codes are stable for client branching.
-- [ ] Invalid legacy operations have deliberate responses.
+- [x] Transition behavior is documented and testable.
+- [x] Error codes are stable for client branching.
+- [x] Invalid legacy operations have deliberate responses.
 
 ## Edge Cases
 
@@ -68,4 +68,4 @@ Make draft/review/accept/reject transitions consistent where possible and intent
 
 ## Notes
 
-Keep this part scoped to Pipeline Checkpoint Contract Reconciliation. If implementation reveals a larger dependency, document it in `impl.log.md` before expanding scope.
+Lifecycle status and error behavior is now documented by family. Generic metadata status mapping is marked as a Plan-046 compatibility contract in the route source.

@@ -1,4 +1,14 @@
 ---
+
+### [2026-06-12 00:00] Agent: Codex
+
+**Action:** Ran standard quality gates for Plan-046 closure.
+
+**Result:** `pnpm check`, `pnpm lint`, `pnpm lint:css`, `pnpm test`, and `pnpm check:tokens` all passed. The initial `pnpm test` run exposed one source-contract expectation that still matched the old proposal callback signature; after updating the test, `pnpm test` passed 241 files / 1762 tests.
+
+**Notes:** Added `evidence/quality-gates-evidence-2026-06-12.md`. Reviewer remains deferred until implementation closeout.
+
+---
 part: part-001-quality-gates
 ---
 

@@ -18,6 +18,8 @@ import { randomUUID } from 'node:crypto';
 
 const PIPELINE_TASK_KEY = 'vibe-worldbuild.populated-world-bible';
 const OWNER_ID = 'vibe-worldbuild';
+const CHECKPOINT_SCHEMA_VERSION = '1.0.0';
+const ARTIFACT_PARSER_VERSION = '1.0.0';
 
 async function createProject(request: APIRequestContext, title: string): Promise<string> {
 	const response = await request.post('/api/db/projects', { data: { title } });
@@ -39,7 +41,7 @@ function buildPopulatedBibleArtifact(taskKey = PIPELINE_TASK_KEY) {
 		pipeline: 'vibe-worldbuild',
 		stage: 'populated-world-bible',
 		model: null,
-		parserVersion: '1.0.0',
+		parserVersion: ARTIFACT_PARSER_VERSION,
 		producedAt: new Date().toISOString(),
 		lifecycle: 'draft',
 		hierarchy: {
@@ -193,7 +195,7 @@ test.describe('vibe-worldbuild checkpoint flow', () => {
 			// 1. Draft
 			const draft = await putCheckpoint(request, projectId, checkpointId, {
 				operation: 'upsert',
-				value: { artifact, version: '1.0.0' },
+				value: { artifact, version: CHECKPOINT_SCHEMA_VERSION },
 			});
 			expect(draft.checkpoint.lifecycle).toBe('draft');
 
@@ -254,7 +256,7 @@ test.describe('vibe-worldbuild checkpoint flow', () => {
 
 			await putCheckpoint(request, projectId, checkpointId, {
 				operation: 'upsert',
-				value: { artifact, version: '1.0.0' },
+				value: { artifact, version: CHECKPOINT_SCHEMA_VERSION },
 			});
 
 			const rejected = await putCheckpoint(request, projectId, checkpointId, {

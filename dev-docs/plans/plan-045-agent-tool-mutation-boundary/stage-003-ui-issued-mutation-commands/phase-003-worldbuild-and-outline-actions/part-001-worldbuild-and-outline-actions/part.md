@@ -2,7 +2,7 @@
 title: Worldbuild & Outline Actions
 slug: part-001-worldbuild-and-outline-actions
 part_number: 1
-status: review
+status: complete
 owner: Planner Agent
 assigned_to: —
 phase: phase-003-worldbuild-and-outline-actions

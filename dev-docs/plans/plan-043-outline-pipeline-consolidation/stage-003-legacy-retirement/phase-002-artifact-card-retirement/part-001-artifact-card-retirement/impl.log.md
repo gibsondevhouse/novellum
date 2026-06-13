@@ -18,3 +18,15 @@ part: part-001-artifact-card-retirement
 **Notes:** No implementation work has started. Keep this log append-only when the part is executed.
 
 ---
+
+### [2026-06-12 14:20] Agent: Codex
+
+**Action:** Retired legacy outline card mutation affordances.
+
+**Result:** `NovaOutlineCard` is read-only and no longer public-barrel exported. `NovaMessageLog` can still render already-open legacy artifacts safely. Added `evidence/artifact-card-retirement-evidence-2026-06-12.md`.
+
+**Validation:** Passed targeted route/card/materialization tests and expanded Nova/outline regression set (52 tests).
+
+**Notes:** Part and Phase 002 moved to implementation `complete`.
+
+---

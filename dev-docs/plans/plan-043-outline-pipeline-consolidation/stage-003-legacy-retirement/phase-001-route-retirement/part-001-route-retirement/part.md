@@ -2,12 +2,12 @@
 title: Route Retirement
 slug: part-001-route-retirement
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-route-retirement
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Retire `/api/nova/outline/apply` so generated outlines cannot replace hierarchy 
 
 **Create:**
 
-- `evidence/route-retirement-evidence-2026-06-09.md`
+- `evidence/route-retirement-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -62,9 +62,9 @@ Retire `/api/nova/outline/apply` so generated outlines cannot replace hierarchy 
 
 ## Acceptance Criteria
 
-- [ ] Legacy route no longer performs hierarchy replacement.
-- [ ] No active caller expects the retired route.
-- [ ] Failure behavior is explicit if the route remains as unsupported.
+- [x] Legacy route no longer performs hierarchy replacement.
+- [x] No active caller expects the retired route.
+- [x] Failure behavior is explicit if the route remains as unsupported.
 
 ## Edge Cases
 

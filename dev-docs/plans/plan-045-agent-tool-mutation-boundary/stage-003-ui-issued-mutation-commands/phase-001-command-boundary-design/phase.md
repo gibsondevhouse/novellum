@@ -2,7 +2,7 @@
 title: Command Boundary Design
 slug: phase-001-command-boundary-design
 phase_number: 1
-status: review
+status: complete
 owner: Planner Agent
 stage: stage-003-ui-issued-mutation-commands
 parts:
@@ -18,7 +18,7 @@ Design the UI-issued command boundary for checkpoint and proposal mutations.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Command Boundary Design](part-001-command-boundary-design/part.md) | `review` | — | TBD |
+| 001 | [Command Boundary Design](part-001-command-boundary-design/part.md) | `complete` | — | TBD |
 
 ## Acceptance Criteria
 

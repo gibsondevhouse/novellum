@@ -2,7 +2,7 @@
 title: Surface Audit
 slug: stage-001-surface-audit
 stage_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-043-outline-pipeline-consolidation
 phases:
@@ -20,8 +20,8 @@ Inventory every outline generation, outline artifact, and outline materializatio
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Call-Site Inventory](phase-001-call-site-inventory/phase.md) | `draft` | TBD |
-| 002 | [Contract Risk Map](phase-002-contract-risk-map/phase.md) | `draft` | TBD |
+| 001 | [Call-Site Inventory](phase-001-call-site-inventory/phase.md) | `complete` | TBD |
+| 002 | [Contract Risk Map](phase-002-contract-risk-map/phase.md) | `complete` | TBD |
 
 ## Entry Criteria
 
@@ -30,11 +30,10 @@ Inventory every outline generation, outline artifact, and outline materializatio
 
 ## Exit Criteria
 
-- All outline-related routes, services, UI cards, stores, and tests are mapped.
-- Legacy and canonical behaviors are classified explicitly.
-- Follow-up stages have enough evidence to choose removal, redirect, or compatibility handling.
+- [x] All outline-related routes, services, UI cards, stores, and tests are mapped.
+- [x] Legacy and canonical behaviors are classified explicitly.
+- [x] Follow-up stages have enough evidence to choose removal, redirect, or compatibility handling.
 
 ## Notes
 
-Start with `/api/nova/outline/apply`, `NovaOutlineCard`, `applyAuthorOutlineArtifact`, `author-outline`, `/api/ai/outline/generate`, and `acceptOutlineCheckpointMaterialization`.
-
+Reviewer sign-off recorded 2026-06-12. The Stage 001 audit evidence identifies the active legacy chain, canonical checkpoint chain, compatibility decision, regression set, and next-stage implementation order.

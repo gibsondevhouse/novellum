@@ -2,7 +2,7 @@
 title: Legacy Adapter or Retirement
 slug: stage-003-legacy-adapter-or-retirement
 stage_number: 3
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-046-pipeline-checkpoint-contract-reconciliation
 phases:
@@ -21,9 +21,9 @@ Either preserve legacy checkpoint behavior intentionally through adapters or ret
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Compatibility Decision](phase-001-compatibility-decision/phase.md) | `draft` | TBD |
-| 002 | [Route or Test Updates](phase-002-route-or-test-updates/phase.md) | `draft` | TBD |
-| 003 | [Hidden Caller Sweep](phase-003-hidden-caller-sweep/phase.md) | `draft` | TBD |
+| 001 | [Compatibility Decision](phase-001-compatibility-decision/phase.md) | `complete` | TBD |
+| 002 | [Route or Test Updates](phase-002-route-or-test-updates/phase.md) | `complete` | TBD |
+| 003 | [Hidden Caller Sweep](phase-003-hidden-caller-sweep/phase.md) | `complete` | TBD |
 
 ## Entry Criteria
 
@@ -37,5 +37,4 @@ Either preserve legacy checkpoint behavior intentionally through adapters or ret
 
 ## Notes
 
-Be strict about not keeping legacy behavior only because old tests encode it.
-
+Completed 2026-06-12. Stale Plan-028 fixtures were updated to the current `PipelineArtifactEnvelope` contract instead of adding legacy adapters; proposal decision helpers now include project context; source sweep found no active caller that depends on retired checkpoint contracts.

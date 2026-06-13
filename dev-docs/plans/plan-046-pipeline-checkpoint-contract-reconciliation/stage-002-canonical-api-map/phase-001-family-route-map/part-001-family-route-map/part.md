@@ -2,12 +2,12 @@
 title: Family Route Map
 slug: part-001-family-route-map
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-family-route-map
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Decide which route handles each lifecycle operation for worldbuild checkpoints, 
 
 **Create:**
 
-- `evidence/family-route-map-evidence-2026-06-09.md`
+- `evidence/family-route-map-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -57,9 +57,9 @@ Decide which route handles each lifecycle operation for worldbuild checkpoints, 
 
 ## Acceptance Criteria
 
-- [ ] Each family has exactly one canonical lifecycle path per operation.
-- [ ] Generic metadata route support is explicitly scoped.
-- [ ] Client helpers are assigned to canonical routes.
+- [x] Each family has exactly one canonical lifecycle path per operation.
+- [x] Generic metadata route support is explicitly scoped.
+- [x] Client helpers are assigned to canonical routes.
 
 ## Edge Cases
 
@@ -68,4 +68,4 @@ Decide which route handles each lifecycle operation for worldbuild checkpoints, 
 
 ## Notes
 
-Keep this part scoped to Pipeline Checkpoint Contract Reconciliation. If implementation reveals a larger dependency, document it in `impl.log.md` before expanding scope.
+Canonical route ownership is documented in `dev-docs/03-ai/agents-map.md`. Stage 003 should update stale callers/tests to this map.

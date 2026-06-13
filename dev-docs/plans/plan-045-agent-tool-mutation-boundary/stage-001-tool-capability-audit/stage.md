@@ -2,7 +2,7 @@
 title: Tool Capability Audit
 slug: stage-001-tool-capability-audit
 stage_number: 1
-status: review
+status: complete
 owner: Planner Agent
 plan: plan-045-agent-tool-mutation-boundary
 phases:
@@ -20,8 +20,8 @@ Inventory every Nova Agent mode tool and classify whether it reads, generates re
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Registry Inventory](phase-001-registry-inventory/phase.md) | `review` | TBD |
-| 002 | [Capability Classification](phase-002-capability-classification/phase.md) | `review` | TBD |
+| 001 | [Registry Inventory](phase-001-registry-inventory/phase.md) | `complete` | TBD |
+| 002 | [Capability Classification](phase-002-capability-classification/phase.md) | `complete` | TBD |
 
 ## Entry Criteria
 

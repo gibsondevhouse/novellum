@@ -2,7 +2,7 @@
 title: Proposal Flow Tests
 slug: phase-001-proposal-flow-tests
 phase_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-004-regression-and-docs
 parts:
@@ -18,13 +18,13 @@ Cover the proposal review flow with diff-aware tests.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Proposal Flow Tests](part-001-proposal-flow-tests/part.md) | `draft` | — | TBD |
+| 001 | [Proposal Flow Tests](part-001-proposal-flow-tests/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Create-only proposals still work.
-- [ ] Diff-aware proposals require explicit accept.
-- [ ] Reject preserves reason and does not mutate canon.
+- [x] Create-only proposals still work.
+- [x] Diff-aware proposals require explicit accept.
+- [x] Reject preserves reason and does not mutate canon.
 
 ## Notes
 

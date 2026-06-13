@@ -88,6 +88,7 @@ Functionality is organized by **vertical domain slices** (e.g., `project`, `worl
 ## Recent Accomplishments
 
 - **Plan-040 (Outline Generation)**: Worldbuilding-to-Outline review-gated proposal flow (Closed 2026-06-04).
+- **Plan-045 (Agent Mutation Boundary)**: Separated model-callable Agent tools from UI/app mutation commands and closed review-gated validation (Closed 2026-06-12).
 - **Plan-039 (Manuscript Export UI)**: Chapter subset selector and delivery helper for browser/desktop (Closed 2026-06-03).
 - **Plan-041 (Docs Rebaseline)**: Reframed milestones and reconciled dev-docs (Closed 2026-06-01).
 - **Plan-038 (Novel Engine v1)**: Draft-from-Outline agentic pipeline (Closed 2026-06-01).
@@ -98,7 +99,7 @@ Functionality is organized by **vertical domain slices** (e.g., `project`, `worl
 
 ## Current Focus (Active Plans)
 
-No active plan. See the **Roadmap Execution Order** below for the recommended sequence of work.
+Active plan: **None**. Phase 2 implementation is closed out: Plan-046 and Plan-047 are both awaiting plan-level Reviewer evaluation.
 
 ### Roadmap Execution Order (Draft Queue)
 
@@ -106,12 +107,12 @@ To ensure system stability and logical dependency management, execute pending pl
 
 1.  **Phase 1: Context & Safety Foundations**
     - [x] **Plan-044 (Active Context Routing)**: Resolved Nova/AI context from routes; fixed brittle query-param detection (Closed 2026-06-11).
-    - [ ] **Plan-045 (Agent Mutation Boundary)**: Enforce strict separation between AI reading and manuscript mutation.
+    - [x] **Plan-045 (Agent Mutation Boundary)**: Enforce strict separation between AI reading and manuscript mutation. (Closed 2026-06-12)
 
 2.  **Phase 2: Pipeline Standardization**
-    - [ ] **Plan-043 (Outline Consolidation)**: Retire legacy direct apply paths; make checkpoints the sole materialization path.
-    - [ ] **Plan-046 (Pipeline Reconciliation)**: Align schemas and routes across all generation pipelines.
-    - [ ] **Plan-047 (Worldbuilding Canon Merge Diff)**: Upgrade worldbuilding from "insert-only" to a full diff/merge flow.
+    - [x] **Plan-043 (Outline Consolidation)**: Retire legacy direct apply paths; make checkpoints the sole materialization path. (Closed 2026-06-12)
+    - [ ] **Plan-046 (Pipeline Reconciliation)**: Align schemas and routes across all generation pipelines. (Implementation closed out; reviewer pending)
+    - [ ] **Plan-047 (Worldbuilding Canon Merge Diff)**: Upgrade worldbuilding from "insert-only" to a full diff/merge flow. (Implementation closed out; reviewer pending)
 
 3.  **Phase 3: Infrastructure & Coherence**
     - [ ] **Plan-049 (Runtime Hardening)**: SQLite job queue, durable runs, token budgeting, and AI traces.
@@ -136,9 +137,9 @@ To ensure system stability and logical dependency management, execute pending pl
 - Path 5: Observability, reliability, and model-budget optimization.
 
 ## Vulnerabilities and Fragilities
-- **Type Safety**: ~11 pre-existing warnings in `pnpm check`. Impact: Potential runtime regressions. Detection: `pnpm check`.
+- **Type Safety**: `pnpm check` is clean as of Plan-046 implementation closeout. Keep running it before plan closure.
 - **Visual Drift**: Pre-existing cross-surface snapshot drift in Playwright tests. Impact: Unreliable visual regression testing. Detection: `pnpm run test:visual`.
-- **Linting**: Known unrelated `lint:css` error in `IndividualsWorkspaceShell.svelte:183`. Impact: CI noise.
+- **Linting**: `pnpm lint` and `pnpm lint:css` are clean as of Plan-046 implementation closeout. Treat new warnings/errors as regressions.
 - **Legacy Persistence**: Dexie remains in `src/lib/db` and `src/modules/export` strictly for portability snapshots. Do not use for new live reads/writes.
 - **Sidebar/active-project detection**: Path parsing is brittle on routes outside `/projects/<id>/...`. Verified gotcha — see `dev-docs/02-architecture/routing.md`.
 - **`+server.ts` export discipline**: ESLint restricts to handlers / `config` / `_`-prefixed exports. Helpers must live in sibling files.

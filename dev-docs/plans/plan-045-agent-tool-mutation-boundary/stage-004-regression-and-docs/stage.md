@@ -2,7 +2,7 @@
 title: Regression & Docs
 slug: stage-004-regression-and-docs
 stage_number: 4
-status: review
+status: complete
 owner: Planner Agent
 plan: plan-045-agent-tool-mutation-boundary
 phases:
@@ -21,9 +21,9 @@ Prove Agent mode remains useful while preserving explicit author approval before
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Agent Mode Regression](phase-001-agent-mode-regression/phase.md) | `review` | TBD |
-| 002 | [Review Gate Regression](phase-002-review-gate-regression/phase.md) | `review` | TBD |
-| 003 | [Docs Sync](phase-003-docs-sync/phase.md) | `review` | TBD |
+| 001 | [Agent Mode Regression](phase-001-agent-mode-regression/phase.md) | `complete` | TBD |
+| 002 | [Review Gate Regression](phase-002-review-gate-regression/phase.md) | `complete` | TBD |
+| 003 | [Docs Sync](phase-003-docs-sync/phase.md) | `complete` | TBD |
 
 ## Entry Criteria
 
@@ -39,4 +39,4 @@ Prove Agent mode remains useful while preserving explicit author approval before
 
 Target both source-contract tests and user-flow tests so the policy is enforced at compile-time and behavior level.
 
-Stage 004 is ready for Reviewer Agent sign-off. Do not mark complete until review is accepted.
+Stage 004 completed after Reviewer Agent sign-off on 2026-06-12.

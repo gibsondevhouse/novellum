@@ -2,7 +2,7 @@
 title: Review Gate Regression
 slug: phase-002-review-gate-regression
 phase_number: 2
-status: review
+status: complete
 owner: Planner Agent
 stage: stage-004-regression-and-docs
 parts:
@@ -18,7 +18,7 @@ Prove author review gates still apply manuscript/canon changes only after explic
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Review Gate Regression](part-001-review-gate-regression/part.md) | `review` | Codex | TBD |
+| 001 | [Review Gate Regression](part-001-review-gate-regression/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 

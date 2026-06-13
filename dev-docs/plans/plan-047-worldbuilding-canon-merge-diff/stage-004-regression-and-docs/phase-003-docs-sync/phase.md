@@ -2,7 +2,7 @@
 title: Docs Sync
 slug: phase-003-docs-sync
 phase_number: 3
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-004-regression-and-docs
 parts:
@@ -18,13 +18,13 @@ Document diff/merge worldbuilding behavior and author review guarantees.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Docs Sync](part-001-docs-sync/part.md) | `draft` | — | TBD |
+| 001 | [Docs Sync](part-001-docs-sync/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Docs explain field-level review before canon mutation.
-- [ ] Duplicate evidence is described as advisory.
-- [ ] Audit trail behavior is documented.
+- [x] Docs explain field-level review before canon mutation.
+- [x] Duplicate evidence is described as advisory.
+- [x] Audit trail behavior is documented.
 
 ## Notes
 

@@ -2,12 +2,12 @@
 title: Closeout Evidence
 slug: part-001-closeout-evidence
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-003-closeout-evidence
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,8 @@ Collect the final proof that outline pipeline consolidation is ready for reviewe
 
 **Create:**
 
-- `evidence/closeout-evidence-2026-06-09.md`
+- `evidence/closeout-evidence-2026-06-12.md`
+- `../../../CLOSEOUT.md`
 
 **Update:**
 
@@ -60,9 +61,9 @@ Collect the final proof that outline pipeline consolidation is ready for reviewe
 
 ## Acceptance Criteria
 
-- [ ] Evidence is sufficient for reviewer evaluation.
-- [ ] All completed parts have final impl log entries.
-- [ ] Tracker updates are prepared only if the plan is actually executed and closed.
+- [x] Evidence is sufficient for reviewer evaluation.
+- [x] All completed parts have final impl log entries.
+- [x] Tracker updates are prepared only if the plan is actually executed and closed.
 
 ## Edge Cases
 

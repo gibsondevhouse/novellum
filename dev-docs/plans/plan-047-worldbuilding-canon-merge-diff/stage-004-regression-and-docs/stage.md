@@ -2,7 +2,7 @@
 title: Regression & Docs
 slug: stage-004-regression-and-docs
 stage_number: 4
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-047-worldbuilding-canon-merge-diff
 phases:
@@ -21,9 +21,9 @@ Verify worldbuilding diff/merge behavior and document the new canon acceptance g
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Proposal Flow Tests](phase-001-proposal-flow-tests/phase.md) | `draft` | TBD |
-| 002 | [Canon Merge Tests](phase-002-canon-merge-tests/phase.md) | `draft` | TBD |
-| 003 | [Docs Sync](phase-003-docs-sync/phase.md) | `draft` | TBD |
+| 001 | [Proposal Flow Tests](phase-001-proposal-flow-tests/phase.md) | `complete` | TBD |
+| 002 | [Canon Merge Tests](phase-002-canon-merge-tests/phase.md) | `complete` | TBD |
+| 003 | [Docs Sync](phase-003-docs-sync/phase.md) | `complete` | TBD |
 
 ## Entry Criteria
 
@@ -38,4 +38,3 @@ Verify worldbuilding diff/merge behavior and document the new canon acceptance g
 ## Notes
 
 This stage should include evidence that existing insert-only proposals still work where create is the correct decision.
-

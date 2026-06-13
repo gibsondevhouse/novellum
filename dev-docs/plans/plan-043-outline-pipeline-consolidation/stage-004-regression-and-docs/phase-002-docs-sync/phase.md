@@ -2,7 +2,7 @@
 title: Docs Sync
 slug: phase-002-docs-sync
 phase_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-004-regression-and-docs
 parts:
@@ -18,13 +18,13 @@ Sync docs to the consolidated outline flow.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Docs Sync](part-001-docs-sync/part.md) | `draft` | — | TBD |
+| 001 | [Docs Sync](part-001-docs-sync/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Docs identify checkpoint generation and accept materialization as canonical.
-- [ ] Retired route references are removed or marked historical.
-- [ ] Verification commands are recorded.
+- [x] Docs identify checkpoint generation and accept materialization as canonical.
+- [x] Retired route references are removed or marked historical.
+- [x] Verification commands are recorded.
 
 ## Notes
 

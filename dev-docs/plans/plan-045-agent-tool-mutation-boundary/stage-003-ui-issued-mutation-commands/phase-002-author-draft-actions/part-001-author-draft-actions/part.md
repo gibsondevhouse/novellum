@@ -2,7 +2,7 @@
 title: Author Draft Actions
 slug: part-001-author-draft-actions
 part_number: 1
-status: review
+status: complete
 owner: Planner Agent
 assigned_to: —
 phase: phase-002-author-draft-actions

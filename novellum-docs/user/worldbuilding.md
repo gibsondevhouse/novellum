@@ -1,6 +1,6 @@
 # World Building
 
-> Last verified: 2026-06-01
+> Last verified: 2026-06-12
 
 The **World Building** surface gathers everything that isn't manuscript prose: who's in your story, where it happens, what they know, what's brewing, and when it all unfolds.
 
@@ -44,6 +44,22 @@ Timeline events and milestones. Useful when your story spans long periods or has
 ## How AI uses world building
 
 When you trigger AI features (continuity checks, edits, rewrites), the **Context Engine** pulls in relevant world-building entries — only the ones referenced by the active scope, never everything. This is why filling in your characters and lore matters: it makes AI suggestions meaningfully grounded in your story.
+
+## AI Proposals And Canon
+
+Worldbuilding scan results are proposals first. They do not become canon until you explicitly accept them.
+
+Proposal cards can now show the intended canon action before you decide:
+
+- **Create** proposes a new character, location, lore entry, plot thread, or timeline event.
+- **Update** fills safe empty fields on an existing canon record.
+- **Merge** adds compatible details to an existing record when duplicate evidence is present.
+- **Link** connects supported records, such as a character and faction.
+- **No-op** records that existing canon already covers the proposal.
+
+Duplicate matches are advisory evidence. They help you compare a proposal with existing canon, but they do not automatically merge records or block your decision.
+
+Accepted and rejected proposals keep compact audit metadata: the decision, projection mode, target ID when one exists, changed field names, duplicate evidence count, and rejection reason when rejected. Audit records intentionally avoid storing full before/after entity snapshots or raw model output.
 
 For details, see the dev-docs: [../../dev-docs/03-ai/context-engine.md](../../dev-docs/03-ai/context-engine.md).
 

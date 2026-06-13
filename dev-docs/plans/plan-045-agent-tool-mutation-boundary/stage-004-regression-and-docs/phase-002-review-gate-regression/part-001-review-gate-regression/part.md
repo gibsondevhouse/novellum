@@ -2,7 +2,7 @@
 title: Review Gate Regression
 slug: part-001-review-gate-regression
 part_number: 1
-status: review
+status: complete
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-002-review-gate-regression

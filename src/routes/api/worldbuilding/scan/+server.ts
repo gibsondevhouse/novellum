@@ -34,6 +34,7 @@ import {
 	MAX_PROPOSALS_PER_SCAN,
 	MIN_PROPOSAL_CONFIDENCE,
 	buildProposalDedupeKey,
+	buildProposalDuplicateCandidates,
 	clampConfidence,
 	isDuplicateProposalKey,
 	type WorldbuildProposalRecord,
@@ -412,19 +413,6 @@ function loadExistingProposalKeys(projectId: string): Set<string> {
 	return keys;
 }
 
-function addCanonDedupeKeys(
-	keys: Set<string>,
-	domainScope: WorldbuildingDomainId,
-	canon: WorldbuildScanCanonContext,
-): void {
-	const config = DOMAIN_CONFIG[domainScope];
-	for (const identifier of canon[config.canonField]) {
-		if (typeof identifier === 'string' && identifier.trim()) {
-			keys.add(buildProposalDedupeKey(domainScope, config.entityKind, identifier));
-		}
-	}
-}
-
 function isObject(value: unknown): value is Record<string, unknown> {
 	return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
@@ -467,6 +455,12 @@ function proposalFromDraft(
 		reasoningSummary,
 		payload,
 		dedupeKey: buildProposalDedupeKey(scanRequest.domainScope, config.entityKind, identifier),
+		duplicateCandidates: buildProposalDuplicateCandidates({
+			categoryId: scanRequest.domainScope,
+			entityKind: config.entityKind,
+			identifier,
+			canonIdentifiers: scanRequest.context.canon[config.canonField],
+		}),
 		acceptance: null,
 		rejection: null,
 	};
@@ -479,7 +473,6 @@ function normalizeAndDedupeProposals(
 	const generatedAt = new Date().toISOString();
 	const sourceContext = buildSourceContext(scanRequest.context.project);
 	const existingKeys = loadExistingProposalKeys(scanRequest.projectId);
-	addCanonDedupeKeys(existingKeys, scanRequest.domainScope, scanRequest.context.canon);
 
 	const proposals: WorldbuildProposalRecord[] = [];
 	for (const draft of rawDrafts) {
@@ -626,7 +619,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		if (proposals.length === 0) {
 			return scanError('schema_validation_failed', statusForScanCode('schema_validation_failed'), {
-				issue: 'No valid, non-duplicate proposals returned by provider.',
+				issue: 'No valid proposals returned by provider.',
 			});
 		}
 

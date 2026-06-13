@@ -2,12 +2,12 @@
 title: Schema Inventory
 slug: part-001-schema-inventory
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-002-schema-inventory
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Identify current envelope shapes and why stale e2e fixtures fail against them.
 
 **Create:**
 
-- `evidence/schema-inventory-evidence-2026-06-09.md`
+- `evidence/schema-inventory-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -57,9 +57,9 @@ Identify current envelope shapes and why stale e2e fixtures fail against them.
 
 ## Acceptance Criteria
 
-- [ ] Current schema requirements are documented by family.
-- [ ] Fixture/schema mismatches are identified.
-- [ ] Version policy questions are listed for stage 002.
+- [x] Current schema requirements are documented by family.
+- [x] Fixture/schema mismatches are identified.
+- [x] Version policy questions are listed for stage 002.
 
 ## Edge Cases
 
@@ -68,4 +68,4 @@ Identify current envelope shapes and why stale e2e fixtures fail against them.
 
 ## Notes
 
-Keep this part scoped to Pipeline Checkpoint Contract Reconciliation. If implementation reveals a larger dependency, document it in `impl.log.md` before expanding scope.
+Schema inventory evidence distinguishes strict Zod contracts from manual worldbuild checkpoint normalization and lists version-policy questions for Stage 002.

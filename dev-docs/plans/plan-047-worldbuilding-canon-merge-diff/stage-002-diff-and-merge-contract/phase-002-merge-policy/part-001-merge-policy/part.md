@@ -2,12 +2,12 @@
 title: Merge Policy
 slug: part-001-merge-policy
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-002-merge-policy
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Specify what fields can be updated, appended, linked, or left untouched during p
 
 **Create:**
 
-- `evidence/merge-policy-evidence-2026-06-09.md`
+- `evidence/merge-policy-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -57,9 +57,9 @@ Specify what fields can be updated, appended, linked, or left untouched during p
 
 ## Acceptance Criteria
 
-- [ ] Merge policy is explicit and bounded.
-- [ ] No field overwrite occurs without visible author approval.
-- [ ] Atomicity expectations are documented.
+- [x] Merge policy is explicit and bounded.
+- [x] No field overwrite occurs without visible author approval.
+- [x] Atomicity expectations are documented.
 
 ## Edge Cases
 

@@ -2,12 +2,12 @@
 title: Duplicate & Relationship Gap Map
 slug: part-001-duplicate-and-relationship-gap-map
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-003-duplicate-and-relationship-gap-map
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Identify where exact name dedupe is insufficient and where accepted proposals sh
 
 **Create:**
 
-- `evidence/duplicate-and-relationship-gap-map-evidence-2026-06-09.md`
+- `evidence/duplicate-and-relationship-gap-map-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -57,9 +57,9 @@ Identify where exact name dedupe is insufficient and where accepted proposals sh
 
 ## Acceptance Criteria
 
-- [ ] Exact dedupe limits are documented.
-- [ ] Relationship/link gaps are listed by entity family.
-- [ ] Review evidence requirements for duplicates are defined.
+- [x] Exact dedupe limits are documented.
+- [x] Relationship/link gaps are listed by entity family.
+- [x] Review evidence requirements for duplicates are defined.
 
 ## Edge Cases
 

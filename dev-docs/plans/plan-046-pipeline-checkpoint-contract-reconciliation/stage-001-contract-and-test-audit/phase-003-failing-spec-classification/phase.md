@@ -2,7 +2,7 @@
 title: Failing Spec Classification
 slug: phase-003-failing-spec-classification
 phase_number: 3
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-001-contract-and-test-audit
 parts:
@@ -18,14 +18,14 @@ Classify each full-e2e failure as stale test, product regression, or retired con
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Failing Spec Classification](part-001-failing-spec-classification/part.md) | `draft` | — | TBD |
+| 001 | [Failing Spec Classification](part-001-failing-spec-classification/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Every failing spec has a classification and recommended action.
-- [ ] Stale fixture failures are distinguished from product regressions.
-- [ ] Next-stage API map can resolve each failure.
+- [x] Every failing spec has a classification and recommended action.
+- [x] Stale fixture failures are distinguished from product regressions.
+- [x] Next-stage API map can resolve each failure.
 
 ## Notes
 
-Prevent stale tests from driving accidental compatibility while still catching real regressions.
+Failing spec classification captured in `part-001-failing-spec-classification/evidence/failing-spec-classification-evidence-2026-06-12.md`.

@@ -2,7 +2,7 @@
 title: Diff & Merge Contract
 slug: stage-002-diff-and-merge-contract
 stage_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-047-worldbuilding-canon-merge-diff
 phases:
@@ -21,9 +21,9 @@ Define typed proposal outcomes for create, update, merge, link, and no-op canon 
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Diff Schema](phase-001-diff-schema/phase.md) | `draft` | TBD |
-| 002 | [Merge Policy](phase-002-merge-policy/phase.md) | `draft` | TBD |
-| 003 | [Duplicate Evidence](phase-003-duplicate-evidence/phase.md) | `draft` | TBD |
+| 001 | [Diff Schema](phase-001-diff-schema/phase.md) | `complete` | TBD |
+| 002 | [Merge Policy](phase-002-merge-policy/phase.md) | `complete` | TBD |
+| 003 | [Duplicate Evidence](phase-003-duplicate-evidence/phase.md) | `complete` | TBD |
 
 ## Entry Criteria
 
@@ -39,4 +39,3 @@ Define typed proposal outcomes for create, update, merge, link, and no-op canon 
 ## Notes
 
 Keep the first implementation narrow if needed. The contract can support broader families before every family is fully implemented.
-

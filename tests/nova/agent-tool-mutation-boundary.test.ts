@@ -96,8 +96,8 @@ describe('Agent tool mutation boundary', () => {
 
 	it('keeps worldbuilding accept/reject behind UI callbacks and store actions', () => {
 		expect(modelCallableSource).not.toMatch(/acceptWorldbuild|rejectWorldbuild|acceptProposal|rejectProposal/);
-		expect(worldbuildProposalCardSource).toContain('onAccept?.(proposal.proposalId)');
-		expect(worldbuildProposalCardSource).toContain('onReject?.(proposal.proposalId, reason)');
+		expect(worldbuildProposalCardSource).toContain('onAccept?.(proposal.proposalId, proposal.projectId)');
+		expect(worldbuildProposalCardSource).toContain('onReject?.(proposal.proposalId, reason, proposal.projectId)');
 		expect(worldbuildStoreSource).toContain('acceptStagedWorldbuildCheckpoint');
 		expect(worldbuildStoreSource).toContain('rejectStagedWorldbuildCheckpoint');
 	});

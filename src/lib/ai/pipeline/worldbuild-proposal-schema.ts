@@ -10,6 +10,13 @@
  */
 
 import type { WorldbuildingDomainId } from '../../../modules/world-building/worldbuilding-workflow.js';
+import type {
+	WorldbuildCanonDecision,
+	WorldbuildCanonDiff,
+	WorldbuildCanonEntityFamily,
+	WorldbuildCanonFieldDiff,
+	WorldbuildCanonLinkDiff,
+} from './worldbuild-canon-diff-schema.js';
 
 // ---------------------------------------------------------------------------
 // Status lifecycle
@@ -55,6 +62,43 @@ export interface WorldbuildProposalSourceContext {
 // Audit metadata
 // ---------------------------------------------------------------------------
 
+export type WorldbuildProposalProjectionMode = 'canon_diff' | 'legacy_create_projection';
+
+export interface WorldbuildProposalAuditTarget {
+	family: WorldbuildCanonEntityFamily | string;
+	id: string | null;
+	displayName: string;
+}
+
+export interface WorldbuildProposalAuditFieldChange {
+	fieldPath: string;
+	label?: string;
+	operation: WorldbuildCanonFieldDiff['operation'] | 'payload';
+	valueType: WorldbuildCanonFieldDiff['valueType'];
+	evidenceCount: number;
+}
+
+export interface WorldbuildProposalAuditLinkChange {
+	linkType: WorldbuildCanonLinkDiff['linkType'];
+	source: WorldbuildProposalAuditTarget | null;
+	target: WorldbuildProposalAuditTarget | null;
+	evidenceCount: number;
+}
+
+export interface WorldbuildProposalMutationAudit {
+	projectionMode: WorldbuildProposalProjectionMode;
+	decision: WorldbuildCanonDecision;
+	diffId: string | null;
+	family: WorldbuildCanonEntityFamily | string;
+	targetId: string | null;
+	target: WorldbuildProposalAuditTarget | null;
+	changedFields: WorldbuildProposalAuditFieldChange[];
+	linkedTargets: WorldbuildProposalAuditLinkChange[];
+	duplicateCandidateCount: number;
+	evidenceCount: number;
+	summary: string;
+}
+
 export interface WorldbuildProposalAcceptance {
 	acceptedAt: string;
 	acceptedBy: string | null;
@@ -62,6 +106,8 @@ export interface WorldbuildProposalAcceptance {
 	projectionTarget: string;
 	/** Whether the projection completed without error. */
 	projectedToCanon: boolean;
+	/** Compact audit metadata for later review; does not copy full canon values. */
+	audit?: WorldbuildProposalMutationAudit;
 }
 
 export interface WorldbuildProposalRejection {
@@ -69,6 +115,26 @@ export interface WorldbuildProposalRejection {
 	rejectedBy: string | null;
 	/** Optional free-text reason from the author. */
 	reason: string;
+	/** Compact audit metadata retained with the rejection reason. */
+	audit?: WorldbuildProposalMutationAudit;
+}
+
+export type WorldbuildProposalDuplicateMatchKind = 'exact_key' | 'normalized_name' | 'token_overlap';
+
+export interface WorldbuildProposalDuplicateEvidence {
+	kind: WorldbuildProposalDuplicateMatchKind;
+	label: string;
+	detail?: string;
+	score: number;
+}
+
+export interface WorldbuildProposalDuplicateCandidate {
+	displayName: string;
+	identifier: string;
+	dedupeKey: string;
+	matchKind: WorldbuildProposalDuplicateMatchKind;
+	score: number;
+	evidence: WorldbuildProposalDuplicateEvidence[];
 }
 
 // ---------------------------------------------------------------------------
@@ -101,6 +167,10 @@ export interface WorldbuildProposalRecord {
 	/** Validated draft payload. Shape depends on entityKind. */
 	payload: Record<string, unknown>;
 	dedupeKey: string;
+	/** Optional field-level diff contract for author-reviewable canon projection. */
+	canonDiff?: WorldbuildCanonDiff | null;
+	/** Advisory duplicate candidates surfaced during review; never an automatic merge decision. */
+	duplicateCandidates?: WorldbuildProposalDuplicateCandidate[];
 	acceptance: WorldbuildProposalAcceptance | null;
 	rejection: WorldbuildProposalRejection | null;
 }
@@ -143,6 +213,99 @@ export function isDuplicateProposalKey(
 	existingKeys: ReadonlySet<string>,
 ): boolean {
 	return existingKeys.has(candidateKey);
+}
+
+export const MIN_DUPLICATE_EVIDENCE_SCORE = 0.5;
+
+function identifierTokens(identifier: string): Set<string> {
+	return new Set(
+		identifier
+			.trim()
+			.toLowerCase()
+			.replace(/['"]/g, '')
+			.split(/[^a-z0-9]+/)
+			.map((token) => token.trim())
+			.filter((token) => token.length > 1),
+	);
+}
+
+function tokenOverlapScore(candidateIdentifier: string, canonIdentifier: string): number {
+	const candidateTokens = identifierTokens(candidateIdentifier);
+	const canonTokens = identifierTokens(canonIdentifier);
+	if (candidateTokens.size === 0 || canonTokens.size === 0) return 0;
+
+	let shared = 0;
+	for (const token of candidateTokens) {
+		if (canonTokens.has(token)) shared += 1;
+	}
+
+	return shared / Math.max(candidateTokens.size, canonTokens.size);
+}
+
+export function buildProposalDuplicateCandidates(input: {
+	categoryId: WorldbuildingDomainId;
+	entityKind: string;
+	identifier: string;
+	canonIdentifiers: readonly string[];
+	maxCandidates?: number;
+}): WorldbuildProposalDuplicateCandidate[] {
+	const candidateKey = buildProposalDedupeKey(
+		input.categoryId,
+		input.entityKind,
+		input.identifier,
+	);
+	const candidates: WorldbuildProposalDuplicateCandidate[] = [];
+
+	for (const canonIdentifier of input.canonIdentifiers) {
+		const trimmedCanonIdentifier = canonIdentifier.trim();
+		if (!trimmedCanonIdentifier) continue;
+
+		const dedupeKey = buildProposalDedupeKey(
+			input.categoryId,
+			input.entityKind,
+			trimmedCanonIdentifier,
+		);
+		if (dedupeKey === candidateKey) {
+			candidates.push({
+				displayName: trimmedCanonIdentifier,
+				identifier: trimmedCanonIdentifier,
+				dedupeKey,
+				matchKind: 'exact_key',
+				score: 1,
+				evidence: [
+					{
+						kind: 'exact_key',
+						label: 'Exact normalized name/title match in existing canon.',
+						score: 1,
+					},
+				],
+			});
+			continue;
+		}
+
+		const score = tokenOverlapScore(input.identifier, trimmedCanonIdentifier);
+		if (score >= MIN_DUPLICATE_EVIDENCE_SCORE) {
+			candidates.push({
+				displayName: trimmedCanonIdentifier,
+				identifier: trimmedCanonIdentifier,
+				dedupeKey,
+				matchKind: score === 1 ? 'normalized_name' : 'token_overlap',
+				score,
+				evidence: [
+					{
+						kind: score === 1 ? 'normalized_name' : 'token_overlap',
+						label: 'Name/title tokens overlap with existing canon.',
+						detail: `${Math.round(score * 100)}% token overlap.`,
+						score,
+					},
+				],
+			});
+		}
+	}
+
+	return candidates
+		.sort((a, b) => b.score - a.score || a.displayName.localeCompare(b.displayName))
+		.slice(0, input.maxCandidates ?? 3);
 }
 
 // ---------------------------------------------------------------------------

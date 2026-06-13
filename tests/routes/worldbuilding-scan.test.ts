@@ -207,6 +207,41 @@ describe('POST /api/worldbuilding/scan', () => {
 			expect(row.count).toBe(3);
 		});
 
+		it('surfaces canon duplicate candidates without blocking proposal persistence', async () => {
+			const response = await callScan({
+				projectId: 'proj-1',
+				domainScope: 'personae',
+				context: {
+					...VALID_CONTEXT,
+					project: { ...VALID_CONTEXT.project, title: 'Signal Fire' },
+					canon: {
+						...VALID_CONTEXT.canon,
+						characterNames: ['Signal Fire Witness 1'],
+					},
+				},
+				maxProposals: 1,
+			});
+			expect(response.status).toBe(200);
+			const body = (await response.json()) as {
+				ok: true;
+				proposals: Array<{ duplicateCandidates?: Array<Record<string, unknown>> }>;
+			};
+			expect(body.proposals).toHaveLength(1);
+			expect(body.proposals[0].duplicateCandidates?.[0]).toMatchObject({
+				displayName: 'Signal Fire Witness 1',
+				matchKind: 'exact_key',
+				score: 1,
+			});
+
+			const row = testDb
+				.prepare(
+					`SELECT COUNT(*) as count FROM project_metadata
+					 WHERE projectId = ? AND scope = 'pipeline' AND ownerId = 'vibe-worldbuild-scan'`,
+				)
+				.get('proj-1') as { count: number };
+			expect(row.count).toBe(1);
+		});
+
 		it('accepts all valid domain scopes and produces scoped proposals', async () => {
 			const domains = ['personae', 'atlas', 'archive', 'threads', 'chronicles'];
 			for (const domainScope of domains) {

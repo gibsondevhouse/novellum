@@ -2,12 +2,12 @@
 title: Audit Records
 slug: part-001-audit-records
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-003-audit-records
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -40,7 +40,7 @@ Make worldbuilding canon mutations explainable after the fact.
 **Create:**
 
 - `tests/ai/pipeline/worldbuild-canon-audit.test.ts`
-- `evidence/audit-records-evidence-2026-06-09.md`
+- `evidence/audit-records-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -59,9 +59,9 @@ Make worldbuilding canon mutations explainable after the fact.
 
 ## Acceptance Criteria
 
-- [ ] Accepted proposals record what changed and where.
-- [ ] Rejected proposals retain reason and review evidence.
-- [ ] Audit metadata validates with proposal schema.
+- [x] Accepted proposals record what changed and where.
+- [x] Rejected proposals retain reason and review evidence.
+- [x] Audit metadata validates with proposal schema.
 
 ## Edge Cases
 

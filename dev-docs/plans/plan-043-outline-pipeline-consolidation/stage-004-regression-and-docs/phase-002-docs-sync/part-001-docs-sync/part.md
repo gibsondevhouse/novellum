@@ -2,12 +2,12 @@
 title: Docs Sync
 slug: part-001-docs-sync
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-002-docs-sync
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,12 +39,15 @@ Update developer and user docs so future work starts from the checkpoint pipelin
 
 **Create:**
 
-- `evidence/docs-sync-evidence-2026-06-09.md`
+- `evidence/docs-sync-evidence-2026-06-12.md`
 
 **Update:**
 
 - `dev-docs/03-ai/agents-map.md`
+- `dev-docs/03-ai/pipeline.md`
+- `dev-docs/03-ai/outline-generation.md`
 - `dev-docs/03-ai/context-engine.md`
+- `dev-docs/04-modules/nova.md`
 - `novellum-docs/user/nova.md`
 
 **Reference:**
@@ -62,9 +65,9 @@ Update developer and user docs so future work starts from the checkpoint pipelin
 
 ## Acceptance Criteria
 
-- [ ] Docs identify checkpoint generation and accept materialization as canonical.
-- [ ] Retired route references are removed or marked historical.
-- [ ] Verification commands are recorded.
+- [x] Docs identify checkpoint generation and accept materialization as canonical.
+- [x] Retired route references are removed or marked historical.
+- [x] Verification commands are recorded.
 
 ## Edge Cases
 

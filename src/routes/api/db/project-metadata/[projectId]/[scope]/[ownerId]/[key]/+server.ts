@@ -73,6 +73,7 @@ function parsePipelineOperation(value: unknown): PipelineOperation {
 }
 
 function statusForCheckpointError(error: WorldbuildCheckpointError): number {
+	// Plan-046 keeps these generic pipeline metadata status codes stable for client branching.
 	switch (error.code) {
 		case 'not_found':
 			return 404;

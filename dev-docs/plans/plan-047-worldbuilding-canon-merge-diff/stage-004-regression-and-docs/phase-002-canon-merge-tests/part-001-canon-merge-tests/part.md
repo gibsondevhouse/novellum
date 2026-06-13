@@ -2,12 +2,12 @@
 title: Canon Merge Tests
 slug: part-001-canon-merge-tests
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-002-canon-merge-tests
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,11 +39,14 @@ Prove accepted diff decisions produce expected canon state without partial mutat
 
 **Create:**
 
-- `evidence/canon-merge-tests-evidence-2026-06-09.md`
+- `evidence/canon-merge-tests-evidence-2026-06-12.md`
 
 **Update:**
 
 - `tests/ai/pipeline/worldbuild-canon-diff-apply.test.ts`
+- `tests/ai/pipeline/worldbuild-canon-merge-policy.test.ts`
+- `tests/ai/pipeline/worldbuild-duplicate-evidence.test.ts`
+- `tests/ai/pipeline/worldbuild-canon-audit.test.ts`
 
 **Reference:**
 
@@ -57,9 +60,9 @@ Prove accepted diff decisions produce expected canon state without partial mutat
 
 ## Acceptance Criteria
 
-- [ ] Merge/update writes only intended fields.
-- [ ] Rollback leaves canon unchanged on failure.
-- [ ] No-op records lifecycle without canon mutation.
+- [x] Merge/update writes only intended fields.
+- [x] Rollback leaves canon unchanged on failure.
+- [x] No-op records lifecycle without canon mutation.
 
 ## Edge Cases
 

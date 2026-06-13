@@ -2,7 +2,7 @@
 title: Compatibility Notes
 slug: phase-003-compatibility-notes
 phase_number: 3
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-003-legacy-retirement
 parts:
@@ -18,13 +18,13 @@ Document how Novellum handles any legacy outline artifacts or retired route refe
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Compatibility Notes](part-001-compatibility-notes/part.md) | `draft` | — | TBD |
+| 001 | [Compatibility Notes](part-001-compatibility-notes/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Docs name the checkpoint path as canonical.
-- [ ] Legacy path behavior is documented as retired or unsupported.
-- [ ] No user doc instructs authors to use old outline artifact apply.
+- [x] Docs name the checkpoint path as canonical.
+- [x] Legacy path behavior is documented as retired or unsupported.
+- [x] No user doc instructs authors to use old outline artifact apply.
 
 ## Notes
 

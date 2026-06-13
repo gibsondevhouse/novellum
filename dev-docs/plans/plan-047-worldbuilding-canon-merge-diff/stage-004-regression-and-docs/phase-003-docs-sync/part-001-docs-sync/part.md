@@ -2,12 +2,12 @@
 title: Docs Sync
 slug: part-001-docs-sync
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-003-docs-sync
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Update user and developer docs to describe how proposals become canon after this
 
 **Create:**
 
-- `evidence/docs-sync-evidence-2026-06-09.md`
+- `evidence/docs-sync-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -59,9 +59,9 @@ Update user and developer docs to describe how proposals become canon after this
 
 ## Acceptance Criteria
 
-- [ ] Docs explain field-level review before canon mutation.
-- [ ] Duplicate evidence is described as advisory.
-- [ ] Audit trail behavior is documented.
+- [x] Docs explain field-level review before canon mutation.
+- [x] Duplicate evidence is described as advisory.
+- [x] Audit trail behavior is documented.
 
 ## Edge Cases
 

@@ -2,12 +2,12 @@
 title: Docs & Closeout
 slug: part-001-docs-and-closeout
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-003-docs-and-closeout
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,13 +39,18 @@ Make the reconciled route/schema contract discoverable for future plan execution
 
 **Create:**
 
-- `evidence/docs-and-closeout-evidence-2026-06-09.md`
+- `evidence/docs-and-closeout-evidence-2026-06-12.md`
 
 **Update:**
 
 - `dev-docs/03-ai/agents-map.md`
 - `dev-docs/03-ai/context-engine.md`
 - `dev-docs/plans/plan-046-pipeline-checkpoint-contract-reconciliation/plan.md`
+- `dev-docs/03-ai/worldbuild-generation.md`
+- `dev-docs/plans/plan-046-pipeline-checkpoint-contract-reconciliation/CLOSEOUT.md`
+- `dev-docs/plans/ACTIVE-PLAN.md`
+- `dev-docs/plans/MASTER-PLAN.md`
+- `GEMINI.md`
 
 **Reference:**
 
@@ -59,9 +64,9 @@ Make the reconciled route/schema contract discoverable for future plan execution
 
 ## Acceptance Criteria
 
-- [ ] Docs and tests agree on checkpoint contracts.
-- [ ] Reviewer handoff lists changed route/test behavior.
-- [ ] No tracker completion claims are made before execution.
+- [x] Docs and tests agree on checkpoint contracts.
+- [x] Reviewer handoff lists changed route/test behavior.
+- [x] No tracker completion claims are made before execution.
 
 ## Edge Cases
 
@@ -70,4 +75,4 @@ Make the reconciled route/schema contract discoverable for future plan execution
 
 ## Notes
 
-Keep this part scoped to Pipeline Checkpoint Contract Reconciliation. If implementation reveals a larger dependency, document it in `impl.log.md` before expanding scope.
+Implementation closeout is documented in `CLOSEOUT.md`. Trackers leave Plan-046 in `review`, not completed, pending real plan-level Reviewer evaluation.

@@ -2,7 +2,7 @@
 title: Advertisement Filter
 slug: phase-002-advertisement-filter
 phase_number: 2
-status: review
+status: complete
 owner: Planner Agent
 stage: stage-002-tool-policy-contract
 parts:
@@ -18,7 +18,7 @@ Filter model-advertised tools to exclude mutation capabilities.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Advertisement Filter](part-001-advertisement-filter/part.md) | `review` | — | TBD |
+| 001 | [Advertisement Filter](part-001-advertisement-filter/part.md) | `complete` | — | TBD |
 
 ## Acceptance Criteria
 

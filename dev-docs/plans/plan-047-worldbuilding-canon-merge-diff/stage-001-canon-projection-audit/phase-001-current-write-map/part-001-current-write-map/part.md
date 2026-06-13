@@ -2,12 +2,12 @@
 title: Current Write Map
 slug: part-001-current-write-map
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-current-write-map
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Identify every canon write performed when worldbuilding artifacts are accepted.
 
 **Create:**
 
-- `evidence/current-write-map-evidence-2026-06-09.md`
+- `evidence/current-write-map-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -57,9 +57,9 @@ Identify every canon write performed when worldbuilding artifacts are accepted.
 
 ## Acceptance Criteria
 
-- [ ] All canon table writes are mapped.
-- [ ] Insert-only behavior is documented by entity family.
-- [ ] Transaction and audit fields are identified.
+- [x] All canon table writes are mapped.
+- [x] Insert-only behavior is documented by entity family.
+- [x] Transaction and audit fields are identified.
 
 ## Edge Cases
 

@@ -2,7 +2,7 @@
 title: Canon Merge Tests
 slug: phase-002-canon-merge-tests
 phase_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-004-regression-and-docs
 parts:
@@ -18,13 +18,13 @@ Verify canon merge/update writes and rollback behavior.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Canon Merge Tests](part-001-canon-merge-tests/part.md) | `draft` | — | TBD |
+| 001 | [Canon Merge Tests](part-001-canon-merge-tests/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Merge/update writes only intended fields.
-- [ ] Rollback leaves canon unchanged on failure.
-- [ ] No-op records lifecycle without canon mutation.
+- [x] Merge/update writes only intended fields.
+- [x] Rollback leaves canon unchanged on failure.
+- [x] No-op records lifecycle without canon mutation.
 
 ## Notes
 

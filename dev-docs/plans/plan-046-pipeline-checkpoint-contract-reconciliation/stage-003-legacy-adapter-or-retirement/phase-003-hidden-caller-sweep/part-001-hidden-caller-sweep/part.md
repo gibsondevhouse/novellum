@@ -2,12 +2,12 @@
 title: Hidden Caller Sweep
 slug: part-001-hidden-caller-sweep
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-003-hidden-caller-sweep
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,13 +39,14 @@ Use source search and targeted runtime checks to prevent hidden route breakage.
 
 **Create:**
 
-- `evidence/hidden-caller-sweep-evidence-2026-06-09.md`
+- `evidence/hidden-caller-sweep-evidence-2026-06-12.md`
 
 **Update:**
 
 - `src/modules/nova/services/context-hooks.ts`
 - `src/modules/nova/services/author-draft-api.ts`
 - `src/modules/world-building/services/worldbuild-scan-contract.ts`
+- `dev-docs/03-ai/worldbuild-generation.md`
 
 **Reference:**
 
@@ -59,9 +60,9 @@ Use source search and targeted runtime checks to prevent hidden route breakage.
 
 ## Acceptance Criteria
 
-- [ ] No active caller uses retired checkpoint contracts.
-- [ ] Remaining historical references are documented.
-- [ ] Source search evidence is captured.
+- [x] No active caller uses retired checkpoint contracts.
+- [x] Remaining historical references are documented.
+- [x] Source search evidence is captured.
 
 ## Edge Cases
 
@@ -70,4 +71,4 @@ Use source search and targeted runtime checks to prevent hidden route breakage.
 
 ## Notes
 
-Keep this part scoped to Pipeline Checkpoint Contract Reconciliation. If implementation reveals a larger dependency, document it in `impl.log.md` before expanding scope.
+Source sweep found no active caller relying on retired checkpoint contracts. `worldbuild-generation.md` was corrected to describe proposal accept/reject request bodies with project context.

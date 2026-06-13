@@ -2,7 +2,7 @@
 title: Author Draft Actions
 slug: phase-002-author-draft-actions
 phase_number: 2
-status: review
+status: complete
 owner: Planner Agent
 stage: stage-003-ui-issued-mutation-commands
 parts:
@@ -18,7 +18,7 @@ Keep author draft accept/reject behind visible review card actions.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Author Draft Actions](part-001-author-draft-actions/part.md) | `review` | — | TBD |
+| 001 | [Author Draft Actions](part-001-author-draft-actions/part.md) | `complete` | — | TBD |
 
 ## Acceptance Criteria
 

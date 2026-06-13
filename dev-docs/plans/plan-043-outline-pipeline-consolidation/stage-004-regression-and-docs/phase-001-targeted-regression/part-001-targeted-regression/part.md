@@ -2,12 +2,12 @@
 title: Targeted Regression
 slug: part-001-targeted-regression
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-targeted-regression
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,12 +39,12 @@ Verify checkpoint generation, review, reject, accept, and conflict behavior afte
 
 **Create:**
 
-- `evidence/targeted-regression-evidence-2026-06-09.md`
+- `evidence/targeted-regression-evidence-2026-06-12.md`
 
 **Update:**
 
-- `tests/e2e/outline-generation-review.spec.ts`
 - `tests/nova/nova-artifact-cards.test.ts`
+- `tests/routes/nova-outline-apply-route.test.ts`
 
 **Reference:**
 
@@ -61,9 +61,9 @@ Verify checkpoint generation, review, reject, accept, and conflict behavior afte
 
 ## Acceptance Criteria
 
-- [ ] Targeted outline e2e passes.
-- [ ] Static gates pass or blockers are documented with exact output.
-- [ ] Any test changes assert current canonical behavior.
+- [x] Targeted outline e2e passes.
+- [x] Static gates pass or blockers are documented with exact output.
+- [x] Any test changes assert current canonical behavior.
 
 ## Edge Cases
 

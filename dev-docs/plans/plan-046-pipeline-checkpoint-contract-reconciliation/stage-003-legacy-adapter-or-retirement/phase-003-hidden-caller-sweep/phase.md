@@ -2,7 +2,7 @@
 title: Hidden Caller Sweep
 slug: phase-003-hidden-caller-sweep
 phase_number: 3
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-003-legacy-adapter-or-retirement
 parts:
@@ -18,13 +18,13 @@ Confirm no active source caller relies on retired or changed checkpoint contract
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Hidden Caller Sweep](part-001-hidden-caller-sweep/part.md) | `draft` | — | TBD |
+| 001 | [Hidden Caller Sweep](part-001-hidden-caller-sweep/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] No active caller uses retired checkpoint contracts.
-- [ ] Remaining historical references are documented.
-- [ ] Source search evidence is captured.
+- [x] No active caller uses retired checkpoint contracts.
+- [x] Remaining historical references are documented.
+- [x] Source search evidence is captured.
 
 ## Notes
 

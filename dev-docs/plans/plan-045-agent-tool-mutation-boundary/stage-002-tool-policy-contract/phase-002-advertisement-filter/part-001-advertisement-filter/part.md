@@ -2,7 +2,7 @@
 title: Advertisement Filter
 slug: part-001-advertisement-filter
 part_number: 1
-status: review
+status: complete
 owner: Planner Agent
 assigned_to: —
 phase: phase-002-advertisement-filter

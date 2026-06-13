@@ -2,7 +2,7 @@
 title: Source Contract Tests
 slug: phase-003-source-contract-tests
 phase_number: 3
-status: review
+status: complete
 owner: Planner Agent
 stage: stage-002-tool-policy-contract
 parts:
@@ -18,7 +18,7 @@ Add source-contract tests that prevent future mutation tool regressions.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Source Contract Tests](part-001-source-contract-tests/part.md) | `review` | — | TBD |
+| 001 | [Source Contract Tests](part-001-source-contract-tests/part.md) | `complete` | — | TBD |
 
 ## Acceptance Criteria
 

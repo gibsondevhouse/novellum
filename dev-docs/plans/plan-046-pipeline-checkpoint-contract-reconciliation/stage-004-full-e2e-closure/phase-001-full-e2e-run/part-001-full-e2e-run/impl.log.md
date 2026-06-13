@@ -1,4 +1,14 @@
 ---
+
+### [2026-06-12 00:00] Agent: Codex
+
+**Action:** Ran the canonical full Chromium E2E command after fixture and proposal-client reconciliation.
+
+**Result:** `pnpm test:e2e --project=chromium` passed 19/19 tests. No stale checkpoint fixture failures remained.
+
+**Notes:** Added `evidence/full-e2e-run-evidence-2026-06-12.md`. Reviewer remains deferred until implementation closeout.
+
+---
 part: part-001-full-e2e-run
 ---
 

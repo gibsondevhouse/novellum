@@ -1,6 +1,6 @@
 # Agents Map
 
-> Last verified: 2026-06-11 (plan-045 mutation boundary)
+> Last verified: 2026-06-12 (plan-047 worldbuilding canon merge diff)
 
 Authoritative status of all Novellum runtime agents. Anchored to [src/lib/ai/](../../src/lib/ai/).
 The V1.1 staged pipeline (`vibe-worldbuild` / `vibe-author`) is
@@ -71,7 +71,7 @@ is deferred.
 | Stage key | Output format | Canon projection |
 | --- | --- | --- |
 | `vibe-author.premise` | `json_author_premise` | None — artifact only. |
-| `vibe-author.outline` | `json_author_outline` | None — artifact only. |
+| `vibe-author.outline` | `json_author_outline` | Legacy parser/task contract only; supported outline generation now uses `vibe-outline.draft` checkpoints. |
 | `vibe-author.scene-draft` | `json_author_scene_draft` | None — surfaced via [`NovaSceneDraftCard`](../../src/modules/nova/components/NovaSceneDraftCard.svelte). Accept emits the envelope; the manuscript is never auto-mutated. |
 | `vibe-author.revision-pack` | `json_author_revision_pack` | None — surfaced via [`NovaRevisionPackCard`](../../src/modules/nova/components/NovaRevisionPackCard.svelte) with per-issue Acknowledge. |
 
@@ -79,7 +79,12 @@ Delivery surface:
 
 - Runner: [`runAuthorPipelineTask`](../../src/modules/nova/services/author-pipeline-runner.ts) — resolves the task, builds RAG context, calls OpenRouter, parses the response, attaches a `NovaArtifact` to the originating Nova message.
 - Cards: [`NovaSceneDraftCard`](../../src/modules/nova/components/NovaSceneDraftCard.svelte) and [`NovaRevisionPackCard`](../../src/modules/nova/components/NovaRevisionPackCard.svelte) render parsed envelopes with explicit user-driven controls only.
-- Review gates: persisted via the shared `/api/db/project-metadata/{projectId}/pipeline/vibe-author/{key}/{id}` lifecycle (`upsert | review | accept | reject`). End-to-end coverage lives in [`tests/e2e/vibe-author-review-gates.spec.ts`](../../tests/e2e/vibe-author-review-gates.spec.ts).
+- Review gates: scene draft checkpoints use the task-specific `/api/author-draft/checkpoints/*` routes for list, generate, accept, and reject. End-to-end coverage lives in [`tests/e2e/vibe-author-review-gates.spec.ts`](../../tests/e2e/vibe-author-review-gates.spec.ts).
+
+Plan-043 retires user-facing `vibe-author.outline` application. Write-mode
+outline prompts use the outline checkpoint flow (`POST /api/ai/outline/generate`
+then `NovaOutlineDraftCheckpointCard` review) and legacy outline artifact cards
+are read-only compatibility output.
 
 Author-in-the-loop guarantee: every accept path emits a typed callback;
 no card component imports the editor store or calls `insertText` /
@@ -113,6 +118,78 @@ Rejecting a review artifact is still a mutation because it records an author
 decision and changes lifecycle state. Generation-only checkpoint tools remain
 model-callable only while they create review artifacts and do not project into
 manuscript or canon state.
+
+## Checkpoint Route Ownership (plan-046)
+
+Plan-046 distinguishes canonical route ownership from generic metadata
+compatibility. Each checkpoint/proposal family has one supported lifecycle
+path per operation:
+
+| Family | Generate / Upsert | List / Read | Review | Accept | Reject | Client Owner |
+| --- | --- | --- | --- | --- | --- | --- |
+| `vibe-worldbuild` staged checkpoints | `PUT /api/db/project-metadata/{projectId}/pipeline/vibe-worldbuild/{checkpointId}` with `operation: "upsert"` and a current `PipelineArtifactEnvelope` | `GET /api/db/project-metadata/{projectId}/pipeline/vibe-worldbuild` and item `GET` | Same generic metadata item route with `operation: "review"` | Same generic metadata item route with `operation: "accept"` | Same generic metadata item route with `operation: "reject"` and non-empty reason | `src/lib/project-metadata.ts` worldbuild helpers and `world-building-store.svelte.ts` |
+| Worldbuilding scan proposals | `POST /api/worldbuilding/scan` persists `WorldbuildProposalRecord` rows under owner `vibe-worldbuild-scan` | Project metadata list/read by owner for notification state | Pending proposal records are already review-ready | `POST /api/worldbuilding/proposals/{proposalId}/accept` with `projectId` body | `POST /api/worldbuilding/proposals/{proposalId}/reject` with `projectId` and reason | `worldbuilding-proposal-service.ts` should target the proposal routes and include project context |
+| Author draft checkpoints | `POST /api/author-draft/checkpoints/generate` creates or reuses a `review` checkpoint | `GET /api/author-draft/checkpoints` and `GET /api/author-draft/scene-draft-context` | Generated scene drafts are already review-ready | `POST /api/author-draft/checkpoints/{checkpointId}/accept` | `POST /api/author-draft/checkpoints/{checkpointId}/reject` with reason | `author-draft-api.ts` and `NovaAuthorDraftCheckpointCard.svelte` |
+| Outline draft checkpoints | `POST /api/ai/outline/generate` creates a `review` checkpoint; generic metadata upsert remains fixture/internal compatibility | `GET /api/db/project-metadata/{projectId}/pipeline/outlineDraftCheckpoints.v1` and item `GET` | Generic metadata item route with `operation: "review"` | `POST /api/outline/checkpoints/{checkpointId}/accept` with stale preconditions | Generic metadata item route with `operation: "reject"` and non-empty reason | `outline-generation-runner.ts`, `outline-checkpoint-actions.ts`, and `NovaOutlineDraftCheckpointCard.svelte` |
+
+Worldbuilding scan proposals support an optional `canonDiff` contract for
+author-reviewable `create`, `update`, `merge`, `link`, and `no_op` decisions.
+The proposal card renders field-level changes and duplicate candidates before
+the author accepts or rejects. Accept uses
+[`acceptProposalAtomically`](../../src/lib/ai/pipeline/checkpoint-service.ts)
+to project supported decisions inside one SQLite transaction; unsupported or
+protected fields fail without partial canon writes. Historical proposals with
+no `canonDiff` continue through the legacy create projection fallback.
+
+Duplicate candidates are review evidence only. They can make a `merge`
+decision visible, but they never auto-select a target or mutate canon without
+the proposal accept route.
+
+Accepted and rejected proposal records retain compact audit metadata on the
+proposal: projection mode, decision, diff id, target id/display name, changed
+field names, link targets, duplicate/evidence counts, and rejection reason
+when applicable. The audit block intentionally avoids full entity snapshots,
+prompt text, and raw provider output.
+
+Generic project metadata remains supported for ordinary `scene`, `chapter`,
+and `project` metadata. Under `scope: "pipeline"`, it is canonical only for
+`vibe-worldbuild` staged checkpoint lifecycle and for outline checkpoint
+list/read/review/reject compatibility. It is not canonical for author draft
+checkpoints, worldbuilding scan proposal accept/reject, or outline accept
+materialization. `/api/nova/outline/apply` is retired and returns
+`410 outline_apply_retired`.
+
+Lifecycle and error responses are intentionally family-specific where the
+product behavior differs:
+
+| Family | Success | Invalid Request / Payload | Missing Target | Invalid Transition / Stale State | Materialization Failure |
+| --- | --- | --- | --- | --- | --- |
+| `vibe-worldbuild` staged checkpoints | `200 { ok, checkpoint }` | `400 invalid_payload` | `404 not_found` | `409 invalid_transition` | `400 projection_failed` on projection errors |
+| Worldbuilding scan proposals | `200 { ok, proposal }` | `400 invalid_request`; `422` for proposal lifecycle errors | `404 not_found` | `422 invalid_transition` | Projection errors stay in proposal error payloads |
+| Author draft checkpoints | `200 { ok, checkpoint }` | `400` missing request fields; `422 invalid_payload` | `404 not_found` or `scene_not_found` | `409 invalid_transition` or `stale_target` | `500 apply_failed` |
+| Outline draft checkpoints | Generic review/reject `200 { ok, checkpoint }`; accept `200 { ok, checkpoint, materialization }` | `400 invalid_request`, `invalid_payload`, or `invalid_version` | `404 not_found` | `409 invalid_transition`, `stale_checkpoint`, or `outline_conflict` | `500 materialization_failed` with rollback |
+| Retired Nova outline apply | None | `410 outline_apply_retired` | n/a | n/a | n/a |
+
+Accept idempotency is not uniform: worldbuild checkpoint accept returns the
+accepted checkpoint when it is already accepted; author draft accept is also
+idempotent for accepted checkpoints; outline accept requires a `review`
+checkpoint and stale preconditions, so accepting an already accepted outline
+checkpoint returns `409 invalid_transition`.
+
+Version policy is also family-specific:
+
+| Family | Current Version | Compatibility Policy | Unknown / Malformed Version Behavior |
+| --- | --- | --- | --- |
+| `vibe-worldbuild` staged checkpoints | Checkpoint record `1.0.0`; current artifact fixtures use `parserVersion: "1.0.0"` and a `PipelineArtifactEnvelope` with `pipeline`, `model`, `hierarchy`, and `notes`. | E2E fixtures and clients must emit the current envelope instead of relying on legacy `family`-only artifacts. Existing persisted `1.0.0` rows remain supported. | Malformed artifacts fail `400 invalid_payload`. Unknown checkpoint record versions are not accepted for review, accept, or reject and return `400 invalid_version`. |
+| Worldbuilding scan proposals | No independent schema version field; owner `vibe-worldbuild-scan` and `WorldbuildProposalRecord` shape define the contract. | Proposal rows are consumed only through the proposal routes with project context. Historical proposal rows must already deserialize to `WorldbuildProposalRecord`. | Malformed proposal rows fail before projection. Unknown future proposal shapes are not compatibility-supported. |
+| Author draft checkpoints | Owner `authorDraftCheckpoints.v1`; artifact `version: 1`. | Generated checkpoints are already review-ready and must validate against `authorDraftCheckpointSchema`. There is no legacy `draft` lifecycle compatibility layer. | Zod validation rejects malformed or unknown artifact versions as `invalid_payload`; accept/reject never migrates old shapes. |
+| Outline draft checkpoints | Owner `outlineDraftCheckpoints.v1`; checkpoint schema `1.0.0`; draft artifact `version: 1` and `schemaVersion: "1.0.0"`. | Outline generation creates current review checkpoints. Generic metadata upsert is fixture/internal compatibility only and rejects non-current checkpoint schema versions. | Upsert rejects unsupported checkpoint versions with `400 invalid_version`; accept also enforces current checkpoint and draft versions before materialization. |
+| Retired Nova outline apply | None. | No compatibility adapter. | Always returns `410 outline_apply_retired`. |
+
+Plan-046 stale fixture remediation rule: update tests that still seed legacy
+checkpoint artifacts to the current family schema when they cover behavior
+that remains canonical. Retire or rewrite tests only when the route itself is
+retired, such as `/api/nova/outline/apply`.
 
 ## Cross-references
 

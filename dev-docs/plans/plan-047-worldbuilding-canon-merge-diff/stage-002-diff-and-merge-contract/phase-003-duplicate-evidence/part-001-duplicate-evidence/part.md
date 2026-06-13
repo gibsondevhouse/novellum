@@ -2,12 +2,12 @@
 title: Duplicate Evidence
 slug: part-001-duplicate-evidence
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-003-duplicate-evidence
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -40,7 +40,7 @@ Give authors enough information to decide whether a proposal creates, merges, or
 **Create:**
 
 - `tests/ai/pipeline/worldbuild-duplicate-evidence.test.ts`
-- `evidence/duplicate-evidence-evidence-2026-06-09.md`
+- `evidence/duplicate-evidence-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -59,9 +59,9 @@ Give authors enough information to decide whether a proposal creates, merges, or
 
 ## Acceptance Criteria
 
-- [ ] Duplicate candidates can be surfaced to UI.
-- [ ] Potential duplicates do not silently mutate or block canon.
-- [ ] Tests cover exact and near-match evidence.
+- [x] Duplicate candidates can be surfaced to UI.
+- [x] Potential duplicates do not silently mutate or block canon.
+- [x] Tests cover exact and near-match evidence.
 
 ## Edge Cases
 

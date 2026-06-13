@@ -2,7 +2,7 @@
 title: Field Diff Review
 slug: phase-001-field-diff-review
 phase_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-003-review-ui-and-audit-ledger
 parts:
@@ -18,13 +18,13 @@ Render proposal field diffs clearly in the worldbuilding review UI.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Field Diff Review](part-001-field-diff-review/part.md) | `draft` | — | TBD |
+| 001 | [Field Diff Review](part-001-field-diff-review/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Authors can see what will be created or changed.
-- [ ] Duplicate candidates are visible before acceptance.
-- [ ] UI tests cover create and update/merge displays.
+- [x] Authors can see what will be created or changed.
+- [x] Duplicate candidates are visible before acceptance.
+- [x] UI tests cover create and update/merge displays.
 
 ## Notes
 

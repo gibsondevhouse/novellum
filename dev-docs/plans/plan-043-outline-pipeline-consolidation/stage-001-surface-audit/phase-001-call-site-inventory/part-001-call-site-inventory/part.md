@@ -2,12 +2,12 @@
 title: Call-Site Inventory
 slug: part-001-call-site-inventory
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-call-site-inventory
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Map all outline-related entrypoints and callers so the legacy direct-apply path 
 
 **Create:**
 
-- `evidence/call-site-inventory-evidence-2026-06-09.md`
+- `evidence/call-site-inventory-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -60,9 +60,9 @@ Map all outline-related entrypoints and callers so the legacy direct-apply path 
 
 ## Acceptance Criteria
 
-- [ ] Every outline-related caller found by search is represented in the inventory.
-- [ ] Legacy direct-apply surfaces are clearly separated from checkpoint surfaces.
-- [ ] The next phase can identify the exact files to modify.
+- [x] Every outline-related caller found by search is represented in the inventory.
+- [x] Legacy direct-apply surfaces are clearly separated from checkpoint surfaces.
+- [x] The next phase can identify the exact files to modify.
 
 ## Edge Cases
 

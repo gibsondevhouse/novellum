@@ -2,7 +2,7 @@
 title: Merge Policy
 slug: phase-002-merge-policy
 phase_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-002-diff-and-merge-contract
 parts:
@@ -18,13 +18,13 @@ Define safe merge/update policy for selected worldbuilding entity families.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Merge Policy](part-001-merge-policy/part.md) | `draft` | — | TBD |
+| 001 | [Merge Policy](part-001-merge-policy/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Merge policy is explicit and bounded.
-- [ ] No field overwrite occurs without visible author approval.
-- [ ] Atomicity expectations are documented.
+- [x] Merge policy is explicit and bounded.
+- [x] No field overwrite occurs without visible author approval.
+- [x] Atomicity expectations are documented.
 
 ## Notes
 

@@ -2,11 +2,11 @@
 title: Worldbuilding Canon Merge Diff
 slug: plan-047-worldbuilding-canon-merge-diff
 version: 1.0.0
-status: draft
+status: review
 owner: Planner Agent
 created: 2026-06-09
-last_updated: 2026-06-09
-target_completion: ~
+last_updated: 2026-06-12
+target_completion: 2026-06-12
 stages:
   - stage-001-canon-projection-audit
   - stage-002-diff-and-merge-contract
@@ -52,22 +52,22 @@ The world-building engine should help maintain canon over time: propose new enti
 
 | # | Stage | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Canon Projection Audit](stage-001-canon-projection-audit/stage.md) | `draft` | TBD |
-| 002 | [Diff & Merge Contract](stage-002-diff-and-merge-contract/stage.md) | `draft` | TBD |
-| 003 | [Review UI & Audit Ledger](stage-003-review-ui-and-audit-ledger/stage.md) | `draft` | TBD |
-| 004 | [Regression & Docs](stage-004-regression-and-docs/stage.md) | `draft` | TBD |
+| 001 | [Canon Projection Audit](stage-001-canon-projection-audit/stage.md) | `complete` | TBD |
+| 002 | [Diff & Merge Contract](stage-002-diff-and-merge-contract/stage.md) | `complete` | TBD |
+| 003 | [Review UI & Audit Ledger](stage-003-review-ui-and-audit-ledger/stage.md) | `complete` | TBD |
+| 004 | [Regression & Docs](stage-004-regression-and-docs/stage.md) | `complete` | TBD |
 
 ## Quality Gates
 
 All stages must pass the following gates before the plan is marked `complete`:
 
-- [ ] **lint** — zero lint errors
-- [ ] **lint:css** — zero CSS lint errors
-- [ ] **typecheck** — zero type errors and zero warnings
-- [ ] **tests** — Vitest suite passes
-- [ ] **e2e** — worldbuilding proposal accept/reject flow covers create and update/merge decisions
-- [ ] **check:tokens** — zero token violations
-- [ ] **docs_sync** — worldbuilding and AI pipeline docs describe diff/merge behavior and audit guarantees
+- [x] **lint** — zero lint errors
+- [x] **lint:css** — zero CSS lint errors
+- [x] **typecheck** — zero type errors and zero warnings
+- [x] **tests** — Vitest suite passes
+- [x] **e2e** — worldbuilding proposal accept/reject flow covers create and update/merge decisions
+- [x] **check:tokens** — zero token violations
+- [x] **docs_sync** — worldbuilding and AI pipeline docs describe diff/merge behavior and audit guarantees
 
 ## Risks & Mitigations
 
@@ -79,5 +79,4 @@ All stages must pass the following gates before the plan is marked `complete`:
 
 ## Notes
 
-The full draft plan tree has been scaffolded through stages, phases, parts, checklists, implementation logs, and evidence README files. Status remains `draft`; no implementation work has started and tracker files have not been changed.
-
+Implementation closed out 2026-06-12 and awaiting plan-level Reviewer evaluation. Do not mark the plan `complete` until Reviewer sign-off is recorded.

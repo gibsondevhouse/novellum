@@ -2,7 +2,7 @@
 title: Compatibility Decision
 slug: phase-001-compatibility-decision
 phase_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-003-legacy-adapter-or-retirement
 parts:
@@ -18,13 +18,13 @@ Choose whether to implement adapters or retire each legacy checkpoint contract.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Compatibility Decision](part-001-compatibility-decision/part.md) | `draft` | — | TBD |
+| 001 | [Compatibility Decision](part-001-compatibility-decision/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Every legacy behavior has a disposition.
-- [ ] Decision avoids preserving stale tests by default.
-- [ ] Required implementation files are named.
+- [x] Every legacy behavior has a disposition.
+- [x] Decision avoids preserving stale tests by default.
+- [x] Required implementation files are named.
 
 ## Notes
 

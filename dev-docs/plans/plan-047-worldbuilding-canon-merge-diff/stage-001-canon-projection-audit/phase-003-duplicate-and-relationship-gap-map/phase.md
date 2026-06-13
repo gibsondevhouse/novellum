@@ -2,7 +2,7 @@
 title: Duplicate & Relationship Gap Map
 slug: phase-003-duplicate-and-relationship-gap-map
 phase_number: 3
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-001-canon-projection-audit
 parts:
@@ -18,13 +18,13 @@ Map duplicate detection and relationship/link projection gaps.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Duplicate & Relationship Gap Map](part-001-duplicate-and-relationship-gap-map/part.md) | `draft` | — | TBD |
+| 001 | [Duplicate & Relationship Gap Map](part-001-duplicate-and-relationship-gap-map/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Exact dedupe limits are documented.
-- [ ] Relationship/link gaps are listed by entity family.
-- [ ] Review evidence requirements for duplicates are defined.
+- [x] Exact dedupe limits are documented.
+- [x] Relationship/link gaps are listed by entity family.
+- [x] Review evidence requirements for duplicates are defined.
 
 ## Notes
 

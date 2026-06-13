@@ -196,6 +196,24 @@ describe('OutlineGenerationStateStore', () => {
 		expect(fetchMock).toHaveBeenCalledTimes(2);
 	});
 
+	it('passes the caller instruction through to the generation runner', async () => {
+		const fetchMock = vi.fn().mockResolvedValueOnce(jsonResponse(successBody('project-1', 'instruction-success')));
+		const runner = createOutlineGenerationRunner({ fetch: fetchMock });
+		const store = new OutlineGenerationStateStore({ runner, listCheckpoints: vi.fn(async () => ({})) });
+
+		const result = await store.generate(' project-1 ', ' Use a mystery spine. ');
+
+		expect(result.ok).toBe(true);
+		const [, init] = fetchMock.mock.calls[0];
+		expect(JSON.parse(String(init?.body))).toMatchObject({
+			projectId: 'project-1',
+			instruction: 'Use a mystery spine.',
+			confirmContextReady: true,
+		});
+		expect(store.runnerState.lastInput?.instruction).toBe('Use a mystery spine.');
+		expect(store.checkpoint?.id).toBe('instruction-success');
+	});
+
 	it('resets state and ignores stale completion when the project changes', async () => {
 		const pending = deferred<Response>();
 		const fetchMock = vi.fn((_url: string | URL | Request, init?: RequestInit) => {

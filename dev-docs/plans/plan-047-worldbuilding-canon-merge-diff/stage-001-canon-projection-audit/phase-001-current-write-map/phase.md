@@ -2,7 +2,7 @@
 title: Current Write Map
 slug: phase-001-current-write-map
 phase_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-001-canon-projection-audit
 parts:
@@ -18,13 +18,13 @@ Map the current insert-only projection behavior for worldbuilding checkpoints an
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Current Write Map](part-001-current-write-map/part.md) | `draft` | — | TBD |
+| 001 | [Current Write Map](part-001-current-write-map/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] All canon table writes are mapped.
-- [ ] Insert-only behavior is documented by entity family.
-- [ ] Transaction and audit fields are identified.
+- [x] All canon table writes are mapped.
+- [x] Insert-only behavior is documented by entity family.
+- [x] Transaction and audit fields are identified.
 
 ## Notes
 

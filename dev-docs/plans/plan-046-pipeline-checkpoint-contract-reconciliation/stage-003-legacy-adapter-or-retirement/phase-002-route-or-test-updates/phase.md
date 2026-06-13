@@ -2,7 +2,7 @@
 title: Route or Test Updates
 slug: phase-002-route-or-test-updates
 phase_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-003-legacy-adapter-or-retirement
 parts:
@@ -18,13 +18,13 @@ Apply the compatibility decision to route handlers and tests.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Route or Test Updates](part-001-route-or-test-updates/part.md) | `draft` | — | TBD |
+| 001 | [Route or Test Updates](part-001-route-or-test-updates/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Supported checkpoint contracts pass tests.
-- [ ] Retired contracts have explicit failure tests or no longer appear as supported specs.
-- [ ] No tests depend on malformed current fixtures.
+- [x] Supported checkpoint contracts pass tests.
+- [x] Retired contracts have explicit failure tests or no longer appear as supported specs.
+- [x] No tests depend on malformed current fixtures.
 
 ## Notes
 

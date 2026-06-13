@@ -2,10 +2,10 @@
 title: Outline Pipeline Consolidation
 slug: plan-043-outline-pipeline-consolidation
 version: 1.0.0
-status: draft
+status: complete
 owner: Planner Agent
 created: 2026-06-09
-last_updated: 2026-06-09
+last_updated: 2026-06-12
 target_completion: ~
 stages:
   - stage-001-surface-audit
@@ -49,22 +49,22 @@ This plan retires the older Nova outline artifact apply path that can replace th
 
 | # | Stage | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Surface Audit](stage-001-surface-audit/stage.md) | `draft` | TBD |
-| 002 | [Canonical Checkpoint Flow](stage-002-canonical-checkpoint-flow/stage.md) | `draft` | TBD |
-| 003 | [Legacy Retirement](stage-003-legacy-retirement/stage.md) | `draft` | TBD |
-| 004 | [Regression & Docs](stage-004-regression-and-docs/stage.md) | `draft` | TBD |
+| 001 | [Surface Audit](stage-001-surface-audit/stage.md) | `complete` | TBD |
+| 002 | [Canonical Checkpoint Flow](stage-002-canonical-checkpoint-flow/stage.md) | `complete` | TBD |
+| 003 | [Legacy Retirement](stage-003-legacy-retirement/stage.md) | `complete` | TBD |
+| 004 | [Regression & Docs](stage-004-regression-and-docs/stage.md) | `complete` | TBD |
 
 ## Quality Gates
 
 All stages must pass the following gates before the plan is marked `complete`:
 
-- [ ] **lint** — zero lint errors
-- [ ] **lint:css** — zero CSS lint errors
-- [ ] **typecheck** — zero type errors and zero warnings
-- [ ] **tests** — Vitest suite passes
-- [ ] **e2e** — outline generation review gate passes
-- [ ] **check:tokens** — zero token violations
-- [ ] **docs_sync** — Nova, outline, and AI pipeline docs identify the canonical outline path
+- [x] **lint** — zero lint errors
+- [x] **lint:css** — zero CSS lint errors
+- [x] **typecheck** — zero type errors and zero warnings
+- [x] **tests** — Vitest suite passes
+- [x] **e2e** — outline generation review gate passes
+- [x] **check:tokens** — zero token violations
+- [x] **docs_sync** — Nova, outline, and AI pipeline docs identify the canonical outline path
 
 ## Risks & Mitigations
 
@@ -76,5 +76,4 @@ All stages must pass the following gates before the plan is marked `complete`:
 
 ## Notes
 
-The full draft plan tree has been scaffolded through stages, phases, parts, checklists, implementation logs, and evidence README files. Status remains `draft`; no implementation work has started and tracker files have not been changed.
-
+Activated 2026-06-12 after Plan-045 closeout. Implementation closed out 2026-06-12 with final evidence and clean gates. Current focus: plan-level reviewer evaluation.

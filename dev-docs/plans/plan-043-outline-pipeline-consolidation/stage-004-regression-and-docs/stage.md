@@ -2,7 +2,7 @@
 title: Regression & Docs
 slug: stage-004-regression-and-docs
 stage_number: 4
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-043-outline-pipeline-consolidation
 phases:
@@ -21,9 +21,9 @@ Prove the consolidated outline flow is stable and update docs so future agents d
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Targeted Regression](phase-001-targeted-regression/phase.md) | `draft` | TBD |
-| 002 | [Docs Sync](phase-002-docs-sync/phase.md) | `draft` | TBD |
-| 003 | [Closeout Evidence](phase-003-closeout-evidence/phase.md) | `draft` | TBD |
+| 001 | [Targeted Regression](phase-001-targeted-regression/phase.md) | `complete` | TBD |
+| 002 | [Docs Sync](phase-002-docs-sync/phase.md) | `complete` | TBD |
+| 003 | [Closeout Evidence](phase-003-closeout-evidence/phase.md) | `complete` | TBD |
 
 ## Entry Criteria
 
@@ -39,4 +39,3 @@ Prove the consolidated outline flow is stable and update docs so future agents d
 ## Notes
 
 At minimum, verify `pnpm check`, `pnpm lint`, `pnpm lint:css`, `pnpm test`, `pnpm check:tokens`, and targeted outline e2e coverage.
-

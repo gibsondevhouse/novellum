@@ -2,7 +2,7 @@
 title: Capability Schema
 slug: part-001-capability-schema
 part_number: 1
-status: review
+status: complete
 owner: Planner Agent
 assigned_to: —
 phase: phase-001-capability-schema

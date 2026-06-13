@@ -2,12 +2,12 @@
 title: Diff Schema
 slug: part-001-diff-schema
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-diff-schema
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -41,7 +41,7 @@ Give worldbuilding proposal review a structured representation of field-level ch
 
 - `src/lib/ai/pipeline/worldbuild-canon-diff-schema.ts`
 - `tests/ai/pipeline/worldbuild-canon-diff-schema.test.ts`
-- `evidence/diff-schema-evidence-2026-06-09.md`
+- `evidence/diff-schema-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -59,9 +59,9 @@ Give worldbuilding proposal review a structured representation of field-level ch
 
 ## Acceptance Criteria
 
-- [ ] Diff schema validates all intended decision types.
-- [ ] Schema includes enough evidence for author review.
-- [ ] Malformed diffs fail safely.
+- [x] Diff schema validates all intended decision types.
+- [x] Schema includes enough evidence for author review.
+- [x] Malformed diffs fail safely.
 
 ## Edge Cases
 

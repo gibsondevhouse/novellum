@@ -2,12 +2,12 @@
 title: Route Inventory
 slug: part-001-route-inventory
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-route-inventory
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Create a route ownership map across generic metadata, worldbuild proposals, auth
 
 **Create:**
 
-- `evidence/route-inventory-evidence-2026-06-09.md`
+- `evidence/route-inventory-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -57,9 +57,9 @@ Create a route ownership map across generic metadata, worldbuild proposals, auth
 
 ## Acceptance Criteria
 
-- [ ] Every pipeline-related route is mapped.
-- [ ] Generic metadata route responsibilities are explicit.
-- [ ] Tests and clients are linked to route owners.
+- [x] Every pipeline-related route is mapped.
+- [x] Generic metadata route responsibilities are explicit.
+- [x] Tests and clients are linked to route owners.
 
 ## Edge Cases
 
@@ -68,4 +68,4 @@ Create a route ownership map across generic metadata, worldbuild proposals, auth
 
 ## Notes
 
-Keep this part scoped to Pipeline Checkpoint Contract Reconciliation. If implementation reveals a larger dependency, document it in `impl.log.md` before expanding scope.
+Route inventory evidence identifies one follow-up compatibility risk: the worldbuilding proposal client omits `projectId` while the new-style proposal route only loads persisted proposal records when `projectId` is present.

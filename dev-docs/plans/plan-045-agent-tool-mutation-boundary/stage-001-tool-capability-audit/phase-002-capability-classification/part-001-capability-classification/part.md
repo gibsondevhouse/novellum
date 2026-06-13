@@ -2,7 +2,7 @@
 title: Capability Classification
 slug: part-001-capability-classification
 part_number: 1
-status: review
+status: complete
 owner: Planner Agent
 assigned_to: —
 phase: phase-002-capability-classification

@@ -9,6 +9,8 @@ import { randomUUID } from 'node:crypto';
  */
 
 const OWNER_ID = 'vibe-worldbuild';
+const CHECKPOINT_SCHEMA_VERSION = '1.0.0';
+const ARTIFACT_PARSER_VERSION = '1.0.0';
 
 async function createProject(request: APIRequestContext, title: string): Promise<string> {
 	const response = await request.post('/api/db/projects', { data: { title } });
@@ -36,15 +38,31 @@ async function putCheckpoint(
 }
 
 function buildMinimalArtifact(taskKey: string) {
+	const stage = taskKey.replace('vibe-worldbuild.', '');
 	return {
 		id: randomUUID(),
 		taskKey,
-		family: 'vibe-worldbuild',
-		stage: 'premise',
-		parserVersion: '1.0.0',
+		pipeline: 'vibe-worldbuild',
+		stage,
+		model: null,
+		parserVersion: ARTIFACT_PARSER_VERSION,
 		producedAt: new Date().toISOString(),
 		lifecycle: 'draft',
+		hierarchy: {
+			order: ['arcs', 'acts', 'milestones', 'chapters', 'scenes', 'beats', 'stages'],
+			references: {
+				arcs: [],
+				acts: [],
+				milestones: [],
+				chapters: [],
+				scenes: [],
+				beats: [],
+				stages: ['stage-worldbuild-plan-028-e2e'],
+			},
+			stageStatusById: {},
+		},
 		payload: { premise: 'Failure test premise.' },
+		notes: [],
 	};
 }
 
@@ -56,7 +74,7 @@ test.describe('plan-028 checkpoint failure handling', () => {
 
 			const draft = await putCheckpoint(request, projectId, artifact.id, {
 				operation: 'upsert',
-				value: { artifact, version: '1.0.0' },
+				value: { artifact, version: CHECKPOINT_SCHEMA_VERSION },
 			});
 			expect(draft.status).toBe(200);
 
@@ -78,7 +96,7 @@ test.describe('plan-028 checkpoint failure handling', () => {
 
 			await putCheckpoint(request, projectId, artifact.id, {
 				operation: 'upsert',
-				value: { artifact, version: '1.0.0' },
+				value: { artifact, version: CHECKPOINT_SCHEMA_VERSION },
 			});
 
 			const rejected = await putCheckpoint(request, projectId, artifact.id, {
@@ -107,7 +125,7 @@ test.describe('plan-028 checkpoint failure handling', () => {
 
 			await putCheckpoint(request, projectId, artifact.id, {
 				operation: 'upsert',
-				value: { artifact, version: '1.0.0' },
+				value: { artifact, version: CHECKPOINT_SCHEMA_VERSION },
 			});
 
 			const characters = await request.get(`/api/db/characters?projectId=${projectId}`);

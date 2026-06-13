@@ -2,12 +2,12 @@
 title: Materialization Contract
 slug: part-001-materialization-contract
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-003-materialization-contract
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,13 +39,13 @@ Verify the dedicated checkpoint accept route owns hierarchy writes and retains c
 
 **Create:**
 
-- `evidence/materialization-contract-evidence-2026-06-09.md`
+- `evidence/materialization-contract-evidence-2026-06-12.md`
 
 **Update:**
 
-- `src/routes/api/outline/checkpoints/[checkpointId]/accept/+server.ts`
-- `src/routes/api/db/project-metadata/[projectId]/[scope]/[ownerId]/[key]/+server.ts`
-- `tests/routes/outline-checkpoint-accept-route.test.ts`
+- `tests/routes/outline-accept.test.ts`
+- `tests/routes/outline-checkpoints.test.ts`
+- `tests/routes/nova-outline-apply-route.test.ts`
 
 **Reference:**
 
@@ -62,9 +62,9 @@ Verify the dedicated checkpoint accept route owns hierarchy writes and retains c
 
 ## Acceptance Criteria
 
-- [ ] Outline hierarchy writes are reachable only through the dedicated accept route.
-- [ ] Existing conflict and stale guards remain covered.
-- [ ] Generic metadata accept for outline checkpoints stays blocked.
+- [x] Outline hierarchy writes are reachable only through the dedicated accept route.
+- [x] Existing conflict and stale guards remain covered.
+- [x] Generic metadata accept for outline checkpoints stays blocked.
 
 ## Edge Cases
 

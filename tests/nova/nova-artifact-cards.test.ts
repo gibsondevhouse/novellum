@@ -108,7 +108,7 @@ describe('Nova artifact cards', () => {
 		document.body.innerHTML = '';
 	});
 
-	it('outline card presents an apply action with writer-facing guidance', () => {
+	it('outline card is read-only compatibility output without an apply action', () => {
 		const target = document.createElement('div');
 		document.body.appendChild(target);
 		const cmp = mount(NovaOutlineCard, {
@@ -118,9 +118,11 @@ describe('Nova artifact cards', () => {
 		flushSync();
 
 		expect(target.querySelector('[data-testid="nova-outline-card"]')).not.toBeNull();
-		expect(target.textContent).toContain('Draft artifact');
-		expect(target.textContent).toContain('Apply To Outline');
-		expect(target.textContent).toContain('Applies this draft to your Outline board');
+		expect(target.textContent).toContain('Legacy artifact');
+		expect(target.textContent).toContain('read-only');
+		expect(target.textContent).toContain('Only checkpoint proposals can be accepted');
+		expect(target.textContent).toContain('Copy Technical JSON');
+		expect(target.textContent).not.toContain('Apply To Outline');
 		unmount(cmp);
 	});
 
@@ -233,6 +235,7 @@ describe('Nova artifact source contracts', () => {
 		resolve(process.cwd(), 'src/modules/nova/services/author-pipeline-runner.ts'),
 		'utf-8',
 	);
+	const novaIndexSource = readFileSync(resolve(process.cwd(), 'src/modules/nova/index.ts'), 'utf-8');
 
 	it('artifact cards do not import editor mutation modules', () => {
 		for (const source of [sceneCardSource, revisionCardSource, outlineCardSource]) {
@@ -241,6 +244,8 @@ describe('Nova artifact source contracts', () => {
 			expect(source).not.toContain('updateScene(');
 			expect(source).not.toContain('setProjectMetadata(');
 		}
+		expect(outlineCardSource).not.toContain('applyAuthorOutlineArtifact');
+		expect(outlineCardSource).not.toContain('/api/nova/outline/apply');
 	});
 
 	it('author runner only produces artifacts and does not import manuscript mutation paths', () => {
@@ -249,5 +254,10 @@ describe('Nova artifact source contracts', () => {
 		expect(runnerSource).not.toContain('scene-repository');
 		expect(runnerSource).not.toContain('updateScene(');
 		expect(runnerSource).not.toContain('/api/db/scenes');
+	});
+
+	it('does not expose the legacy outline artifact card through the public Nova barrel', () => {
+		expect(novaIndexSource).not.toContain('NovaOutlineCard');
+		expect(novaIndexSource).toContain('NovaOutlineDraftCheckpointCard');
 	});
 });

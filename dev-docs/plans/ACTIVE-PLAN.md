@@ -6,10 +6,17 @@
 
 ## Current
 
-[plan-045-agent-tool-mutation-boundary](./plan-045-agent-tool-mutation-boundary/plan.md) — Agent Tool Mutation Boundary. Current focus: Reviewer Agent sign-off for all stages. Status: `review`. Activated 2026-06-11 from the roadmap queue after plan-044 closure. Implementation gates passed 2026-06-11; do not advance to the next plan until review is accepted.
+No active plan. Phase 2 implementation is closed out; Plan-046 and Plan-047 are awaiting plan-level Reviewer evaluation.
+
+## Pending review
+
+- [plan-046-pipeline-checkpoint-contract-reconciliation](./plan-046-pipeline-checkpoint-contract-reconciliation/plan.md) — Pipeline Checkpoint Contract Reconciliation. Implementation closed out 2026-06-12; status: `review`; awaiting plan-level Reviewer evaluation.
+- [plan-047-worldbuilding-canon-merge-diff](./plan-047-worldbuilding-canon-merge-diff/plan.md) — Worldbuilding Canon Merge Diff. Implementation closed out 2026-06-12; status: `review`; awaiting plan-level Reviewer evaluation.
 
 ## Recently completed
 
+- [plan-043-outline-pipeline-consolidation](./plan-043-outline-pipeline-consolidation/plan.md) — Outline Pipeline Consolidation. Retired legacy direct apply paths; made checkpoints the sole materialization path. Closed 2026-06-12 after plan-level reviewer evaluation.
+- [plan-045-agent-tool-mutation-boundary](./plan-045-agent-tool-mutation-boundary/plan.md) — Agent Tool Mutation Boundary. Separated model-callable Agent tools from trusted UI/app mutation commands; added capability classification, model advertisement filtering, default mutation dispatch blocking, source-contract coverage, docs sync, and current quality-gate evidence. Closed 2026-06-12 after Reviewer Agent sign-off.
 - [plan-044-nova-active-context-routing](./plan-044-nova-active-context-routing/plan.md) — Nova Active Context Routing. Resolved brittle context detection by centralizing resolution in `activeContext` store. Integrated with root layout and Nova panel, ensuring grounding on deep routes. (Closed 2026-06-11).
 - [plan-042-quality-gates-closure](./plan-042-quality-gates-closure/plan.md) — Quality Gates Closure. Eliminated all 11 pre-existing `pnpm check` warnings (unused CSS selectors + a11y autofocus), fixed the `lint:css` duplicate `text-align` error in `IndividualsWorkspaceShell.svelte`, hardened sidebar active-project detection to guard against non-`/projects/` routes (with 6 new unit tests), and audited Dexie boundary (all imports correct; assets module documented as known exception pending dedicated migration). Closed 2026-06-04. Quality gates: check (0 errors, 0 warnings, 1833 files), lint (clean), lint:css (clean), test (237 files / 1728 tests), tokens (347 files / 0 violations).
 

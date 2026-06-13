@@ -2,12 +2,12 @@
 title: Compatibility Notes
 slug: part-001-compatibility-notes
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-003-compatibility-notes
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,11 +39,15 @@ Leave future maintainers with explicit compatibility guidance after the legacy p
 
 **Create:**
 
-- `evidence/compatibility-notes-evidence-2026-06-09.md`
+- `evidence/compatibility-notes-evidence-2026-06-12.md`
 
 **Update:**
 
 - `dev-docs/03-ai/agents-map.md`
+- `dev-docs/03-ai/pipeline.md`
+- `dev-docs/03-ai/outline-generation.md`
+- `dev-docs/03-ai/context-engine.md`
+- `dev-docs/04-modules/nova.md`
 - `novellum-docs/user/nova.md`
 - `dev-docs/plans/plan-043-outline-pipeline-consolidation/plan.md`
 
@@ -62,9 +66,9 @@ Leave future maintainers with explicit compatibility guidance after the legacy p
 
 ## Acceptance Criteria
 
-- [ ] Docs name the checkpoint path as canonical.
-- [ ] Legacy path behavior is documented as retired or unsupported.
-- [ ] No user doc instructs authors to use old outline artifact apply.
+- [x] Docs name the checkpoint path as canonical.
+- [x] Legacy path behavior is documented as retired or unsupported.
+- [x] No user doc instructs authors to use old outline artifact apply.
 
 ## Edge Cases
 

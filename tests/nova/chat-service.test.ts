@@ -5,6 +5,7 @@ import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
 
 const streamCompleteMock = vi.fn();
 const buildRagContextMock = vi.fn();
+const outlineGenerateMock = vi.fn();
 
 vi.mock('$lib/ai/openrouter.js', async () => {
 	const actual = await vi.importActual<typeof import('$lib/ai/openrouter.js')>(
@@ -32,6 +33,12 @@ vi.mock('$modules/nova/services/context-hooks.js', () => ({
 	buildRagContext: (...args: unknown[]) => buildRagContextMock(...args),
 }));
 
+vi.mock('$modules/nova/stores/outline-generation-state.svelte.js', () => ({
+	outlineGenerationState: {
+		generate: (...args: unknown[]) => outlineGenerateMock(...args),
+	},
+}));
+
 buildRagContextMock.mockResolvedValue({
 		aiContext: null,
 		contextText: '',
@@ -56,11 +63,17 @@ describe('sendNovaChat', () => {
 	beforeEach(() => {
 		streamCompleteMock.mockReset();
 		buildRagContextMock.mockReset();
+		outlineGenerateMock.mockReset();
 		buildRagContextMock.mockResolvedValue({
 			aiContext: null,
 			contextText: '',
 			includedScopes: [],
 			warnings: [],
+		});
+		outlineGenerateMock.mockResolvedValue({
+			ok: true,
+			status: 'succeeded',
+			checkpointId: 'outline-checkpoint-1',
 		});
 		novaSession.clear();
 	});
@@ -263,6 +276,29 @@ describe('sendNovaChat', () => {
 			status: 'error',
 		});
 		expect(novaSession.messages[1].content).toContain('Open a project');
+	});
+
+	it('routes write-mode outline builds to checkpoint generation', async () => {
+		await sendNovaChat({
+			prompt: 'Generate a story outline from the worldbuilding notes.',
+			mode: 'write',
+			projectId: 'p1',
+			activeSceneId: null,
+			activeChapterId: null,
+		});
+
+		expect(outlineGenerateMock).toHaveBeenCalledWith(
+			'p1',
+			'Generate a story outline from the worldbuilding notes.',
+		);
+		expect(streamCompleteMock).not.toHaveBeenCalled();
+		expect(novaSession.messages).toHaveLength(2);
+		expect(novaSession.messages[1]).toMatchObject({
+			role: 'nova',
+			status: 'complete',
+		});
+		expect(novaSession.messages[1].content).toContain('outline-checkpoint-1');
+		expect(novaSession.messages[1].artifact).toBeUndefined();
 	});
 
 	it('blocks generation when project baseline fields are missing', async () => {

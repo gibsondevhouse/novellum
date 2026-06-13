@@ -2,12 +2,12 @@
 title: Compatibility Decision
 slug: part-001-compatibility-decision
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-compatibility-decision
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Resolve old generic metadata fixture behavior without preserving accidental comp
 
 **Create:**
 
-- `evidence/compatibility-decision-evidence-2026-06-09.md`
+- `evidence/compatibility-decision-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -57,9 +57,9 @@ Resolve old generic metadata fixture behavior without preserving accidental comp
 
 ## Acceptance Criteria
 
-- [ ] Every legacy behavior has a disposition.
-- [ ] Decision avoids preserving stale tests by default.
-- [ ] Required implementation files are named.
+- [x] Every legacy behavior has a disposition.
+- [x] Decision avoids preserving stale tests by default.
+- [x] Required implementation files are named.
 
 ## Edge Cases
 
@@ -68,4 +68,4 @@ Resolve old generic metadata fixture behavior without preserving accidental comp
 
 ## Notes
 
-Keep this part scoped to Pipeline Checkpoint Contract Reconciliation. If implementation reveals a larger dependency, document it in `impl.log.md` before expanding scope.
+Decision: update stale fixtures and active clients to current contracts; keep retired routes retired; do not add compatibility adapters for malformed checkpoint artifacts.

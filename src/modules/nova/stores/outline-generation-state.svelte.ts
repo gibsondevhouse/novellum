@@ -142,7 +142,10 @@ export class OutlineGenerationStateStore {
 		}
 	}
 
-	async generate(projectId: string | null | undefined = this.projectId): Promise<OutlineGenerationRunnerResult> {
+	async generate(
+		projectId: string | null | undefined = this.projectId,
+		instruction?: string,
+	): Promise<OutlineGenerationRunnerResult> {
 		const normalized = normalizeProjectId(projectId);
 		if (normalized !== this.projectId) this.setProject(normalized);
 		if (!normalized) {
@@ -158,7 +161,7 @@ export class OutlineGenerationStateStore {
 
 		this.error = null;
 		this.checkpoint = null;
-		this.#runner.prepare({ projectId: normalized, confirmContextReady: true });
+		this.#runner.prepare({ projectId: normalized, instruction, confirmContextReady: true });
 		this.#syncRunnerState();
 		const promise = this.#runner.run();
 		this.status = 'running';

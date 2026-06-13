@@ -2,12 +2,12 @@
 title: Artifact Card Retirement
 slug: part-001-artifact-card-retirement
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-002-artifact-card-retirement
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Remove the UI affordance that applies legacy `author-outline` artifacts to the o
 
 **Create:**
 
-- None
+- `evidence/artifact-card-retirement-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -63,9 +63,9 @@ Remove the UI affordance that applies legacy `author-outline` artifacts to the o
 
 ## Acceptance Criteria
 
-- [ ] No visible legacy outline card button can apply hierarchy changes.
-- [ ] Supported outline checkpoint cards still work.
-- [ ] Exports do not expose retired mutation helpers unnecessarily.
+- [x] No visible legacy outline card button can apply hierarchy changes.
+- [x] Supported outline checkpoint cards still work.
+- [x] Exports do not expose retired mutation helpers unnecessarily.
 
 ## Edge Cases
 

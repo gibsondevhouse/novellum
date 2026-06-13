@@ -3,11 +3,12 @@
 		WorldbuildProposalRecord,
 		WorldbuildProposalStatus,
 	} from '$lib/ai/pipeline/worldbuild-proposal-schema.js';
+	import WorldbuildingProposalDiffView from './WorldbuildingProposalDiffView.svelte';
 
 	interface Props {
 		proposal: WorldbuildProposalRecord;
-		onAccept?: (proposalId: string) => void;
-		onReject?: (proposalId: string, reason: string) => void;
+		onAccept?: (proposalId: string, projectId: string) => void;
+		onReject?: (proposalId: string, reason: string, projectId: string) => void;
 	}
 
 	let { proposal, onAccept, onReject }: Props = $props();
@@ -40,13 +41,13 @@
 	let rejectReason = $state('');
 
 	function handleAccept(): void {
-		onAccept?.(proposal.proposalId);
+		onAccept?.(proposal.proposalId, proposal.projectId);
 	}
 
 	function handleRejectSubmit(): void {
 		const reason = rejectReason.trim();
 		if (reason) {
-			onReject?.(proposal.proposalId, reason);
+			onReject?.(proposal.proposalId, reason, proposal.projectId);
 			rejecting = false;
 			rejectReason = '';
 		}
@@ -87,16 +88,7 @@
 		{/if}
 	</dl>
 
-	{#if Object.keys(proposal.payload).length > 0}
-		<dl class="proposal-card__payload">
-			{#each Object.entries(proposal.payload).slice(0, 4) as [key, value] (key)}
-				<div class="proposal-card__provenance-row">
-					<dt>{key.replace(/([A-Z])/g, ' $1')}</dt>
-					<dd>{Array.isArray(value) ? value.join(', ') : String(value)}</dd>
-				</div>
-			{/each}
-		</dl>
-	{/if}
+	<WorldbuildingProposalDiffView {proposal} maxPayloadFields={4} />
 
 	{#if proposal.status === 'pending_review'}
 		<div class="proposal-card__actions">

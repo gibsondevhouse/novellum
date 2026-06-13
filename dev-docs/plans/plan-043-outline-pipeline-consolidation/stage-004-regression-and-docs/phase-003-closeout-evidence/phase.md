@@ -2,7 +2,7 @@
 title: Closeout Evidence
 slug: phase-003-closeout-evidence
 phase_number: 3
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-004-regression-and-docs
 parts:
@@ -18,13 +18,13 @@ Prepare plan-level evidence and handoff notes for review.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Closeout Evidence](part-001-closeout-evidence/part.md) | `draft` | — | TBD |
+| 001 | [Closeout Evidence](part-001-closeout-evidence/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Evidence is sufficient for reviewer evaluation.
-- [ ] All completed parts have final impl log entries.
-- [ ] Tracker updates are prepared only if the plan is actually executed and closed.
+- [x] Evidence is sufficient for reviewer evaluation.
+- [x] All completed parts have final impl log entries.
+- [x] Tracker updates are prepared only if the plan is actually executed and closed.
 
 ## Notes
 

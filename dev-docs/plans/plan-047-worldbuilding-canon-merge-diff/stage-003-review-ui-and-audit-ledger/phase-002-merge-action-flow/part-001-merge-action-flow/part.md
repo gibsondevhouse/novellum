@@ -2,12 +2,12 @@
 title: Merge Action Flow
 slug: part-001-merge-action-flow
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-002-merge-action-flow
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -41,7 +41,7 @@ Replace insert-only acceptance with create/update/merge/link/no-op execution whe
 
 - `src/lib/ai/pipeline/worldbuild-canon-diff-apply.ts`
 - `tests/ai/pipeline/worldbuild-canon-diff-apply.test.ts`
-- `evidence/merge-action-flow-evidence-2026-06-09.md`
+- `evidence/merge-action-flow-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -60,9 +60,9 @@ Replace insert-only acceptance with create/update/merge/link/no-op execution whe
 
 ## Acceptance Criteria
 
-- [ ] Accepted create/update/merge decisions write expected canon rows.
-- [ ] Unsupported decisions fail safely without partial writes.
-- [ ] No-op decisions update proposal lifecycle without canon writes.
+- [x] Accepted create/update/merge decisions write expected canon rows.
+- [x] Unsupported decisions fail safely without partial writes.
+- [x] No-op decisions update proposal lifecycle without canon writes.
 
 ## Edge Cases
 

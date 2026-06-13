@@ -1,6 +1,6 @@
 # AI Pipeline
 
-> Last verified: 2026-06-04 (plan-040 closeout docs sync)
+> Last verified: 2026-06-12 (plan-043 outline consolidation)
 
 Every AI feature in Novellum follows the same pipeline. The runtime
 agents (continuity / edit / rewrite / style) live in [src/lib/ai/](../../src/lib/ai/)
@@ -130,6 +130,9 @@ Stage-003 phase-003 ships the author drafting + revision surface:
   attaches a `NovaArtifact` to the Nova message via
   `novaSession.attachArtifact()`. Result variants surface
   `invalid_task | parse_failed | transport_failed | aborted` reasons.
+- `vibe-author.outline` artifacts are compatibility-only after plan-043:
+  supported Write-mode outline requests use the checkpoint flow described
+  below, and legacy outline artifact cards render read-only JSON/copy output.
 - `src/modules/nova/components/NovaSceneDraftCard.svelte` renders the
   scene-draft envelope with explicit `Accept` / `Reject` / `Copy`
   controls (Copy goes through `navigator.clipboard`).
@@ -207,7 +210,7 @@ Plan-031 ships three explicit modes and a real bounded Agent-mode tool loop.
 | Mode | Route | Tools | Output |
 | --- | --- | --- | --- |
 | `ask` | `OpenRouterClient.streamComplete` | None | Streamed nova message |
-| `write` (outline) | `runAuthorPipelineTask(AUTHOR_OUTLINE)` | None | Pipeline artifact card |
+| `write` (outline) | `outlineGenerationState.generate()` -> `POST /api/ai/outline/generate` | None | Outline checkpoint review card |
 | `write` (unsupported) | Explicit limitation card | None | `unsupported_action` message |
 | `agent` | `runAgentLoop` → `/api/nova/agent` | Registered agent tools | Tool chips + proposal envelope |
 
@@ -238,6 +241,11 @@ Key enforcement tests:
 
 See [ADR-0027](../02-architecture/adr/adr-0027-pipeline-entity-scope.md)
 for the V1.1 scope decision.
+
+Legacy outline artifact apply is retired. `/api/nova/outline/apply`
+returns `410 outline_apply_retired`; the only hierarchy materialization
+route for generated outlines is
+`POST /api/outline/checkpoints/{checkpointId}/accept`.
 
 ### Outline-first worldbuild UI (plan-028)
 

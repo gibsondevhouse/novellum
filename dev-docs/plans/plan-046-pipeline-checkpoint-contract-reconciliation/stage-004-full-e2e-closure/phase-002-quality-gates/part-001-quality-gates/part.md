@@ -2,12 +2,12 @@
 title: Quality Gates
 slug: part-001-quality-gates
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-002-quality-gates
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Ensure checkpoint contract reconciliation did not regress type, lint, test, or t
 
 **Create:**
 
-- `evidence/quality-gates-evidence-2026-06-09.md`
+- `evidence/quality-gates-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -57,9 +57,9 @@ Ensure checkpoint contract reconciliation did not regress type, lint, test, or t
 
 ## Acceptance Criteria
 
-- [ ] All required gates pass.
-- [ ] Evidence includes command outputs.
-- [ ] Any unrelated blocker is documented with exact file/line.
+- [x] All required gates pass.
+- [x] Evidence includes command outputs.
+- [x] Any unrelated blocker is documented with exact file/line.
 
 ## Edge Cases
 
@@ -68,4 +68,4 @@ Ensure checkpoint contract reconciliation did not regress type, lint, test, or t
 
 ## Notes
 
-Keep this part scoped to Pipeline Checkpoint Contract Reconciliation. If implementation reveals a larger dependency, document it in `impl.log.md` before expanding scope.
+All required quality gates passed. A transient source-contract test failure after callback signature changes was fixed and full Vitest passed on rerun.

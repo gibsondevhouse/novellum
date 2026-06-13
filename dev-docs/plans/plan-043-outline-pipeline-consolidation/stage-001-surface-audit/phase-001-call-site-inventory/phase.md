@@ -2,7 +2,7 @@
 title: Call-Site Inventory
 slug: phase-001-call-site-inventory
 phase_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-001-surface-audit
 parts:
@@ -18,13 +18,13 @@ Produce a complete inventory of every outline generation, artifact, apply, and m
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Call-Site Inventory](part-001-call-site-inventory/part.md) | `draft` | — | TBD |
+| 001 | [Call-Site Inventory](part-001-call-site-inventory/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Every outline-related caller found by search is represented in the inventory.
-- [ ] Legacy direct-apply surfaces are clearly separated from checkpoint surfaces.
-- [ ] The next phase can identify the exact files to modify.
+- [x] Every outline-related caller found by search is represented in the inventory.
+- [x] Legacy direct-apply surfaces are clearly separated from checkpoint surfaces.
+- [x] The next phase can identify the exact files to modify.
 
 ## Notes
 

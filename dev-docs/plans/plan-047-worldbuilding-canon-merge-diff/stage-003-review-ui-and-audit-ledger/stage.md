@@ -2,7 +2,7 @@
 title: Review UI & Audit Ledger
 slug: stage-003-review-ui-and-audit-ledger
 stage_number: 3
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-047-worldbuilding-canon-merge-diff
 phases:
@@ -21,9 +21,9 @@ Give authors clear field-level review controls and preserve an audit trail for a
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Field Diff Review](phase-001-field-diff-review/phase.md) | `draft` | TBD |
-| 002 | [Merge Action Flow](phase-002-merge-action-flow/phase.md) | `draft` | TBD |
-| 003 | [Audit Records](phase-003-audit-records/phase.md) | `draft` | TBD |
+| 001 | [Field Diff Review](phase-001-field-diff-review/phase.md) | `complete` | TBD |
+| 002 | [Merge Action Flow](phase-002-merge-action-flow/phase.md) | `complete` | TBD |
+| 003 | [Audit Records](phase-003-audit-records/phase.md) | `complete` | TBD |
 
 ## Entry Criteria
 
@@ -39,4 +39,3 @@ Give authors clear field-level review controls and preserve an audit trail for a
 ## Notes
 
 Do not trade safety for convenience. Every canon mutation must remain explicitly author-approved.
-

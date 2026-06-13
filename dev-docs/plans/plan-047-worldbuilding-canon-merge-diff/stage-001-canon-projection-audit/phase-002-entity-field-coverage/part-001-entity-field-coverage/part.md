@@ -2,12 +2,12 @@
 title: Entity Field Coverage
 slug: part-001-entity-field-coverage
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-002-entity-field-coverage
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Identify fields lost during projection and fields that need diff/merge support.
 
 **Create:**
 
-- `evidence/entity-field-coverage-evidence-2026-06-09.md`
+- `evidence/entity-field-coverage-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -57,9 +57,9 @@ Identify fields lost during projection and fields that need diff/merge support.
 
 ## Acceptance Criteria
 
-- [ ] Field coverage gaps are documented by entity family.
-- [ ] Initial merge target families are recommended.
-- [ ] Dropped fields are separated from intentionally ignored fields.
+- [x] Field coverage gaps are documented by entity family.
+- [x] Initial merge target families are recommended.
+- [x] Dropped fields are separated from intentionally ignored fields.
 
 ## Edge Cases
 

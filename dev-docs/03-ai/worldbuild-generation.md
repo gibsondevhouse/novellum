@@ -102,7 +102,9 @@ Nova presents the prefill to the author, who can edit before submitting. The gen
 
 ## How Accept Triggers Canon Projection
 
-When `acceptCheckpoint(projectId, ownerId, proposalId)` is called (via the POST `/api/worldbuilding/proposals/[proposalId]/accept` endpoint):
+When a staged worldbuild checkpoint is accepted through
+`PUT /api/db/project-metadata/{projectId}/pipeline/vibe-worldbuild/{checkpointId}`
+with `operation: "accept"`:
 
 1. The checkpoint service loads the stored `WorldbuildCheckpointRecord`
 2. `hasPopulatedBibleProjection(record)` checks if the artifact contains `tableWrites`
@@ -118,14 +120,19 @@ Domain proposals (`vibe-worldbuild-domain` family) use `createDomainCheckpoint` 
 
 Scan proposals always start as `pending_review`. They never write to canon during scan execution.
 
-When `POST /api/worldbuilding/proposals/[proposalId]/accept` receives a scan proposal, it delegates to `acceptProposalAtomically(projectId, proposalId)`. That helper wraps the canon insert and proposal status update in one SQLite transaction:
+When `POST /api/worldbuilding/proposals/[proposalId]/accept` receives a scan
+proposal with `{ projectId }` in the request body, it delegates to
+`acceptProposalAtomically(projectId, proposalId)`. That helper wraps the canon
+insert and proposal status update in one SQLite transaction:
 
 1. Load the `pending_review` proposal from `project_metadata`.
 2. Insert the payload into the mapped canon table (`characters`, `locations`, `lore_entries`, `plot_threads`, or `timeline_events`).
 3. Update the proposal to `accepted` with `acceptance.projectedToCanon = true`.
 4. Roll the full transaction back if validation or insertion fails, leaving the proposal `pending_review`.
 
-Rejecting a scan proposal records `rejection` audit metadata and performs no canon write.
+Rejecting a scan proposal uses the matching proposal reject route with
+`{ projectId, reason }`, records `rejection` audit metadata, and performs no
+canon write.
 
 ## Quick-Generate Context-Priority Flow
 

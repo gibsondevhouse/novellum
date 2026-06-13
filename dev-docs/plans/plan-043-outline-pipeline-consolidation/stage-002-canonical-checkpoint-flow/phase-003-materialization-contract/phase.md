@@ -2,7 +2,7 @@
 title: Materialization Contract
 slug: phase-003-materialization-contract
 phase_number: 3
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-002-canonical-checkpoint-flow
 parts:
@@ -18,13 +18,13 @@ Protect the outline materialization service as the only route that writes outlin
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Materialization Contract](part-001-materialization-contract/part.md) | `draft` | — | TBD |
+| 001 | [Materialization Contract](part-001-materialization-contract/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Outline hierarchy writes are reachable only through the dedicated accept route.
-- [ ] Existing conflict and stale guards remain covered.
-- [ ] Generic metadata accept for outline checkpoints stays blocked.
+- [x] Outline hierarchy writes are reachable only through the dedicated accept route.
+- [x] Existing conflict and stale guards remain covered.
+- [x] Generic metadata accept for outline checkpoints stays blocked.
 
 ## Notes
 

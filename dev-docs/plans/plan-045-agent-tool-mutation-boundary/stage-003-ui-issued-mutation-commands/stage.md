@@ -2,7 +2,7 @@
 title: UI-Issued Mutation Commands
 slug: stage-003-ui-issued-mutation-commands
 stage_number: 3
-status: review
+status: complete
 owner: Planner Agent
 plan: plan-045-agent-tool-mutation-boundary
 phases:
@@ -21,9 +21,9 @@ Keep accept/reject/apply functionality available to authors through explicit UI 
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Command Boundary Design](phase-001-command-boundary-design/phase.md) | `review` | TBD |
-| 002 | [Author Draft Actions](phase-002-author-draft-actions/phase.md) | `review` | TBD |
-| 003 | [Worldbuild & Outline Actions](phase-003-worldbuild-and-outline-actions/phase.md) | `review` | TBD |
+| 001 | [Command Boundary Design](phase-001-command-boundary-design/phase.md) | `complete` | TBD |
+| 002 | [Author Draft Actions](phase-002-author-draft-actions/phase.md) | `complete` | TBD |
+| 003 | [Worldbuild & Outline Actions](phase-003-worldbuild-and-outline-actions/phase.md) | `complete` | TBD |
 
 ## Entry Criteria
 

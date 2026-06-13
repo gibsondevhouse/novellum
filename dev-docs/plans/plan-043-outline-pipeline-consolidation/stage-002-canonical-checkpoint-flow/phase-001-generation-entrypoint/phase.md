@@ -2,7 +2,7 @@
 title: Generation Entrypoint
 slug: phase-001-generation-entrypoint
 phase_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-002-canonical-checkpoint-flow
 parts:
@@ -18,13 +18,13 @@ Route every supported outline generation request to the checkpoint generation se
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Generation Entrypoint](part-001-generation-entrypoint/part.md) | `draft` | — | TBD |
+| 001 | [Generation Entrypoint](part-001-generation-entrypoint/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Supported outline generation requests produce checkpoint-backed review artifacts.
-- [ ] No supported path creates a legacy `author-outline` artifact for application.
-- [ ] Existing outline generation review e2e remains meaningful.
+- [x] Supported outline generation requests produce checkpoint-backed review artifacts.
+- [x] No supported path creates a legacy `author-outline` artifact for application.
+- [x] Existing outline generation review e2e remains meaningful.
 
 ## Notes
 

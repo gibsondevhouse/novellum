@@ -2,7 +2,7 @@
 title: Targeted Regression
 slug: phase-001-targeted-regression
 phase_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-004-regression-and-docs
 parts:
@@ -18,13 +18,13 @@ Run the smallest test set that proves the outline pipeline consolidation is safe
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Targeted Regression](part-001-targeted-regression/part.md) | `draft` | — | TBD |
+| 001 | [Targeted Regression](part-001-targeted-regression/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Targeted outline e2e passes.
-- [ ] Static gates pass or blockers are documented with exact output.
-- [ ] Any test changes assert current canonical behavior.
+- [x] Targeted outline e2e passes.
+- [x] Static gates pass or blockers are documented with exact output.
+- [x] Any test changes assert current canonical behavior.
 
 ## Notes
 

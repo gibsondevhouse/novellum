@@ -1,6 +1,6 @@
 # Nova — Your AI Copilot
 
-> Last verified: 2026-06-11
+> Last verified: 2026-06-12
 
 **Nova** is Novellum's AI assistant. Chat-style. Project-aware. BYOK (you bring your own OpenRouter key).
 
@@ -10,6 +10,7 @@
 - **Suggest** edits, rewrites, continuity checks, and stylistic adjustments via specialized agents under the hood.
 - **Draft** ideas for you to copy/paste into the editor.
 - **Create review artifacts** such as draft checkpoints or proposals that you can inspect before accepting.
+- **Generate outline proposals** as checkpoints that stay non-canonical until you accept them from the review card.
 
 ## What Nova will not do
 
@@ -38,6 +39,11 @@ Nova will reply with structured suggestions you can review and apply manually.
 When Agent mode creates a checkpoint or proposal, it appears as a review card
 with explicit accept/reject controls. Accepting or rejecting that artifact is a
 trusted app action, not a model tool call.
+
+Outline generation follows the same author-in-the-loop rule. Nova can generate
+an outline checkpoint, but it will not rewrite your outline board until you
+explicitly accept the checkpoint from the outline review card. Older outline
+artifact messages, if still visible in an open session, are read-only.
 
 ## The agents behind Nova
 

@@ -2,7 +2,7 @@
 title: Command Boundary Design
 slug: part-001-command-boundary-design
 part_number: 1
-status: review
+status: complete
 owner: Planner Agent
 assigned_to: —
 phase: phase-001-command-boundary-design

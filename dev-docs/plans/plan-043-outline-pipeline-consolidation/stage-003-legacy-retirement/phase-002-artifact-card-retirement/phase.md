@@ -2,7 +2,7 @@
 title: Artifact Card Retirement
 slug: phase-002-artifact-card-retirement
 phase_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-003-legacy-retirement
 parts:
@@ -18,13 +18,13 @@ Retire the legacy `NovaOutlineCard` apply behavior and any associated service ca
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Artifact Card Retirement](part-001-artifact-card-retirement/part.md) | `draft` | — | TBD |
+| 001 | [Artifact Card Retirement](part-001-artifact-card-retirement/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] No visible legacy outline card button can apply hierarchy changes.
-- [ ] Supported outline checkpoint cards still work.
-- [ ] Exports do not expose retired mutation helpers unnecessarily.
+- [x] No visible legacy outline card button can apply hierarchy changes.
+- [x] Supported outline checkpoint cards still work.
+- [x] Exports do not expose retired mutation helpers unnecessarily.
 
 ## Notes
 

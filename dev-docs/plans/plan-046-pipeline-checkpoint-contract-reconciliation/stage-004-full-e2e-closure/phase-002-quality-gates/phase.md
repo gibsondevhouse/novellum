@@ -2,7 +2,7 @@
 title: Quality Gates
 slug: phase-002-quality-gates
 phase_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-004-full-e2e-closure
 parts:
@@ -18,13 +18,13 @@ Run standard repo quality gates after e2e closure.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Quality Gates](part-001-quality-gates/part.md) | `draft` | — | TBD |
+| 001 | [Quality Gates](part-001-quality-gates/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] All required gates pass.
-- [ ] Evidence includes command outputs.
-- [ ] Any unrelated blocker is documented with exact file/line.
+- [x] All required gates pass.
+- [x] Evidence includes command outputs.
+- [x] Any unrelated blocker is documented with exact file/line.
 
 ## Notes
 

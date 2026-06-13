@@ -2,7 +2,7 @@
 title: Canonical Checkpoint Flow
 slug: stage-002-canonical-checkpoint-flow
 stage_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-043-outline-pipeline-consolidation
 phases:
@@ -21,9 +21,9 @@ Make the outline checkpoint pipeline the canonical user-facing path for generati
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Generation Entrypoint](phase-001-generation-entrypoint/phase.md) | `draft` | TBD |
-| 002 | [Review Card Wiring](phase-002-review-card-wiring/phase.md) | `draft` | TBD |
-| 003 | [Materialization Contract](phase-003-materialization-contract/phase.md) | `draft` | TBD |
+| 001 | [Generation Entrypoint](phase-001-generation-entrypoint/phase.md) | `complete` | TBD |
+| 002 | [Review Card Wiring](phase-002-review-card-wiring/phase.md) | `complete` | TBD |
+| 003 | [Materialization Contract](phase-003-materialization-contract/phase.md) | `complete` | TBD |
 
 ## Entry Criteria
 
@@ -39,4 +39,3 @@ Make the outline checkpoint pipeline the canonical user-facing path for generati
 ## Notes
 
 This stage should preserve the plan-040 safety guarantees and avoid adding any new direct hierarchy mutation path.
-

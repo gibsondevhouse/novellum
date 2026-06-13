@@ -1,6 +1,6 @@
 # Context Engine
 
-> Last verified: 2026-06-03 (plan-040 stage-002 context sufficiency gate)
+> Last verified: 2026-06-12 (plan-047 worldbuilding canon merge diff)
 
 The Context Engine selects the **minimum viable context** for an AI task. Hallucination reduction at Novellum is mostly a context-discipline problem, not a prompt-tuning problem.
 
@@ -75,6 +75,21 @@ The gate returns UI-safe missing codes:
 - `story_source_missing`
 
 Malformed legacy JSON sources are ignored with a `malformed_legacy_json` warning that does not include the raw payload. Long synopsis text is represented by a deterministic summary plus hash/length metadata instead of requiring the full text to be echoed by callers.
+
+## Worldbuilding Proposal Context Discipline
+
+Worldbuilding scan proposals remain review artifacts until accepted. Prompt
+context should prefer accepted canon rows and accepted worldbuild checkpoints
+over pending proposal payloads. When pending proposals are surfaced for review,
+use compact proposal metadata: source context hashes, field-level `canonDiff`
+summaries, duplicate evidence labels/scores, and lifecycle state.
+
+Accepted/rejected proposal audit metadata is also compact by design. It records
+projection mode, decision, target identifiers, changed field names, link
+targets, duplicate/evidence counts, and rejection reason where applicable. Do
+not use audit records as a substitute for full canon retrieval, and do not feed
+raw model output or full before/after entity snapshots back into prompts unless
+a future task explicitly scopes that behavior.
 
 ## Adding a new policy
 

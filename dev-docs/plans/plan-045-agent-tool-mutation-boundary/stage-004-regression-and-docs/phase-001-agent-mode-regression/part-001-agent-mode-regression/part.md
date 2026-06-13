@@ -2,7 +2,7 @@
 title: Agent Mode Regression
 slug: part-001-agent-mode-regression
 part_number: 1
-status: review
+status: complete
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-001-agent-mode-regression

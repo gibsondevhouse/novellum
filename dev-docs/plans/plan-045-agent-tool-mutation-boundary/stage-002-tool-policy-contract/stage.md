@@ -2,7 +2,7 @@
 title: Tool Policy Contract
 slug: stage-002-tool-policy-contract
 stage_number: 2
-status: review
+status: complete
 owner: Planner Agent
 plan: plan-045-agent-tool-mutation-boundary
 phases:
@@ -21,9 +21,9 @@ Define and enforce the policy that model-callable tools cannot directly apply ma
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Capability Schema](phase-001-capability-schema/phase.md) | `review` | TBD |
-| 002 | [Advertisement Filter](phase-002-advertisement-filter/phase.md) | `review` | TBD |
-| 003 | [Source Contract Tests](phase-003-source-contract-tests/phase.md) | `review` | TBD |
+| 001 | [Capability Schema](phase-001-capability-schema/phase.md) | `complete` | TBD |
+| 002 | [Advertisement Filter](phase-002-advertisement-filter/phase.md) | `complete` | TBD |
+| 003 | [Source Contract Tests](phase-003-source-contract-tests/phase.md) | `complete` | TBD |
 
 ## Entry Criteria
 

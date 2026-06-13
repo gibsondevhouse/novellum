@@ -2,12 +2,12 @@
 title: Contract Risk Map
 slug: part-001-contract-risk-map
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-002-contract-risk-map
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Identify what can break when the legacy outline path is removed and define the p
 
 **Create:**
 
-- `evidence/contract-risk-map-evidence-2026-06-09.md`
+- `evidence/contract-risk-map-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -60,9 +60,9 @@ Identify what can break when the legacy outline path is removed and define the p
 
 ## Acceptance Criteria
 
-- [ ] Each legacy caller has a recommended disposition.
-- [ ] Persisted legacy artifact handling is decided.
-- [ ] Regression commands are listed for the implementation stages.
+- [x] Each legacy caller has a recommended disposition.
+- [x] Persisted legacy artifact handling is decided.
+- [x] Regression commands are listed for the implementation stages.
 
 ## Edge Cases
 

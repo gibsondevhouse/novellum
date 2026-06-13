@@ -2,12 +2,12 @@
 title: Failing Spec Classification
 slug: part-001-failing-spec-classification
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-003-failing-spec-classification
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,7 +39,7 @@ Prevent stale tests from driving accidental compatibility while still catching r
 
 **Create:**
 
-- `evidence/failing-spec-classification-evidence-2026-06-09.md`
+- `evidence/failing-spec-classification-evidence-2026-06-12.md`
 
 **Update:**
 
@@ -57,9 +57,9 @@ Prevent stale tests from driving accidental compatibility while still catching r
 
 ## Acceptance Criteria
 
-- [ ] Every failing spec has a classification and recommended action.
-- [ ] Stale fixture failures are distinguished from product regressions.
-- [ ] Next-stage API map can resolve each failure.
+- [x] Every failing spec has a classification and recommended action.
+- [x] Stale fixture failures are distinguished from product regressions.
+- [x] Next-stage API map can resolve each failure.
 
 ## Edge Cases
 
@@ -68,4 +68,4 @@ Prevent stale tests from driving accidental compatibility while still catching r
 
 ## Notes
 
-Keep this part scoped to Pipeline Checkpoint Contract Reconciliation. If implementation reveals a larger dependency, document it in `impl.log.md` before expanding scope.
+Full Chromium e2e classification is complete: 15 tests pass; 4 plan-028 specs fail because stale fixtures use `family` instead of the current `pipeline` artifact envelope field.

@@ -2,12 +2,12 @@
 title: Proposal Flow Tests
 slug: part-001-proposal-flow-tests
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-proposal-flow-tests
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -39,12 +39,15 @@ Ensure create/update/merge/reject proposal behavior remains review-gated and sta
 
 **Create:**
 
-- `evidence/proposal-flow-tests-evidence-2026-06-09.md`
+- `evidence/proposal-flow-tests-evidence-2026-06-12.md`
 
 **Update:**
 
-- `tests/world-building/worldbuilding-proposal-card.test.ts`
-- `tests/routes/worldbuilding-proposals-route.test.ts`
+- `tests/world-building/worldbuilding-proposal-diff-view.test.ts`
+- `tests/world-building/worldbuilding-proposal-service.test.ts`
+- `tests/world-building/worldbuild-proposal-canon-safety.test.ts`
+- `tests/routes/worldbuilding-proposals.test.ts`
+- `tests/ai/pipeline/worldbuild-canon-audit.test.ts`
 
 **Reference:**
 
@@ -58,9 +61,9 @@ Ensure create/update/merge/reject proposal behavior remains review-gated and sta
 
 ## Acceptance Criteria
 
-- [ ] Create-only proposals still work.
-- [ ] Diff-aware proposals require explicit accept.
-- [ ] Reject preserves reason and does not mutate canon.
+- [x] Create-only proposals still work.
+- [x] Diff-aware proposals require explicit accept.
+- [x] Reject preserves reason and does not mutate canon.
 
 ## Edge Cases
 

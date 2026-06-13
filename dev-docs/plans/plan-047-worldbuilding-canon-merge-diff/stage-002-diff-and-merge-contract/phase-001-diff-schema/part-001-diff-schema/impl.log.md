@@ -18,3 +18,15 @@ part: part-001-diff-schema
 **Notes:** No implementation work has started. Keep this log append-only when the part is executed.
 
 ---
+
+### [2026-06-12 14:38] Agent: Codex
+
+**Action:** Added a Zod-backed worldbuilding canon diff contract and wired proposal records to optionally carry a parsed diff.
+
+**Result:** Created `src/lib/ai/pipeline/worldbuild-canon-diff-schema.ts`, added `canonDiff` compatibility to `WorldbuildProposalRecord`, and added focused parser tests for create, update, merge, link, no-op, and malformed contracts.
+
+**Validation:** `pnpm vitest run tests/ai/pipeline/worldbuild-canon-diff-schema.test.ts` passed (7 tests). `pnpm check` passed with 0 errors and 0 warnings.
+
+**Notes:** Lint remains deferred to the Stage 002/full-plan quality gate. Part and Phase 001 moved to implementation `complete`.
+
+---

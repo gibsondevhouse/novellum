@@ -1,30 +1,30 @@
 ---
 part: part-001-docs-and-closeout
-last_updated: 2026-06-09
+last_updated: 2026-06-12
 ---
 
 # Implementation Checklist
 
 ## Pre-Implementation
 
-- [ ] Parent phase and stage are `in-progress`
-- [ ] All declared dependencies are `complete`
-- [ ] `part.md` has been reviewed and accepted
-- [ ] Dev environment is ready
+- [x] Parent phase and stage are `in-progress`
+- [x] All declared dependencies are `complete`
+- [x] `part.md` has been reviewed and accepted
+- [x] Dev environment is ready
 
 ## Implementation
 
-- [ ] All files listed in `part.md > Files > Create` have been created
-- [ ] All files listed in `part.md > Files > Update` have been updated
-- [ ] Each acceptance criterion in `part.md` is satisfied
-- [ ] Edge cases addressed
+- [x] All files listed in `part.md > Files > Create` have been created
+- [x] All files listed in `part.md > Files > Update` have been updated
+- [x] Each acceptance criterion in `part.md` is satisfied
+- [x] Edge cases addressed
 
 ## Post-Implementation
 
-- [ ] Lint passes with zero errors
-- [ ] Type-check passes with zero errors
-- [ ] Tests pass, if applicable
-- [ ] At least one artifact added to `evidence/`
-- [ ] `impl.log.md` updated with final entry
-- [ ] Part `status` updated to `review` in `part.md` frontmatter
-- [ ] Reviewer notified / Reviewer Agent invoked
+- [x] Lint passes with zero errors: `pnpm lint`
+- [x] Type-check passes with zero errors: `pnpm check`
+- [x] Tests pass: `pnpm test` and `pnpm test:e2e --project=chromium`
+- [x] At least one artifact added to `evidence/`
+- [x] `impl.log.md` updated with final entry
+- [x] Part `status` updated to implementation `complete` in `part.md` frontmatter
+- [x] Plan-level reviewer handoff prepared; Reviewer not invoked by implementation agent

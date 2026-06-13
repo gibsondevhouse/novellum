@@ -13,6 +13,7 @@ const streamCompleteMock = vi.fn();
 const buildRagContextMock = vi.fn();
 const runAuthorPipelineTaskMock = vi.fn();
 const runAgentLoopMock = vi.fn();
+const outlineGenerateMock = vi.fn();
 
 vi.mock('$lib/ai/openrouter.js', async () => {
 	const actual = await vi.importActual<typeof import('$lib/ai/openrouter.js')>(
@@ -41,6 +42,12 @@ vi.mock('$modules/nova/services/author-pipeline-runner.js', () => ({
 	runAuthorPipelineTask: (...args: unknown[]) => runAuthorPipelineTaskMock(...args),
 }));
 
+vi.mock('$modules/nova/stores/outline-generation-state.svelte.js', () => ({
+	outlineGenerationState: {
+		generate: (...args: unknown[]) => outlineGenerateMock(...args),
+	},
+}));
+
 vi.mock('$modules/nova/services/agent-loop.js', () => ({
 	runAgentLoop: (...args: unknown[]) => runAgentLoopMock(...args),
 	MAX_AGENT_STEPS: 8,
@@ -49,7 +56,6 @@ vi.mock('$modules/nova/services/agent-loop.js', () => ({
 import { sendNovaChat } from '$modules/nova/services/chat-service.js';
 import { novaSession } from '$modules/nova/stores/nova-session.svelte.js';
 import { novaMode } from '$modules/nova/stores/nova-mode.svelte.js';
-import { PIPELINE_TASK_KEYS } from '$lib/ai/pipeline/task-catalog.js';
 
 async function* yieldChunks(chunks: string[]): AsyncGenerator<string> {
 	for (const chunk of chunks) yield chunk;
@@ -83,8 +89,14 @@ describe('Nova mode routing — sendNovaChat', () => {
 		buildRagContextMock.mockReset();
 		runAuthorPipelineTaskMock.mockReset();
 		runAgentLoopMock.mockReset();
+		outlineGenerateMock.mockReset();
 		buildRagContextMock.mockResolvedValue(defaultRagResult);
 		runAgentLoopMock.mockResolvedValue(undefined);
+		outlineGenerateMock.mockResolvedValue({
+			ok: true,
+			status: 'succeeded',
+			checkpointId: 'outline-checkpoint-1',
+		});
 		novaSession.clear();
 	});
 
@@ -118,9 +130,7 @@ describe('Nova mode routing — sendNovaChat', () => {
 		expect(novaSession.messages[1].content).toBe('Hi.');
 	});
 
-	it('write mode + outline request routes to pipeline runner', async () => {
-		runAuthorPipelineTaskMock.mockResolvedValue({ ok: true });
-
+	it('write mode + outline request routes to checkpoint generation', async () => {
 		await sendNovaChat({
 			prompt: 'Build a chapter outline for act one.',
 			mode: 'write',
@@ -129,14 +139,14 @@ describe('Nova mode routing — sendNovaChat', () => {
 			activeChapterId: 'c1',
 		});
 
-		expect(runAuthorPipelineTaskMock).toHaveBeenCalledWith({
-			taskKey: PIPELINE_TASK_KEYS.AUTHOR_OUTLINE,
-			projectId: 'p1',
-			activeSceneId: 's1',
-			activeChapterId: 'c1',
-			instruction: 'Build a chapter outline for act one.',
-		});
+		expect(outlineGenerateMock).toHaveBeenCalledWith('p1', 'Build a chapter outline for act one.');
+		expect(runAuthorPipelineTaskMock).not.toHaveBeenCalled();
 		expect(streamCompleteMock).not.toHaveBeenCalled();
+		const novaMessages = novaSession.messages.filter((m) => m.role === 'nova');
+		expect(novaMessages).toHaveLength(1);
+		expect(novaMessages[0].content).toContain('outline-checkpoint-1');
+		expect(novaMessages[0].content).toContain('ready for review');
+		expect(novaMessages[0].artifact).toBeUndefined();
 	});
 
 	it('write mode + unsupported concrete request appends unsupported-action state', async () => {
@@ -167,6 +177,7 @@ describe('Nova mode routing — sendNovaChat', () => {
 		});
 
 		expect(runAuthorPipelineTaskMock).not.toHaveBeenCalled();
+		expect(outlineGenerateMock).not.toHaveBeenCalled();
 		const novaMsg = novaSession.messages.find((m) => m.role === 'nova');
 		expect(novaMsg?.status).toBe('error');
 	});

@@ -2,7 +2,7 @@
 title: Lifecycle Operation Map
 slug: phase-002-lifecycle-operation-map
 phase_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-002-canonical-api-map
 parts:
@@ -18,14 +18,14 @@ Define lifecycle transition behavior and status codes across checkpoint families
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Lifecycle Operation Map](part-001-lifecycle-operation-map/part.md) | `draft` | — | TBD |
+| 001 | [Lifecycle Operation Map](part-001-lifecycle-operation-map/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Transition behavior is documented and testable.
-- [ ] Error codes are stable for client branching.
-- [ ] Invalid legacy operations have deliberate responses.
+- [x] Transition behavior is documented and testable.
+- [x] Error codes are stable for client branching.
+- [x] Invalid legacy operations have deliberate responses.
 
 ## Notes
 
-Make draft/review/accept/reject transitions consistent where possible and intentionally different where necessary.
+Lifecycle operation map captured in `part-001-lifecycle-operation-map/evidence/lifecycle-operation-map-evidence-2026-06-12.md` and `dev-docs/03-ai/agents-map.md`.

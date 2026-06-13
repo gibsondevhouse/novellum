@@ -2,12 +2,12 @@
 title: Version Policy
 slug: part-001-version-policy
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-003-version-policy
-started_at: ~
-completed_at: ~
+started_at: 2026-06-12
+completed_at: 2026-06-12
 estimated_duration: TBD
 ---
 
@@ -58,9 +58,9 @@ Clarify how routes handle old, current, malformed, and future checkpoint artifac
 
 ## Acceptance Criteria
 
-- [ ] Version policy is explicit by family.
-- [ ] Stale fixture update strategy is clear.
-- [ ] Unknown versions fail safely.
+- [x] Version policy is explicit by family.
+- [x] Stale fixture update strategy is clear.
+- [x] Unknown versions fail safely.
 
 ## Edge Cases
 
@@ -69,4 +69,4 @@ Clarify how routes handle old, current, malformed, and future checkpoint artifac
 
 ## Notes
 
-Keep this part scoped to Pipeline Checkpoint Contract Reconciliation. If implementation reveals a larger dependency, document it in `impl.log.md` before expanding scope.
+Version behavior is documented in the agents map. `vibe-worldbuild` E2E fixtures now name the current checkpoint and parser versions explicitly so stale fixture updates have one local policy anchor.

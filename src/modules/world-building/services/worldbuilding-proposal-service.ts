@@ -8,10 +8,14 @@ export interface ProposalRejectResult {
 	error?: string;
 }
 
-export async function acceptProposal(proposalId: string): Promise<ProposalAcceptResult> {
+export async function acceptProposal(
+	projectId: string,
+	proposalId: string,
+): Promise<ProposalAcceptResult> {
 	const res = await fetch(`/api/worldbuilding/proposals/${proposalId}/accept`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ projectId }),
 	});
 
 	if (!res.ok) {
@@ -23,13 +27,14 @@ export async function acceptProposal(proposalId: string): Promise<ProposalAccept
 }
 
 export async function rejectProposal(
+	projectId: string,
 	proposalId: string,
 	reason: string,
 ): Promise<ProposalRejectResult> {
 	const res = await fetch(`/api/worldbuilding/proposals/${proposalId}/reject`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ reason }),
+		body: JSON.stringify({ projectId, reason }),
 	});
 
 	if (!res.ok) {

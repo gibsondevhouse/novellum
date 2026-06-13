@@ -4,17 +4,17 @@ Reconcile route, schema, docs, and e2e expectations for all pipeline checkpoint 
 
 ## Status
 
-- Plan status: `draft`
-- Tracker status: not activated
-- Scope: full draft plan tree scaffolded for future execution
+- Plan status: `review`
+- Tracker status: active; implementation closed out, pending plan-level reviewer
+- Scope: route/schema/test/docs reconciliation complete with full quality-gate evidence
 
 ## Execution Notes
 
 1. Read `plan.md` first.
 2. Expand or adjust any part-level file lists before starting implementation.
 3. Follow each part checklist before editing source files.
-4. Add dated evidence under the part's `evidence/` directory before moving a part to review.
-5. Do not mark reviewer sign-off complete without a real review.
+4. Add dated evidence under the part's `evidence/` directory before moving a part to implementation complete.
+5. Defer Reviewer Agent evaluation until full plan implementation closeout.
 
 ## Canonical Quality Gates
 

@@ -27,9 +27,26 @@ import type {
 } from './worldbuild-agent.js';
 import type {
 	WorldbuildProposalAcceptance,
+	WorldbuildProposalAuditFieldChange,
+	WorldbuildProposalAuditLinkChange,
+	WorldbuildProposalAuditTarget,
+	WorldbuildProposalMutationAudit,
 	WorldbuildProposalRecord,
 	WorldbuildProposalRejection,
 } from './worldbuild-proposal-schema.js';
+import { applyWorldbuildCanonDiff } from './worldbuild-canon-diff-apply.js';
+import {
+	worldbuildCanonDiffSchema,
+	type WorldbuildCanonDiff,
+	type WorldbuildCanonEntityRef,
+} from './worldbuild-canon-diff-schema.js';
+export {
+	getWorldbuildCanonMergeFieldMode,
+	getWorldbuildCanonMergePolicy,
+	WORLDBUILD_CANON_MERGE_POLICIES,
+	type WorldbuildCanonMergeFamilyPolicy,
+	type WorldbuildCanonMergeFieldMode,
+} from './worldbuild-canon-merge-policy.js';
 
 type JsonObject = Record<string, unknown>;
 
@@ -590,6 +607,113 @@ function applyProposalProjection(
 	);
 }
 
+const MAX_PROPOSAL_AUDIT_ITEMS = 12;
+
+function valueTypeForAudit(value: unknown): WorldbuildProposalAuditFieldChange['valueType'] {
+	if (value === null || value === undefined) return 'null';
+	if (Array.isArray(value)) return 'array';
+	const type = typeof value;
+	if (type === 'string' || type === 'number' || type === 'boolean') return type;
+	if (type === 'object') return 'object';
+	return 'unknown';
+}
+
+function proposalAuditTarget(
+	target: WorldbuildCanonEntityRef | null | undefined,
+): WorldbuildProposalAuditTarget | null {
+	if (!target) return null;
+	return {
+		family: target.family,
+		id: target.id ?? null,
+		displayName: target.displayName,
+	};
+}
+
+function proposalAuditFieldChanges(diff: WorldbuildCanonDiff): WorldbuildProposalAuditFieldChange[] {
+	return diff.fields.slice(0, MAX_PROPOSAL_AUDIT_ITEMS).map((field) => ({
+		fieldPath: field.fieldPath,
+		label: field.label,
+		operation: field.operation,
+		valueType: field.valueType,
+		evidenceCount: field.evidence.length,
+	}));
+}
+
+function proposalAuditLinkChanges(diff: WorldbuildCanonDiff): WorldbuildProposalAuditLinkChange[] {
+	return diff.links.slice(0, MAX_PROPOSAL_AUDIT_ITEMS).map((link) => ({
+		linkType: link.linkType,
+		source: proposalAuditTarget(link.source),
+		target: proposalAuditTarget(link.target),
+		evidenceCount: link.evidence.length,
+	}));
+}
+
+function proposalAuditEvidenceCount(diff: WorldbuildCanonDiff): number {
+	return (
+		diff.evidence.length +
+		diff.fields.reduce((total, field) => total + field.evidence.length, 0) +
+		diff.links.reduce((total, link) => total + link.evidence.length, 0) +
+		diff.duplicateCandidates.reduce((total, candidate) => total + candidate.evidence.length, 0)
+	);
+}
+
+function buildCanonDiffAudit(
+	diff: WorldbuildCanonDiff,
+	input: {
+		projectionMode: WorldbuildProposalMutationAudit['projectionMode'];
+		targetId?: string | null;
+	},
+): WorldbuildProposalMutationAudit {
+	const target = proposalAuditTarget(diff.target);
+	return {
+		projectionMode: input.projectionMode,
+		decision: diff.decision,
+		diffId: diff.diffId,
+		family: diff.family,
+		targetId: input.targetId ?? target?.id ?? null,
+		target,
+		changedFields: proposalAuditFieldChanges(diff),
+		linkedTargets: proposalAuditLinkChanges(diff),
+		duplicateCandidateCount: diff.duplicateCandidates.length,
+		evidenceCount: proposalAuditEvidenceCount(diff),
+		summary: diff.summary,
+	};
+}
+
+function legacyProposalAudit(
+	proposal: WorldbuildProposalRecord,
+	projectionTarget: string,
+): WorldbuildProposalMutationAudit {
+	const changedFields = Object.entries(proposal.payload)
+		.slice(0, MAX_PROPOSAL_AUDIT_ITEMS)
+		.map(([fieldPath, value]) => ({
+			fieldPath,
+			operation: 'payload' as const,
+			valueType: valueTypeForAudit(value),
+			evidenceCount: 0,
+		}));
+	const duplicateCandidateCount = proposal.duplicateCandidates?.length ?? 0;
+	const evidenceCount =
+		proposal.duplicateCandidates?.reduce(
+			(total, candidate) => total + candidate.evidence.length,
+			0,
+		) ?? 0;
+
+	return {
+		projectionMode: 'legacy_create_projection',
+		decision: 'create',
+		diffId: null,
+		family: proposal.entityKind,
+		targetId: null,
+		target: null,
+		changedFields,
+		linkedTargets: [],
+		duplicateCandidateCount,
+		evidenceCount,
+		summary: `Legacy proposal projection to ${projectionTarget}.`,
+	};
+}
+
 export type WorldbuildProposalMutationResult =
 	| { ok: true; proposal: WorldbuildProposalRecord }
 	| { ok: false; code: WorldbuildCheckpointErrorCode; error: string };
@@ -914,12 +1038,44 @@ export function acceptProposalAtomically(
 			}
 
 			const acceptedAt = nowIso();
-			const projectionTarget = applyProposalProjection(database, proposal, acceptedAt);
+			let projectionTarget: string;
+			let projectedToCanon = true;
+			let audit: WorldbuildProposalMutationAudit;
+			const diff = proposal.canonDiff
+				? worldbuildCanonDiffSchema.safeParse(proposal.canonDiff)
+				: null;
+
+			if (diff && !diff.success) {
+				throw new WorldbuildCheckpointError(
+					'projection_failed',
+					'Proposal canon diff is malformed and cannot be accepted.',
+				);
+			}
+
+			if (diff?.success && diff.data.decision !== 'create') {
+				const applied = applyWorldbuildCanonDiff(database, proposal, acceptedAt);
+				projectionTarget = applied.projectionTarget;
+				projectedToCanon = applied.projectedToCanon;
+				audit = buildCanonDiffAudit(diff.data, {
+					projectionMode: 'canon_diff',
+					targetId: applied.targetId,
+				});
+			} else {
+				projectionTarget = applyProposalProjection(database, proposal, acceptedAt);
+				audit = diff?.success
+					? buildCanonDiffAudit(diff.data, {
+							projectionMode: 'legacy_create_projection',
+							targetId: null,
+						})
+					: legacyProposalAudit(proposal, projectionTarget);
+			}
+
 			const acceptance: WorldbuildProposalAcceptance = {
 				acceptedAt,
 				acceptedBy: null,
 				projectionTarget,
-				projectedToCanon: true,
+				projectedToCanon,
+				audit,
 			};
 			const next: WorldbuildProposalRecord = {
 				...proposal,
@@ -969,10 +1125,20 @@ export function rejectProposalAtomically(
 			}
 
 			const rejectedAt = nowIso();
+			const diff = proposal.canonDiff
+				? worldbuildCanonDiffSchema.safeParse(proposal.canonDiff)
+				: null;
+			const audit = diff?.success
+				? buildCanonDiffAudit(diff.data, {
+						projectionMode: 'canon_diff',
+						targetId: diff.data.target?.id ?? null,
+					})
+				: legacyProposalAudit(proposal, proposal.categoryId);
 			const rejection: WorldbuildProposalRejection = {
 				rejectedAt,
 				rejectedBy: asOptionalString(input.rejectedBy),
 				reason,
+				audit,
 			};
 			const next: WorldbuildProposalRecord = {
 				...proposal,
