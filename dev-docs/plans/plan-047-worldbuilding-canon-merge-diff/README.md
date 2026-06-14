@@ -4,8 +4,8 @@ Upgrade worldbuilding proposal acceptance from insert-only projection to reviewa
 
 ## Status
 
-- Plan status: `review`
-- Tracker status: implementation closed out 2026-06-12; awaiting plan-level Reviewer evaluation
+- Plan status: `complete`
+- Tracker status: closed 2026-06-14 after plan-level Reviewer evaluation
 - Scope: full plan tree implemented with closeout evidence
 
 ## Execution Notes

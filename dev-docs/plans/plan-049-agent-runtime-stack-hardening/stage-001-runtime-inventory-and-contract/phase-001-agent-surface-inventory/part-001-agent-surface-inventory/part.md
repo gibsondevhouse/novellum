@@ -2,12 +2,12 @@
 title: Agent Surface Inventory
 slug: part-001-agent-surface-inventory
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: unassigned
+assigned_to: Codex
 phase: phase-001-agent-surface-inventory
-started_at: ~
-completed_at: ~
+started_at: 2026-06-14
+completed_at: 2026-06-14
 estimated_duration: TBD
 ---
 
@@ -64,9 +64,9 @@ Produce a source-grounded map of Novellum's current AI runtime surfaces before a
 
 ## Acceptance Criteria
 
-- [ ] Every Nova, outline, author draft, worldbuilding, continuity, and provider runtime path is listed.
-- [ ] Each path is classified as read-only, generation-only, review-gated mutation, direct mutation, or diagnostics.
-- [ ] Missing durability, retry, cancellation, trace, and cost behavior is documented by source path.
+- [x] Every Nova, outline, author draft, worldbuilding, continuity, and provider runtime path is listed.
+- [x] Each path is classified as read-only, generation-only, review-gated mutation, direct mutation, or diagnostics.
+- [x] Missing durability, retry, cancellation, trace, and cost behavior is documented by source path.
 
 ## Edge Cases
 

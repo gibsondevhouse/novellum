@@ -48,6 +48,11 @@ import {
 	type WorldbuildScanCanonContext,
 	type WorldbuildScanProjectContext,
 } from '$modules/world-building/services/worldbuild-scan-contract.js';
+import {
+	KNOWN_AGENT_JOB_TYPES,
+	enqueueKnownAgentJob,
+	isQueuedExecutionRequest,
+} from '$lib/server/agent-runtime/index.js';
 
 // ---------------------------------------------------------------------------
 // Error codes — stable and typed for client branching
@@ -589,6 +594,33 @@ export const POST: RequestHandler = async ({ request }) => {
 		return scanError('context_insufficient', statusForScanCode('context_insufficient'), {
 			missing: sufficiency.missing,
 		});
+	}
+
+	if (isQueuedExecutionRequest(scanRequest as unknown as { defer?: unknown; executionMode?: unknown })) {
+		return json(
+			enqueueKnownAgentJob({
+				jobType: KNOWN_AGENT_JOB_TYPES.worldbuildingScan,
+				projectId: scanRequest.projectId,
+				family: 'worldbuild',
+				entrypoint: 'worldbuilding.scan',
+				targetKind: 'worldbuilding-domain',
+				targetId: scanRequest.domainScope,
+				targetJson: {
+					projectId: scanRequest.projectId,
+					domainScope: scanRequest.domainScope,
+					maxProposals: scanRequest.maxProposals ?? 3,
+				},
+				payloadRedactedJson: {
+					projectId: scanRequest.projectId,
+					domainScope: scanRequest.domainScope,
+					maxProposals: scanRequest.maxProposals ?? 3,
+					sourceContext: buildSourceContext(scanRequest.context.project),
+				},
+				priority: 10,
+				maxAttempts: 2,
+			}),
+			{ status: 202 },
+		);
 	}
 
 	const providerResult = await loadProvider();

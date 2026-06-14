@@ -48,6 +48,8 @@ interface AgentCompletionResult {
 	content: string | null;
 	tool_calls: OpenRouterToolCall[] | null;
 	finish_reason: string;
+	run?: { id: string };
+	job?: { id: string };
 }
 
 export interface AgentLoopInput {
@@ -228,6 +230,12 @@ export async function runAgentLoop(input: AgentLoopInput): Promise<void> {
 		}
 
 		const { content, tool_calls } = result;
+		if (result.run?.id || result.job?.id) {
+			novaSession.setRuntimeReference(thinkingMsg.id, {
+				runId: result.run?.id,
+				jobId: result.job?.id,
+			});
+		}
 
 		if (tool_calls && tool_calls.length > 0) {
 			// --- Tool-call turn ---

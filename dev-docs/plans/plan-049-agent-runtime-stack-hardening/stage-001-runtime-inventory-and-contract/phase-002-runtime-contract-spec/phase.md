@@ -2,7 +2,7 @@
 title: Runtime Contract Spec
 slug: phase-002-runtime-contract-spec
 phase_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-001-runtime-inventory-and-contract
 parts:
@@ -18,13 +18,13 @@ Define the canonical runtime state machine and data contract before adding persi
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Runtime Contract Spec](part-001-runtime-contract-spec/part.md) | `draft` | unassigned | TBD |
+| 001 | [Runtime Contract Spec](part-001-runtime-contract-spec/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Runtime lifecycle states are defined for runs, steps, jobs, tool calls, artifacts, cancellations, retries, and failures.
-- [ ] Review-gated mutation boundaries are explicit in the runtime contract.
-- [ ] The contract maps current runtime paths to future schema and service owners.
+- [x] Runtime lifecycle states are defined for runs, steps, jobs, tool calls, artifacts, cancellations, retries, and failures.
+- [x] Review-gated mutation boundaries are explicit in the runtime contract.
+- [x] The contract maps current runtime paths to future schema and service owners.
 
 ## Notes
 

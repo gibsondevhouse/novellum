@@ -2,10 +2,10 @@
 title: Worldbuilding Canon Merge Diff
 slug: plan-047-worldbuilding-canon-merge-diff
 version: 1.0.0
-status: review
+status: complete
 owner: Planner Agent
 created: 2026-06-09
-last_updated: 2026-06-12
+last_updated: 2026-06-14
 target_completion: 2026-06-12
 stages:
   - stage-001-canon-projection-audit
@@ -79,4 +79,4 @@ All stages must pass the following gates before the plan is marked `complete`:
 
 ## Notes
 
-Implementation closed out 2026-06-12 and awaiting plan-level Reviewer evaluation. Do not mark the plan `complete` until Reviewer sign-off is recorded.
+Implementation closed out 2026-06-12. Plan-level Reviewer evaluation finished 2026-06-14 and the plan is closed.

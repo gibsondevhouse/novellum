@@ -4,8 +4,8 @@ Reconcile route, schema, docs, and e2e expectations for all pipeline checkpoint 
 
 ## Status
 
-- Plan status: `review`
-- Tracker status: active; implementation closed out, pending plan-level reviewer
+- Plan status: `complete`
+- Tracker status: closed 2026-06-14 after plan-level reviewer evaluation
 - Scope: route/schema/test/docs reconciliation complete with full quality-gate evidence
 
 ## Execution Notes

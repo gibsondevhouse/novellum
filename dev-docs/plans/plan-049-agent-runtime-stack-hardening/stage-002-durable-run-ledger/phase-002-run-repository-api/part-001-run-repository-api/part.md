@@ -2,12 +2,12 @@
 title: Run Repository API
 slug: part-001-run-repository-api
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: unassigned
+assigned_to: Codex
 phase: phase-002-run-repository-api
-started_at: ~
-completed_at: ~
+started_at: 2026-06-14
+completed_at: 2026-06-14
 estimated_duration: TBD
 ---
 
@@ -63,9 +63,9 @@ Implement typed runtime ledger accessors that let server routes and worker code 
 
 ## Acceptance Criteria
 
-- [ ] Runtime repositories expose typed create, append, transition, query, and redact operations.
-- [ ] Invalid lifecycle transitions are rejected.
-- [ ] Unit tests cover run creation, step append, tool call capture, artifact link, usage update, error capture, and redaction.
+- [x] Runtime repositories expose typed create, append, transition, query, and redact operations.
+- [x] Invalid lifecycle transitions are rejected.
+- [x] Unit tests cover run creation, step append, tool call capture, artifact link, usage update, error capture, and redaction.
 
 ## Edge Cases
 

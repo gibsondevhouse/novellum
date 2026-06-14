@@ -37,6 +37,8 @@ interface AppendInput {
 	intent?: NovaMessageIntent;
 	toolId?: string;
 	toolPayload?: unknown;
+	runtimeRunId?: string;
+	runtimeJobId?: string;
 }
 
 class NovaSessionStore {
@@ -101,9 +103,42 @@ class NovaSessionStore {
 			createdAt: new Date().toISOString(),
 			toolId: input.toolId,
 			toolPayload: input.toolPayload,
+			runtimeRunId: input.runtimeRunId,
+			runtimeJobId: input.runtimeJobId,
 		};
 		this.messages = [...this.messages, message];
 		return message;
+	}
+
+	appendQueuedRun(input: {
+		content: string;
+		runId: string;
+		jobId: string;
+		toolPayload?: unknown;
+	}): NovaMessage {
+		return this.append({
+			role: 'nova',
+			content: input.content,
+			status: 'queued',
+			runtimeRunId: input.runId,
+			runtimeJobId: input.jobId,
+			toolPayload: input.toolPayload,
+		});
+	}
+
+	setRuntimeReference(id: string, reference: { runId?: string; jobId?: string }): void {
+		const idx = this.messages.findIndex((m) => m.id === id);
+		if (idx === -1) return;
+		const next: NovaMessage = {
+			...this.messages[idx],
+			runtimeRunId: reference.runId ?? this.messages[idx].runtimeRunId,
+			runtimeJobId: reference.jobId ?? this.messages[idx].runtimeJobId,
+		};
+		this.messages = [
+			...this.messages.slice(0, idx),
+			next,
+			...this.messages.slice(idx + 1),
+		];
 	}
 
 	appendUnsupportedWriteAction(request: string): NovaMessage {

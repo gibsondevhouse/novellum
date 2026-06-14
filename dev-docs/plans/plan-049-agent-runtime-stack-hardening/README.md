@@ -4,9 +4,9 @@ Infrastructure plan for making Novellum's agent runtime durable, observable, rec
 
 ## Status
 
-- Plan status: `draft`
-- Tracker status: deferred
-- Scope: full draft plan tree authored for future execution
+- Plan status: `in-progress`
+- Tracker status: active as of 2026-06-14
+- Scope: Stage 001 runtime inventory and contract is underway
 
 ## Execution Notes
 

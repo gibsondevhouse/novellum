@@ -39,6 +39,11 @@ import {
 	upsertOutlineDraftCheckpoint,
 } from '$lib/ai/pipeline/outline-checkpoint-service.js';
 import { getOutlineConflictPreflight } from '$lib/server/outline/outline-conflict-preflight.js';
+import {
+	KNOWN_AGENT_JOB_TYPES,
+	enqueueKnownAgentJob,
+	isQueuedExecutionRequest,
+} from '$lib/server/agent-runtime/index.js';
 
 const credentialService = createCredentialService();
 const openRouterProvider = createOpenRouterProvider();
@@ -52,6 +57,8 @@ interface BodyShape {
 	projectId?: unknown;
 	instruction?: unknown;
 	confirmContextReady?: unknown;
+	defer?: unknown;
+	executionMode?: unknown;
 }
 
 interface ResolvedProvider {
@@ -256,6 +263,29 @@ export const POST: RequestHandler = async ({ request }) => {
 				},
 			},
 			{ status: 422 },
+		);
+	}
+
+	if (isQueuedExecutionRequest(body)) {
+		return json(
+			enqueueKnownAgentJob({
+				jobType: KNOWN_AGENT_JOB_TYPES.outlineGenerate,
+				projectId,
+				family: 'outline',
+				entrypoint: 'outline.generate',
+				targetKind: 'project',
+				targetId: projectId,
+				targetJson: { projectId, contextHash: packet.contextHash },
+				payloadRedactedJson: {
+					projectId,
+					instruction,
+					confirmContextReady,
+					contextHash: packet.contextHash,
+				},
+				priority: 20,
+				maxAttempts: 2,
+			}),
+			{ status: 202 },
 		);
 	}
 

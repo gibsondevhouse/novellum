@@ -2,7 +2,7 @@
 title: Run Ledger Schema
 slug: phase-001-run-ledger-schema
 phase_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-002-durable-run-ledger
 parts:
@@ -18,13 +18,13 @@ Add versioned SQLite tables for durable agent runtime records.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Run Ledger Schema](part-001-run-ledger-schema/part.md) | `draft` | unassigned | TBD |
+| 001 | [Run Ledger Schema](part-001-run-ledger-schema/part.md) | `complete` | Codex | TBD |
 
 ## Acceptance Criteria
 
-- [ ] Migrations create runtime tables with indexes for project, status, run type, created time, and linked artifact IDs.
-- [ ] Migration tests pass from empty and existing databases.
-- [ ] Schema docs explain what belongs in the ledger versus checkpoint/proposal domain tables.
+- [x] Migrations create runtime tables with indexes for project, status, run type, created time, and linked artifact IDs.
+- [x] Migration tests pass from empty and existing databases.
+- [x] Schema docs explain what belongs in the ledger versus checkpoint/proposal domain tables.
 
 ## Notes
 

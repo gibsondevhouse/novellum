@@ -87,7 +87,10 @@ Functionality is organized by **vertical domain slices** (e.g., `project`, `worl
 
 ## Recent Accomplishments
 
+- **Plan-049 progress (Runtime Hardening)**: Completed runtime inventory/contract, durable run ledger schema, typed server ledger repository, read-only Nova run routes, SQLite-backed queue claiming/stale-recovery mechanics, and local worker lifecycle/cancel/retry support (Active 2026-06-14).
 - **Plan-040 (Outline Generation)**: Worldbuilding-to-Outline review-gated proposal flow (Closed 2026-06-04).
+- **Plan-047 (Worldbuilding Canon Merge Diff)**: Reviewable worldbuilding canon diff/merge acceptance with audit metadata (Closed 2026-06-14).
+- **Plan-046 (Pipeline Reconciliation)**: Canonical checkpoint route/schema/docs/test reconciliation with full E2E closure (Closed 2026-06-14).
 - **Plan-045 (Agent Mutation Boundary)**: Separated model-callable Agent tools from UI/app mutation commands and closed review-gated validation (Closed 2026-06-12).
 - **Plan-039 (Manuscript Export UI)**: Chapter subset selector and delivery helper for browser/desktop (Closed 2026-06-03).
 - **Plan-041 (Docs Rebaseline)**: Reframed milestones and reconciled dev-docs (Closed 2026-06-01).
@@ -99,7 +102,7 @@ Functionality is organized by **vertical domain slices** (e.g., `project`, `worl
 
 ## Current Focus (Active Plans)
 
-Active plan: **Plan-046 (Pipeline Reconciliation)**. Current focus: implementation is closed out with route/schema/test/docs reconciliation complete; plan-level Reviewer evaluation is next.
+Active plan: **Plan-049 (Runtime Hardening)**. Current focus: Stage 004 / Phase 001 / Part 001, Model Capability Registry. Completed so far: Stage 001 runtime contract, Stage 002 durable run ledger, and Stage 003 local job execution.
 
 ### Roadmap Execution Order (Draft Queue)
 
@@ -111,11 +114,11 @@ To ensure system stability and logical dependency management, execute pending pl
 
 2.  **Phase 2: Pipeline Standardization**
     - [x] **Plan-043 (Outline Consolidation)**: Retire legacy direct apply paths; make checkpoints the sole materialization path. (Closed 2026-06-12)
-    - [x] **Plan-046 (Pipeline Reconciliation)**: Align schemas and routes across all generation pipelines. (Implementation closed out; reviewer pending)
-    - [ ] **Plan-047 (Worldbuilding Canon Merge Diff)**: Upgrade worldbuilding from "insert-only" to a full diff/merge flow.
+    - [x] **Plan-046 (Pipeline Reconciliation)**: Align schemas and routes across all generation pipelines. (Closed 2026-06-14)
+    - [x] **Plan-047 (Worldbuilding Canon Merge Diff)**: Upgrade worldbuilding from "insert-only" to a full diff/merge flow. (Closed 2026-06-14)
 
 3.  **Phase 3: Infrastructure & Coherence**
-    - [ ] **Plan-049 (Runtime Hardening)**: SQLite job queue, durable runs, token budgeting, and AI traces.
+    - [ ] **Plan-049 (Runtime Hardening)**: SQLite job queue, durable runs, token budgeting, and AI traces. (Active)
     - [ ] **Plan-048 (Frontend Coherence)**: Final UX pass for navigation, review gates, and visual state unification.
 
 4.  **Phase 4: Release Engineering**
@@ -137,9 +140,9 @@ To ensure system stability and logical dependency management, execute pending pl
 - Path 5: Observability, reliability, and model-budget optimization.
 
 ## Vulnerabilities and Fragilities
-- **Type Safety**: `pnpm check` is clean as of Plan-046 implementation closeout. Keep running it before plan closure.
+- **Type Safety**: `pnpm check` is clean as of Plan-049 Stage 003 implementation closeout. Keep running it before plan closure.
 - **Visual Drift**: Pre-existing cross-surface snapshot drift in Playwright tests. Impact: Unreliable visual regression testing. Detection: `pnpm run test:visual`.
-- **Linting**: `pnpm lint` and `pnpm lint:css` are clean as of Plan-046 implementation closeout. Treat new warnings/errors as regressions.
+- **Linting**: `pnpm lint` and `pnpm lint:css` are clean as of Plan-047 implementation closeout. Treat new warnings/errors as regressions.
 - **Legacy Persistence**: Dexie remains in `src/lib/db` and `src/modules/export` strictly for portability snapshots. Do not use for new live reads/writes.
 - **Sidebar/active-project detection**: Path parsing is brittle on routes outside `/projects/<id>/...`. Verified gotcha — see `dev-docs/02-architecture/routing.md`.
 - **`+server.ts` export discipline**: ESLint restricts to handlers / `config` / `_`-prefixed exports. Helpers must live in sibling files.

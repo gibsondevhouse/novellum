@@ -2,12 +2,12 @@
 title: Worker Lifecycle & Retry
 slug: part-001-worker-lifecycle-and-retry
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: unassigned
+assigned_to: Codex
 phase: phase-002-worker-lifecycle-and-retry
-started_at: ~
-completed_at: ~
+started_at: 2026-06-14
+completed_at: 2026-06-14
 estimated_duration: TBD
 ---
 
@@ -67,9 +67,9 @@ Run local agent jobs through a controlled worker lifecycle that supports progres
 
 ## Acceptance Criteria
 
-- [ ] Worker execution updates job and run state consistently.
-- [ ] Cancellation, retry, and failure behavior is deterministic and user-visible.
-- [ ] Long-running outline, author draft, and worldbuilding runs can be moved behind the worker contract without bypassing review gates.
+- [x] Worker execution updates job and run state consistently.
+- [x] Cancellation, retry, and failure behavior is deterministic and user-visible.
+- [x] Long-running outline, author draft, and worldbuilding runs can be moved behind the worker contract without bypassing review gates.
 
 ## Edge Cases
 

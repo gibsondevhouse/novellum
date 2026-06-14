@@ -44,6 +44,7 @@ export type NovaRole = 'user' | 'nova' | 'system' | 'tool-call' | 'tool-result';
 
 export type NovaMessageStatus =
 	| 'pending'
+	| 'queued'
 	| 'streaming'
 	| 'complete'
 	| 'error'
@@ -63,6 +64,8 @@ export interface NovaMessage {
 	createdAt: string;
 	toolId?: string;
 	toolPayload?: unknown;
+	runtimeRunId?: string;
+	runtimeJobId?: string;
 	error?: string;
 	/**
 	 * plan-027 stage-003 phase-003 part-001 — populated by

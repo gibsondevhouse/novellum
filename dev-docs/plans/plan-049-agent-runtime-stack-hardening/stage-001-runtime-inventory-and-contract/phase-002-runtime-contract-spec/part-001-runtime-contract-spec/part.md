@@ -2,12 +2,12 @@
 title: Runtime Contract Spec
 slug: part-001-runtime-contract-spec
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: unassigned
+assigned_to: Codex
 phase: phase-002-runtime-contract-spec
-started_at: ~
-completed_at: ~
+started_at: 2026-06-14
+completed_at: 2026-06-14
 estimated_duration: TBD
 ---
 
@@ -61,9 +61,9 @@ Write the canonical runtime contract for durable local agent execution.
 
 ## Acceptance Criteria
 
-- [ ] Runtime lifecycle states are defined for runs, steps, jobs, tool calls, artifacts, cancellations, retries, and failures.
-- [ ] Review-gated mutation boundaries are explicit in the runtime contract.
-- [ ] The contract maps current runtime paths to future schema and service owners.
+- [x] Runtime lifecycle states are defined for runs, steps, jobs, tool calls, artifacts, cancellations, retries, and failures.
+- [x] Review-gated mutation boundaries are explicit in the runtime contract.
+- [x] The contract maps current runtime paths to future schema and service owners.
 
 ## Edge Cases
 

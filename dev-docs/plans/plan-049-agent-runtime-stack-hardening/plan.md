@@ -2,10 +2,10 @@
 title: Agent Runtime Stack Hardening
 slug: plan-049-agent-runtime-stack-hardening
 version: 1.0.0
-status: draft
+status: in-progress
 owner: Planner Agent
 created: 2026-06-11
-last_updated: 2026-06-11
+last_updated: 2026-06-14
 target_completion: ~
 stages:
   - stage-001-runtime-inventory-and-contract
@@ -61,9 +61,9 @@ This plan strengthens the existing SvelteKit, Tauri, SQLite, OpenRouter/Ollama, 
 
 | # | Stage | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Runtime Inventory & Contract](stage-001-runtime-inventory-and-contract/stage.md) | `draft` | TBD |
-| 002 | [Durable Run Ledger](stage-002-durable-run-ledger/stage.md) | `draft` | TBD |
-| 003 | [Local Job Execution](stage-003-local-job-execution/stage.md) | `draft` | TBD |
+| 001 | [Runtime Inventory & Contract](stage-001-runtime-inventory-and-contract/stage.md) | `complete` | TBD |
+| 002 | [Durable Run Ledger](stage-002-durable-run-ledger/stage.md) | `complete` | TBD |
+| 003 | [Local Job Execution](stage-003-local-job-execution/stage.md) | `complete` | TBD |
 | 004 | [Model, Budget & Memory Capabilities](stage-004-model-budget-and-memory-capabilities/stage.md) | `draft` | TBD |
 | 005 | [Observability, Evals & Diagnostics](stage-005-observability-evals-diagnostics/stage.md) | `draft` | TBD |
 
@@ -93,4 +93,4 @@ All stages must pass the following gates before the plan is marked `complete`:
 
 ## Notes
 
-This plan exists because plans 043-048 improve engine contracts and frontend coherence, but they still need durable runtime infrastructure underneath them. Keep this plan deferred until the core mutation boundaries are stable, then execute it before the heaviest frontend coherence and production readiness work.
+This plan exists because plans 043-048 improve engine contracts and frontend coherence, but they still need durable runtime infrastructure underneath them. Activated 2026-06-14 after Phase 2 review closeout; execute it before the heaviest frontend coherence and production readiness work.

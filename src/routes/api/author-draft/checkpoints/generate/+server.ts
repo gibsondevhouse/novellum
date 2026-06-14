@@ -33,6 +33,11 @@ import {
 	AUTHOR_DRAFT_ARTIFACT_VERSION,
 } from '$lib/ai/pipeline/author-draft-contract.js';
 import { getPipelineTaskDefinition } from '$lib/ai/pipeline/task-catalog.js';
+import {
+	KNOWN_AGENT_JOB_TYPES,
+	enqueueKnownAgentJob,
+	isQueuedExecutionRequest,
+} from '$lib/server/agent-runtime/index.js';
 
 const credentialService = createCredentialService();
 const openRouterProvider = createOpenRouterProvider();
@@ -45,6 +50,8 @@ interface BodyShape {
 	projectId?: unknown;
 	sceneId?: unknown;
 	forceRegenerate?: unknown;
+	defer?: unknown;
+	executionMode?: unknown;
 }
 
 interface ResolvedProvider {
@@ -127,6 +134,31 @@ export const POST: RequestHandler = async ({ request }) => {
 	const draftContext = context;
 
 	const baseGuard = getSceneDraftBaseGuard(projectId, sceneId);
+
+	if (isQueuedExecutionRequest(body)) {
+		return json(
+			enqueueKnownAgentJob({
+				jobType: KNOWN_AGENT_JOB_TYPES.authorDraftGenerate,
+				projectId,
+				family: 'author-draft',
+				entrypoint: 'author-draft.generate',
+				targetKind: 'scene',
+				targetId: sceneId,
+				targetJson: { projectId, sceneId, chapterId: baseGuard.chapterId },
+				payloadRedactedJson: {
+					projectId,
+					sceneId,
+					chapterId: baseGuard.chapterId,
+					forceRegenerate,
+					baseSceneUpdatedAt: baseGuard.baseSceneUpdatedAt,
+					baseSceneContentHash: baseGuard.baseSceneContentHash,
+				},
+				priority: 30,
+				maxAttempts: 2,
+			}),
+			{ status: 202 },
+		);
+	}
 
 	function persistGenerationFailure(reason: string): void {
 		// Keep existing active checkpoints intact (especially for regeneration attempts).

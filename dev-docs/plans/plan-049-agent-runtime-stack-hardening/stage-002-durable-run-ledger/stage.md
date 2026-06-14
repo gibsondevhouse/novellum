@@ -2,7 +2,7 @@
 title: Durable Run Ledger
 slug: stage-002-durable-run-ledger
 stage_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-049-agent-runtime-stack-hardening
 phases:
@@ -20,19 +20,19 @@ Persist agent runs, steps, tool calls, artifacts, usage, errors, and review link
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Run Ledger Schema](phase-001-run-ledger-schema/phase.md) | `draft` | TBD |
-| 002 | [Run Repository API](phase-002-run-repository-api/phase.md) | `draft` | TBD |
+| 001 | [Run Ledger Schema](phase-001-run-ledger-schema/phase.md) | `complete` | TBD |
+| 002 | [Run Repository API](phase-002-run-repository-api/phase.md) | `complete` | TBD |
 
 ## Entry Criteria
 
-- Stage 001 runtime contract is accepted.
-- SQLite migration conventions and project metadata compatibility are understood.
+- [x] Stage 001 runtime contract is accepted.
+- [x] SQLite migration conventions and project metadata compatibility are understood.
 
 ## Exit Criteria
 
-- SQLite schema and migrations exist for durable runtime state.
-- Server-side repositories expose typed APIs for creating, updating, querying, and redacting runtime records.
-- Tests prove migration idempotency and basic ledger operations.
+- [x] SQLite schema and migrations exist for durable runtime state.
+- [x] Server-side repositories expose typed APIs for creating, updating, querying, and redacting runtime records.
+- [x] Tests prove migration idempotency and basic ledger operations.
 
 ## Notes
 

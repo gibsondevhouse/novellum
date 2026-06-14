@@ -9,6 +9,7 @@ import {
 	MigrationFailedError,
 	type Migration,
 } from '$lib/server/db/migration-runner.js';
+import { MIGRATION_REGISTRY } from '$lib/server/db/migration-registry.js';
 import { migration0001 } from '$lib/server/db/migrations/0001_baseline.js';
 import { migration0002 } from '$lib/server/db/migrations/0002_add_backup_metadata.js';
 
@@ -125,6 +126,48 @@ describe('runMigrations + beforeApply snapshot integration', () => {
 			.all() as Array<{ kind: string; schema_version: number }>;
 		expect(rows.length).toBe(1);
 		expect(rows[0].schema_version).toBe(2);
+	});
+
+	it('takes a pre-runtime-ledger snapshot before applying migration 0006', () => {
+		const preRuntimeRegistry = MIGRATION_REGISTRY.filter((migration) => migration.version < 6);
+		runMigrations(db, preRuntimeRegistry);
+
+		const result = runMigrations(db, MIGRATION_REGISTRY, {
+			beforeApply: ({ currentVersion }) => {
+				expect(currentVersion).toBe(5);
+				const { path } = writePreMigrationSnapshot(db, currentVersion, { root: snapshotsDir });
+				return { snapshotPath: path };
+			},
+		});
+
+		expect(result.applied.map((migration) => migration.version)).toEqual([6]);
+		expect(result.snapshotPath).toBeDefined();
+		expect(existsSync(result.snapshotPath ?? '')).toBe(true);
+
+		const snapshotDb = new Database(result.snapshotPath ?? '', { readonly: true });
+		try {
+			const snapshotVersion = snapshotDb
+				.prepare('SELECT MAX(version) AS version FROM schema_migrations')
+				.get() as { version: number };
+			expect(snapshotVersion.version).toBe(5);
+			expect(
+				snapshotDb
+					.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'agent_runs'")
+					.get(),
+			).toBeTruthy();
+		} finally {
+			snapshotDb.close();
+		}
+
+		const liveVersion = db
+			.prepare('SELECT MAX(version) AS version FROM schema_migrations')
+			.get() as { version: number };
+		expect(liveVersion.version).toBe(6);
+		expect(
+			db
+				.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'agent_runs'")
+				.get(),
+		).toBeTruthy();
 	});
 
 	it('attaches snapshotPath to MigrationFailedError when a migration throws', () => {

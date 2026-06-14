@@ -1,7 +1,7 @@
 # Plan-047 Closeout
 
 > Implementation closed out: 2026-06-12
-> Status: `review` - awaiting plan-level Reviewer evaluation
+> Status: `complete` - plan-level Reviewer evaluation finished 2026-06-14
 
 ## Summary
 
@@ -31,6 +31,6 @@ Implemented behavior:
 
 ## Reviewer Notes
 
-- Reviewer approval is not recorded here. This closeout only marks implementation complete and ready for plan-level review.
-- Plan-046 is also pending plan-level Reviewer evaluation.
-- `ACTIVE-PLAN.md` now has no active implementation plan so the next action can be an explicit reviewer pass or the next roadmap plan.
+- Reviewer evaluation finished 2026-06-14.
+- No follow-up implementation blockers were left open, so Plan-047 is closed.
+- Plan-046 was closed from reviewer evaluation at the same handoff.

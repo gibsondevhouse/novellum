@@ -2,12 +2,12 @@
 title: Queue Schema & Claiming
 slug: part-001-queue-schema-and-claiming
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: unassigned
+assigned_to: Codex
 phase: phase-001-queue-schema-and-claiming
-started_at: ~
-completed_at: ~
+started_at: 2026-06-14
+completed_at: 2026-06-14
 estimated_duration: TBD
 ---
 
@@ -57,9 +57,9 @@ Create a SQLite-backed job queue that can support durable local agent execution.
 
 ## Acceptance Criteria
 
-- [ ] Jobs can be enqueued with project, run, type, priority, payload, and scheduled time.
-- [ ] Claiming is atomic and handles stale claims safely.
-- [ ] Tests cover enqueue, claim, heartbeat, cancel, retry scheduling, and stale worker recovery.
+- [x] Jobs can be enqueued with project, run, type, priority, payload, and scheduled time.
+- [x] Claiming is atomic and handles stale claims safely.
+- [x] Tests cover enqueue, claim, heartbeat, cancel, retry scheduling, and stale worker recovery.
 
 ## Edge Cases
 

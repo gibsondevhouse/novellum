@@ -6,15 +6,16 @@
 
 ## Current
 
-No active plan. Phase 2 implementation is closed out; Plan-046 and Plan-047 are awaiting plan-level Reviewer evaluation.
+[plan-049-agent-runtime-stack-hardening](./plan-049-agent-runtime-stack-hardening/plan.md) — Agent Runtime Stack Hardening. Next slice: Stage 004 Model, Budget & Memory Capabilities / Phase 001 Model Capability Registry / Part 001 Model Capability Registry. Status: `draft`.
 
 ## Pending review
 
-- [plan-046-pipeline-checkpoint-contract-reconciliation](./plan-046-pipeline-checkpoint-contract-reconciliation/plan.md) — Pipeline Checkpoint Contract Reconciliation. Implementation closed out 2026-06-12; status: `review`; awaiting plan-level Reviewer evaluation.
-- [plan-047-worldbuilding-canon-merge-diff](./plan-047-worldbuilding-canon-merge-diff/plan.md) — Worldbuilding Canon Merge Diff. Implementation closed out 2026-06-12; status: `review`; awaiting plan-level Reviewer evaluation.
+No plans are currently pending plan-level review.
 
 ## Recently completed
 
+- [plan-047-worldbuilding-canon-merge-diff](./plan-047-worldbuilding-canon-merge-diff/plan.md) — Worldbuilding Canon Merge Diff. Upgraded worldbuilding proposal acceptance from insert-only projection to reviewable canon diff/merge behavior with audit metadata, duplicate evidence, and E2E coverage. Closed 2026-06-14 after plan-level reviewer evaluation.
+- [plan-046-pipeline-checkpoint-contract-reconciliation](./plan-046-pipeline-checkpoint-contract-reconciliation/plan.md) — Pipeline Checkpoint Contract Reconciliation. Reconciled checkpoint route ownership, schema versions, docs, and full E2E expectations across current generation pipelines. Closed 2026-06-14 after plan-level reviewer evaluation.
 - [plan-043-outline-pipeline-consolidation](./plan-043-outline-pipeline-consolidation/plan.md) — Outline Pipeline Consolidation. Retired legacy direct apply paths; made checkpoints the sole materialization path. Closed 2026-06-12 after plan-level reviewer evaluation.
 - [plan-045-agent-tool-mutation-boundary](./plan-045-agent-tool-mutation-boundary/plan.md) — Agent Tool Mutation Boundary. Separated model-callable Agent tools from trusted UI/app mutation commands; added capability classification, model advertisement filtering, default mutation dispatch blocking, source-contract coverage, docs sync, and current quality-gate evidence. Closed 2026-06-12 after Reviewer Agent sign-off.
 - [plan-044-nova-active-context-routing](./plan-044-nova-active-context-routing/plan.md) — Nova Active Context Routing. Resolved brittle context detection by centralizing resolution in `activeContext` store. Integrated with root layout and Nova panel, ensuring grounding on deep routes. (Closed 2026-06-11).

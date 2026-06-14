@@ -1,7 +1,7 @@
 # Plan-046 Closeout
 
 Date: 2026-06-12
-Status: implementation closed out; ready for plan-level reviewer evaluation
+Status: complete; plan-level reviewer evaluation finished 2026-06-14
 
 ## Summary
 
@@ -36,3 +36,7 @@ checkpoints.
 - Confirm stale Plan-028 worldbuild fixture shapes were updated rather than adapted.
 - Confirm worldbuilding scan proposal decisions require project context and do not fall back to global lookup.
 - Confirm docs, route tests, and E2E fixtures agree on checkpoint schema/version policy.
+
+## Reviewer Result
+
+Reviewer evaluation finished 2026-06-14. No follow-up implementation blockers were left open, so Plan-046 is closed.

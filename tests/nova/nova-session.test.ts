@@ -77,6 +77,20 @@ describe('novaSession store', () => {
 		expect(novaSession.messages).toHaveLength(0);
 	});
 
+	it('appendQueuedRun() records user-visible runtime references', () => {
+		const message = novaSession.appendQueuedRun({
+			content: 'Outline generation queued.',
+			runId: 'run-1',
+			jobId: 'job-1',
+			toolPayload: { family: 'outline' },
+		});
+
+		expect(message.status).toBe('queued');
+		expect(message.runtimeRunId).toBe('run-1');
+		expect(message.runtimeJobId).toBe('job-1');
+		expect(message.toolPayload).toEqual({ family: 'outline' });
+	});
+
 	it('fail(id, message) flips status to error, sets error, clears activeStreamId', () => {
 		const stream = novaSession.beginStream('nova');
 		novaSession.appendDelta(stream.id, 'partial');
