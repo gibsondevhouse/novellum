@@ -140,7 +140,7 @@ describe('runMigrations + beforeApply snapshot integration', () => {
 			},
 		});
 
-		expect(result.applied.map((migration) => migration.version)).toEqual([6]);
+		expect(result.applied.map((migration) => migration.version)).toEqual([6, 7]);
 		expect(result.snapshotPath).toBeDefined();
 		expect(existsSync(result.snapshotPath ?? '')).toBe(true);
 
@@ -162,7 +162,7 @@ describe('runMigrations + beforeApply snapshot integration', () => {
 		const liveVersion = db
 			.prepare('SELECT MAX(version) AS version FROM schema_migrations')
 			.get() as { version: number };
-		expect(liveVersion.version).toBe(6);
+			expect(liveVersion.version).toBe(7);
 		expect(
 			db
 				.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'agent_runs'")

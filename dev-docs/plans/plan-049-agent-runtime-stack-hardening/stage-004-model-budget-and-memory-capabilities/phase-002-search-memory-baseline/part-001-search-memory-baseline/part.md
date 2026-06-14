@@ -2,12 +2,12 @@
 title: Search Memory Baseline
 slug: part-001-search-memory-baseline
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 assigned_to: unassigned
 phase: phase-002-search-memory-baseline
-started_at: ~
-completed_at: ~
+started_at: '2026-06-14'
+completed_at: '2026-06-14'
 estimated_duration: TBD
 ---
 

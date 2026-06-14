@@ -2,12 +2,12 @@
 title: Model Capability Registry
 slug: part-001-model-capability-registry
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 assigned_to: unassigned
 phase: phase-001-model-capability-registry
-started_at: ~
-completed_at: ~
+started_at: '2026-06-14'
+completed_at: '2026-06-14'
 estimated_duration: TBD
 ---
 

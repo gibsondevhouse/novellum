@@ -363,7 +363,7 @@ describe('migration 0006 — agent runtime ledger', () => {
 
 			const result = runMigrations(db, MIGRATION_REGISTRY);
 
-			expect(result.applied.map((migration) => migration.version)).toEqual([6]);
+			expect(result.applied.map((migration) => migration.version)).toEqual([6, 7]);
 			expect(
 				db
 					.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'agent_runs'")

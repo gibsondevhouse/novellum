@@ -2,7 +2,7 @@
 title: Search Memory Baseline
 slug: phase-002-search-memory-baseline
 phase_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-004-model-budget-and-memory-capabilities
 parts:

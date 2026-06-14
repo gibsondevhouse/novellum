@@ -2,7 +2,7 @@
 title: Model Capability Registry
 slug: phase-001-model-capability-registry
 phase_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-004-model-budget-and-memory-capabilities
 parts:

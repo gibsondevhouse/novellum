@@ -65,6 +65,7 @@ This plan strengthens the existing SvelteKit, Tauri, SQLite, OpenRouter/Ollama, 
 | 002 | [Durable Run Ledger](stage-002-durable-run-ledger/stage.md) | `complete` | TBD |
 | 003 | [Local Job Execution](stage-003-local-job-execution/stage.md) | `complete` | TBD |
 | 004 | [Model, Budget & Memory Capabilities](stage-004-model-budget-and-memory-capabilities/stage.md) | `draft` | TBD |
+| 004 | [Model, Budget & Memory Capabilities](stage-004-model-budget-and-memory-capabilities/stage.md) | `complete` | TBD |
 | 005 | [Observability, Evals & Diagnostics](stage-005-observability-evals-diagnostics/stage.md) | `draft` | TBD |
 
 ## Quality Gates

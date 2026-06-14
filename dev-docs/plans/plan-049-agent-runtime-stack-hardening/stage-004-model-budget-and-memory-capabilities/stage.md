@@ -2,7 +2,7 @@
 title: Model, Budget & Memory Capabilities
 slug: stage-004-model-budget-and-memory-capabilities
 stage_number: 4
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-049-agent-runtime-stack-hardening
 phases:
@@ -21,7 +21,8 @@ Give the runtime enough local capability metadata, budget controls, and search/m
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
 | 001 | [Model Capability Registry](phase-001-model-capability-registry/phase.md) | `draft` | TBD |
-| 002 | [Search Memory Baseline](phase-002-search-memory-baseline/phase.md) | `draft` | TBD |
+| 001 | [Model Capability Registry](phase-001-model-capability-registry/phase.md) | `complete` | TBD |
+| 002 | [Search Memory Baseline](phase-002-search-memory-baseline/phase.md) | `complete` | TBD |
 
 ## Entry Criteria
 

@@ -6,7 +6,7 @@
 
 ## Current
 
-[plan-049-agent-runtime-stack-hardening](./plan-049-agent-runtime-stack-hardening/plan.md) — Agent Runtime Stack Hardening. Next slice: Stage 004 Model, Budget & Memory Capabilities / Phase 001 Model Capability Registry / Part 001 Model Capability Registry. Status: `draft`.
+[plan-049-agent-runtime-stack-hardening](./plan-049-agent-runtime-stack-hardening/plan.md) — Agent Runtime Stack Hardening. Next slice: Stage 005 Observability, Evals & Diagnostics. Status: `in-progress`.
 
 ## Pending review
 
