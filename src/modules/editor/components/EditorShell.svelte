@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
 	import type { Chapter, Character, Project, Scene } from '$lib/db/domain-types';
 	import EmptyStatePanel from '$lib/components/ui/EmptyStatePanel.svelte';
@@ -39,8 +38,6 @@
 		obstacle: string;
 		outcome: OutcomeType;
 	};
-
-	type MobilePlanningPanel = 'none' | 'queue' | 'compass';
 
 	const EMPTY_DEFINITION: SceneDefinition = {
 		sceneGoal: '',
@@ -83,8 +80,6 @@
 	let tipTapEditor = $state<any | null>(null);
 	let editorTick = $state(0);
 	let spellcheckEnabled = $state(true);
-	let mobileToolsOpen = $state(false);
-	let mobilePlanningPanel = $state<MobilePlanningPanel>('none');
 
 	function handleSceneContentApplied(detail: SceneContentAppliedDetail): void {
 		const scene = data.scenes.find((s: Scene) => s.id === detail.sceneId);
@@ -116,12 +111,6 @@
 	const requestedPanel = $derived(page.url.searchParams.get('panel'));
 	const selectedChapterId = $derived(page.url.searchParams.get('chapterId'));
 	const selectedSceneId = $derived(page.url.searchParams.get('sceneId'));
-
-	onMount(() => {
-		if (window.matchMedia('(max-width: 900px)').matches && requestedPanel !== 'ai') {
-			novaPanel.close();
-		}
-	});
 
 	$effect(() => {
 		if (requestedPanel === 'ai' && !novaPanel.isOpen) {
@@ -447,15 +436,7 @@
 
 	<main class="editor-area" aria-label="Writing workspace">
 		<header class="editor-toolbar" aria-label="Editor toolbar">
-			<div class="editor-command-row" class:editor-command-row--expanded={mobileToolsOpen}>
-				<button
-					type="button"
-					class="mobile-tools-toggle"
-					aria-expanded={mobileToolsOpen}
-					onclick={() => (mobileToolsOpen = !mobileToolsOpen)}
-				>
-					Format
-				</button>
+			<div class="editor-command-row">
 				<div class="editor-command-toolbar">
 					<EditorToolbar
 						editor={tipTapEditor}
@@ -488,65 +469,7 @@
 					onGoToScene={goToScene}
 				/>
 			</div>
-			{#if editorPreferences.mode === 'planning'}
-				<div class="mobile-planning-switcher" aria-label="Planning panels">
-					<button
-						type="button"
-						class:active={mobilePlanningPanel === 'queue'}
-						aria-pressed={mobilePlanningPanel === 'queue'}
-						onclick={() =>
-							(mobilePlanningPanel = mobilePlanningPanel === 'queue' ? 'none' : 'queue')}
-					>
-						Queue
-					</button>
-					<button
-						type="button"
-						class:active={mobilePlanningPanel === 'compass'}
-						aria-pressed={mobilePlanningPanel === 'compass'}
-						onclick={() =>
-							(mobilePlanningPanel =
-								mobilePlanningPanel === 'compass' ? 'none' : 'compass')}
-					>
-						Compass
-					</button>
-				</div>
-			{/if}
 		</header>
-
-		{#if editorPreferences.mode === 'planning' && mobilePlanningPanel !== 'none'}
-			<div class="mobile-planning-panel">
-				{#if mobilePlanningPanel === 'queue'}
-					<SceneNavigator
-						scenes={data.scenes}
-						chapters={data.chapters}
-						activeSceneId={editorState.activeSceneId}
-						activeContent={activeContent}
-						activeSceneDefinition={sceneDefinition}
-						onSceneSelect={setActiveScene}
-					/>
-				{:else}
-					<SceneCompassPanel
-						sceneCompassRows={sceneCompassRows}
-						liveSignals={liveSignals}
-						progressFlags={progressFlags}
-						quickIntent={quickIntent}
-						locationTag={locationTag}
-						characters={data.characters}
-						activeScene={activeScene}
-						activeWordCount={activeWordCount}
-						sceneTargetWords={sceneTargetWords}
-						pacingHint={pacingHint}
-						storyCompassCollapsed={storyCompassCollapsed}
-						onCollapsedChange={(val) => (storyCompassCollapsed = val)}
-						onQuickIntentChange={(qi) => (quickIntent = qi)}
-						onPersistQuickIntent={persistQuickIntent}
-						onToggleParticipant={toggleParticipant}
-						onPersistLocationTag={persistLocationTag}
-						onLocationTagChange={(val) => (locationTag = val)}
-					/>
-				{/if}
-			</div>
-		{/if}
 
 		<div
 			class="editor-content-split"
@@ -665,9 +588,7 @@
 	}
 
 	/* Focus mode collapses navigator and compass even in planning mode */
-	.editor-page.editor-focus-mode .desktop-planning-panel,
-	.editor-page.editor-focus-mode .mobile-planning-switcher,
-	.editor-page.editor-focus-mode .mobile-planning-panel {
+	.editor-page.editor-focus-mode .desktop-planning-panel {
 		display: none;
 	}
 
@@ -716,10 +637,6 @@
 		min-width: 0;
 	}
 
-	.mobile-tools-toggle {
-		display: none;
-	}
-
 	.editor-meta-row {
 		display: flex;
 		align-items: center;
@@ -733,11 +650,6 @@
 		gap: var(--space-2);
 		align-items: center;
 		min-width: 0;
-	}
-
-	.mobile-planning-switcher,
-	.mobile-planning-panel {
-		display: none;
 	}
 
 	.editor-content-split {
@@ -835,43 +747,6 @@
 		.editor-page.mode-planning .desktop-planning-panel {
 			display: none;
 		}
-
-		.mobile-planning-switcher {
-			display: flex;
-			justify-content: center;
-			gap: var(--space-2);
-		}
-
-		.mobile-planning-switcher button {
-			border: 1px solid var(--color-border-default);
-			border-radius: var(--radius-sm);
-			background: var(--color-surface-base);
-			color: var(--color-text-secondary);
-			cursor: pointer;
-			font-size: var(--text-xs);
-			padding: var(--space-1) var(--space-3);
-		}
-
-		.mobile-planning-switcher button.active {
-			background: color-mix(in srgb, var(--color-teal) 12%, transparent);
-			border-color: color-mix(in srgb, var(--color-teal) 30%, transparent);
-			color: var(--color-teal);
-		}
-
-		.mobile-planning-panel {
-			display: block;
-			max-height: min(34vh, 22rem);
-			min-height: 0;
-			overflow: auto;
-			border-bottom: 1px solid var(--color-border-subtle);
-			background: var(--color-surface-ground);
-		}
-
-		.mobile-planning-panel :global(.doc-list),
-		.mobile-planning-panel :global(.story-compass) {
-			border: 0;
-			max-height: min(34vh, 22rem);
-		}
 	}
 
 	@media (max-width: 720px) {
@@ -888,32 +763,6 @@
 			justify-content: flex-start;
 			gap: var(--space-2);
 			flex-wrap: wrap;
-		}
-
-		.mobile-tools-toggle {
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			border: 1px solid var(--color-border-default);
-			border-radius: var(--radius-sm);
-			background: var(--color-surface-base);
-			color: var(--color-text-secondary);
-			cursor: pointer;
-			font-size: var(--text-xs);
-			font-weight: var(--font-weight-medium);
-			min-height: var(--space-6);
-			padding: var(--space-1) var(--space-3);
-		}
-
-		.editor-command-toolbar {
-			display: none;
-			order: 2;
-			width: 100%;
-			overflow-x: auto;
-		}
-
-		.editor-command-row--expanded .editor-command-toolbar {
-			display: flex;
 		}
 
 		.editor-command-toolbar :global(.editor-toolbar-wrap) {
@@ -941,10 +790,6 @@
 		.editor-meta-row :global(.editor-context-row) {
 			justify-content: flex-start;
 			padding-inline: 0;
-		}
-
-		.mobile-planning-switcher {
-			justify-content: flex-start;
 		}
 
 		.editor-content-split.showing-history {
