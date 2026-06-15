@@ -13,8 +13,10 @@
 	} from '$lib/events/scene-content.js';
 	import { editorState } from '../stores/editor.svelte.js';
 	import * as autosaveService from '../services/autosave-service.js';
+	import type { AutosaveResult } from '../services/autosave-types.js';
 	import ManuscriptEditorPane from './ManuscriptEditorPane.svelte';
 	import EditorToolbar from './EditorToolbar.svelte';
+	import SaveStatus from './SaveStatus.svelte';
 	import SnapshotHistoryPanel from './SnapshotHistoryPanel.svelte';
 	import { updateScene } from '../services/scene-repository.js';
 	import {
@@ -80,6 +82,7 @@
 	let tipTapEditor = $state<any | null>(null);
 	let editorTick = $state(0);
 	let spellcheckEnabled = $state(true);
+	let autosaveResult = $state<AutosaveResult>(autosaveService.getResult());
 
 	function handleSceneContentApplied(detail: SceneContentAppliedDetail): void {
 		const scene = data.scenes.find((s: Scene) => s.id === detail.sceneId);
@@ -250,6 +253,7 @@
 			quickIntent = { ...EMPTY_QUICK_INTENT, goal: scene.summary ?? '' };
 			locationTag = scene.locationId ?? '';
 			autosaveService.mount(scene.id, scene.projectId, (result) => {
+				autosaveResult = result;
 				editorDirty.setSnapshot({
 					sceneId: scene.id,
 					status: result.status,
@@ -460,6 +464,7 @@
 						onToggle={editorPreferences.toggleFocus}
 					/>
 				</div>
+				<SaveStatus result={autosaveResult} />
 				<SceneContextPanel
 					activeScene={activeScene}
 					characters={data.characters}
