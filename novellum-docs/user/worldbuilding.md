@@ -1,6 +1,6 @@
 # World Building
 
-> Last verified: 2026-06-12
+> Last verified: 2026-06-15
 
 The **World Building** surface gathers everything that isn't manuscript prose: who's in your story, where it happens, what they know, what's brewing, and when it all unfolds.
 
@@ -15,6 +15,11 @@ Five sections, one shell:
 | **Chronicles** | Timeline events and milestones. |
 
 Open it from the project sidebar at `/projects/<id>/world-building`.
+
+On narrow screens, the world-building workspace keeps the project header,
+section tabs, and current project context visible while the main sidebar can
+collapse to icons. The active project is derived from `/projects/<id>/...`
+routes only, so visiting global pages does not keep stale project context alive.
 
 ## Personae
 
@@ -60,6 +65,11 @@ Proposal cards can now show the intended canon action before you decide:
 Duplicate matches are advisory evidence. They help you compare a proposal with existing canon, but they do not automatically merge records or block your decision.
 
 Accepted and rejected proposals keep compact audit metadata: the decision, projection mode, target ID when one exists, changed field names, duplicate evidence count, and rejection reason when rejected. Audit records intentionally avoid storing full before/after entity snapshots or raw model output.
+
+Proposal and checkpoint cards share the same review language as Nova drafting
+and outline cards. A pending proposal remains non-canonical until you choose an
+explicit accept action; rejecting it records your decision without projecting it
+into canon.
 
 For details, see the dev-docs: [../../dev-docs/03-ai/context-engine.md](../../dev-docs/03-ai/context-engine.md).
 

@@ -2,13 +2,13 @@
 title: Route State Contract
 slug: part-001-route-state-contract
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: unassigned
+assigned_to: Codex
 phase: phase-001-route-state-contract
-started_at: ~
-completed_at: ~
-estimated_duration: TBD
+started_at: 2026-06-15T00:00:00-04:00
+completed_at: 2026-06-15T00:00:00-04:00
+estimated_duration: 1h
 ---
 
 ## Objective
@@ -40,7 +40,7 @@ Make active route context explicit enough that authors and Nova agree on the cur
 
 **Create:**
 
-- `evidence/route-state-contract-2026-06-09.md`
+- `evidence/route-state-contract-2026-06-15.md`
 
 **Update:**
 
@@ -65,14 +65,18 @@ Make active route context explicit enough that authors and Nova agree on the cur
 
 ## Acceptance Criteria
 
-- [ ] Route-derived active context is documented for every project workspace.
-- [ ] Store-derived context cannot silently disagree with the visible route.
-- [ ] Nova context disclosure reflects the same contract users can see in the UI.
+- [x] Route-derived active context is documented for every project workspace.
+- [x] Store-derived context cannot silently disagree with the visible route.
+- [x] Nova context disclosure reflects the same contract users can see in the UI.
 
 ## Edge Cases
 
 - Authors can navigate directly to a deep link without visiting the project hub first.
 - Deleted projects, chapters, or scenes can leave stale context in client stores.
+
+## Evidence
+
+- [Route State Contract (2026-06-15)](./evidence/route-state-contract-2026-06-15.md)
 
 ## Notes
 

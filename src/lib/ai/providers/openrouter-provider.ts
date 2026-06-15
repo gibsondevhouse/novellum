@@ -11,8 +11,10 @@ import type {
 } from './types.js';
 import { AiProviderError } from './types.js';
 
-let traceModule: any = null;
-async function getTracer() {
+type TraceModule = typeof import('../../server/agent-runtime/trace.js');
+
+let traceModule: TraceModule | null = null;
+async function getTracer(): Promise<TraceModule | null> {
 	if (traceModule) return traceModule;
 	try {
 		// Dynamic import to stay client-safe while allowing server-side tracing.
@@ -54,6 +56,11 @@ function authHeaders(apiKey: string, referer: string, title: string): HeadersIni
 
 interface OpenRouterErrorBody {
 	error?: { message?: string; code?: number };
+}
+
+interface OpenRouterChatMessage {
+	content?: string;
+	tool_calls?: CompletionResponse['toolCalls'];
 }
 
 async function readErrorMessage(response: Response): Promise<string> {
@@ -183,7 +190,7 @@ class OpenRouterProvider implements AiProvider {
 		const body = (await response.json()) as {
 			model?: string;
 			choices?: Array<{
-				message?: { content?: string };
+				message?: OpenRouterChatMessage;
 				finish_reason?: CompletionResponse['finishReason'];
 			}>;
 			usage?: {

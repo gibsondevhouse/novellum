@@ -2,12 +2,12 @@
 title: Route Surface Inventory
 slug: phase-001-route-surface-inventory
 phase_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-001-experience-inventory-and-principles
 parts:
   - part-001-route-surface-inventory
-estimated_duration: TBD
+estimated_duration: 1h
 ---
 
 ## Goal
@@ -18,13 +18,13 @@ Map every route, shell, navigation primitive, workspace module, and major author
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Route Surface Inventory](part-001-route-surface-inventory/part.md) | `draft` | unassigned | TBD |
+| 001 | [Route Surface Inventory](part-001-route-surface-inventory/part.md) | `complete` | Gemini CLI | 1h |
 
 ## Acceptance Criteria
 
-- [ ] Project, editor, outline, Nova, worldbuilding, export, settings, onboarding, reader, books, stories, images, and styles surfaces are inventoried.
-- [ ] Shell and navigation responsibilities are separated from module-specific responsibilities.
-- [ ] Duplicate or conflicting frontend patterns are captured as concrete follow-up candidates.
+- [x] Project, editor, outline, Nova, worldbuilding, export, settings, onboarding, reader, books, stories, images, and styles surfaces are inventoried.
+- [x] Shell and navigation responsibilities are separated from module-specific responsibilities.
+- [x] Duplicate or conflicting frontend patterns are captured as concrete follow-up candidates.
 
 ## Notes
 

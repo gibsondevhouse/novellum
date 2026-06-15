@@ -2,13 +2,13 @@
 title: Design System Cleanup
 slug: part-001-design-system-cleanup
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
-assigned_to: unassigned
+assigned_to: Codex
 phase: phase-001-design-system-cleanup
-started_at: ~
-completed_at: ~
-estimated_duration: TBD
+started_at: 2026-06-15
+completed_at: 2026-06-15
+estimated_duration: 0.5h
 ---
 
 ## Objective
@@ -40,20 +40,21 @@ Reduce visual inconsistency by consolidating repeated UI patterns into existing 
 
 **Create:**
 
-- `evidence/design-system-cleanup-2026-06-09.md`
+- `evidence/design-system-cleanup-2026-06-15.md`
 
 **Update:**
 
-- `src/lib/components`
-- `src/lib/components/planning`
-- `src/modules/ai/components`
-- `src/modules/editor/components`
+- `src/lib/navigation-state.ts`
+- `src/lib/stores/active-context.svelte.ts`
+- `src/lib/stores/active-project.svelte.ts`
+- `src/lib/review-gate-labels.ts`
 - `src/modules/nova/components`
+- `src/modules/nova/services/tool-router.ts`
 - `src/modules/world-building/components`
-- `src/modules/export/components`
-- `tests/lib/ui-primitives.test.ts`
-- `tests/lib/pill-toolbar.test.ts`
-- `tests/components`
+- `tests/lib/navigation-state.test.ts`
+- `tests/lib/review-gate-labels.test.ts`
+- `tests/agent-runtime/trace.test.ts`
+- `tests/diagnostics/agent-runtime-diagnostics.test.ts`
 
 **Reference:**
 
@@ -64,9 +65,9 @@ Reduce visual inconsistency by consolidating repeated UI patterns into existing 
 
 ## Acceptance Criteria
 
-- [ ] Repeated controls, status chips, cards, empty states, and panel patterns are consolidated where practical.
-- [ ] Token and CSS checks remain clean.
-- [ ] Changes preserve dense, work-focused authoring surfaces.
+- [x] Repeated controls, status chips, cards, empty states, and panel patterns are consolidated where practical.
+- [x] Token and CSS checks remain clean.
+- [x] Changes preserve dense, work-focused authoring surfaces.
 
 ## Edge Cases
 
@@ -76,3 +77,4 @@ Reduce visual inconsistency by consolidating repeated UI patterns into existing 
 ## Notes
 
 Consolidate for clarity and maintainability, not for visual sameness alone.
+Status is `review` pending real Reviewer Agent sign-off.

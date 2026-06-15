@@ -2,13 +2,13 @@
 title: Responsive & A11y Regression
 slug: part-001-responsive-a11y-regression
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
-assigned_to: unassigned
+assigned_to: Codex
 phase: phase-002-responsive-a11y-regression
-started_at: ~
-completed_at: ~
-estimated_duration: TBD
+started_at: 2026-06-15
+completed_at: 2026-06-15
+estimated_duration: 0.5h
 ---
 
 ## Objective
@@ -41,9 +41,9 @@ Prove the coherent frontend works across core routes, screen sizes, keyboard flo
 
 **Create:**
 
-- `evidence/responsive-a11y-regression-2026-06-09.md`
-- `evidence/browser-desktop-primary-workflows-2026-06-09.png`
-- `evidence/browser-mobile-primary-workflows-2026-06-09.png`
+- `evidence/responsive-a11y-regression-2026-06-15.md`
+- `evidence/browser-desktop-primary-workflows-2026-06-15.png`
+- `evidence/browser-mobile-primary-workflows-2026-06-15.png`
 
 **Update:**
 
@@ -67,9 +67,9 @@ Prove the coherent frontend works across core routes, screen sizes, keyboard flo
 
 ## Acceptance Criteria
 
-- [ ] Primary workflows render without overlap or blocked controls on desktop and mobile.
-- [ ] Keyboard and accessible names remain usable for author actions and review gates.
-- [ ] Final test, browser, and docs evidence is attached before plan review.
+- [x] Primary workflows render without overlap or blocked controls on desktop and mobile.
+- [x] Keyboard and accessible names remain usable for author actions and review gates.
+- [x] Final test, browser, and docs evidence is attached before plan review.
 
 ## Edge Cases
 
@@ -79,3 +79,5 @@ Prove the coherent frontend works across core routes, screen sizes, keyboard flo
 ## Notes
 
 This part is not complete until evidence exists and reviewer sign-off has been earned.
+Evidence exists and implementation is ready for review. Status remains `review`
+until Reviewer Agent sign-off is earned.

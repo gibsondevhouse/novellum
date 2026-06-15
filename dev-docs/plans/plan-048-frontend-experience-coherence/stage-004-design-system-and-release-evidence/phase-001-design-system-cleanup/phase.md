@@ -2,7 +2,7 @@
 title: Design System Cleanup
 slug: phase-001-design-system-cleanup
 phase_number: 1
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-004-design-system-and-release-evidence
 parts:
@@ -18,13 +18,13 @@ Consolidate repeated frontend patterns into stable components, tokens, and inter
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Design System Cleanup](part-001-design-system-cleanup/part.md) | `draft` | unassigned | TBD |
+| 001 | [Design System Cleanup](part-001-design-system-cleanup/part.md) | `review` | Codex | 0.5h |
 
 ## Acceptance Criteria
 
-- [ ] Repeated controls, status chips, cards, empty states, and panel patterns are consolidated where practical.
-- [ ] Token and CSS checks remain clean.
-- [ ] Changes preserve dense, work-focused authoring surfaces.
+- [x] Repeated controls, status chips, cards, empty states, and panel patterns are consolidated where practical.
+- [x] Token and CSS checks remain clean.
+- [x] Changes preserve dense, work-focused authoring surfaces.
 
 ## Notes
 

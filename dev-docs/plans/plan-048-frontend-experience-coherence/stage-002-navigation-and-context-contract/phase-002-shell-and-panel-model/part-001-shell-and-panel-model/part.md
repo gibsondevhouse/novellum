@@ -2,13 +2,13 @@
 title: Shell & Panel Model
 slug: part-001-shell-and-panel-model
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: unassigned
+assigned_to: Codex
 phase: phase-002-shell-and-panel-model
-started_at: ~
-completed_at: ~
-estimated_duration: TBD
+started_at: 2026-06-15T00:00:00-04:00
+completed_at: 2026-06-15T00:00:00-04:00
+estimated_duration: 1h
 ---
 
 ## Objective
@@ -40,7 +40,7 @@ Define and implement a coherent shell and panel model for global routes, project
 
 **Create:**
 
-- `evidence/shell-and-panel-model-2026-06-09.md`
+- `evidence/shell-and-panel-model-2026-06-15.md`
 
 **Update:**
 
@@ -65,14 +65,18 @@ Define and implement a coherent shell and panel model for global routes, project
 
 ## Acceptance Criteria
 
-- [ ] Global and project-scoped shells have clear responsibilities.
-- [ ] Nova panel behavior is consistent across project workspaces.
-- [ ] Layout changes do not hide critical author actions or review gates.
+- [x] Global and project-scoped shells have clear responsibilities.
+- [x] Nova panel behavior is consistent across project workspaces.
+- [x] Layout changes do not hide critical author actions or review gates.
 
 ## Edge Cases
 
 - Narrow viewports may need a different Nova and sidebar presentation.
 - Focus mode in the editor may intentionally suppress some shell chrome.
+
+## Evidence
+
+- [Shell And Panel Model (2026-06-15)](./evidence/shell-and-panel-model-2026-06-15.md)
 
 ## Notes
 

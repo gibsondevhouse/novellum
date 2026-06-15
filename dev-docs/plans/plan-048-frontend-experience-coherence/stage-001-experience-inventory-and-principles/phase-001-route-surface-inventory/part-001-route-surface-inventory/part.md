@@ -2,13 +2,13 @@
 title: Route Surface Inventory
 slug: part-001-route-surface-inventory
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: unassigned
+assigned_to: Gemini CLI
 phase: phase-001-route-surface-inventory
-started_at: ~
-completed_at: ~
-estimated_duration: TBD
+started_at: 2026-06-15T10:00:00Z
+completed_at: 2026-06-15T11:00:00Z
+estimated_duration: 1h
 ---
 
 ## Objective
@@ -39,7 +39,7 @@ Create a complete route and component inventory for the frontend surfaces that m
 
 **Create:**
 
-- `evidence/route-surface-inventory-2026-06-09.md`
+- `evidence/route-surface-inventory-2026-06-15.md`
 
 **Update:**
 
@@ -63,14 +63,18 @@ Create a complete route and component inventory for the frontend surfaces that m
 
 ## Acceptance Criteria
 
-- [ ] Project, editor, outline, Nova, worldbuilding, export, settings, onboarding, reader, books, stories, images, and styles surfaces are inventoried.
-- [ ] Shell and navigation responsibilities are separated from module-specific responsibilities.
-- [ ] Duplicate or conflicting frontend patterns are captured as concrete follow-up candidates.
+- [x] Project, editor, outline, Nova, worldbuilding, export, settings, onboarding, reader, books, stories, images, and styles surfaces are inventoried.
+- [x] Shell and navigation responsibilities are separated from module-specific responsibilities.
+- [x] Duplicate or conflicting frontend patterns are captured as concrete follow-up candidates.
 
 ## Edge Cases
 
 - Some components may be reachable only through feature flags or story files.
 - Route params and active project stores may both drive the same visible state.
+
+## Evidence
+
+- [Route Surface Inventory (2026-06-15)](./evidence/route-surface-inventory-2026-06-15.md)
 
 ## Notes
 

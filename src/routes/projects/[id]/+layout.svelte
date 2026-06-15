@@ -6,6 +6,7 @@
 	import type { Project } from '$lib/db/domain-types';
 	import EditProjectForm from '$modules/project/components/EditProjectForm.svelte';
 	import DeleteProjectDialog from '$modules/project/components/DeleteProjectDialog.svelte';
+	import { novaPanel } from '$modules/nova';
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	import SurfacePanel from '$lib/components/ui/SurfacePanel.svelte';
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -46,6 +47,7 @@
 	$effect(() => {
 		const exportFlag = page.url.searchParams.get('export');
 		if (exportFlag === '1' && lastExportFlag !== '1') {
+			novaPanel.close();
 			showManuscriptExportDialog = true;
 		}
 		lastExportFlag = exportFlag;
@@ -84,9 +86,11 @@
 			showDeleteDialog = true;
 		},
 		openExport: () => {
+			novaPanel.close();
 			showManuscriptExportDialog = true;
 		},
 		openJsonExport: () => {
+			novaPanel.close();
 			showJsonExportModal = true;
 		},
 		openImport: () => {

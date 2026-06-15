@@ -1,6 +1,6 @@
 # Agents Map
 
-> Last verified: 2026-06-12 (plan-047 worldbuilding canon merge diff)
+> Last verified: 2026-06-15 (plan-048 frontend coherence)
 
 Authoritative status of all Novellum runtime agents. Anchored to [src/lib/ai/](../../src/lib/ai/).
 The V1.1 staged pipeline (`vibe-worldbuild` / `vibe-author`) is
@@ -168,6 +168,23 @@ Every agent run and high-level AI interaction is tracked through the **Agent Run
 - **Diagnostics**: A support bundle can be exported via `GET /api/diagnostics/agent-runtime`, containing redacted runtime history and environment metadata for troubleshooting.
 
 The `AiProvider` interface supports an optional `runtime` context in `CompletionRequest`, allowing providers to emit traces automatically when a `runId` is provided.
+
+## Frontend Review Surface Language (plan-048)
+
+Review-gated AI outputs use shared UI language from
+[`review-gate-labels.ts`](../../src/lib/review-gate-labels.ts). The helper is
+used by Nova author-draft checkpoints, Nova outline checkpoints, worldbuilding
+proposal cards, and worldbuilding generation status displays.
+
+Canonical labels:
+
+- `review` / `pending_review` / `draft` → `Pending review`
+- `accepted` / `applied` → `Accepted`
+- `rejected` → `Rejected`
+
+Action labels remain explicit: `Accept`, `Reject`, and `Review changes`.
+The helper is frontend copy only; lifecycle authority stays in the family-owned
+routes documented below.
 
 ## Lifecycle and error responses
 

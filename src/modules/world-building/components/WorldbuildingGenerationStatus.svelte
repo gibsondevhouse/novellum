@@ -5,6 +5,7 @@
 		getMissingContextReason,
 		resetState,
 	} from '../stores/worldbuilding-generation-state.svelte.js';
+	import { reviewGateStatusLabel } from '$lib/review-gate-labels.js';
 
 	interface Props {
 		domainId: WorldbuildingDomainId;
@@ -24,7 +25,7 @@
 {:else if state === 'review-ready'}
 	<div class="gen-status gen-status--review" role="status">
 		<span class="gen-status__dot" aria-hidden="true"></span>
-		<span>Review ready</span>
+		<span>{reviewGateStatusLabel('review-ready')}</span>
 	</div>
 {:else if state === 'missing-context'}
 	<div class="gen-status gen-status--warn" role="status">
@@ -44,11 +45,11 @@
 {:else if state === 'accepted'}
 	<div class="gen-status gen-status--accepted" role="status">
 		<span class="gen-status__icon" aria-hidden="true">✓</span>
-		<span>Accepted</span>
+		<span>{reviewGateStatusLabel('accepted')}</span>
 	</div>
 {:else if state === 'rejected'}
 	<div class="gen-status gen-status--rejected" role="status">
-		<span>Rejected</span>
+		<span>{reviewGateStatusLabel('rejected')}</span>
 		<button
 			type="button"
 			class="gen-status__retry"

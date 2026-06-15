@@ -2,11 +2,10 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import Database from 'better-sqlite3';
 import { createRunLedgerRepository } from '$lib/server/agent-runtime/run-ledger.js';
 import { captureTrace, TRACE_EVENT_TYPES, TraceMetadata } from '$lib/server/agent-runtime/trace.js';
-import { redactRuntimePayload } from '$lib/server/agent-runtime/redaction.js';
 
 describe('Agent Runtime Tracing', () => {
 	let db: Database.Database;
-	let repository: any;
+	let repository: ReturnType<typeof createRunLedgerRepository>;
 
 	beforeEach(() => {
 		db = new Database(':memory:');
@@ -84,7 +83,11 @@ describe('Agent Runtime Tracing', () => {
 		expect(event.eventType).toBe(TRACE_EVENT_TYPES.PROVIDER_CALL);
 		expect(event.redactionState).toBe('redacted');
 		
-		const redactedJson = event.metadataRedactedJson as any;
+		const redactedJson = event.metadataRedactedJson as {
+			apiKey?: string;
+			prompt?: string;
+			count?: number;
+		};
 		expect(redactedJson.apiKey).toBe('[redacted]');
 		expect(redactedJson.prompt).toBe('[redacted]');
 		expect(redactedJson.count).toBe(100);
@@ -108,8 +111,11 @@ describe('Agent Runtime Tracing', () => {
 			{ runId: run.id, ledger: repository }
 		);
 
-		const redactedJson = event.metadataRedactedJson as any;
+		const redactedJson = event.metadataRedactedJson as {
+			providerId?: string;
+			request?: { apiKey?: string };
+		};
 		expect(redactedJson.providerId).toBe('openrouter');
-		expect(redactedJson.request.apiKey).toBe('[redacted]');
+		expect(redactedJson.request?.apiKey).toBe('[redacted]');
 	});
 });

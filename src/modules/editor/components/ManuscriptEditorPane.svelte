@@ -66,7 +66,7 @@
 				TableHeader,
 				TableCell,
 				Placeholder.configure({
-					placeholder: 'Begin drafting...',
+					placeholder: 'Begin drafting this scene...',
 					showOnlyCurrent: false,
 					emptyEditorClass: 'is-empty',
 				}),
@@ -326,11 +326,12 @@
 		width: 100%;
 		display: flex;
 		flex-direction: column;
-		padding-block-start: var(--editor-page-padding-block-start);
-		padding-block-end: var(--editor-page-padding-block-end);
+		padding-block-start: var(--space-8);
+		padding-block-end: var(--space-10);
 		padding-inline: var(--editor-page-padding-inline);
-		margin-block: var(--space-8);
+		margin-block: var(--space-4) var(--space-8);
 		box-sizing: border-box;
+		min-height: min(58vh, 44rem);
 		background: var(--editor-page-surface);
 		box-shadow: var(--editor-page-shadow);
 		border-radius: var(--editor-page-radius);
@@ -538,12 +539,10 @@
 	@media (max-width: 720px) {
 		.editor-page {
 			max-width: 100%;
-			margin-block: 0;
-			background: transparent;
-			box-shadow: none;
-			border-radius: 0;
-			padding-inline: var(--space-4);
-			padding-block-start: var(--space-8);
+			margin-block: var(--space-2) var(--space-4);
+			min-height: 56vh;
+			padding-inline: var(--space-3);
+			padding-block-start: var(--space-3);
 			padding-block-end: var(--space-6);
 		}
 

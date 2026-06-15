@@ -2,12 +2,12 @@
 title: Shell & Panel Model
 slug: phase-002-shell-and-panel-model
 phase_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-002-navigation-and-context-contract
 parts:
   - part-001-shell-and-panel-model
-estimated_duration: TBD
+estimated_duration: 1h
 ---
 
 ## Goal
@@ -18,13 +18,13 @@ Define the application shell, project shell, workspace sidebars, and Nova panel 
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Shell & Panel Model](part-001-shell-and-panel-model/part.md) | `draft` | unassigned | TBD |
+| 001 | [Shell & Panel Model](part-001-shell-and-panel-model/part.md) | `complete` | Codex | 1h |
 
 ## Acceptance Criteria
 
-- [ ] Global and project-scoped shells have clear responsibilities.
-- [ ] Nova panel behavior is consistent across project workspaces.
-- [ ] Layout changes do not hide critical author actions or review gates.
+- [x] Global and project-scoped shells have clear responsibilities.
+- [x] Nova panel behavior is consistent across project workspaces.
+- [x] Layout changes do not hide critical author actions or review gates.
 
 ## Notes
 

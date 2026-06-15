@@ -1,4 +1,5 @@
 import { page } from '$app/state';
+import { deriveRouteContext } from '$lib/navigation-state.js';
 
 /**
  * plan-044 — Centralized active context resolution.
@@ -8,12 +9,21 @@ import { page } from '$app/state';
  * parameters.
  */
 class ActiveContextStore {
+	private get routeContext() {
+		return deriveRouteContext({
+			pathname: page.url.pathname,
+			searchParams: page.url.searchParams,
+			params: page.params,
+			data: page.data,
+		});
+	}
+
 	/**
 	 * Canonical Project ID.
 	 * Derived from /projects/[id] route parameter.
 	 */
 	get projectId(): string | null {
-		return page.url.pathname.startsWith('/projects/') ? (page.params.id ?? null) : null;
+		return this.routeContext.projectId;
 	}
 
 	/**
@@ -22,12 +32,7 @@ class ActiveContextStore {
 	 * or page data.
 	 */
 	get sceneId(): string | null {
-		return (
-			page.url.searchParams.get('sceneId') ??
-			page.params.sceneId ??
-			(page.data.scene?.id as string | undefined) ??
-			null
-		);
+		return this.routeContext.activeSceneId;
 	}
 
 	/**
@@ -36,12 +41,7 @@ class ActiveContextStore {
 	 * or page data.
 	 */
 	get chapterId(): string | null {
-		return (
-			page.url.searchParams.get('chapterId') ??
-			page.params.chapterId ??
-			(page.data.chapter?.id as string | undefined) ??
-			null
-		);
+		return this.routeContext.activeChapterId;
 	}
 }
 

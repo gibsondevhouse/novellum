@@ -1,18 +1,18 @@
 # MASTER PLAN: Novellum Development
 
-> Last reconciled: 2026-06-14
+> Last reconciled: 2026-06-15
 
 ## Active Plans
 
-- [plan-049-agent-runtime-stack-hardening](./plan-049-agent-runtime-stack-hardening/plan.md): Agent Runtime Stack Hardening — local-first infrastructure for durable agent runs, job execution, model capabilities, budgets, search memory, traces, evals, and diagnostics. Status: `in-progress` (activated 2026-06-14; completed Stage 001 runtime contract, Stage 002 durable run ledger, and Stage 003 local job execution; next slice: Stage 004 / Phase 001 / Part 001 model capability registry).
+- [plan-048-frontend-experience-coherence](./plan-048-frontend-experience-coherence/plan.md): Frontend Experience Coherence — final frontend pass to make route context, navigation, author workflows, review gates, and visual states read as one production app. Status: `review` (implementation evidence complete 2026-06-15; pending plan-level Reviewer Agent evaluation).
 
 ## Deferred (not yet scheduled)
 
 - **Release engineering** — code signing, notarization, brand icons, formal smoke/keyring verification. Infrastructure exists; requires external procurement. Originally plan-024 stage-002.
-- [plan-048-frontend-experience-coherence](./plan-048-frontend-experience-coherence/plan.md): Frontend Experience Coherence — final frontend pass to make route context, navigation, author workflows, review gates, and visual states read as one production app. Status: `draft` (full plan tree scaffolded 2026-06-09).
 
 ## Completed Plans (Archived)
 
+- [plan-049-agent-runtime-stack-hardening](./plan-049-agent-runtime-stack-hardening/plan.md): Agent Runtime Stack Hardening — local-first infrastructure for durable agent runs, job execution, model capabilities, budgets, search memory, traces, evals, and diagnostics. Status: `complete` (closed 2026-06-15).
 - [plan-047-worldbuilding-canon-merge-diff](./plan-047-worldbuilding-canon-merge-diff/plan.md): Worldbuilding Canon Merge Diff — upgraded worldbuilding proposal acceptance from insert-only projection to reviewable canon diff/merge behavior with field-level diffs, duplicate evidence, audit metadata, and E2E coverage. Status: `complete` (closed 2026-06-14 after plan-level reviewer evaluation).
 - [plan-046-pipeline-checkpoint-contract-reconciliation](./plan-046-pipeline-checkpoint-contract-reconciliation/plan.md): Pipeline Checkpoint Contract Reconciliation — aligned checkpoint routes, schemas, tests, and docs around canonical pipeline contracts. Status: `complete` (closed 2026-06-14 after plan-level reviewer evaluation).
 - [plan-043-outline-pipeline-consolidation](./plan-043-outline-pipeline-consolidation/plan.md): Outline Pipeline Consolidation — retired legacy direct outline apply behavior and made review-gated outline checkpoints the sole supported generation/materialization path. Status: `complete` (closed 2026-06-12 after plan-level reviewer evaluation).

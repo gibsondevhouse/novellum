@@ -33,27 +33,29 @@
 			{/each}
 		</select>
 	</label>
-	<div class="nav-actions">
-		<button
-			type="button"
-			class="nav-btn"
-			onclick={() => onGoToScene(-1)}
-			disabled={activeSceneIndex <= 0}
-		>Previous</button>
-		<button
-			type="button"
-			class="nav-btn"
-			onclick={() => onGoToScene(1)}
-			disabled={activeSceneIndex < 0 || activeSceneIndex >= scenesCount - 1}
-		>Next</button>
-	</div>
+	{#if scenesCount > 1}
+		<div class="nav-actions">
+			<button
+				type="button"
+				class="nav-btn"
+				onclick={() => onGoToScene(-1)}
+				disabled={activeSceneIndex <= 0}
+			>Previous</button>
+			<button
+				type="button"
+				class="nav-btn"
+				onclick={() => onGoToScene(1)}
+				disabled={activeSceneIndex < 0 || activeSceneIndex >= scenesCount - 1}
+			>Next</button>
+		</div>
+	{/if}
 </div>
 
 <style>
 	.editor-context-row {
 		display: flex;
 		flex-wrap: wrap;
-		gap: var(--space-3);
+		gap: var(--space-2);
 		justify-content: center;
 		align-items: center;
 		padding-inline: var(--space-2);

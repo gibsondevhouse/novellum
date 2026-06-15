@@ -1,4 +1,10 @@
-import type { AiProvider, CompletionRequest, CompletionResponse, StreamChunk } from '$lib/ai/providers/types.js';
+import type {
+	AiModel,
+	AiProvider,
+	CompletionRequest,
+	CompletionResponse,
+	StreamChunk,
+} from '$lib/ai/providers/types.js';
 
 export interface EvalFixture {
 	id: string;
@@ -34,11 +40,11 @@ export class EvalMockProvider implements AiProvider {
 		return { ok: true, verifiedAt: new Date().toISOString() };
 	}
 
-	async listModels(): Promise<any[]> {
+	async listModels(): Promise<AiModel[]> {
 		return [];
 	}
 
-	async complete(_apiKey: string, request: CompletionRequest): Promise<CompletionResponse> {
+	async complete(_apiKey: string, _request: CompletionRequest): Promise<CompletionResponse> {
 		// In a real eval, we might match by prompt hash or a specific header.
 		// For simplicity, we assume the first fixture matches if none specified.
 		const fixture = [...this.fixtures.values()][0];
@@ -46,7 +52,7 @@ export class EvalMockProvider implements AiProvider {
 		return fixture.response;
 	}
 
-	async *stream(_apiKey: string, request: CompletionRequest): AsyncIterable<StreamChunk> {
+	async *stream(_apiKey: string, _request: CompletionRequest): AsyncIterable<StreamChunk> {
 		const fixture = [...this.fixtures.values()][0];
 		if (!fixture) {
 			yield { type: 'error', message: 'No fixtures loaded', recoverable: false };

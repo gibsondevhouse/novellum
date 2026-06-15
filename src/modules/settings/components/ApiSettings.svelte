@@ -78,6 +78,23 @@
 		}
 	}
 
+	async function handleDelete() {
+		if (!canDelete) return;
+		isDeleting = true;
+		try {
+			await deleteKey(providerId);
+			status = await getStatus(providerId);
+			apiKey = '';
+			toast('API key removed.', 'success');
+		} catch (err) {
+			const message =
+				err instanceof Error && err.message ? err.message : 'Could not remove API key. Please retry.';
+			toast(message, 'error');
+		} finally {
+			isDeleting = false;
+		}
+	}
+
 	async function testKeyWithSupplied(value: string) {
 		const res = await fetch('/api/settings/ai-key', {
 			method: 'POST',
@@ -101,7 +118,7 @@
 			a.click();
 			URL.revokeObjectURL(url);
 			toast('Diagnostics bundle downloaded.', 'success');
-		} catch (err) {
+		} catch {
 			toast('Could not download diagnostics.', 'error');
 		}
 	}

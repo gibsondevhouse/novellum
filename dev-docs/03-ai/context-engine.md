@@ -1,6 +1,6 @@
 # Context Engine
 
-> Last verified: 2026-06-12 (plan-047 worldbuilding canon merge diff)
+> Last verified: 2026-06-15 (plan-048 frontend coherence)
 
 The Context Engine selects the **minimum viable context** for an AI task. Hallucination reduction at Novellum is mostly a context-discipline problem, not a prompt-tuning problem.
 
@@ -54,6 +54,34 @@ Required baseline fields:
 
 This preserves grounding for "what is this novel about?" class prompts without widening
 to full-manuscript context.
+
+## Route Context Contract (plan-048)
+
+Frontend route context is derived by
+[`deriveRouteContext`](../../src/lib/navigation-state.ts). The helper is pure
+and shared by the active-context store, active-project store, and Nova panel.
+
+The contract distinguishes:
+
+- global routes such as `/`, `/projects`, `/settings`, `/nova`, `/images`, and
+  `/styles`;
+- project-scoped routes under `/projects/<id>`;
+- editor scene routes under `/projects/<id>/editor/<sceneId>`;
+- outline, world-building, export, continuity, and hierarchy routes.
+
+Stale `page.params.id` values are ignored when the current path is not a
+project route. This prevents global pages from accidentally inheriting a prior
+project context.
+
+Nova uses the same route contract to classify its visible surface:
+
+- `global` when opened from the standalone Nova route;
+- `project` when a project exists but no narrower workflow is active;
+- `editor`, `outline`, `worldbuilding`, `export`, or `continuity` on those
+  project surfaces.
+
+This keeps context disclosure and review-gated generation prompts aligned with
+the workspace the author is actually viewing.
 
 ## Outline Generation Sufficiency (plan-040)
 

@@ -10,6 +10,7 @@
 <script lang="ts">
 	import type { Scene } from '$lib/db/domain-types.js';
 	import type { AuthorDraftCheckpoint } from '$lib/ai/pipeline/author-draft-contract.js';
+	import { reviewGateStatusLabel } from '$lib/review-gate-labels.js';
 	import { toast } from '$lib/stores/toast.svelte.js';
 	import { editorDirty } from '$lib/stores/editor-dirty.svelte.js';
 	import { dispatchSceneContentApplied } from '$lib/events/scene-content.js';
@@ -213,13 +214,13 @@
 	function lifecycleLabel(value: AuthorDraftCheckpoint['lifecycle'] | 'none'): string {
 		switch (value) {
 			case 'review':
-				return 'Draft ready';
+				return reviewGateStatusLabel('review');
 			case 'accepted':
-				return 'Accepted';
+				return reviewGateStatusLabel('accepted');
 			case 'rejected':
-				return 'Rejected';
+				return reviewGateStatusLabel('rejected');
 			default:
-				return 'No draft';
+				return reviewGateStatusLabel('none');
 		}
 	}
 

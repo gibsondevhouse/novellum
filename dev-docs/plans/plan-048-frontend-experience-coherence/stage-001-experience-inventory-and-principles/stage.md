@@ -2,13 +2,13 @@
 title: Experience Inventory & Principles
 slug: stage-001-experience-inventory-and-principles
 stage_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-048-frontend-experience-coherence
 phases:
   - phase-001-route-surface-inventory
   - phase-002-workflow-coherence-map
-estimated_duration: TBD
+estimated_duration: 4h
 risk_level: medium
 ---
 
@@ -20,8 +20,8 @@ Inventory the existing frontend and define the author workflow principles that t
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Route Surface Inventory](phase-001-route-surface-inventory/phase.md) | `draft` | TBD |
-| 002 | [Workflow Coherence Map](phase-002-workflow-coherence-map/phase.md) | `draft` | TBD |
+| 001 | [Route Surface Inventory](phase-001-route-surface-inventory/phase.md) | `complete` | 1h |
+| 002 | [Workflow Coherence Map](phase-002-workflow-coherence-map/phase.md) | `complete` | 1h |
 
 ## Entry Criteria
 

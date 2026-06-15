@@ -2,13 +2,13 @@
 title: Review & Mutation Surfaces
 slug: part-001-review-and-mutation-surfaces
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: unassigned
+assigned_to: Codex
 phase: phase-002-review-and-mutation-surfaces
-started_at: ~
-completed_at: ~
-estimated_duration: TBD
+started_at: 2026-06-15T00:00:00-04:00
+completed_at: 2026-06-15T00:00:00-04:00
+estimated_duration: 1h
 ---
 
 ## Objective
@@ -40,7 +40,7 @@ Make AI review and mutation surfaces consistent, explicit, and safe across outli
 
 **Create:**
 
-- `evidence/review-and-mutation-surfaces-2026-06-09.md`
+- `evidence/review-and-mutation-surfaces-2026-06-15.md`
 
 **Update:**
 
@@ -66,14 +66,18 @@ Make AI review and mutation surfaces consistent, explicit, and safe across outli
 
 ## Acceptance Criteria
 
-- [ ] Outline checkpoints, author drafts, and worldbuilding proposals share clear review language.
-- [ ] No model-callable path is presented as an author acceptance action.
-- [ ] Accepted, rejected, stale, conflicted, and failed states are visually distinguishable.
+- [x] Outline checkpoints, author drafts, and worldbuilding proposals share clear review language.
+- [x] No model-callable path is presented as an author acceptance action.
+- [x] Accepted, rejected, stale, conflicted, and failed states are visually distinguishable.
 
 ## Edge Cases
 
 - A proposal can become stale after underlying manuscript or canon content changes.
 - A rejected item should remain understandable in history without looking actionable.
+
+## Evidence
+
+- [Review And Mutation Surfaces (2026-06-15)](./evidence/review-and-mutation-surfaces-2026-06-15.md)
 
 ## Notes
 

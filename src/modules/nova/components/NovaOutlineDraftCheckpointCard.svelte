@@ -9,6 +9,7 @@
 		createOutlineCheckpointActions,
 		type OutlineCheckpointActions,
 	} from '../services/outline-checkpoint-actions.js';
+	import { reviewGateStatusLabel } from '$lib/review-gate-labels.js';
 
 	interface Props {
 		checkpoint: OutlineDraftCheckpointRecord;
@@ -32,6 +33,7 @@
 	let rejectState = $state<RejectState>('idle');
 	let rejectReasonDraft = $state('');
 	let errorMessage = $state<string | null>(null);
+	const pendingReviewLabel = 'Pending review';
 
 	const activeCheckpoint = $derived(returnedCheckpoint ?? checkpoint);
 	const lifecycleWord = $derived.by(() => {
@@ -190,8 +192,9 @@
 	}
 
 	function lifecycleChip(lifecycle: OutlineDraftLifecycle): string {
-		if (lifecycle === 'review') return 'Pending review';
-		return lifecycle.charAt(0).toUpperCase() + lifecycle.slice(1);
+		if (lifecycle === 'draft') return reviewGateStatusLabel('draft');
+		if (lifecycle === 'review') return pendingReviewLabel;
+		return reviewGateStatusLabel(lifecycle);
 	}
 
 	function orderLabel(order: number): string {

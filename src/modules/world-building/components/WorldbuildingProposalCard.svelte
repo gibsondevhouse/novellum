@@ -3,6 +3,7 @@
 		WorldbuildProposalRecord,
 		WorldbuildProposalStatus,
 	} from '$lib/ai/pipeline/worldbuild-proposal-schema.js';
+	import { reviewGateStatusLabel } from '$lib/review-gate-labels.js';
 	import WorldbuildingProposalDiffView from './WorldbuildingProposalDiffView.svelte';
 
 	interface Props {
@@ -59,7 +60,7 @@
 		<div class="proposal-card__meta">
 			<span class="proposal-card__domain">{domainLabel}</span>
 			<span class="proposal-card__badge proposal-card__badge--{statusVariant(proposal.status)}">
-				{proposal.status.replace('_', ' ')}
+				{reviewGateStatusLabel(proposal.status)}
 			</span>
 		</div>
 		<time class="proposal-card__time" datetime={proposal.generatedAt}>

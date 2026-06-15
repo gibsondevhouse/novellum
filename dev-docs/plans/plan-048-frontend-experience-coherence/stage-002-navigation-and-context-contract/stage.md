@@ -2,13 +2,13 @@
 title: Navigation & Context Contract
 slug: stage-002-navigation-and-context-contract
 stage_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-048-frontend-experience-coherence
 phases:
   - phase-001-route-state-contract
   - phase-002-shell-and-panel-model
-estimated_duration: TBD
+estimated_duration: 2h
 risk_level: high
 ---
 
@@ -20,8 +20,8 @@ Make project, chapter, scene, route, and Nova context visible and predictable ac
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Route State Contract](phase-001-route-state-contract/phase.md) | `draft` | TBD |
-| 002 | [Shell & Panel Model](phase-002-shell-and-panel-model/phase.md) | `draft` | TBD |
+| 001 | [Route State Contract](phase-001-route-state-contract/phase.md) | `complete` | 1h |
+| 002 | [Shell & Panel Model](phase-002-shell-and-panel-model/phase.md) | `complete` | 1h |
 
 ## Entry Criteria
 

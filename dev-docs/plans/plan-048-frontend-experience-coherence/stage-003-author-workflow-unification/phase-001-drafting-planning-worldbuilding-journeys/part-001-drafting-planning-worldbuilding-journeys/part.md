@@ -2,13 +2,13 @@
 title: Drafting, Planning & Worldbuilding Journeys
 slug: part-001-drafting-planning-worldbuilding-journeys
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: unassigned
+assigned_to: Codex
 phase: phase-001-drafting-planning-worldbuilding-journeys
-started_at: ~
-completed_at: ~
-estimated_duration: TBD
+started_at: 2026-06-15T00:00:00-04:00
+completed_at: 2026-06-15T00:00:00-04:00
+estimated_duration: 1h
 ---
 
 ## Objective
@@ -40,7 +40,7 @@ Unify the primary author workflow surfaces so planning, drafting, and world-buil
 
 **Create:**
 
-- `evidence/drafting-planning-worldbuilding-journeys-2026-06-09.md`
+- `evidence/drafting-planning-worldbuilding-journeys-2026-06-15.md`
 
 **Update:**
 
@@ -66,14 +66,18 @@ Unify the primary author workflow surfaces so planning, drafting, and world-buil
 
 ## Acceptance Criteria
 
-- [ ] Editor, outline, and world-building surfaces expose consistent next actions.
-- [ ] Empty and incomplete states guide authors toward useful work without feature narration.
-- [ ] Project hub, editor, outline, and worldbuilding e2e paths remain intact.
+- [x] Editor, outline, and world-building surfaces expose consistent next actions.
+- [x] Empty and incomplete states guide authors toward useful work without feature narration.
+- [x] Project hub, editor, outline, and worldbuilding e2e paths remain intact.
 
 ## Edge Cases
 
 - New projects may have no characters, no outline, and no manuscript scenes yet.
 - Existing projects may have manuscript content but missing world-building or outline data.
+
+## Evidence
+
+- [Drafting, Planning & Worldbuilding Journeys (2026-06-15)](./evidence/drafting-planning-worldbuilding-journeys-2026-06-15.md)
 
 ## Notes
 

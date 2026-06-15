@@ -21,7 +21,7 @@ export interface SupportBundle {
 		migrations: Array<{ version: number; name: string; appliedAt: string }>;
 	};
 	agentRuntime: {
-		recentRuns: any[];
+		recentRuns: unknown[];
 		stats: {
 			totalRuns: number;
 			failedRuns: number;

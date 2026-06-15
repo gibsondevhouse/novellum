@@ -6,11 +6,11 @@
 
 ## Current
 
-[plan-048-frontend-experience-coherence](./plan-048-frontend-experience-coherence/plan.md) — Frontend Experience Coherence. Next slice: Stage 001 Experience Inventory & Principles. Status: `in-progress`.
+[plan-048-frontend-experience-coherence](./plan-048-frontend-experience-coherence/plan.md) — Frontend Experience Coherence. Implementation evidence is complete; next slice is plan-level Reviewer Agent evaluation. Status: `review`.
 
 ## Pending review
 
-No plans are currently pending plan-level review.
+- [plan-048-frontend-experience-coherence](./plan-048-frontend-experience-coherence/plan.md) — Frontend Experience Coherence. Route/context contract, review-gate language, docs sync, quality gates, targeted E2E, and browser evidence are ready for Reviewer Agent evaluation. Moved to review 2026-06-15.
 
 ## Recently completed
 

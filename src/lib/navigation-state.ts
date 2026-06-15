@@ -21,8 +21,142 @@ export interface CachedIdResolution {
 	status: 'empty' | 'valid' | 'invalid' | 'error';
 }
 
+export type RouteWorkspace =
+	| 'home'
+	| 'onboarding'
+	| 'projects'
+	| 'project-hub'
+	| 'editor'
+	| 'outline'
+	| 'world-building'
+	| 'continuity'
+	| 'story-bible'
+	| 'arcs'
+	| 'nova'
+	| 'settings'
+	| 'books'
+	| 'reader'
+	| 'stories'
+	| 'images'
+	| 'styles'
+	| 'unknown';
+
+export type NovaRouteSurface = 'embedded-project' | 'global-exploratory' | 'none';
+
+export interface RouteContextInput {
+	pathname: string;
+	searchParams?: URLSearchParams | string | Record<string, string | null | undefined>;
+	params?: Record<string, string | null | undefined>;
+	data?: Record<string, unknown>;
+}
+
+export interface RouteContextContract {
+	pathname: string;
+	workspace: RouteWorkspace;
+	projectId: string | null;
+	activeChapterId: string | null;
+	activeSceneId: string | null;
+	worldbuildingPath: string | null;
+	isProjectScoped: boolean;
+	novaSurface: NovaRouteSurface;
+}
+
 function inBrowser(): boolean {
 	return typeof window !== 'undefined';
+}
+
+function cleanRouteId(value: string | null | undefined): string | null {
+	const trimmed = value?.trim();
+	if (!trimmed || trimmed === 'undefined' || trimmed === 'null') return null;
+	return decodeURIComponent(trimmed);
+}
+
+function searchParam(
+	searchParams: RouteContextInput['searchParams'],
+	key: string,
+): string | null {
+	if (!searchParams) return null;
+	if (searchParams instanceof URLSearchParams) return cleanRouteId(searchParams.get(key));
+	if (typeof searchParams === 'string') {
+		const raw = searchParams.startsWith('?') ? searchParams.slice(1) : searchParams;
+		return cleanRouteId(new URLSearchParams(raw).get(key));
+	}
+	return cleanRouteId(searchParams[key] ?? null);
+}
+
+function entityIdFromData(data: Record<string, unknown> | undefined, key: string): string | null {
+	const value = data?.[key];
+	if (!value || typeof value !== 'object') return null;
+	const id = (value as { id?: unknown }).id;
+	return typeof id === 'string' ? cleanRouteId(id) : null;
+}
+
+function projectIdFromPath(pathname: string): string | null {
+	const match = /^\/projects\/([^/]+)/.exec(pathname);
+	return cleanRouteId(match?.[1]);
+}
+
+function chapterIdFromPath(pathname: string): string | null {
+	const match = /\/chapters\/([^/]+)/.exec(pathname);
+	return cleanRouteId(match?.[1]);
+}
+
+function workspaceFromPath(pathname: string): RouteWorkspace {
+	if (pathname === '/') return 'home';
+	if (pathname === '/onboarding' || pathname.startsWith('/onboarding/')) return 'onboarding';
+	if (pathname === '/projects') return 'projects';
+	if (/^\/projects\/[^/]+\/editor(\/|$)/.test(pathname)) return 'editor';
+	if (/^\/projects\/[^/]+\/outline(\/|$)/.test(pathname)) return 'outline';
+	if (/^\/projects\/[^/]+\/world-building(\/|$)/.test(pathname)) return 'world-building';
+	if (/^\/projects\/[^/]+\/continuity(\/|$)/.test(pathname)) return 'continuity';
+	if (/^\/projects\/[^/]+\/story-bible(\/|$)/.test(pathname)) return 'story-bible';
+	if (/^\/projects\/[^/]+\/arcs(\/|$)/.test(pathname)) return 'arcs';
+	if (/^\/projects\/[^/]+\/?$/.test(pathname)) return 'project-hub';
+	if (pathname === '/nova' || pathname.startsWith('/nova/')) return 'nova';
+	if (pathname === '/settings' || pathname.startsWith('/settings/')) return 'settings';
+	if (/^\/books\/[^/]+/.test(pathname)) return 'reader';
+	if (pathname === '/books' || pathname.startsWith('/books/')) return 'books';
+	if (pathname === '/stories' || pathname.startsWith('/stories/')) return 'stories';
+	if (pathname === '/images' || pathname.startsWith('/images/')) return 'images';
+	if (pathname === '/styles' || pathname.startsWith('/styles/')) return 'styles';
+	return 'unknown';
+}
+
+function worldbuildingPathFromRoute(pathname: string): string | null {
+	const match = /^\/projects\/[^/]+\/world-building\/?(.*)$/.exec(pathname);
+	const tail = match?.[1]?.replace(/\/$/, '') ?? '';
+	return tail.length > 0 ? tail : null;
+}
+
+export function deriveRouteContext(input: RouteContextInput): RouteContextContract {
+	const pathname = input.pathname || '/';
+	const workspace = workspaceFromPath(pathname);
+	const hasProjectPath = pathname.startsWith('/projects/');
+	const projectId =
+		projectIdFromPath(pathname) ?? (hasProjectPath ? cleanRouteId(input.params?.id ?? null) : null);
+	const activeSceneId =
+		searchParam(input.searchParams, 'sceneId') ??
+		cleanRouteId(input.params?.sceneId ?? null) ??
+		entityIdFromData(input.data, 'scene');
+	const activeChapterId =
+		searchParam(input.searchParams, 'chapterId') ??
+		cleanRouteId(input.params?.chapterId ?? null) ??
+		chapterIdFromPath(pathname) ??
+		entityIdFromData(input.data, 'chapter');
+	const isProjectScoped = projectId !== null;
+	const novaSurface: NovaRouteSurface =
+		workspace === 'nova' ? 'global-exploratory' : isProjectScoped ? 'embedded-project' : 'none';
+
+	return {
+		pathname,
+		workspace,
+		projectId,
+		activeChapterId,
+		activeSceneId,
+		worldbuildingPath: worldbuildingPathFromRoute(pathname),
+		isProjectScoped,
+		novaSurface,
+	};
 }
 
 function readLocalString(key: string): string | null {

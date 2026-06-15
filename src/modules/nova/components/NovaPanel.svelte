@@ -13,6 +13,7 @@
 	import { aiSession } from '../services/ai-session-service.svelte.js';
 	import { sendNovaChat } from '../services/chat-service.js';
 	import { classifyNovaError } from '../utils/classify-nova-error.js';
+	import { deriveRouteContext } from '$lib/navigation-state.js';
 	import EmptyStatePanel from '$lib/components/ui/EmptyStatePanel.svelte';
 	import ContextDisclosurePill from './ContextDisclosurePill.svelte';
 	import NovaMessageLog from './NovaMessageLog.svelte';
@@ -54,12 +55,18 @@
 	const aiLoading = $derived(aiSession.loading);
 	const aiChecked = $derived(aiSession.checked);
 	const hasProjectContext = $derived(Boolean(projectId));
-	const isEditorRoute = $derived(/^\/projects\/[^/]+\/editor(\/|$)/.test(page.url.pathname));
-	const isChapterRoute = $derived(/\/chapters\/[^/]+$/.test(page.url.pathname));
+	const routeContext = $derived(
+		deriveRouteContext({
+			pathname: page.url.pathname,
+			searchParams: page.url.searchParams,
+			params: page.params,
+			data: page.data,
+		}),
+	);
+	const isEditorRoute = $derived(routeContext.workspace === 'editor');
+	const isChapterRoute = $derived(routeContext.workspace === 'arcs' && Boolean(routeContext.activeChapterId));
 	const hasSubheader = $derived(
-		page.url.pathname.includes('/world-building') ||
-		isEditorRoute ||
-		isChapterRoute,
+		routeContext.workspace === 'world-building' || isEditorRoute || isChapterRoute,
 	);
 	const panelStatusLabel = $derived.by(() => {
 		if (aiLoading) return 'Checking AI configuration';

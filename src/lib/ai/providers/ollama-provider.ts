@@ -8,7 +8,7 @@
  * Reference: https://github.com/ollama/ollama/blob/main/docs/api.md
  */
 
-import {
+import type {
 	AiModel,
 	AiProvider,
 	AiProviderConfig,
@@ -19,8 +19,10 @@ import {
 	ValidateKeyResult,
 } from './types.js';
 
-let traceModule: any = null;
-async function getTracer() {
+type TraceModule = typeof import('../../server/agent-runtime/trace.js');
+
+let traceModule: TraceModule | null = null;
+async function getTracer(): Promise<TraceModule | null> {
 	if (traceModule) return traceModule;
 	try {
 		// Dynamic import to stay client-safe while allowing server-side tracing.

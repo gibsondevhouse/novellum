@@ -1,6 +1,6 @@
 # Export
 
-> Last verified: 2026-06-01
+> Last verified: 2026-06-15
 
 Novellum exports your manuscript to four formats. All exports run locally — no upload, no remote service.
 
@@ -16,10 +16,14 @@ Novellum exports your manuscript to four formats. All exports run locally — no
 ## How to export
 
 1. Open the project.
-2. Go to **Settings → Data → Export**, or use the export button in the project hub (depending on the build).
+2. Use **Export** in the project sidebar or project hub, or open **Settings → Data → Export** for defaults and data tools.
 3. Pick a format.
 4. Configure options (front matter, scene breaks, chapter formatting).
 5. Save the file to disk.
+
+Export is treated as a project-scoped workflow. It uses the same active project
+context as the editor, outline, world-building, and Nova panel surfaces, but it
+does not apply AI-generated checkpoints or proposals.
 
 ## What gets exported
 

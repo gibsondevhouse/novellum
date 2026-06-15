@@ -1,10 +1,9 @@
+import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
-import { getSceneById } from '$modules/editor/services/scene-repository.js';
-import { getChapterById } from '$modules/project/services/chapter-repository.js';
 
-export const load: PageLoad = async ({ params }) => {
-	const scene = await getSceneById(params.sceneId);
-	if (!scene) throw new Error(`Scene not found: ${params.sceneId}`);
-	const chapter = scene.chapterId ? await getChapterById(scene.chapterId) : null;
-	return { scene, chapter };
+export const load: PageLoad = ({ params, url }) => {
+	const search = new URLSearchParams(url.searchParams);
+	search.set('sceneId', params.sceneId);
+
+	throw redirect(307, `/projects/${params.id}/editor?${search.toString()}`);
 };

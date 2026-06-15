@@ -2,13 +2,13 @@
 title: Workflow Coherence Map
 slug: part-001-workflow-coherence-map
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
-assigned_to: unassigned
+assigned_to: Codex
 phase: phase-002-workflow-coherence-map
-started_at: ~
-completed_at: ~
-estimated_duration: TBD
+started_at: 2026-06-15T00:00:00-04:00
+completed_at: 2026-06-15T00:00:00-04:00
+estimated_duration: 1h
 ---
 
 ## Objective
@@ -39,7 +39,7 @@ Write the target author workflow map that the frontend coherence pass will optim
 
 **Create:**
 
-- `evidence/workflow-coherence-map-2026-06-09.md`
+- `evidence/workflow-coherence-map-2026-06-15.md`
 
 **Update:**
 
@@ -60,14 +60,18 @@ Write the target author workflow map that the frontend coherence pass will optim
 
 ## Acceptance Criteria
 
-- [ ] Primary author journeys are mapped from entry to completion.
-- [ ] Each journey identifies required context, review gates, and completion signals.
-- [ ] Frontend principles are written as constraints for later stages.
+- [x] Primary author journeys are mapped from entry to completion.
+- [x] Each journey identifies required context, review gates, and completion signals.
+- [x] Frontend principles are written as constraints for later stages.
 
 ## Edge Cases
 
 - Empty projects need useful next actions without sending authors into dead ends.
 - Global Nova routes may have less context than project-scoped Nova surfaces.
+
+## Evidence
+
+- [Workflow Coherence Map (2026-06-15)](./evidence/workflow-coherence-map-2026-06-15.md)
 
 ## Notes
 

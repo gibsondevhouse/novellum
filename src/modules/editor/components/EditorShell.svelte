@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import { SvelteURLSearchParams } from 'svelte/reactivity';
 	import type { Chapter, Character, Project, Scene } from '$lib/db/domain-types';
 	import EmptyStatePanel from '$lib/components/ui/EmptyStatePanel.svelte';
 	import { goto } from '$app/navigation';
@@ -37,6 +39,8 @@
 		obstacle: string;
 		outcome: OutcomeType;
 	};
+
+	type MobilePlanningPanel = 'none' | 'queue' | 'compass';
 
 	const EMPTY_DEFINITION: SceneDefinition = {
 		sceneGoal: '',
@@ -79,6 +83,8 @@
 	let tipTapEditor = $state<any | null>(null);
 	let editorTick = $state(0);
 	let spellcheckEnabled = $state(true);
+	let mobileToolsOpen = $state(false);
+	let mobilePlanningPanel = $state<MobilePlanningPanel>('none');
 
 	function handleSceneContentApplied(detail: SceneContentAppliedDetail): void {
 		const scene = data.scenes.find((s: Scene) => s.id === detail.sceneId);
@@ -110,6 +116,12 @@
 	const requestedPanel = $derived(page.url.searchParams.get('panel'));
 	const selectedChapterId = $derived(page.url.searchParams.get('chapterId'));
 	const selectedSceneId = $derived(page.url.searchParams.get('sceneId'));
+
+	onMount(() => {
+		if (window.matchMedia('(max-width: 900px)').matches && requestedPanel !== 'ai') {
+			novaPanel.close();
+		}
+	});
 
 	$effect(() => {
 		if (requestedPanel === 'ai' && !novaPanel.isOpen) {
@@ -357,8 +369,19 @@
 		);
 	}
 
-	function setActiveScene(sceneId: string): void {
+	function setActiveScene(sceneId: string, syncUrl = true): void {
 		editorState.setActiveSceneId(sceneId);
+
+		if (!syncUrl || page.url.searchParams.get('sceneId') === sceneId) return;
+
+		const search = new SvelteURLSearchParams(page.url.searchParams);
+		search.set('sceneId', sceneId);
+		const query = search.toString();
+		void goto(`${page.url.pathname}${query ? `?${query}` : ''}`, {
+			replaceState: true,
+			keepFocus: true,
+			noScroll: true,
+		});
 	}
 
 	function goToScene(offset: -1 | 1): void {
@@ -410,71 +433,153 @@
 	class:mode-revision={editorPreferences.mode === 'revision'}
 >
 	{#if editorPreferences.mode === 'planning'}
-		<SceneNavigator
-			scenes={data.scenes}
-			chapters={data.chapters}
-			activeSceneId={editorState.activeSceneId}
-			activeContent={activeContent}
-			activeSceneDefinition={sceneDefinition}
-			onSceneSelect={setActiveScene}
-		/>
+		<div class="desktop-planning-panel">
+			<SceneNavigator
+				scenes={data.scenes}
+				chapters={data.chapters}
+				activeSceneId={editorState.activeSceneId}
+				activeContent={activeContent}
+				activeSceneDefinition={sceneDefinition}
+				onSceneSelect={setActiveScene}
+			/>
+		</div>
 	{/if}
 
 	<main class="editor-area" aria-label="Writing workspace">
 		<header class="editor-toolbar" aria-label="Editor toolbar">
-			<EditorToolbar
-				editor={tipTapEditor}
-				tick={editorTick}
-				spellcheck={spellcheckEnabled}
-				onToggleSpellcheck={(next) => (spellcheckEnabled = next)}
-				onViewInReader={handleViewInReader}
-				novaPanelOpen={novaPanel.isOpen}
-				onToggleNova={() => novaPanel.toggle()}
-			/>
-			<div class="editor-mode-bar">
-				<EditorModeToggle
-					mode={editorPreferences.mode}
-					onModeChange={editorPreferences.setMode}
-				/>
-				<FocusModeToggle
-					focusMode={editorPreferences.focusMode}
-					onToggle={editorPreferences.toggleFocus}
+			<div class="editor-command-row" class:editor-command-row--expanded={mobileToolsOpen}>
+				<button
+					type="button"
+					class="mobile-tools-toggle"
+					aria-expanded={mobileToolsOpen}
+					onclick={() => (mobileToolsOpen = !mobileToolsOpen)}
+				>
+					Format
+				</button>
+				<div class="editor-command-toolbar">
+					<EditorToolbar
+						editor={tipTapEditor}
+						tick={editorTick}
+						spellcheck={spellcheckEnabled}
+						onToggleSpellcheck={(next) => (spellcheckEnabled = next)}
+						onViewInReader={handleViewInReader}
+						novaPanelOpen={novaPanel.isOpen}
+						onToggleNova={() => novaPanel.toggle()}
+					/>
+				</div>
+			</div>
+			<div class="editor-meta-row">
+				<div class="editor-mode-bar">
+					<EditorModeToggle
+						mode={editorPreferences.mode}
+						onModeChange={editorPreferences.setMode}
+					/>
+					<FocusModeToggle
+						focusMode={editorPreferences.focusMode}
+						onToggle={editorPreferences.toggleFocus}
+					/>
+				</div>
+				<SceneContextPanel
+					activeScene={activeScene}
+					characters={data.characters}
+					activeSceneIndex={activeSceneIndex}
+					scenesCount={data.scenes.length}
+					onPersistPovCharacter={persistPovCharacter}
+					onGoToScene={goToScene}
 				/>
 			</div>
-			<SceneContextPanel
-				activeScene={activeScene}
-				characters={data.characters}
-				activeSceneIndex={activeSceneIndex}
-				scenesCount={data.scenes.length}
-				onPersistPovCharacter={persistPovCharacter}
-				onGoToScene={goToScene}
-			/>
+			{#if editorPreferences.mode === 'planning'}
+				<div class="mobile-planning-switcher" aria-label="Planning panels">
+					<button
+						type="button"
+						class:active={mobilePlanningPanel === 'queue'}
+						aria-pressed={mobilePlanningPanel === 'queue'}
+						onclick={() =>
+							(mobilePlanningPanel = mobilePlanningPanel === 'queue' ? 'none' : 'queue')}
+					>
+						Queue
+					</button>
+					<button
+						type="button"
+						class:active={mobilePlanningPanel === 'compass'}
+						aria-pressed={mobilePlanningPanel === 'compass'}
+						onclick={() =>
+							(mobilePlanningPanel =
+								mobilePlanningPanel === 'compass' ? 'none' : 'compass')}
+					>
+						Compass
+					</button>
+				</div>
+			{/if}
 		</header>
-		{#if data.scenes.length === 0}
-			<EmptyStatePanel title="No scenes yet." description="Add one from the Outline." />
-		{:else}
-			<div class="editor-scroll">
-				<ManuscriptEditorPane
-					content={activeContent}
-					onContentChange={handleManuscriptChange}
-					oneditorReady={(ed) => (tipTapEditor = ed)}
-					ontick={() => (editorTick += 1)}
-					spellcheck={spellcheckEnabled}
-					onAskNova={(text) =>
-						novaPanel.openWithPrompt(
-							`About this passage:\n\n"${text.slice(0, 500)}"\n\n`,
-						)}
-				/>
+
+		{#if editorPreferences.mode === 'planning' && mobilePlanningPanel !== 'none'}
+			<div class="mobile-planning-panel">
+				{#if mobilePlanningPanel === 'queue'}
+					<SceneNavigator
+						scenes={data.scenes}
+						chapters={data.chapters}
+						activeSceneId={editorState.activeSceneId}
+						activeContent={activeContent}
+						activeSceneDefinition={sceneDefinition}
+						onSceneSelect={setActiveScene}
+					/>
+				{:else}
+					<SceneCompassPanel
+						sceneCompassRows={sceneCompassRows}
+						liveSignals={liveSignals}
+						progressFlags={progressFlags}
+						quickIntent={quickIntent}
+						locationTag={locationTag}
+						characters={data.characters}
+						activeScene={activeScene}
+						activeWordCount={activeWordCount}
+						sceneTargetWords={sceneTargetWords}
+						pacingHint={pacingHint}
+						storyCompassCollapsed={storyCompassCollapsed}
+						onCollapsedChange={(val) => (storyCompassCollapsed = val)}
+						onQuickIntentChange={(qi) => (quickIntent = qi)}
+						onPersistQuickIntent={persistQuickIntent}
+						onToggleParticipant={toggleParticipant}
+						onPersistLocationTag={persistLocationTag}
+						onLocationTagChange={(val) => (locationTag = val)}
+					/>
+				{/if}
 			</div>
 		{/if}
-		{#if editorPreferences.mode === 'revision' && activeScene}
-			<SnapshotHistoryPanel
-				sceneId={activeScene.id}
-				currentText={activeContent}
-				onRestore={handleSnapshotRestore}
-				onClose={() => editorPreferences.setMode('writing')}
-			/>
-		{/if}
+
+		<div
+			class="editor-content-split"
+			class:showing-history={editorPreferences.mode === 'revision' && activeScene !== null}
+		>
+			{#if data.scenes.length === 0}
+				<div class="editor-empty-wrap">
+					<EmptyStatePanel title="No scenes yet." description="Add one from the Outline." />
+				</div>
+			{:else}
+				<div class="editor-scroll">
+					<ManuscriptEditorPane
+						content={activeContent}
+						onContentChange={handleManuscriptChange}
+						oneditorReady={(ed) => (tipTapEditor = ed)}
+						ontick={() => (editorTick += 1)}
+						spellcheck={spellcheckEnabled}
+						onAskNova={(text) =>
+							novaPanel.openWithPrompt(
+								`About this passage:\n\n"${text.slice(0, 500)}"\n\n`,
+							)}
+					/>
+				</div>
+			{/if}
+			{#if editorPreferences.mode === 'revision' && activeScene}
+				<SnapshotHistoryPanel
+					sceneId={activeScene.id}
+					currentText={activeContent}
+					onRestore={handleSnapshotRestore}
+					onClose={() => editorPreferences.setMode('writing')}
+				/>
+			{/if}
+		</div>
 
 		<SceneSignalNudge
 			signals={liveSignals}
@@ -513,25 +618,27 @@
 	</main>
 
 	{#if editorPreferences.mode === 'planning'}
-		<SceneCompassPanel
-			sceneCompassRows={sceneCompassRows}
-			liveSignals={liveSignals}
-			progressFlags={progressFlags}
-			quickIntent={quickIntent}
-			locationTag={locationTag}
-			characters={data.characters}
-			activeScene={activeScene}
-			activeWordCount={activeWordCount}
-			sceneTargetWords={sceneTargetWords}
-			pacingHint={pacingHint}
-			storyCompassCollapsed={storyCompassCollapsed}
-			onCollapsedChange={(val) => (storyCompassCollapsed = val)}
-			onQuickIntentChange={(qi) => (quickIntent = qi)}
-			onPersistQuickIntent={persistQuickIntent}
-			onToggleParticipant={toggleParticipant}
-			onPersistLocationTag={persistLocationTag}
-			onLocationTagChange={(val) => (locationTag = val)}
-		/>
+		<div class="desktop-planning-panel">
+			<SceneCompassPanel
+				sceneCompassRows={sceneCompassRows}
+				liveSignals={liveSignals}
+				progressFlags={progressFlags}
+				quickIntent={quickIntent}
+				locationTag={locationTag}
+				characters={data.characters}
+				activeScene={activeScene}
+				activeWordCount={activeWordCount}
+				sceneTargetWords={sceneTargetWords}
+				pacingHint={pacingHint}
+				storyCompassCollapsed={storyCompassCollapsed}
+				onCollapsedChange={(val) => (storyCompassCollapsed = val)}
+				onQuickIntentChange={(qi) => (quickIntent = qi)}
+				onPersistQuickIntent={persistQuickIntent}
+				onToggleParticipant={toggleParticipant}
+				onPersistLocationTag={persistLocationTag}
+				onLocationTagChange={(val) => (locationTag = val)}
+			/>
+		</div>
 	{/if}
 
 </div>
@@ -558,13 +665,25 @@
 	}
 
 	/* Focus mode collapses navigator and compass even in planning mode */
-	.editor-page.editor-focus-mode :global(.doc-list),
-	.editor-page.editor-focus-mode :global(.story-compass) {
+	.editor-page.editor-focus-mode .desktop-planning-panel,
+	.editor-page.editor-focus-mode .mobile-planning-switcher,
+	.editor-page.editor-focus-mode .mobile-planning-panel {
 		display: none;
 	}
 
 	.editor-page.editor-focus-mode.mode-planning {
 		grid-template-columns: 1fr;
+	}
+
+	.desktop-planning-panel {
+		display: flex;
+		min-width: 0;
+		min-height: 0;
+	}
+
+	.desktop-planning-panel :global(.doc-list),
+	.desktop-planning-panel :global(.story-compass) {
+		flex: 1;
 	}
 
 	.editor-area {
@@ -586,14 +705,66 @@
 		background: var(--color-surface-ground);
 	}
 
+	.editor-command-row {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 0;
+	}
+
+	.editor-command-toolbar {
+		min-width: 0;
+	}
+
+	.mobile-tools-toggle {
+		display: none;
+	}
+
+	.editor-meta-row {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: var(--space-3);
+		flex-wrap: wrap;
+	}
+
 	.editor-mode-bar {
 		display: flex;
 		gap: var(--space-2);
 		align-items: center;
+		min-width: 0;
+	}
+
+	.mobile-planning-switcher,
+	.mobile-planning-panel {
+		display: none;
+	}
+
+	.editor-content-split {
+		flex: 1;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		min-height: 0;
+		overflow: hidden;
+	}
+
+	.editor-content-split.showing-history {
+		grid-template-columns: minmax(0, 1fr) 320px;
+	}
+
+	.editor-content-split :global(.snapshot-history-panel) {
+		width: auto;
+		min-width: 0;
+	}
+
+	.editor-empty-wrap {
+		display: grid;
+		place-items: center;
+		min-height: 0;
+		padding: var(--space-6);
 	}
 
 	.editor-scroll {
-		flex: 1;
 		display: flex;
 		flex-direction: column;
 		min-height: 0;
@@ -661,8 +832,130 @@
 			grid-template-columns: 1fr;
 		}
 
-		.editor-page.mode-planning :global(.story-compass) {
+		.editor-page.mode-planning .desktop-planning-panel {
 			display: none;
+		}
+
+		.mobile-planning-switcher {
+			display: flex;
+			justify-content: center;
+			gap: var(--space-2);
+		}
+
+		.mobile-planning-switcher button {
+			border: 1px solid var(--color-border-default);
+			border-radius: var(--radius-sm);
+			background: var(--color-surface-base);
+			color: var(--color-text-secondary);
+			cursor: pointer;
+			font-size: var(--text-xs);
+			padding: var(--space-1) var(--space-3);
+		}
+
+		.mobile-planning-switcher button.active {
+			background: color-mix(in srgb, var(--color-teal) 12%, transparent);
+			border-color: color-mix(in srgb, var(--color-teal) 30%, transparent);
+			color: var(--color-teal);
+		}
+
+		.mobile-planning-panel {
+			display: block;
+			max-height: min(34vh, 22rem);
+			min-height: 0;
+			overflow: auto;
+			border-bottom: 1px solid var(--color-border-subtle);
+			background: var(--color-surface-ground);
+		}
+
+		.mobile-planning-panel :global(.doc-list),
+		.mobile-planning-panel :global(.story-compass) {
+			border: 0;
+			max-height: min(34vh, 22rem);
+		}
+	}
+
+	@media (max-width: 720px) {
+		.editor-page {
+			height: calc(100vh - 72px);
+		}
+
+		.editor-toolbar {
+			gap: var(--space-1);
+			padding: var(--space-1) var(--space-2);
+		}
+
+		.editor-command-row {
+			justify-content: flex-start;
+			gap: var(--space-2);
+			flex-wrap: wrap;
+		}
+
+		.mobile-tools-toggle {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			border: 1px solid var(--color-border-default);
+			border-radius: var(--radius-sm);
+			background: var(--color-surface-base);
+			color: var(--color-text-secondary);
+			cursor: pointer;
+			font-size: var(--text-xs);
+			font-weight: var(--font-weight-medium);
+			min-height: var(--space-6);
+			padding: var(--space-1) var(--space-3);
+		}
+
+		.editor-command-toolbar {
+			display: none;
+			order: 2;
+			width: 100%;
+			overflow-x: auto;
+		}
+
+		.editor-command-row--expanded .editor-command-toolbar {
+			display: flex;
+		}
+
+		.editor-command-toolbar :global(.editor-toolbar-wrap) {
+			justify-content: flex-start;
+			padding: 0;
+		}
+
+		.editor-command-toolbar :global(.pill-toolbar) {
+			flex-wrap: nowrap;
+			max-width: 100%;
+			overflow-x: auto;
+			border-radius: var(--radius-md);
+		}
+
+		.editor-meta-row {
+			justify-content: flex-start;
+			gap: var(--space-1);
+		}
+
+		.editor-mode-bar {
+			max-width: 100%;
+			overflow-x: auto;
+		}
+
+		.editor-meta-row :global(.editor-context-row) {
+			justify-content: flex-start;
+			padding-inline: 0;
+		}
+
+		.mobile-planning-switcher {
+			justify-content: flex-start;
+		}
+
+		.editor-content-split.showing-history {
+			grid-template-columns: 1fr;
+			grid-template-rows: minmax(0, 1fr) minmax(10rem, 34vh);
+		}
+
+		.editor-content-split.showing-history :global(.snapshot-history-panel) {
+			height: auto;
+			border-left: 0;
+			border-top: 1px solid var(--color-border-default);
 		}
 	}
 

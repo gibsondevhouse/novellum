@@ -1,8 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { generateSupportBundle } from '$lib/server/diagnostics/agent-runtime-diagnostics.js';
-import * as migrationRunner from '$lib/server/db/migration-runner.js';
-import { createRunLedgerRepository } from '$lib/server/agent-runtime/run-ledger.js';
-import { db } from '$lib/server/db/index.js';
 
 vi.mock('$lib/server/db/migration-runner.js', () => ({
 	getAppliedMigrations: vi.fn(() => [{ version: 1, name: 'baseline', applied_at: '2026-06-11T00:00:00Z' }]),

@@ -105,4 +105,61 @@ describe('navigation-state', () => {
 		expect(setPreference).not.toHaveBeenCalled();
 		expect(localStorage.getItem('novellum:reader')).toContain('book-transient');
 	});
+
+	it('derives editor context from the visible project route and query params', async () => {
+		const { deriveRouteContext } = await loadNavigationState();
+		const resolved = deriveRouteContext({
+			pathname: '/projects/proj-1/editor',
+			searchParams: '?chapterId=chapter-2&sceneId=scene-9',
+			params: { id: 'stale-param' },
+		});
+
+		expect(resolved).toMatchObject({
+			workspace: 'editor',
+			projectId: 'proj-1',
+			activeChapterId: 'chapter-2',
+			activeSceneId: 'scene-9',
+			isProjectScoped: true,
+			novaSurface: 'embedded-project',
+		});
+	});
+
+	it('derives worldbuilding sub-route context without a scene or chapter', async () => {
+		const { deriveRouteContext } = await loadNavigationState();
+		const resolved = deriveRouteContext({
+			pathname: '/projects/proj-1/world-building/locations/realms',
+		});
+
+		expect(resolved).toMatchObject({
+			workspace: 'world-building',
+			projectId: 'proj-1',
+			worldbuildingPath: 'locations/realms',
+			activeChapterId: null,
+			activeSceneId: null,
+			novaSurface: 'embedded-project',
+		});
+	});
+
+	it('keeps fullscreen Nova as global exploratory context', async () => {
+		const { deriveRouteContext } = await loadNavigationState();
+		const resolved = deriveRouteContext({ pathname: '/nova' });
+
+		expect(resolved).toMatchObject({
+			workspace: 'nova',
+			projectId: null,
+			isProjectScoped: false,
+			novaSurface: 'global-exploratory',
+		});
+	});
+
+	it('ignores placeholder ids when deriving project context', async () => {
+		const { deriveRouteContext } = await loadNavigationState();
+		const resolved = deriveRouteContext({
+			pathname: '/projects/undefined/editor/scene-1',
+			params: { id: 'undefined', sceneId: 'scene-1' },
+		});
+
+		expect(resolved.projectId).toBeNull();
+		expect(resolved.activeSceneId).toBe('scene-1');
+	});
 });

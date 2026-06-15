@@ -1,6 +1,6 @@
 # Nova — Your AI Copilot
 
-> Last verified: 2026-06-12
+> Last verified: 2026-06-15
 
 **Nova** is Novellum's AI assistant. Chat-style. Project-aware. BYOK (you bring your own OpenRouter key).
 
@@ -29,13 +29,19 @@ For OpenRouter setup details, see [ai-setup.md](./ai-setup.md).
 
 ## How to use Nova
 
-Open the **Nova** workspace from the sidebar (or, in upcoming editor changes, the right-side panel). Ask in plain English:
+Open the **Nova** workspace from the sidebar, or use the right-side **Nova**
+panel while you are in a project workspace. Ask in plain English:
 
 - *"Is this scene consistent with what we know about Marin?"*
 - *"Rewrite this paragraph in a more clipped voice."*
 - *"What hasn't paid off from the threads we set up in chapter 3?"*
 
 Nova will reply with structured suggestions you can review and apply manually.
+When the panel is open inside a project route, Nova shows whether project
+context is attached. On editor routes it can also inherit the active chapter or
+scene from the route, so prompt grounding follows where you are working instead
+of relying on copied IDs or query parameters.
+
 When Agent mode creates a checkpoint or proposal, it appears as a review card
 with explicit accept/reject controls. Accepting or rejecting that artifact is a
 trusted app action, not a model tool call.
@@ -44,6 +50,11 @@ Outline generation follows the same author-in-the-loop rule. Nova can generate
 an outline checkpoint, but it will not rewrite your outline board until you
 explicitly accept the checkpoint from the outline review card. Older outline
 artifact messages, if still visible in an open session, are read-only.
+
+Review cards use the same lifecycle language across drafting, outlines, and
+worldbuilding: pending review, accepted, rejected, accept, reject, and review
+changes. If a card says it is pending review, nothing has been applied to the
+manuscript or canon yet.
 
 ## The agents behind Nova
 

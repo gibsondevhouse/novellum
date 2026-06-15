@@ -18,3 +18,13 @@ part: part-001-workflow-coherence-map
 **Notes:** No implementation work has started. Keep this log append-only when the part is executed.
 
 ---
+
+### [2026-06-15 00:00] Agent: Codex
+
+**Action:** Converted the route surface inventory into a primary author workflow map.
+
+**Result:** Added `evidence/workflow-coherence-map-2026-06-15.md`, mapped core author journeys from entry point to success/failure states, and recorded route/context/review-gate principles for stages 002-004.
+
+**Notes:** This part is documentation/evidence only. No runtime code changes were required.
+
+---

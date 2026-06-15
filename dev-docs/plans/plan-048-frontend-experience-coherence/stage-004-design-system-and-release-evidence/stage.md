@@ -2,7 +2,7 @@
 title: Design System & Release Evidence
 slug: stage-004-design-system-and-release-evidence
 stage_number: 4
-status: draft
+status: review
 owner: Planner Agent
 plan: plan-048-frontend-experience-coherence
 phases:
@@ -20,8 +20,8 @@ Close the frontend plan with visual system cleanup, accessibility coverage, resp
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Design System Cleanup](phase-001-design-system-cleanup/phase.md) | `draft` | TBD |
-| 002 | [Responsive & A11y Regression](phase-002-responsive-a11y-regression/phase.md) | `draft` | TBD |
+| 001 | [Design System Cleanup](phase-001-design-system-cleanup/phase.md) | `review` | 0.5h |
+| 002 | [Responsive & A11y Regression](phase-002-responsive-a11y-regression/phase.md) | `review` | 0.5h |
 
 ## Entry Criteria
 
@@ -37,3 +37,4 @@ Close the frontend plan with visual system cleanup, accessibility coverage, resp
 ## Notes
 
 This stage is where frontend polish is earned through evidence, not subjective cleanup.
+Implementation evidence is complete and ready for Reviewer Agent evaluation.
