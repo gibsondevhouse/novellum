@@ -56,12 +56,28 @@ export interface CompletionRequest {
 			schema: Record<string, unknown>;
 		};
 	};
+	/**
+	 * Optional runtime context for local tracing. If present, providers
+	 * should emit trace events via the supplied run and step IDs.
+	 */
+	runtime?: {
+		runId: string;
+		stepId?: string;
+	};
 	signal?: AbortSignal;
 }
 
 export interface CompletionResponse {
 	model: string;
 	content: string;
+	toolCalls?: Array<{
+		id: string;
+		type: 'function';
+		function: {
+			name: string;
+			arguments: string;
+		};
+	}>;
 	finishReason: 'stop' | 'length' | 'content_filter' | 'tool_calls' | 'other';
 	usage?: {
 		promptTokens?: number;

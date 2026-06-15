@@ -67,3 +67,4 @@ Additional agents may be added as Novellum's AI capabilities grow.
 - **"Nova isn't answering."** Confirm Settings → AI → status shows "Configured". Re-validate the key.
 - **"The reply doesn't match my world."** Check that the relevant characters/locations/lore are filled in — Nova grounds replies on what it can see in the project. See [worldbuilding.md](./worldbuilding.md).
 - **"Nova introduced facts I didn't write."** Open a bug report. The agents are constrained against this; if it happens, the team wants to know.
+- **"Nova encountered an error."** If you see a "Something went wrong" message, you can click "Technical detail" and download a diagnostics bundle to help with troubleshooting.

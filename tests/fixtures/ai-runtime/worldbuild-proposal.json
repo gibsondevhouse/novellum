@@ -1,0 +1,21 @@
+{
+	"id": "worldbuild-proposal-001",
+	"name": "Worldbuild Proposal Basic",
+	"description": "Basic worldbuilding proposal generation",
+	"request": {
+		"model": "gpt-4o",
+		"messages": [
+			{ "role": "user", "content": "Generate a new character for the project." }
+		]
+	},
+	"response": {
+		"model": "gpt-4o",
+		"content": "{\"entities\": [{\"kind\": \"character\", \"name\": \"Elora\", \"role\": \"mystic\", \"traits\": [\"wise\", \"blind\"]}]}",
+		"finishReason": "stop",
+		"usage": {
+			"promptTokens": 80,
+			"completionTokens": 120,
+			"totalTokens": 200
+		}
+	}
+}

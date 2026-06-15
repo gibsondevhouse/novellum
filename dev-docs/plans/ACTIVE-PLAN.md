@@ -6,7 +6,7 @@
 
 ## Current
 
-[plan-049-agent-runtime-stack-hardening](./plan-049-agent-runtime-stack-hardening/plan.md) — Agent Runtime Stack Hardening. Next slice: Stage 005 Observability, Evals & Diagnostics. Status: `in-progress`.
+[plan-048-frontend-experience-coherence](./plan-048-frontend-experience-coherence/plan.md) — Frontend Experience Coherence. Next slice: Stage 001 Experience Inventory & Principles. Status: `in-progress`.
 
 ## Pending review
 
@@ -14,6 +14,7 @@ No plans are currently pending plan-level review.
 
 ## Recently completed
 
+- [plan-049-agent-runtime-stack-hardening](./plan-049-agent-runtime-stack-hardening/plan.md) — Agent Runtime Stack Hardening. Move long-running agent work onto a local SQLite-backed job execution model with durable runs, model capabilities, budget enforcement, search baseline, tracing, evals, and diagnostics. Closed 2026-06-15.
 - [plan-047-worldbuilding-canon-merge-diff](./plan-047-worldbuilding-canon-merge-diff/plan.md) — Worldbuilding Canon Merge Diff. Upgraded worldbuilding proposal acceptance from insert-only projection to reviewable canon diff/merge behavior with audit metadata, duplicate evidence, and E2E coverage. Closed 2026-06-14 after plan-level reviewer evaluation.
 - [plan-046-pipeline-checkpoint-contract-reconciliation](./plan-046-pipeline-checkpoint-contract-reconciliation/plan.md) — Pipeline Checkpoint Contract Reconciliation. Reconciled checkpoint route ownership, schema versions, docs, and full E2E expectations across current generation pipelines. Closed 2026-06-14 after plan-level reviewer evaluation.
 - [plan-043-outline-pipeline-consolidation](./plan-043-outline-pipeline-consolidation/plan.md) — Outline Pipeline Consolidation. Retired legacy direct apply paths; made checkpoints the sole materialization path. Closed 2026-06-12 after plan-level reviewer evaluation.

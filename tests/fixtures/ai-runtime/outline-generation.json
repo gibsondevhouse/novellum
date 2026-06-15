@@ -1,0 +1,21 @@
+{
+	"id": "outline-gen-001",
+	"name": "Outline Generation Basic",
+	"description": "Basic outline generation from worldbuilding context",
+	"request": {
+		"model": "gpt-4o",
+		"messages": [
+			{ "role": "user", "content": "Generate an outline for a fantasy novel." }
+		]
+	},
+	"response": {
+		"model": "gpt-4o",
+		"content": "{\"arcs\": [{\"id\": \"arc-1\", \"title\": \"The Dragon Awakens\"}]}",
+		"finishReason": "stop",
+		"usage": {
+			"promptTokens": 50,
+			"completionTokens": 100,
+			"totalTokens": 150
+		}
+	}
+}

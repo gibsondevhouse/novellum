@@ -2,7 +2,7 @@
 title: AI Trace & Eval Harness
 slug: phase-001-ai-trace-and-eval-harness
 phase_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-005-observability-evals-diagnostics
 parts:

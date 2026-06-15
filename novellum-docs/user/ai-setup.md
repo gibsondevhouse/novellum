@@ -48,7 +48,9 @@ reject, apply, or project changes into your manuscript or canon. Any manuscript
 or worldbuilding mutation still goes through an explicit Novellum UI action,
 such as an accept or reject button on the review card.
 
-## Privacy
+## Privacy & Diagnostics
 
-- Novellum does not log or proxy your prompts. They go directly from the local SvelteKit server (the desktop sidecar) to OpenRouter.
+- Novellum does not log or proxy your prompts to a remote service. They go directly from the local SvelteKit server (the desktop sidecar) to OpenRouter or Ollama.
+- **Local Tracing**: For troubleshooting, Novellum maintains a local trace of AI events (prompts, tool calls, errors). These are stored in your local SQLite database and are **not** sent anywhere automatically.
+- **Support Bundles**: If you encounter an issue, you can export a **Diagnostics Bundle** from **Settings → AI**. This bundle contains redacted runtime records, migration status, and configuration metadata. Personal story content and API keys are redacted by default before export.
 - OpenRouter's privacy policy applies to the messages you send through it.

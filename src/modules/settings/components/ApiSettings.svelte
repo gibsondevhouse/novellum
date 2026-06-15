@@ -88,18 +88,21 @@
 		return (await res.json()) as { ok: boolean; reason?: string };
 	}
 
-	async function handleDelete() {
-		if (!canDelete) return;
-		isDeleting = true;
+	async function handleDownloadDiagnostics() {
 		try {
-			await deleteKey(providerId);
-			status = await getStatus(providerId);
-			apiKey = '';
-			toast('API key removed.', 'info');
-		} catch {
-			toast('Could not remove API key.', 'error');
-		} finally {
-			isDeleting = false;
+			const res = await fetch('/api/diagnostics/agent-runtime');
+			if (!res.ok) throw new Error('Failed to fetch diagnostics');
+			const bundle = await res.json();
+			const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = `novellum-diagnostics-${new Date().toISOString().slice(0, 10)}.json`;
+			a.click();
+			URL.revokeObjectURL(url);
+			toast('Diagnostics bundle downloaded.', 'success');
+		} catch (err) {
+			toast('Could not download diagnostics.', 'error');
 		}
 	}
 </script>
@@ -107,7 +110,12 @@
 <SurfacePanel class="api-settings-panel">
 	<header class="panel-header">
 		<p class="panel-eyebrow">Primary Integration</p>
-		<h2>AI Integration</h2>
+		<div class="header-with-action">
+			<h2>AI Integration</h2>
+			<SecondaryButton onclick={handleDownloadDiagnostics} class="diag-btn">
+				Download Diagnostics
+			</SecondaryButton>
+		</div>
 		<p class="panel-desc">
 			Configure your OpenRouter API key. Your key is stored on this server only and never re-rendered after
 			saving.
@@ -175,10 +183,24 @@
 		color: var(--color-text-muted);
 	}
 
-	.panel-header h2 {
+	.header-with-action {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-4);
 		margin-top: var(--space-1);
+	}
+
+	.header-with-action h2 {
+		margin: 0;
 		font-size: var(--text-xl);
 		font-weight: var(--font-weight-medium);
+	}
+
+	:global(.diag-btn) {
+		font-size: var(--text-xs);
+		height: 28px;
+		padding: 0 var(--space-2);
 	}
 
 	.panel-desc {

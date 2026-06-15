@@ -2,7 +2,7 @@
 title: Diagnostics & Closeout
 slug: phase-002-diagnostics-and-closeout
 phase_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-005-observability-evals-diagnostics
 parts:

@@ -1,0 +1,21 @@
+{
+	"id": "author-draft-001",
+	"name": "Author Draft Basic",
+	"description": "Basic author draft generation",
+	"request": {
+		"model": "gpt-4o",
+		"messages": [
+			{ "role": "user", "content": "Write a scene where the hero enters the dark forest." }
+		]
+	},
+	"response": {
+		"model": "gpt-4o",
+		"content": "The trees loomed like skeletal fingers against the grey sky. Aris stepped over a rotted log, his hand tight on his sword hilt.\n\n```json\n{ \"sceneId\": \"scene-1\", \"wordCount\": 35 }\n```",
+		"finishReason": "stop",
+		"usage": {
+			"promptTokens": 100,
+			"completionTokens": 200,
+			"totalTokens": 300
+		}
+	}
+}

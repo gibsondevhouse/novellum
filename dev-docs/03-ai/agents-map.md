@@ -150,14 +150,26 @@ proposal: projection mode, decision, diff id, target id/display name, changed
 field names, link targets, duplicate/evidence counts, and rejection reason
 when applicable. The audit block intentionally avoids full entity snapshots,
 prompt text, and raw provider output.
+- Generic project metadata remains supported for ordinary `scene`, `chapter`,
+  and `project` metadata. Under `scope: "pipeline"`, it is canonical only for
+  `vibe-worldbuild` staged checkpoint lifecycle and for outline checkpoint
+  list/read/review/reject compatibility. It is not canonical for author draft
+  checkpoints, worldbuilding scan proposal accept/reject, or outline accept
+  materialization. `/api/nova/outline/apply` is retired and returns
+  `410 outline_apply_retired`.
 
-Generic project metadata remains supported for ordinary `scene`, `chapter`,
-and `project` metadata. Under `scope: "pipeline"`, it is canonical only for
-`vibe-worldbuild` staged checkpoint lifecycle and for outline checkpoint
-list/read/review/reject compatibility. It is not canonical for author draft
-checkpoints, worldbuilding scan proposal accept/reject, or outline accept
-materialization. `/api/nova/outline/apply` is retired and returns
-`410 outline_apply_retired`.
+## Observability & Tracing (plan-049)
+
+Every agent run and high-level AI interaction is tracked through the **Agent Runtime Stack**.
+
+- **Run Ledger**: A durable record of every run, its steps, tool calls, and outcomes. Stored in `agent_runs`, `agent_run_steps`, etc.
+- **Tracing**: Redacted records of prompts, provider calls, tool routing, and parser results. Traces are stored in `agent_trace_events` and are linked to runs.
+- **Redaction**: Credentials (API keys, passwords) and manuscript content are redacted by default in trace records using `redaction.ts`.
+- **Diagnostics**: A support bundle can be exported via `GET /api/diagnostics/agent-runtime`, containing redacted runtime history and environment metadata for troubleshooting.
+
+The `AiProvider` interface supports an optional `runtime` context in `CompletionRequest`, allowing providers to emit traces automatically when a `runId` is provided.
+
+## Lifecycle and error responses
 
 Lifecycle and error responses are intentionally family-specific where the
 product behavior differs:

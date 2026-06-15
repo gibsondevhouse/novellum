@@ -2,7 +2,7 @@
 title: Diagnostics & Closeout
 slug: part-001-diagnostics-and-closeout
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 assigned_to: unassigned
 phase: phase-002-diagnostics-and-closeout

@@ -8,7 +8,7 @@
  * Reference: https://github.com/ollama/ollama/blob/main/docs/api.md
  */
 
-import type {
+import {
 	AiModel,
 	AiProvider,
 	AiProviderConfig,
@@ -18,6 +18,18 @@ import type {
 	StreamChunk,
 	ValidateKeyResult,
 } from './types.js';
+
+let traceModule: any = null;
+async function getTracer() {
+	if (traceModule) return traceModule;
+	try {
+		// Dynamic import to stay client-safe while allowing server-side tracing.
+		traceModule = await import('../../server/agent-runtime/trace.js');
+		return traceModule;
+	} catch {
+		return null;
+	}
+}
 
 const DEFAULT_BASE_URL = 'http://127.0.0.1:11434';
 
@@ -30,8 +42,16 @@ interface OllamaTagsResponse {
 }
 
 interface OllamaChatMessage {
-	role: 'system' | 'user' | 'assistant';
+	role: 'system' | 'user' | 'assistant' | 'tool';
 	content: string;
+	tool_calls?: Array<{
+		id: string;
+		type: 'function';
+		function: {
+			name: string;
+			arguments: string;
+		};
+	}>;
 }
 
 interface OllamaChatResponse {
@@ -99,6 +119,16 @@ class OllamaProvider implements AiProvider {
 	}
 
 	async complete(_apiKey: string, request: CompletionRequest): Promise<CompletionResponse> {
+		const tracer = request.runtime ? await getTracer() : null;
+		if (tracer) {
+			tracer.captureTrace(
+				tracer.TRACE_EVENT_TYPES.PROVIDER_CALL,
+				`Ollama request: ${request.model}`,
+				tracer.TraceMetadata.providerCall(this.providerId, request.model, request),
+				request.runtime!,
+			);
+		}
+
 		const response = await this.fetchImpl(`${this.baseUrl}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -106,12 +136,22 @@ class OllamaProvider implements AiProvider {
 			signal: request.signal,
 		});
 		if (!response.ok) {
-			throw new Error(`Ollama complete failed: ${response.status} ${response.statusText}`);
+			const message = `${response.status} ${response.statusText}`;
+			if (tracer) {
+				tracer.captureTrace(
+					tracer.TRACE_EVENT_TYPES.ERROR,
+					`Ollama error: ${message}`,
+					{ status: response.status },
+					request.runtime!,
+				);
+			}
+			throw new Error(`Ollama complete failed: ${message}`);
 		}
 		const body = (await response.json()) as OllamaChatResponse;
-		return {
+		const result: CompletionResponse = {
 			model: body.model ?? request.model,
 			content: body.message?.content ?? '',
+			toolCalls: body.message?.tool_calls,
 			finishReason: mapFinishReason(body.done_reason),
 			usage: {
 				promptTokens: body.prompt_eval_count,
@@ -120,12 +160,33 @@ class OllamaProvider implements AiProvider {
 					(body.prompt_eval_count ?? 0) + (body.eval_count ?? 0) || undefined,
 			},
 		};
+
+		if (tracer) {
+			tracer.captureTrace(
+				tracer.TRACE_EVENT_TYPES.PROVIDER_CALL,
+				`Ollama response: ${result.finishReason}`,
+				tracer.TraceMetadata.providerResponse(this.providerId, result.model, result),
+				request.runtime!,
+			);
+		}
+
+		return result;
 	}
 
 	async *stream(
 		_apiKey: string,
 		request: CompletionRequest,
 	): AsyncIterable<StreamChunk> {
+		const tracer = request.runtime ? await getTracer() : null;
+		if (tracer) {
+			tracer.captureTrace(
+				tracer.TRACE_EVENT_TYPES.PROVIDER_CALL,
+				`Ollama stream request: ${request.model}`,
+				tracer.TraceMetadata.providerCall(this.providerId, request.model, request),
+				request.runtime!,
+			);
+		}
+
 		const response = await this.fetchImpl(`${this.baseUrl}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -134,9 +195,18 @@ class OllamaProvider implements AiProvider {
 		});
 
 		if (!response.ok || !response.body) {
+			const message = `Ollama stream failed: ${response.status} ${response.statusText}`;
+			if (tracer) {
+				tracer.captureTrace(
+					tracer.TRACE_EVENT_TYPES.ERROR,
+					`Ollama stream error: ${message}`,
+					{ status: response.status },
+					request.runtime!,
+				);
+			}
 			yield {
 				type: 'error',
-				message: `Ollama stream failed: ${response.status} ${response.statusText}`,
+				message,
 				recoverable: false,
 			};
 			return;
@@ -174,6 +244,14 @@ class OllamaProvider implements AiProvider {
 									(parsed.prompt_eval_count ?? 0) + (parsed.eval_count ?? 0) ||
 									undefined,
 							};
+							if (tracer) {
+								tracer.captureTrace(
+									tracer.TRACE_EVENT_TYPES.STREAM_CHUNK,
+									'Ollama stream [DONE]',
+									{ finishReason, usage },
+									request.runtime!,
+								);
+							}
 						}
 					} catch {
 						/* ignore malformed line */
@@ -183,10 +261,19 @@ class OllamaProvider implements AiProvider {
 			yield { type: 'done', finishReason, usage };
 		} catch (err) {
 			const message = err instanceof Error ? err.message : String(err);
+			const isAbort = err instanceof DOMException && err.name === 'AbortError';
+			if (tracer) {
+				tracer.captureTrace(
+					tracer.TRACE_EVENT_TYPES.ERROR,
+					`Ollama stream iteration error: ${message}`,
+					{ recoverable: isAbort },
+					request.runtime!,
+				);
+			}
 			yield {
 				type: 'error',
 				message,
-				recoverable: err instanceof DOMException && err.name === 'AbortError',
+				recoverable: isAbort,
 			};
 		} finally {
 			reader.releaseLock?.();

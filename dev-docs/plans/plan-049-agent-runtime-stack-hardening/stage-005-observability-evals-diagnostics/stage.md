@@ -2,7 +2,7 @@
 title: Observability, Evals & Diagnostics
 slug: stage-005-observability-evals-diagnostics
 stage_number: 5
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-049-agent-runtime-stack-hardening
 phases:

@@ -1,0 +1,28 @@
+{
+	"id": "tool-routing-001",
+	"name": "Tool Routing Search",
+	"description": "Model decides to call search_project tool",
+	"request": {
+		"model": "gpt-4o",
+		"messages": [
+			{ "role": "user", "content": "Search for dragon lore in the project." }
+		]
+	},
+	"response": {
+		"model": "gpt-4o",
+		"content": "",
+		"toolCalls": [
+			{
+				"id": "call_123",
+				"type": "function",
+				"function": { "name": "search_project", "arguments": "{\"query\": \"dragon lore\"}" }
+			}
+		],
+		"finishReason": "tool_calls",
+		"usage": {
+			"promptTokens": 150,
+			"completionTokens": 50,
+			"totalTokens": 200
+		}
+	}
+}

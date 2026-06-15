@@ -45,6 +45,23 @@
 	// Show the raw provider/transport error for `unknown` so we surface
 	// real failure context instead of just "An unexpected error occurred".
 	const rawDetail = $derived(errorType === 'unknown' && error ? error : null);
+
+	async function handleDownloadDiagnostics() {
+		try {
+			const res = await fetch('/api/diagnostics/agent-runtime');
+			if (!res.ok) throw new Error('Failed to fetch diagnostics');
+			const bundle = await res.json();
+			const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = `novellum-diagnostics-${new Date().toISOString().slice(0, 10)}.json`;
+			a.click();
+			URL.revokeObjectURL(url);
+		} catch {
+			/* ignore errors in error boundary */
+		}
+	}
 </script>
 
 {#if error && copy}
@@ -53,6 +70,9 @@
 		<details class="nova-error-details">
 			<summary>Technical detail</summary>
 			<pre>{rawDetail}</pre>
+			<button class="diag-link" onclick={handleDownloadDiagnostics}>
+				Download diagnostics bundle
+			</button>
 		</details>
 	{/if}
 {/if}
@@ -75,5 +95,16 @@
 		border-radius: var(--radius-sm);
 		white-space: pre-wrap;
 		word-break: break-word;
+	}
+	.diag-link {
+		display: block;
+		margin-top: var(--space-2);
+		padding: 0;
+		background: none;
+		border: none;
+		font-size: var(--text-xs);
+		color: var(--color-text-brand);
+		text-decoration: underline;
+		cursor: pointer;
 	}
 </style>

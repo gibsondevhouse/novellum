@@ -87,7 +87,7 @@ Functionality is organized by **vertical domain slices** (e.g., `project`, `worl
 
 ## Recent Accomplishments
 
-- **Plan-049 progress (Runtime Hardening)**: Completed runtime inventory/contract, durable run ledger schema, typed server ledger repository, read-only Nova run routes, SQLite-backed queue claiming/stale-recovery mechanics, and local worker lifecycle/cancel/retry support (Active 2026-06-14).
+- **Plan-049 (Runtime Hardening)**: Shipped SQLite-backed job queue, durable run ledger, model capability registry, token budgeting, search memory baseline (FTS5), AI traces, eval fixtures, and exportable diagnostics bundle. (Closed 2026-06-15).
 - **Plan-040 (Outline Generation)**: Worldbuilding-to-Outline review-gated proposal flow (Closed 2026-06-04).
 - **Plan-047 (Worldbuilding Canon Merge Diff)**: Reviewable worldbuilding canon diff/merge acceptance with audit metadata (Closed 2026-06-14).
 - **Plan-046 (Pipeline Reconciliation)**: Canonical checkpoint route/schema/docs/test reconciliation with full E2E closure (Closed 2026-06-14).
@@ -102,7 +102,7 @@ Functionality is organized by **vertical domain slices** (e.g., `project`, `worl
 
 ## Current Focus (Active Plans)
 
-Active plan: **Plan-049 (Runtime Hardening)**. Current focus: Stage 004 / Phase 001 / Part 001, Model Capability Registry. Completed so far: Stage 001 runtime contract, Stage 002 durable run ledger, and Stage 003 local job execution.
+Active plan: **Plan-048 (Frontend Coherence)**. Current focus: Stage 001 Experience Inventory & Principles. Making Novellum's frontend read as one coherent agentic workspace.
 
 ### Roadmap Execution Order (Draft Queue)
 
@@ -118,8 +118,8 @@ To ensure system stability and logical dependency management, execute pending pl
     - [x] **Plan-047 (Worldbuilding Canon Merge Diff)**: Upgrade worldbuilding from "insert-only" to a full diff/merge flow. (Closed 2026-06-14)
 
 3.  **Phase 3: Infrastructure & Coherence**
-    - [ ] **Plan-049 (Runtime Hardening)**: SQLite job queue, durable runs, token budgeting, and AI traces. (Active)
-    - [ ] **Plan-048 (Frontend Coherence)**: Final UX pass for navigation, review gates, and visual state unification.
+    - [x] **Plan-049 (Runtime Hardening)**: SQLite job queue, durable runs, token budgeting, and AI traces. (Closed 2026-06-15)
+    - [ ] **Plan-048 (Frontend Coherence)**: Final UX pass for navigation, review gates, and visual state unification. (Active)
 
 4.  **Phase 4: Release Engineering**
     - [ ] **Release Engineering**: Code signing, notarization, brand icons, and production smoke tests.
@@ -140,7 +140,7 @@ To ensure system stability and logical dependency management, execute pending pl
 - Path 5: Observability, reliability, and model-budget optimization.
 
 ## Vulnerabilities and Fragilities
-- **Type Safety**: `pnpm check` is clean as of Plan-049 Stage 003 implementation closeout. Keep running it before plan closure.
+- **Type Safety**: `pnpm check` is clean as of Plan-049 implementation closeout (2026-06-15). Treat new errors as regressions.
 - **Visual Drift**: Pre-existing cross-surface snapshot drift in Playwright tests. Impact: Unreliable visual regression testing. Detection: `pnpm run test:visual`.
 - **Linting**: `pnpm lint` and `pnpm lint:css` are clean as of Plan-047 implementation closeout. Treat new warnings/errors as regressions.
 - **Legacy Persistence**: Dexie remains in `src/lib/db` and `src/modules/export` strictly for portability snapshots. Do not use for new live reads/writes.

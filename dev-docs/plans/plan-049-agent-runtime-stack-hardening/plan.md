@@ -2,7 +2,7 @@
 title: Agent Runtime Stack Hardening
 slug: plan-049-agent-runtime-stack-hardening
 version: 1.0.0
-status: in-progress
+status: complete
 owner: Planner Agent
 created: 2026-06-11
 last_updated: 2026-06-14
@@ -64,9 +64,8 @@ This plan strengthens the existing SvelteKit, Tauri, SQLite, OpenRouter/Ollama, 
 | 001 | [Runtime Inventory & Contract](stage-001-runtime-inventory-and-contract/stage.md) | `complete` | TBD |
 | 002 | [Durable Run Ledger](stage-002-durable-run-ledger/stage.md) | `complete` | TBD |
 | 003 | [Local Job Execution](stage-003-local-job-execution/stage.md) | `complete` | TBD |
-| 004 | [Model, Budget & Memory Capabilities](stage-004-model-budget-and-memory-capabilities/stage.md) | `draft` | TBD |
 | 004 | [Model, Budget & Memory Capabilities](stage-004-model-budget-and-memory-capabilities/stage.md) | `complete` | TBD |
-| 005 | [Observability, Evals & Diagnostics](stage-005-observability-evals-diagnostics/stage.md) | `draft` | TBD |
+| 005 | [Observability, Evals & Diagnostics](stage-005-observability-evals-diagnostics/stage.md) | `complete` | TBD |
 
 ## Quality Gates
 

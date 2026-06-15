@@ -11,6 +11,18 @@ import type {
 } from './types.js';
 import { AiProviderError } from './types.js';
 
+let traceModule: any = null;
+async function getTracer() {
+	if (traceModule) return traceModule;
+	try {
+		// Dynamic import to stay client-safe while allowing server-side tracing.
+		traceModule = await import('../../server/agent-runtime/trace.js');
+		return traceModule;
+	} catch {
+		return null;
+	}
+}
+
 function classifyStatus(status: number): AiProviderErrorCode {
 	if (status === 401 || status === 403) return 'invalid_key';
 	if (status === 429) return 'rate_limit';
@@ -133,6 +145,16 @@ class OpenRouterProvider implements AiProvider {
 	}
 
 	async complete(apiKey: string, request: CompletionRequest): Promise<CompletionResponse> {
+		const tracer = request.runtime ? await getTracer() : null;
+		if (tracer) {
+			tracer.captureTrace(
+				tracer.TRACE_EVENT_TYPES.PROVIDER_CALL,
+				`OpenRouter request: ${request.model}`,
+				tracer.TraceMetadata.providerCall(this.providerId, request.model, request),
+				request.runtime!,
+			);
+		}
+
 		const response = await this.fetchImpl(`${this.baseUrl}/chat/completions`, {
 			method: 'POST',
 			headers: authHeaders(apiKey, this.appReferer, this.appTitle),
@@ -142,11 +164,20 @@ class OpenRouterProvider implements AiProvider {
 
 		if (!response.ok) {
 			const message = redact(await readErrorMessage(response), apiKey);
-			throw new AiProviderError(
+			const err = new AiProviderError(
 				classifyStatus(response.status),
 				response.status,
 				`OpenRouter complete failed: ${message}`,
 			);
+			if (tracer) {
+				tracer.captureTrace(
+					tracer.TRACE_EVENT_TYPES.ERROR,
+					`OpenRouter error: ${err.message}`,
+					{ status: response.status, code: err.code },
+					request.runtime!,
+				);
+			}
+			throw err;
 		}
 
 		const body = (await response.json()) as {
@@ -163,9 +194,10 @@ class OpenRouterProvider implements AiProvider {
 		};
 
 		const choice = body.choices?.[0];
-		return {
+		const result: CompletionResponse = {
 			model: body.model ?? request.model,
 			content: choice?.message?.content ?? '',
+			toolCalls: choice?.message?.tool_calls,
 			finishReason: choice?.finish_reason ?? 'other',
 			usage: body.usage
 				? {
@@ -175,9 +207,30 @@ class OpenRouterProvider implements AiProvider {
 					}
 				: undefined,
 		};
+
+		if (tracer) {
+			tracer.captureTrace(
+				tracer.TRACE_EVENT_TYPES.PROVIDER_CALL,
+				`OpenRouter response: ${result.finishReason}`,
+				tracer.TraceMetadata.providerResponse(this.providerId, result.model, result),
+				request.runtime!,
+			);
+		}
+
+		return result;
 	}
 
 	async *stream(apiKey: string, request: CompletionRequest): AsyncIterable<StreamChunk> {
+		const tracer = request.runtime ? await getTracer() : null;
+		if (tracer) {
+			tracer.captureTrace(
+				tracer.TRACE_EVENT_TYPES.PROVIDER_CALL,
+				`OpenRouter stream request: ${request.model}`,
+				tracer.TraceMetadata.providerCall(this.providerId, request.model, request),
+				request.runtime!,
+			);
+		}
+
 		const response = await this.fetchImpl(`${this.baseUrl}/chat/completions`, {
 			method: 'POST',
 			headers: authHeaders(apiKey, this.appReferer, this.appTitle),
@@ -187,13 +240,22 @@ class OpenRouterProvider implements AiProvider {
 
 		if (!response.ok || !response.body) {
 			const message = await readErrorMessage(response);
-			yield {
+			const err: StreamChunk = {
 				type: 'error',
 				message: redact(`OpenRouter stream failed: ${message}`, apiKey),
 				recoverable: false,
 				status: response.status,
 				code: classifyStatus(response.status),
 			};
+			if (tracer) {
+				tracer.captureTrace(
+					tracer.TRACE_EVENT_TYPES.ERROR,
+					`OpenRouter stream error: ${err.message}`,
+					{ status: response.status, code: err.code },
+					request.runtime!,
+				);
+			}
+			yield err;
 			return;
 		}
 
@@ -217,6 +279,14 @@ class OpenRouterProvider implements AiProvider {
 					if (!line.startsWith('data:')) continue;
 					const payload = line.slice(5).trim();
 					if (payload === '[DONE]') {
+						if (tracer) {
+							tracer.captureTrace(
+								tracer.TRACE_EVENT_TYPES.STREAM_CHUNK,
+								'OpenRouter stream [DONE]',
+								{ finishReason, usage },
+								request.runtime!,
+							);
+						}
 						yield { type: 'done', finishReason, usage };
 						return;
 					}
@@ -252,10 +322,19 @@ class OpenRouterProvider implements AiProvider {
 			yield { type: 'done', finishReason, usage };
 		} catch (err) {
 			const message = err instanceof Error ? err.message : String(err);
+			const isAbort = err instanceof DOMException && err.name === 'AbortError';
+			if (tracer) {
+				tracer.captureTrace(
+					tracer.TRACE_EVENT_TYPES.ERROR,
+					`OpenRouter stream iteration error: ${message}`,
+					{ recoverable: isAbort },
+					request.runtime!,
+				);
+			}
 			yield {
 				type: 'error',
 				message: redact(message, apiKey),
-				recoverable: err instanceof DOMException && err.name === 'AbortError',
+				recoverable: isAbort,
 			};
 		} finally {
 			reader.releaseLock?.();
