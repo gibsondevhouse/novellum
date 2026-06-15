@@ -25,6 +25,7 @@ import {
 	type ActiveProvider,
 } from '$lib/ai/provider-config.js';
 import { ensureOllamaRunning } from '$lib/server/ai/ollama-launcher.js';
+import { auditControllerEntrypointSafely } from '$lib/server/ai/controller/index.js';
 
 const credentialService = createCredentialService();
 const openRouterProvider = createOpenRouterProvider();
@@ -158,6 +159,13 @@ async function handleProxy(body: ProxyBody, signal: AbortSignal): Promise<Respon
 	const requestedModel = body.model as string;
 	const messages = body.messages as CompletionMessage[];
 	const wantStream = body.stream === true;
+	auditControllerEntrypointSafely({
+		route: '/api/ai',
+		requestId: `api-ai-proxy:${Date.now()}`,
+		workflowId: wantStream ? 'nova.ask' : 'nova.ask',
+		intent: 'nova.ask',
+		metadata: { model: requestedModel, stream: wantStream, messages },
+	});
 
 	const keyResult = await loadKeyOrRespond();
 	if (keyResult.kind === 'no_creds') return noCredentialsResponse();
@@ -291,6 +299,14 @@ async function handleTask(body: TaskBody, signal: AbortSignal, eventFetch?: type
 		activeBeatId: (body.uiContext as UiContext)?.activeBeatId ?? null,
 		activeChapterId: (body.uiContext as UiContext)?.activeChapterId ?? null,
 	};
+	auditControllerEntrypointSafely({
+		route: '/api/ai',
+		requestId: `api-ai-task:${Date.now()}`,
+		projectId: body.projectId as string,
+		workflowId: 'nova.ask',
+		intent: 'nova.ask',
+		metadata: { action: body.action, uiContext: body.uiContext },
+	});
 
 	const task = resolveTask(body.action as string, uiCtx);
 	const ctx = await buildContext(task, body.projectId as string, { fetch: eventFetch });

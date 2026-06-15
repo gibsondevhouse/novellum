@@ -6,10 +6,11 @@
 
 ## Current
 
-[plan-048-frontend-experience-coherence](./plan-048-frontend-experience-coherence/plan.md) — Frontend Experience Coherence. Implementation evidence is complete; next slice is plan-level Reviewer Agent evaluation. Status: `review`.
+[plan-051-governed-ai-controller-runtime](./plan-051-governed-ai-controller-runtime/plan.md) — Governed AI Controller Runtime. Full implementation, evidence, docs sync, and quality gates are ready for Reviewer Agent evaluation. Status: `review`.
 
 ## Pending review
 
+- [plan-051-governed-ai-controller-runtime](./plan-051-governed-ai-controller-runtime/plan.md) — Governed AI Controller Runtime. Central controller runtime, policy guard, context builder, workflow registry, model gateway, output validation, artifact lifecycle, run logging, existing route audit wrappers, docs, and quality gates are ready for Reviewer Agent evaluation. Moved to review 2026-06-15.
 - [plan-048-frontend-experience-coherence](./plan-048-frontend-experience-coherence/plan.md) — Frontend Experience Coherence. Route/context contract, review-gate language, docs sync, quality gates, targeted E2E, and browser evidence are ready for Reviewer Agent evaluation. Moved to review 2026-06-15.
 
 ## Recently completed

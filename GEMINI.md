@@ -87,6 +87,7 @@ Functionality is organized by **vertical domain slices** (e.g., `project`, `worl
 
 ## Recent Accomplishments
 
+- **Plan-051 implementation ready for review (Governed AI Controller Runtime)**: Added the server-side controller runtime, deterministic intent resolver, policy guard, bounded context packets, workflow registry, model gateway, schema validation, artifact lifecycle, run/audit logging, route audit wrappers, docs sync, and final quality-gate evidence (Implementation review 2026-06-15).
 - **Plan-048 implementation ready for review (Frontend Coherence)**: Centralized route context, unified review-gate labels, synchronized Nova/worldbuilding/export/docs, captured browser evidence, and passed final quality gates (Implementation review 2026-06-15).
 - **Plan-049 (Runtime Hardening)**: Completed runtime inventory/contract, durable run ledger schema, typed server ledger repository, read-only Nova run routes, SQLite-backed queue claiming/stale-recovery mechanics, local worker lifecycle/cancel/retry support, model capabilities, tracing/evals/diagnostics, and closeout (Closed 2026-06-15).
 - **Plan-040 (Outline Generation)**: Worldbuilding-to-Outline review-gated proposal flow (Closed 2026-06-04).
@@ -103,7 +104,7 @@ Functionality is organized by **vertical domain slices** (e.g., `project`, `worl
 
 ## Current Focus (Active Plans)
 
-Active plan: **Plan-048 (Frontend Coherence)**. Implementation evidence is complete and the next required slice is plan-level Reviewer Agent evaluation. Do not mark the plan complete until the reviewer sign-off is real.
+Active plan: **Plan-051 (Governed AI Controller Runtime)**. Full implementation and evidence are in `review` pending plan-level Reviewer Agent evaluation. **Plan-048 (Frontend Coherence)** also remains pending plan-level Reviewer Agent evaluation. Do not mark either plan complete until reviewer sign-off is real.
 
 Phase 4 release engineering remains deferred/blocked by external prerequisites: Apple Developer ID, Windows signing certificate, notarization setup, and final brand artwork.
 
@@ -122,6 +123,7 @@ To ensure system stability and logical dependency management, execute pending pl
 
 3.  **Phase 3: Infrastructure & Coherence**
     - [x] **Plan-049 (Runtime Hardening)**: SQLite job queue, durable runs, token budgeting, and AI traces. (Closed 2026-06-15)
+    - [x] **Plan-051 (Governed AI Controller Runtime)**: Central AI control layer for policy, context, workflow routing, schema validation, artifacts, and audit logs. (Implementation complete 2026-06-15; pending Reviewer Agent sign-off)
     - [x] **Plan-048 (Frontend Coherence)**: Final UX pass for navigation, review gates, and visual state unification. (Implementation complete 2026-06-15; pending Reviewer Agent sign-off)
 
 4.  **Phase 4: Release Engineering**
@@ -143,9 +145,9 @@ To ensure system stability and logical dependency management, execute pending pl
 - Path 5: Observability, reliability, and model-budget optimization.
 
 ## Vulnerabilities and Fragilities
-- **Type Safety**: `pnpm check` is clean as of Plan-048 implementation review. Keep running it before plan closure.
+- **Type Safety**: `pnpm check` is clean as of Plan-051 implementation review. Keep running it before plan closure.
 - **Visual Drift**: Pre-existing cross-surface snapshot drift in Playwright tests. Impact: Unreliable visual regression testing. Detection: `pnpm run test:visual`.
-- **Linting**: `pnpm lint` and `pnpm lint:css` are clean as of Plan-048 implementation review. Treat new warnings/errors as regressions.
+- **Linting**: `pnpm lint` and `pnpm lint:css` are clean as of Plan-051 implementation review. Treat new warnings/errors as regressions.
 - **Legacy Persistence**: Dexie remains in `src/lib/db` and `src/modules/export` strictly for portability snapshots. Do not use for new live reads/writes.
 - **Route context**: Project context is centralized in `src/lib/navigation-state.ts`; non-project routes must not inherit stale `page.params.id` values. Keep new route consumers on that helper instead of bespoke parsing.
 - **`+server.ts` export discipline**: ESLint restricts to handlers / `config` / `_`-prefixed exports. Helpers must live in sibling files.

@@ -32,6 +32,7 @@ import {
 	type GenerationContextPayload,
 } from '$modules/world-building/services/generation-context.js';
 import { validateGeneratedDrafts } from '$lib/ai/validators/worldbuilding-draft-validator.js';
+import { auditControllerEntrypointSafely } from '$lib/server/ai/controller/index.js';
 
 const credentialService = createCredentialService();
 const openRouterProvider = createOpenRouterProvider();
@@ -563,6 +564,14 @@ export const POST: RequestHandler = async ({ request }) => {
 	if (!VALID_COUNTS.includes(count as GenerateCount)) {
 		error(400, 'count must be 1, 3, or 5');
 	}
+	auditControllerEntrypointSafely({
+		route: '/api/worldbuilding/generate',
+		requestId: `worldbuilding-generate:${projectId}:${entityKind}:${Date.now()}`,
+		projectId,
+		workflowId: 'worldbuilding.generate',
+		intent: 'worldbuilding.generate',
+		metadata: { entityKind, count },
+	});
 
 	const normalizedGenerationContext =
 		normalizeGenerationContext(generationContext) ??

@@ -44,6 +44,7 @@ import {
 	enqueueKnownAgentJob,
 	isQueuedExecutionRequest,
 } from '$lib/server/agent-runtime/index.js';
+import { auditControllerEntrypointSafely } from '$lib/server/ai/controller/index.js';
 
 const credentialService = createCredentialService();
 const openRouterProvider = createOpenRouterProvider();
@@ -246,6 +247,14 @@ export const POST: RequestHandler = async ({ request }) => {
 	if (!projectId) {
 		return json({ error: { code: 'invalid_request', message: 'projectId is required.' } }, { status: 400 });
 	}
+	auditControllerEntrypointSafely({
+		route: '/api/ai/outline/generate',
+		requestId: `outline-generate:${projectId}:${Date.now()}`,
+		projectId,
+		workflowId: 'outline.generate',
+		intent: 'outline.generate',
+		metadata: { instruction, confirmContextReady, defer: body.defer, executionMode: body.executionMode },
+	});
 
 	const packet = buildPacket(projectId);
 	if (!packet) {

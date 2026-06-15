@@ -38,6 +38,7 @@ import {
 	enqueueKnownAgentJob,
 	isQueuedExecutionRequest,
 } from '$lib/server/agent-runtime/index.js';
+import { auditControllerEntrypointSafely } from '$lib/server/ai/controller/index.js';
 
 const credentialService = createCredentialService();
 const openRouterProvider = createOpenRouterProvider();
@@ -118,6 +119,14 @@ export const POST: RequestHandler = async ({ request }) => {
 	if (!projectId || !sceneId) {
 		return json({ error: 'missing projectId or sceneId' }, { status: 400 });
 	}
+	auditControllerEntrypointSafely({
+		route: '/api/author-draft/checkpoints/generate',
+		requestId: `author-draft:${projectId}:${sceneId}:${Date.now()}`,
+		projectId,
+		workflowId: 'author_draft.generate',
+		intent: 'author_draft.generate',
+		metadata: { sceneId, forceRegenerate, defer: body.defer, executionMode: body.executionMode },
+	});
 
 	const existingActive =
 		listAuthorDraftCheckpoints(projectId)

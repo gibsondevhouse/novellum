@@ -4,6 +4,7 @@
 
 ## Active Plans
 
+- [plan-051-governed-ai-controller-runtime](./plan-051-governed-ai-controller-runtime/plan.md): Governed AI Controller Runtime — centralized control layer for AI intent resolution, policy enforcement, context assembly, workflow routing, model invocation, output validation, artifact lifecycle, and observability. Status: `review` (implementation evidence complete 2026-06-15; pending plan-level Reviewer Agent evaluation).
 - [plan-048-frontend-experience-coherence](./plan-048-frontend-experience-coherence/plan.md): Frontend Experience Coherence — final frontend pass to make route context, navigation, author workflows, review gates, and visual states read as one production app. Status: `review` (implementation evidence complete 2026-06-15; pending plan-level Reviewer Agent evaluation).
 
 ## Deferred (not yet scheduled)

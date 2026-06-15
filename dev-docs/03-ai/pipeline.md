@@ -1,16 +1,28 @@
 # AI Pipeline
 
-> Last verified: 2026-06-12 (plan-043 outline consolidation)
+> Last verified: 2026-06-15 (plan-051 governed AI controller runtime)
 
-Every AI feature in Novellum follows the same pipeline. The runtime
-agents (continuity / edit / rewrite / style) live in [src/lib/ai/](../../src/lib/ai/)
-and the V1.1 staged-pipeline scaffolding lives in [src/lib/ai/pipeline/](../../src/lib/ai/pipeline/).
-Both are consumed by feature modules through orchestrator factories.
+Every AI feature in Novellum follows the same review-gated pipeline.
+The runtime agents (continuity / edit / rewrite / style) live in
+[src/lib/ai/](../../src/lib/ai/), the V1.1 staged-pipeline scaffolding
+lives in [src/lib/ai/pipeline/](../../src/lib/ai/pipeline/), and the
+server-side governed controller runtime lives in
+[src/lib/server/ai/controller/](../../src/lib/server/ai/controller/).
+The controller centralizes intent resolution, policy checks, context
+packet construction, workflow routing, model gateway calls, output
+validation, artifact lifecycle, and redacted run logging.
 
 ## Pipeline diagram
 
 ```text
 User action
+   │
+   ▼
+AI Controller       (server/ai/controller)      intent → policy → context → workflow
+   │
+   ├─ blocks unsupported or unsafe operations before model/provider calls
+   │
+   └─ persists reviewable artifacts instead of applying mutations directly
    │
    ▼
 TaskResolver         (task-resolver.ts)         picks an agent for a TaskType
@@ -33,6 +45,35 @@ Agent parser         (continuity-agent.ts, …)   validates response against out
    ▼
 Suggestion surface   (module UI)                author reviews and explicitly accepts
 ```
+
+## Governed controller runtime
+
+Plan-051 introduces the controller as the server-side control plane for
+AI execution. New workflow work should start by adding or updating a
+controller workflow definition instead of calling providers directly.
+
+| File | Purpose |
+| --- | --- |
+| `contracts.ts` | Request/response envelopes, task statuses, target/source taxonomy, artifact status, and structured error codes. |
+| `intents.ts` / `intent-resolver.ts` | Deterministic author-action to controller-intent classification. Unsupported or source-mismatched actions become `unsupported`. |
+| `permissions.ts` / `policy-guard.ts` | Read-only, proposal-only, review-decision, and mutation permission metadata. Direct mutation workflows are blocked unless a trusted human review route supplies explicit approval. |
+| `context-packet.ts` / `context-builder.ts` | Bounded context packet construction with source disclosure, token estimates, truncation metadata, and context hashing. |
+| `workflow-contracts.ts` / `workflow-registry.ts` | Workflow definitions for Nova ask/agent, prose assistance, continuity, outline, author draft, worldbuilding scan/generate, and artifact accept/reject. |
+| `model-gateway.ts` | Provider abstraction that builds controller prompts, applies workflow model settings, and attaches JSON-schema response formats where required. |
+| `output-schemas.ts` | Zod-backed output validation for text, tool responses, artifact references, proposal lists, and draft lists. |
+| `artifact-lifecycle.ts` / `artifact-service.ts` | Review artifact state transitions and SQLite-backed `project_metadata` persistence under `aiControllerArtifacts.v1`. |
+| `run-log.ts` | Redacted run/audit logs under `aiControllerRuns.v1`; prompt/message-like fields are redacted by default. |
+| `controller.ts` | Orchestrates request → intent → policy → context → workflow → model → validation → artifact/log response. |
+
+The new `/api/ai-controller` endpoint exposes the governed runtime for
+controller-native workflows. Existing shipped synchronous routes
+(`/api/ai`, `/api/nova/agent`, `/api/ai/outline/generate`,
+`/api/author-draft/checkpoints/generate`, `/api/worldbuilding/scan`,
+and `/api/worldbuilding/generate`) are wrapped with safe controller
+audit logging so they remain behavior-compatible while still producing
+controller run evidence. Further endpoint-by-endpoint migration can move
+their model calls fully into `controller.execute()` without changing the
+review-gate contract.
 
 ## Prompt schema
 
@@ -280,12 +321,13 @@ plan-028.
 
 ## Server boundary
 
-The browser never holds the OpenRouter API key. Model calls use one of two server-side routes:
+The browser never holds the OpenRouter API key. Model calls use server-side routes only:
 
 - **`/api/ai`** ([src/routes/api/ai/+server.ts](../../src/routes/api/ai/+server.ts)) — streaming completions for Ask/Write modes and proposal generation.
 - **`/api/nova/agent`** ([src/routes/api/nova/agent/+server.ts](../../src/routes/api/nova/agent/+server.ts)) — non-streaming tool-capable completions for Agent mode. Returns `{ content, tool_calls, finish_reason }`.
+- **`/api/ai-controller`** ([src/routes/api/ai-controller/+server.ts](../../src/routes/api/ai-controller/+server.ts)) — governed controller endpoint for controller-native workflows.
 
-Both routes:
+These routes:
 1. Read the key from the OS keyring via [credential-service.ts](../../src/lib/ai/credential-service.ts).
 2. Build the OpenRouter request.
 3. Return the response to the client.

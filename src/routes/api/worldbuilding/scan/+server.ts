@@ -53,6 +53,7 @@ import {
 	enqueueKnownAgentJob,
 	isQueuedExecutionRequest,
 } from '$lib/server/agent-runtime/index.js';
+import { auditControllerEntrypointSafely } from '$lib/server/ai/controller/index.js';
 
 // ---------------------------------------------------------------------------
 // Error codes — stable and typed for client branching
@@ -588,6 +589,18 @@ export const POST: RequestHandler = async ({ request }) => {
 			hint: 'Request must include projectId, domainScope, and context envelope.',
 		});
 	}
+	auditControllerEntrypointSafely({
+		route: '/api/worldbuilding/scan',
+		requestId: `worldbuilding-scan:${scanRequest.projectId}:${scanRequest.domainScope}:${Date.now()}`,
+		projectId: scanRequest.projectId,
+		workflowId: 'worldbuilding.scan',
+		intent: 'worldbuilding.scan',
+		metadata: {
+			domainScope: scanRequest.domainScope,
+			maxProposals: scanRequest.maxProposals,
+			projectTitle: scanRequest.context.project.title,
+		},
+	});
 
 	const sufficiency = checkScanContextSufficiency(scanRequest.context.project);
 	if (!sufficiency.sufficient) {

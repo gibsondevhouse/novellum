@@ -15,6 +15,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createCredentialService } from '$lib/server/credentials/credential-service.js';
+import { auditControllerEntrypointSafely } from '$lib/server/ai/controller/index.js';
 
 const credentialService = createCredentialService();
 
@@ -66,6 +67,13 @@ export const POST: RequestHandler = async ({ request }) => {
 		messages: unknown[];
 		tools?: AgentToolFunction[];
 	};
+	auditControllerEntrypointSafely({
+		route: '/api/nova/agent',
+		requestId: `nova-agent:${Date.now()}`,
+		workflowId: 'nova.agent',
+		intent: 'nova.agent',
+		metadata: { model, messages, toolCount: tools?.length ?? 0 },
+	});
 
 	// Mock mode for local dev/test
 	if (process.env.NOVELLUM_AI_MOCK === '1') {
