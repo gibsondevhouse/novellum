@@ -9,6 +9,8 @@
 
 ## Deferred (not yet scheduled)
 
+- [plan-052-pipeline-nova-editor-trust-closure](./plan-052-pipeline-nova-editor-trust-closure/plan.md): Pipeline, Nova, and Editor Trust Closure — wire silent Nova artifact actions to durable review-gated behavior, persist revision acknowledgements, clean internal AI metadata/copy, and remove misleading pre-release chrome. Status: `draft` (authored 2026-06-15 from `candidate-plans/pipeline-nova-editor.md`).
+- [plan-053-worldbuilding-outline-review-flow-closure](./plan-053-worldbuilding-outline-review-flow-closure/plan.md): Worldbuilding and Outline Review Flow Closure — surface persisted worldbuilding scan proposals, make generation controls reflect real execution state, polish outline review metadata, and clean worldbuilding persistence errors. Status: `draft` (authored 2026-06-15 from `candidate-plans/worldbuilding-outline.md`; depends on plan-052 display/action foundations).
 - **Release engineering** — code signing, notarization, brand icons, formal smoke/keyring verification. Infrastructure exists; requires external procurement. Originally plan-024 stage-002.
 
 ## Completed Plans (Archived)

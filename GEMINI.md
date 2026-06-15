@@ -126,7 +126,11 @@ To ensure system stability and logical dependency management, execute pending pl
     - [x] **Plan-051 (Governed AI Controller Runtime)**: Central AI control layer for policy, context, workflow routing, schema validation, artifacts, and audit logs. (Implementation complete 2026-06-15; pending Reviewer Agent sign-off)
     - [x] **Plan-048 (Frontend Coherence)**: Final UX pass for navigation, review gates, and visual state unification. (Implementation complete 2026-06-15; pending Reviewer Agent sign-off)
 
-4.  **Phase 4: Release Engineering**
+4.  **Phase 3.5: Pre-Release Trust Closure**
+    - [ ] **Plan-052 (Pipeline, Nova, and Editor Trust Closure)**: Wire silent Nova artifact actions to durable review-gated behavior, persist revision acknowledgements, clean internal metadata/copy, and remove misleading pre-release chrome. (Draft authored 2026-06-15)
+    - [ ] **Plan-053 (Worldbuilding and Outline Review Flow Closure)**: Surface persisted worldbuilding proposals, connect generation controls to truthful execution state, polish outline review metadata, and clean worldbuilding persistence errors. (Draft authored 2026-06-15; depends on plan-052)
+
+5.  **Phase 4: Release Engineering**
     - [ ] **Release Engineering**: Code signing, notarization, brand icons, and production smoke tests. Blocked on external signing/certificate/artwork procurement.
 
 ## Planning Standards
