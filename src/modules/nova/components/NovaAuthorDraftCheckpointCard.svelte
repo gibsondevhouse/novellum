@@ -20,6 +20,10 @@
 		rejectSceneDraftCheckpoint,
 		type AuthorDraftApiError,
 	} from '../services/author-draft-api.js';
+	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
+	import SecondaryButton from '$lib/components/ui/SecondaryButton.svelte';
+	import DestructiveButton from '$lib/components/ui/DestructiveButton.svelte';
+	import Input from '$lib/components/ui/Input.svelte';
 
 	interface Props {
 		projectId: string | null;
@@ -258,9 +262,9 @@
 	{#if !checkpoint}
 		<p class="checkpoint-muted">No draft for this scene yet.</p>
 		<div class="checkpoint-actions">
-			<button type="button" class="checkpoint-btn checkpoint-btn-secondary" onclick={onRegenerate} disabled={!projectId || isGenerating}>
+			<SecondaryButton size="sm" onclick={onRegenerate} disabled={!projectId || isGenerating}>
 				Generate
-			</button>
+			</SecondaryButton>
 		</div>
 	{:else}
 		{#if isGenerationFailed}
@@ -317,30 +321,27 @@
 
 		{#if checkpoint.lifecycle === 'review'}
 			<div class="checkpoint-actions" aria-label="Draft actions">
-				<button
-					type="button"
-					class="checkpoint-btn checkpoint-btn-primary"
+				<PrimaryButton
+					size="sm"
 					disabled={!canAccept()}
 					onclick={handleBeginAccept}
 				>
 					{acceptState === 'accepting' ? 'Accepting…' : 'Accept'}
-				</button>
-				<button
-					type="button"
-					class="checkpoint-btn checkpoint-btn-danger"
+				</PrimaryButton>
+				<DestructiveButton
+					size="sm"
 					disabled={!canReject()}
 					onclick={handleBeginReject}
 				>
 					{rejectState === 'rejecting' ? 'Rejecting…' : 'Reject'}
-				</button>
-				<button
-					type="button"
-					class="checkpoint-btn checkpoint-btn-secondary"
+				</DestructiveButton>
+				<SecondaryButton
+					size="sm"
 					onclick={onRegenerate}
 					disabled={!projectId || isGenerating || acceptState === 'accepting' || rejectState === 'rejecting'}
 				>
 					Regenerate
-				</button>
+				</SecondaryButton>
 			</div>
 
 			{#if acceptState === 'confirming' || acceptState === 'stale'}
@@ -358,16 +359,12 @@
 						{/if}
 					</ul>
 					<div class="checkpoint-confirm-actions">
-						<button
-							type="button"
-							class="checkpoint-btn checkpoint-btn-secondary"
-							onclick={handleCancelAccept}
-						>
+						<SecondaryButton size="sm" onclick={handleCancelAccept}>
 							Cancel
-						</button>
-						<button type="button" class="checkpoint-btn checkpoint-btn-primary" onclick={handleConfirmAccept}>
+						</SecondaryButton>
+						<PrimaryButton size="sm" onclick={handleConfirmAccept}>
 							Apply anyway
-						</button>
+						</PrimaryButton>
 					</div>
 				</div>
 			{/if}
@@ -375,30 +372,28 @@
 			{#if rejectState === 'confirming'}
 				<div class="checkpoint-confirm" aria-label="Reject confirmation">
 					<p class="checkpoint-confirm-title">Reject draft</p>
-					<label class="checkpoint-reason">
-						<span class="checkpoint-reason-label">Reason</span>
-						<input
-							class="checkpoint-reason-input"
-							type="text"
-							bind:value={rejectReasonDraft}
-							placeholder="Why are you rejecting this draft?"
-						/>
-					</label>
+					<Input
+						id="checkpoint-reject-reason"
+						label="Reason"
+						type="text"
+						bind:value={rejectReasonDraft}
+						placeholder="Why are you rejecting this draft?"
+					/>
 					<div class="checkpoint-confirm-actions">
-						<button type="button" class="checkpoint-btn checkpoint-btn-danger" onclick={() => void handleReject()}>
+						<DestructiveButton size="sm" onclick={() => void handleReject()}>
 							Confirm reject
-						</button>
-						<button type="button" class="checkpoint-btn checkpoint-btn-secondary" onclick={handleCancelReject}>
+						</DestructiveButton>
+						<SecondaryButton size="sm" onclick={handleCancelReject}>
 							Cancel
-						</button>
+						</SecondaryButton>
 					</div>
 				</div>
 			{/if}
 		{:else}
 			<div class="checkpoint-actions">
-				<button type="button" class="checkpoint-btn checkpoint-btn-secondary" onclick={onRegenerate} disabled={!projectId || isGenerating}>
+				<SecondaryButton size="sm" onclick={onRegenerate} disabled={!projectId || isGenerating}>
 					Regenerate
-				</button>
+				</SecondaryButton>
 			</div>
 		{/if}
 	{/if}
@@ -511,37 +506,7 @@
 		align-items: center;
 	}
 
-	.checkpoint-btn {
-		font: inherit;
-		padding: 6px 10px;
-		border-radius: var(--radius-md);
-		border: 1px solid var(--color-border-default);
-		background: var(--color-surface-ground);
-		color: var(--color-text-primary);
-		cursor: pointer;
-	}
-
-	.checkpoint-btn:focus-visible {
-		outline: 2px solid var(--color-candle);
-		outline-offset: 2px;
-	}
-
-	.checkpoint-btn:disabled {
-		opacity: 0.55;
-		cursor: not-allowed;
-	}
-
-	.checkpoint-btn-primary {
-		border-color: color-mix(in srgb, var(--color-candle) 72%, var(--color-border-default));
-	}
-
-	.checkpoint-btn-secondary {
-		color: var(--color-text-secondary);
-	}
-
-	.checkpoint-btn-danger {
-		border-color: color-mix(in srgb, var(--color-error) 70%, var(--color-border-default));
-	}
+	/* Button styles delegated to shared PrimaryButton / SecondaryButton / DestructiveButton */
 
 	.checkpoint-confirm {
 		padding: var(--space-2);
@@ -573,26 +538,5 @@
 		flex-wrap: wrap;
 	}
 
-	.checkpoint-reason {
-		display: flex;
-		flex-direction: column;
-		gap: 6px;
-	}
-
-	.checkpoint-reason-label {
-		font-size: 11px;
-		font-weight: var(--font-weight-semibold);
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
-		color: var(--color-text-muted);
-	}
-
-	.checkpoint-reason-input {
-		font: inherit;
-		padding: 8px 10px;
-		border-radius: var(--radius-md);
-		border: 1px solid var(--color-border-default);
-		background: var(--color-surface-overlay);
-		color: var(--color-text-primary);
-	}
+	/* Reject-reason input delegated to shared Input component */
 </style>

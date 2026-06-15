@@ -10,6 +10,9 @@
 		type OutlineCheckpointActions,
 	} from '../services/outline-checkpoint-actions.js';
 	import { reviewGateStatusLabel } from '$lib/review-gate-labels.js';
+	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
+	import SecondaryButton from '$lib/components/ui/SecondaryButton.svelte';
+	import DestructiveButton from '$lib/components/ui/DestructiveButton.svelte';
 
 	interface Props {
 		checkpoint: OutlineDraftCheckpointRecord;
@@ -283,26 +286,24 @@
 
 	{#if activeCheckpoint.lifecycle === 'review'}
 		<div class="draft-card-actions" aria-label="Outline checkpoint actions">
-			<button
-				type="button"
-				class="draft-card-btn draft-card-btn-primary"
+			<PrimaryButton
+				size="sm"
 				data-testid="nova-outline-accept"
 				aria-label="Accept proposed outline checkpoint"
 				disabled={!canAccept()}
 				onclick={handleBeginAccept}
 			>
 				{acceptState === 'accepting' ? 'Accepting...' : 'Accept'}
-			</button>
-			<button
-				type="button"
-				class="draft-card-btn draft-card-btn-danger"
+			</PrimaryButton>
+			<DestructiveButton
+				size="sm"
 				data-testid="nova-outline-reject"
 				aria-label="Reject proposed outline checkpoint"
 				disabled={!canReject()}
 				onclick={handleBeginReject}
 			>
 				{rejectState === 'rejecting' ? 'Rejecting...' : 'Reject'}
-			</button>
+			</DestructiveButton>
 		</div>
 
 		{#if acceptState === 'confirming'}
@@ -312,16 +313,15 @@
 					The server will materialize this proposal only if conflict and transaction checks pass.
 				</p>
 				<div class="action-confirm-actions">
-					<button type="button" class="draft-card-btn" onclick={handleCancelAccept}>Cancel</button>
-					<button
-						type="button"
-						class="draft-card-btn draft-card-btn-primary"
+					<SecondaryButton size="sm" onclick={handleCancelAccept}>Cancel</SecondaryButton>
+					<PrimaryButton
+						size="sm"
 						data-testid="nova-outline-confirm-accept"
 						aria-label="Confirm outline checkpoint acceptance"
 						onclick={() => void handleConfirmAccept()}
 					>
 						Confirm accept
-					</button>
+					</PrimaryButton>
 				</div>
 			</div>
 		{/if}
@@ -338,17 +338,16 @@
 					></textarea>
 				</label>
 				<div class="action-confirm-actions">
-					<button
-						type="button"
-						class="draft-card-btn draft-card-btn-danger"
+					<DestructiveButton
+						size="sm"
 						data-testid="nova-outline-confirm-reject"
 						aria-label="Confirm outline checkpoint rejection"
 						disabled={rejectReasonDraft.trim().length === 0}
 						onclick={() => void handleReject()}
 					>
 						Confirm reject
-					</button>
-					<button type="button" class="draft-card-btn" onclick={handleCancelReject}>Cancel</button>
+					</DestructiveButton>
+					<SecondaryButton size="sm" onclick={handleCancelReject}>Cancel</SecondaryButton>
 				</div>
 			</div>
 		{/if}
@@ -609,46 +608,11 @@
 		gap: var(--space-2);
 	}
 
-	.draft-card-btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		min-height: var(--space-7);
-		padding: var(--space-1) var(--space-3);
-		border: var(--border-width-sm) solid var(--color-border-default);
-		border-radius: var(--radius-sm);
-		background: var(--color-surface-overlay);
-		color: var(--color-text-secondary);
-		font: inherit;
-		font-size: var(--text-xs);
-		line-height: var(--leading-tight);
-		cursor: pointer;
-	}
+	/* Button styles delegated to shared PrimaryButton / SecondaryButton / DestructiveButton */
 
-	.draft-card-btn:hover:not(:disabled) {
-		background: var(--color-surface-hover);
-		color: var(--color-text-primary);
-	}
-
-	.draft-card-btn:focus-visible,
 	.action-reason textarea:focus-visible {
 		outline: none;
 		box-shadow: var(--focus-ring);
-	}
-
-	.draft-card-btn:disabled {
-		opacity: 0.55;
-		cursor: not-allowed;
-	}
-
-	.draft-card-btn-primary {
-		border-color: color-mix(in srgb, var(--color-candle) 72%, var(--color-border-default));
-		color: var(--color-text-primary);
-	}
-
-	.draft-card-btn-danger {
-		border-color: color-mix(in srgb, var(--color-error) 62%, var(--color-border-default));
-		color: var(--color-error);
 	}
 
 	.action-confirm {

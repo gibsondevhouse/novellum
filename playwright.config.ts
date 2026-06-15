@@ -39,8 +39,8 @@ export default defineConfig({
 
 	expect: {
 		toHaveScreenshot: {
-			/* 3% pixel tolerance — accommodates Linux CI vs macOS font rendering drift */
-			maxDiffPixelRatio: 0.03,
+			/* 2% pixel tolerance — tight enough to catch regressions, loose enough for cross-OS font drift */
+			maxDiffPixelRatio: 0.02,
 			animations: 'disabled'
 		}
 	},

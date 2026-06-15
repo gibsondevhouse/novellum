@@ -5,6 +5,10 @@
 	} from '$lib/ai/pipeline/worldbuild-proposal-schema.js';
 	import { reviewGateStatusLabel } from '$lib/review-gate-labels.js';
 	import WorldbuildingProposalDiffView from './WorldbuildingProposalDiffView.svelte';
+	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
+	import DestructiveButton from '$lib/components/ui/DestructiveButton.svelte';
+	import SecondaryButton from '$lib/components/ui/SecondaryButton.svelte';
+	import Input from '$lib/components/ui/Input.svelte';
 
 	interface Props {
 		proposal: WorldbuildProposalRecord;
@@ -94,38 +98,34 @@
 	{#if proposal.status === 'pending_review'}
 		<div class="proposal-card__actions">
 			{#if !rejecting}
-				<button
-					type="button"
-					class="proposal-card__btn proposal-card__btn--accept"
+				<PrimaryButton
+					size="sm"
 					onclick={handleAccept}
 					aria-label="Accept proposal for {domainLabel}"
-				>Accept</button>
-				<button
-					type="button"
-					class="proposal-card__btn proposal-card__btn--reject"
+				>Accept</PrimaryButton>
+				<DestructiveButton
+					size="sm"
 					onclick={() => (rejecting = true)}
 					aria-label="Reject proposal for {domainLabel}"
-				>Reject</button>
+				>Reject</DestructiveButton>
 			{:else}
 				<div class="proposal-card__reject-form">
-					<input
+					<Input
 						class="proposal-card__reject-input"
 						type="text"
 						bind:value={rejectReason}
 						placeholder="Reason for rejection…"
 						aria-label="Rejection reason"
 					/>
-					<button
-						type="button"
-						class="proposal-card__btn proposal-card__btn--reject"
+					<DestructiveButton
+						size="sm"
 						disabled={!rejectReason.trim()}
 						onclick={handleRejectSubmit}
-					>Confirm reject</button>
-					<button
-						type="button"
-						class="proposal-card__btn proposal-card__btn--cancel"
+					>Confirm reject</DestructiveButton>
+					<SecondaryButton
+						size="sm"
 						onclick={() => { rejecting = false; rejectReason = ''; }}
-					>Cancel</button>
+					>Cancel</SecondaryButton>
 				</div>
 			{/if}
 		</div>
@@ -228,71 +228,6 @@
 		align-items: center;
 		flex-wrap: wrap;
 		width: 100%;
-	}
-
-	.proposal-card__reject-input {
-		flex: 1;
-		min-width: 0;
-		padding: var(--space-1) var(--space-2);
-		border: 1px solid var(--color-border-default);
-		border-radius: var(--radius-sm);
-		background: var(--color-surface-base);
-		color: var(--color-text-primary);
-		font-size: var(--text-sm);
-	}
-
-	.proposal-card__reject-input:focus {
-		outline: 2px solid var(--color-border-focus);
-		outline-offset: 1px;
-	}
-
-	.proposal-card__btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		padding: var(--space-1) var(--space-3);
-		border-radius: var(--radius-md);
-		font-size: var(--text-xs);
-		font-weight: var(--font-weight-medium);
-		cursor: pointer;
-		transition:
-			background var(--duration-fast) var(--ease-standard),
-			opacity var(--duration-fast) var(--ease-standard);
-	}
-
-	.proposal-card__btn:disabled {
-		opacity: 0.4;
-		cursor: not-allowed;
-	}
-
-	.proposal-card__btn--accept {
-		background: color-mix(in srgb, var(--color-success) 20%, transparent);
-		border: 1px solid color-mix(in srgb, var(--color-success) 40%, transparent);
-		color: var(--color-success);
-	}
-
-	.proposal-card__btn--accept:hover:not(:disabled) {
-		background: color-mix(in srgb, var(--color-success) 30%, transparent);
-	}
-
-	.proposal-card__btn--reject {
-		background: color-mix(in srgb, var(--color-error) 12%, transparent);
-		border: 1px solid color-mix(in srgb, var(--color-error) 30%, transparent);
-		color: var(--color-error);
-	}
-
-	.proposal-card__btn--reject:hover:not(:disabled) {
-		background: color-mix(in srgb, var(--color-error) 20%, transparent);
-	}
-
-	.proposal-card__btn--cancel {
-		background: transparent;
-		border: 1px solid var(--color-border-default);
-		color: var(--color-text-secondary);
-	}
-
-	.proposal-card__btn--cancel:hover {
-		background: var(--color-surface-overlay);
 	}
 
 	.proposal-card__outcome {
