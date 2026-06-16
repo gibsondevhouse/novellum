@@ -2,12 +2,12 @@
 title: Resolve Disabled Affordance Copy
 slug: part-001-resolve-disabled-affordance-copy
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-003-dead-chrome-and-stub-copy-audit
-started_at: ~
-completed_at: ~
+started_at: 2026-06-15
+completed_at: 2026-06-15
 estimated_duration: 0.5d
 ---
 
@@ -53,9 +53,9 @@ Remove or reword disabled and stubbed pre-release chrome so users do not encount
 
 ## Acceptance Criteria
 
-- [ ] No visible control suggests a feature is clickable when it is not.
-- [ ] Unavailable provider/update features explain current support without internal scheduling language.
-- [ ] Implementation does not expand release-engineering scope.
+- [x] No visible control suggests a feature is clickable when it is not.
+- [x] Unavailable provider/update features explain current support without internal scheduling language.
+- [x] Implementation does not expand release-engineering scope.
 
 ## Edge Cases
 
@@ -71,4 +71,4 @@ Remove or reword disabled and stubbed pre-release chrome so users do not encount
 
 ## Notes
 
-This part is draft-only until explicitly activated. Keep review and mutation boundaries real.
+This part is in `review` pending real Reviewer Agent sign-off. Keep review and mutation boundaries real.

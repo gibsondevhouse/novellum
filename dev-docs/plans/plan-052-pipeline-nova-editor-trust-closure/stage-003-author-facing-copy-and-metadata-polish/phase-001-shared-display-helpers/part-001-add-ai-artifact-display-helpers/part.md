@@ -2,12 +2,12 @@
 title: Add AI Artifact Display Helpers
 slug: part-001-add-ai-artifact-display-helpers
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-001-shared-display-helpers
-started_at: ~
-completed_at: ~
+started_at: 2026-06-15
+completed_at: 2026-06-15
 estimated_duration: 0.5d
 ---
 
@@ -50,9 +50,9 @@ Centralize formatting for AI artifact metadata so Nova and future review surface
 
 ## Acceptance Criteria
 
-- [ ] Raw ISO strings are not required for default card display.
-- [ ] Unknown values degrade to readable fallback labels.
-- [ ] Debug values can still be exposed intentionally in advanced disclosure.
+- [x] Raw ISO strings are not required for default card display.
+- [x] Unknown values degrade to readable fallback labels.
+- [x] Debug values can still be exposed intentionally in advanced disclosure.
 
 ## Edge Cases
 
@@ -68,4 +68,4 @@ Centralize formatting for AI artifact metadata so Nova and future review surface
 
 ## Notes
 
-This part is draft-only until explicitly activated. Keep review and mutation boundaries real.
+This part is in `review` pending real Reviewer Agent sign-off. Keep review and mutation boundaries real.

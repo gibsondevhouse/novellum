@@ -2,12 +2,12 @@
 title: Clean Legacy Artifact And Route Notices
 slug: part-002-clean-legacy-artifact-and-route-notices
 part_number: 2
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-002-nova-card-copy-cleanup
-started_at: ~
-completed_at: ~
+started_at: 2026-06-15
+completed_at: 2026-06-15
 estimated_duration: 0.25d
 ---
 
@@ -51,9 +51,9 @@ Replace internal labels like Legacy artifact and Legacy fullscreen route with au
 
 ## Acceptance Criteria
 
-- [ ] Users do not see Legacy artifact as a default eyebrow.
-- [ ] The /nova route does not present itself as an internal/deprecated engineering route.
-- [ ] Updated copy does not promise parity features that are not present.
+- [x] Users do not see Legacy artifact as a default eyebrow.
+- [x] The /nova route does not present itself as an internal/deprecated engineering route.
+- [x] Updated copy does not promise parity features that are not present.
 
 ## Edge Cases
 
@@ -68,4 +68,4 @@ Replace internal labels like Legacy artifact and Legacy fullscreen route with au
 
 ## Notes
 
-This part is draft-only until explicitly activated. Keep review and mutation boundaries real.
+This part is in `review` pending real Reviewer Agent sign-off. Keep review and mutation boundaries real.

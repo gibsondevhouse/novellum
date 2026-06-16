@@ -2,12 +2,12 @@
 title: Inventory Nova Artifact Actions
 slug: part-001-inventory-nova-artifact-actions
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-001-surface-inventory
-started_at: ~
-completed_at: ~
+started_at: 2026-06-15
+completed_at: 2026-06-15
 estimated_duration: 0.5d
 ---
 
@@ -53,9 +53,9 @@ Produce a source-grounded inventory of inline Nova artifact cards and the action
 
 ## Acceptance Criteria
 
-- [ ] Inventory lists every affected artifact card and callback.
-- [ ] Inventory states whether each user action is durable, local-only, review-gated, or currently unwired.
-- [ ] Execution recommendations preserve explicit human review before manuscript mutation.
+- [x] Inventory lists every affected artifact card and callback.
+- [x] Inventory states whether each user action is durable, local-only, review-gated, or currently unwired.
+- [x] Execution recommendations preserve explicit human review before manuscript mutation.
 
 ## Edge Cases
 

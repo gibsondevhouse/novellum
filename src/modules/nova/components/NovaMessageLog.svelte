@@ -5,7 +5,36 @@
 -->
 <script lang="ts">
 	import { safeHtml } from '$lib/ai/markdown.js';
+	import type { AuthorSceneDraftPayload } from '$lib/ai/pipeline/author-agent.js';
+	import type { AuthorDraftCheckpoint } from '$lib/ai/pipeline/author-draft-contract.js';
+	import type { AuthorRevisionPack } from '$lib/ai/pipeline/author-schemas.js';
+	import type { PipelineArtifactEnvelope } from '$lib/ai/pipeline/contracts.js';
+	import { dispatchSceneContentApplied } from '$lib/events/scene-content.js';
+	import { editorDirty } from '$lib/stores/editor-dirty.svelte.js';
 	import type { NovaMessage } from '../types.js';
+	import {
+		acceptSceneDraftCheckpoint,
+		fetchSceneById,
+		type AuthorDraftApiError,
+	} from '../services/author-draft-api.js';
+	import {
+		classifyNovaArtifactAction,
+		createInsufficientContextResult,
+		createNovaArtifactActionResult,
+		createStaleTargetResult,
+		type NovaArtifactActionResult,
+	} from '../services/artifact-action-types.js';
+	import {
+		rejectInlineSceneDraftCheckpoint,
+		stageInlineSceneDraftCheckpoint,
+		type StageInlineSceneDraftResultData,
+	} from '../services/inline-scene-draft-actions.js';
+	import {
+		acknowledgeRevisionPackIssue,
+		loadRevisionPackAcknowledgements,
+		revisionPackAcknowledgementKey,
+		type RevisionPackAcknowledgementState,
+	} from '../services/revision-pack-acknowledgements.js';
 	import NovaErrorBoundary from './NovaErrorBoundary.svelte';
 	import NovaOutlineCard from './NovaOutlineCard.svelte';
 	import NovaSceneDraftCard from './NovaSceneDraftCard.svelte';
@@ -21,6 +50,14 @@
 	}
 
 	let { messages, novaError, novaErrorType, onRetry, projectId = null }: Props = $props();
+
+	interface RevisionAcknowledgementUiState {
+		loading: boolean;
+		acknowledgedIssueIds: string[];
+		error: string | null;
+	}
+
+	let revisionAcknowledgements = $state<Record<string, RevisionAcknowledgementUiState>>({});
 
 	function isMissingCredentialsError(message: NovaMessage): boolean {
 		return classifyNovaError(message.error ?? '') === 'invalid_key';
@@ -67,6 +104,167 @@
 	function isToolStatusError(status: string): boolean {
 		return status === 'error' || status === 'not-yet-supported';
 	}
+
+	function revisionAckKey(envelope: PipelineArtifactEnvelope<AuthorRevisionPack>): string {
+		return revisionPackAcknowledgementKey(envelope);
+	}
+
+	function upsertRevisionAckState(
+		key: string,
+		next: RevisionAcknowledgementUiState,
+	): void {
+		revisionAcknowledgements = {
+			...revisionAcknowledgements,
+			[key]: next,
+		};
+	}
+
+	function setRevisionAckStateFromPersisted(
+		state: RevisionPackAcknowledgementState,
+		loading = false,
+		error: string | null = null,
+	): void {
+		upsertRevisionAckState(state.artifactKey, {
+			loading,
+			acknowledgedIssueIds: state.acknowledgedIssueIds,
+			error,
+		});
+	}
+
+	async function ensureRevisionAcknowledgements(
+		envelope: PipelineArtifactEnvelope<AuthorRevisionPack>,
+	): Promise<void> {
+		const key = revisionAckKey(envelope);
+		if (!projectId || revisionAcknowledgements[key]) return;
+		upsertRevisionAckState(key, {
+			loading: true,
+			acknowledgedIssueIds: [],
+			error: null,
+		});
+		try {
+			const state = await loadRevisionPackAcknowledgements(projectId, envelope);
+			setRevisionAckStateFromPersisted(state);
+		} catch (err) {
+			upsertRevisionAckState(key, {
+				loading: false,
+				acknowledgedIssueIds: [],
+				error: err instanceof Error ? err.message : 'Could not load acknowledgements.',
+			});
+		}
+	}
+
+	$effect(() => {
+		const _projectId = projectId;
+		for (const message of messages) {
+			if (message.artifact?.kind === 'author-revision-pack') {
+				void ensureRevisionAcknowledgements(message.artifact.envelope);
+			}
+		}
+	});
+
+	function sceneDraftActionBase(
+		envelope: PipelineArtifactEnvelope<AuthorSceneDraftPayload>,
+		checkpoint: AuthorDraftCheckpoint,
+	) {
+		return {
+			action: 'accept' as const,
+			classification: classifyNovaArtifactAction('author-scene-draft', 'accept'),
+			artifactKind: 'author-scene-draft' as const,
+			envelope,
+			projectId,
+			sceneId: checkpoint.sceneId,
+			checkpointId: checkpoint.id,
+		};
+	}
+
+	async function handleSceneDraftAccept(
+		envelope: PipelineArtifactEnvelope<AuthorSceneDraftPayload>,
+	): Promise<NovaArtifactActionResult<StageInlineSceneDraftResultData>> {
+		return stageInlineSceneDraftCheckpoint({ projectId, envelope });
+	}
+
+	async function handleSceneDraftConfirmAccept(
+		envelope: PipelineArtifactEnvelope<AuthorSceneDraftPayload>,
+		checkpoint: AuthorDraftCheckpoint,
+		options: { forceOverwrite?: boolean } = {},
+	): Promise<NovaArtifactActionResult<StageInlineSceneDraftResultData>> {
+		const base = sceneDraftActionBase(envelope, checkpoint);
+		if (!projectId) {
+			return createInsufficientContextResult<StageInlineSceneDraftResultData, AuthorSceneDraftPayload>({
+				...base,
+				reason: 'Open a project before applying this saved draft.',
+			});
+		}
+		if (editorDirty.sceneId === checkpoint.sceneId && editorDirty.isDirty && !options.forceOverwrite) {
+			return createStaleTargetResult<StageInlineSceneDraftResultData, AuthorSceneDraftPayload>({
+				...base,
+				message: 'Save or discard the open scene changes before applying this draft.',
+			});
+		}
+
+		try {
+			const { checkpoint: updated } = await acceptSceneDraftCheckpoint(
+				projectId,
+				checkpoint.id,
+				checkpoint.sceneId,
+				{ forceOverwrite: options.forceOverwrite === true },
+			);
+			const updatedScene = await fetchSceneById(checkpoint.sceneId);
+			dispatchSceneContentApplied({
+				projectId,
+				sceneId: checkpoint.sceneId,
+				content: updatedScene.content ?? '',
+				wordCount: updatedScene.wordCount ?? 0,
+				updatedAt: updatedScene.updatedAt,
+			});
+			return createNovaArtifactActionResult<StageInlineSceneDraftResultData, AuthorSceneDraftPayload>({
+				...base,
+				status: 'succeeded',
+				durability: 'durable',
+				message: 'Draft applied to scene.',
+				data: { checkpoint: updated },
+			});
+		} catch (err) {
+			const apiErr = err as Partial<AuthorDraftApiError> | Error;
+			const code =
+				typeof (apiErr as { code?: unknown }).code === 'string'
+					? (apiErr as { code: string }).code
+					: undefined;
+			if (code === 'stale_target') {
+				return createStaleTargetResult<StageInlineSceneDraftResultData, AuthorSceneDraftPayload>({
+					...base,
+					message:
+						apiErr instanceof Error
+							? apiErr.message
+							: 'This scene changed before the draft could be applied.',
+				});
+			}
+			return createNovaArtifactActionResult<StageInlineSceneDraftResultData, AuthorSceneDraftPayload>({
+				...base,
+				status: 'failed',
+				durability: 'durable',
+				errorCode: code ?? 'accept_failed',
+				message: apiErr instanceof Error ? apiErr.message : 'Could not apply the saved draft.',
+				data: { checkpoint },
+			});
+		}
+	}
+
+	async function handleSceneDraftReject(
+		envelope: PipelineArtifactEnvelope<AuthorSceneDraftPayload>,
+	): Promise<NovaArtifactActionResult<StageInlineSceneDraftResultData>> {
+		return rejectInlineSceneDraftCheckpoint({ projectId, envelope });
+	}
+
+	async function handleRevisionPackAcknowledge(
+		issueId: string,
+		envelope: PipelineArtifactEnvelope<AuthorRevisionPack>,
+	): Promise<RevisionPackAcknowledgementState> {
+		if (!projectId) throw new Error('Open a project before acknowledging this revision note.');
+		const state = await acknowledgeRevisionPackIssue(projectId, envelope, issueId);
+		setRevisionAckStateFromPersisted(state);
+		return state;
+	}
 </script>
 
 <NovaErrorBoundary error={novaError} errorType={novaErrorType} {onRetry} />
@@ -98,9 +296,22 @@
 						{#if message.artifact.kind === 'author-outline'}
 							<NovaOutlineCard envelope={message.artifact.envelope} {projectId} />
 						{:else if message.artifact.kind === 'author-scene-draft'}
-							<NovaSceneDraftCard envelope={message.artifact.envelope} />
+							<NovaSceneDraftCard
+								envelope={message.artifact.envelope}
+								onAccept={handleSceneDraftAccept}
+								onConfirmAccept={handleSceneDraftConfirmAccept}
+								onReject={handleSceneDraftReject}
+							/>
 						{:else if message.artifact.kind === 'author-revision-pack'}
-							<NovaRevisionPackCard envelope={message.artifact.envelope} />
+							{@const ackKey = revisionAckKey(message.artifact.envelope)}
+							{@const ackState = revisionAcknowledgements[ackKey]}
+							<NovaRevisionPackCard
+								envelope={message.artifact.envelope}
+								acknowledgedIssueIds={ackState?.acknowledgedIssueIds ?? []}
+								acknowledgementLoading={ackState?.loading ?? false}
+								acknowledgementError={ackState?.error ?? null}
+								onAcknowledge={handleRevisionPackAcknowledge}
+							/>
 						{/if}
 					{:else if message.content === '' && message.status === 'streaming'}
 						<span class="nova-typing" aria-label="Nova is typing">

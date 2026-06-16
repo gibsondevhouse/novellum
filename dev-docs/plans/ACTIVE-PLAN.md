@@ -6,7 +6,7 @@
 
 ## Current
 
-[plan-051-governed-ai-controller-runtime](./plan-051-governed-ai-controller-runtime/plan.md) — Governed AI Controller Runtime. Full implementation, evidence, docs sync, and quality gates are ready for Reviewer Agent evaluation. Status: `review`.
+[plan-052-pipeline-nova-editor-trust-closure](./plan-052-pipeline-nova-editor-trust-closure/plan.md) — Pipeline, Nova, and Editor Trust Closure. Implementation evidence and automated gates are ready for Reviewer Agent evaluation. Status: `review`.
 
 ## Pending review
 

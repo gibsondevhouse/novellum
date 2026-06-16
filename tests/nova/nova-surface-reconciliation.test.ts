@@ -18,11 +18,12 @@ describe('Nova canonical surface reconciliation', () => {
 		expect(moduleDocSource).toContain('Ownership Guardrails');
 	});
 
-	it('keeps /nova explicitly marked as legacy while retaining ChatInterface backing', () => {
+	it('keeps /nova as an exploratory workspace while retaining ChatInterface backing', () => {
 		expect(novaRouteSource).toContain("import ChatInterface from '$modules/ai/components/ChatInterface.svelte'");
 		expect(novaRouteSource).toContain('data-testid="nova-route-notice"');
-		expect(novaRouteSource).toContain('Legacy fullscreen route');
-		expect(novaRouteSource).toContain('canonical Nova runtime');
+		expect(novaRouteSource).toContain('Nova workspace');
+		expect(novaRouteSource).toContain('focused workspace for exploratory chat');
+		expect(novaRouteSource).toContain('editor sidepanel');
 		expect(novaRouteSource).toContain('<ChatInterface />');
 	});
 

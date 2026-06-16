@@ -25,15 +25,18 @@ describe('NovaSceneDraftCard source contract', () => {
 		expect(source).toContain('aria-label="Accept scene draft and emit accept event"');
 		expect(source).toContain('aria-label="Reject scene draft"');
 		expect(source).toContain('aria-label="Copy drafted prose to clipboard"');
-		expect(source).toContain('>\n\t\t\tAccept\n');
-		expect(source).toContain('>\n\t\t\tReject\n');
+		expect(source).toContain(": 'Accept'");
+		expect(source).toContain(": 'Reject'");
 	});
 
-	it('emits callbacks rather than mutating the manuscript', () => {
+	it('awaits callbacks rather than mutating the manuscript optimistically', () => {
 		expect(source).toContain('onAccept?:');
+		expect(source).toContain('onConfirmAccept?:');
 		expect(source).toContain('onReject?:');
-		expect(source).toContain('onAccept?.(envelope)');
-		expect(source).toContain('onReject?.(envelope)');
+		expect(source).toContain('await onAccept(envelope)');
+		expect(source).toContain('await onConfirmAccept(envelope, stagedCheckpoint');
+		expect(source).toContain('await onReject(envelope)');
+		expect(source).not.toContain('Marked as accepted');
 		// Guardrail: no editor-store / manuscript-write imports or calls.
 		expect(source).not.toMatch(/from ['"][^'"]*editor[^'"]*['"]/);
 		expect(source).not.toMatch(/\binsertText\b|\bapplyEdit\b|manuscriptStore|editorStore/);

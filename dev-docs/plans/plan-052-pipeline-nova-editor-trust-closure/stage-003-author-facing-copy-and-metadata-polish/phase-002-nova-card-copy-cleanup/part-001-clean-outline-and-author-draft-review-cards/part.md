@@ -2,12 +2,12 @@
 title: Clean Outline And Author Draft Review Cards
 slug: part-001-clean-outline-and-author-draft-review-cards
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-002-nova-card-copy-cleanup
-started_at: ~
-completed_at: ~
+started_at: 2026-06-15
+completed_at: 2026-06-15
 estimated_duration: 0.75d
 ---
 
@@ -52,10 +52,10 @@ Remove raw timestamps, hashes, prompt versions, schema labels, scene UUIDs, and 
 
 ## Acceptance Criteria
 
-- [ ] Generated row displays a readable date/time.
-- [ ] Context hash and prompt version are not visible without advanced disclosure.
-- [ ] Scene metadata is readable to an author and avoids full UUID display.
-- [ ] Sidecar is replaced with author-facing terminology.
+- [x] Generated row displays a readable date/time.
+- [x] Context hash and prompt version are not visible without advanced disclosure.
+- [x] Scene metadata is readable to an author and avoids full UUID display.
+- [x] Sidecar is replaced with author-facing terminology.
 
 ## Edge Cases
 
@@ -71,4 +71,4 @@ Remove raw timestamps, hashes, prompt versions, schema labels, scene UUIDs, and 
 
 ## Notes
 
-This part is draft-only until explicitly activated. Keep review and mutation boundaries real.
+This part is in `review` pending real Reviewer Agent sign-off. Keep review and mutation boundaries real.

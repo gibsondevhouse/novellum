@@ -2,12 +2,12 @@
 title: Update Docs And Closeout Evidence
 slug: part-001-update-docs-and-closeout-evidence
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-002-docs-and-tracker-closeout
-started_at: ~
-completed_at: ~
+started_at: 2026-06-15
+completed_at: 2026-06-15
 estimated_duration: 0.5d
 ---
 
@@ -51,9 +51,9 @@ Document the corrected Nova/editor artifact action behavior and prepare plan clo
 
 ## Acceptance Criteria
 
-- [ ] Docs describe action semantics accurately.
-- [ ] Evidence includes command output and any required screenshots.
-- [ ] Reviewer Agent sign-off remains pending until actually performed.
+- [x] Docs describe action semantics accurately.
+- [x] Evidence includes command output and any required screenshots.
+- [x] Reviewer Agent sign-off remains pending until actually performed.
 
 ## Edge Cases
 
@@ -68,4 +68,4 @@ Document the corrected Nova/editor artifact action behavior and prepare plan clo
 
 ## Notes
 
-This part is draft-only until explicitly activated. Keep review and mutation boundaries real.
+This part is in `review` pending real Reviewer Agent sign-off. Keep review and mutation boundaries real.

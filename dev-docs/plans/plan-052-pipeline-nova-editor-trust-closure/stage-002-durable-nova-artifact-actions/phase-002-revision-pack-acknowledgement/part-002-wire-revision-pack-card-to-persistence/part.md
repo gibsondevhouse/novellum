@@ -2,12 +2,12 @@
 title: Wire Revision Pack Card To Persistence
 slug: part-002-wire-revision-pack-card-to-persistence
 part_number: 2
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-002-revision-pack-acknowledgement
-started_at: ~
-completed_at: ~
+started_at: 2026-06-15
+completed_at: 2026-06-15
 estimated_duration: 0.5d
 ---
 
@@ -51,9 +51,9 @@ Load and update persisted acknowledgement state from the rendered Nova revision 
 
 ## Acceptance Criteria
 
-- [ ] Closing and reopening Nova preserves acknowledged issue state.
-- [ ] Acknowledgement failure is visible and retryable.
-- [ ] The card copy communicates acknowledgement, not acceptance of an edit.
+- [x] Closing and reopening Nova preserves acknowledged issue state.
+- [x] Acknowledgement failure is visible and retryable.
+- [x] The card copy communicates acknowledgement, not acceptance of an edit.
 
 ## Edge Cases
 
@@ -69,4 +69,4 @@ Load and update persisted acknowledgement state from the rendered Nova revision 
 
 ## Notes
 
-This part is draft-only until explicitly activated. Keep review and mutation boundaries real.
+This part is in `review` pending real Reviewer Agent sign-off. Keep review and mutation boundaries real.

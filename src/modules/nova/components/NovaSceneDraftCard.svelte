@@ -2,28 +2,60 @@
 	plan-027 stage-003 phase-003 part-002 — Scene Draft card.
 
 	Renders a parsed `vibe-author.scene-draft` artifact (prose + sidecar)
-	alongside explicit Accept / Reject / Copy controls. NEVER mutates
-	the manuscript directly — Accept emits an `onAccept` callback the
-	editor accept-pipeline will consume in a later plan. Reject and
-	Copy are local-only effects.
+	alongside explicit Accept / Reject / Copy controls. Accept first saves
+	a durable checkpoint, then requires explicit confirmation before the
+	editor bridge can apply it. Reject must persist through the callback.
 -->
 <script lang="ts">
 	import type { PipelineArtifactEnvelope } from '$lib/ai/pipeline/contracts.js';
 	import type { AuthorSceneDraftPayload } from '$lib/ai/pipeline/author-agent.js';
+	import type { AuthorDraftCheckpoint } from '$lib/ai/pipeline/author-draft-contract.js';
+	import type { NovaArtifactActionResult } from '../services/artifact-action-types.js';
+	import type { StageInlineSceneDraftResultData } from '../services/inline-scene-draft-actions.js';
 
 	interface Props {
 		envelope: PipelineArtifactEnvelope<AuthorSceneDraftPayload>;
-		onAccept?: (envelope: PipelineArtifactEnvelope<AuthorSceneDraftPayload>) => void;
-		onReject?: (envelope: PipelineArtifactEnvelope<AuthorSceneDraftPayload>) => void;
+		onAccept?: (
+			envelope: PipelineArtifactEnvelope<AuthorSceneDraftPayload>,
+		) => Promise<NovaArtifactActionResult<StageInlineSceneDraftResultData>>;
+		onConfirmAccept?: (
+			envelope: PipelineArtifactEnvelope<AuthorSceneDraftPayload>,
+			checkpoint: AuthorDraftCheckpoint,
+			options?: { forceOverwrite?: boolean },
+		) => Promise<NovaArtifactActionResult<StageInlineSceneDraftResultData>>;
+		onReject?: (
+			envelope: PipelineArtifactEnvelope<AuthorSceneDraftPayload>,
+		) => Promise<NovaArtifactActionResult<StageInlineSceneDraftResultData>>;
 	}
 
-	let { envelope, onAccept, onReject }: Props = $props();
+	let { envelope, onAccept, onConfirmAccept, onReject }: Props = $props();
 
-	let acted = $state<'accepted' | 'rejected' | null>(null);
+	type ActionState =
+		| 'idle'
+		| 'saving'
+		| 'confirming'
+		| 'applying'
+		| 'stale'
+		| 'accepted'
+		| 'rejecting'
+		| 'rejected'
+		| 'blocked'
+		| 'failed';
+
+	let actionState = $state<ActionState>('idle');
+	let actionMessage = $state<string | null>(null);
+	let stagedCheckpoint = $state<AuthorDraftCheckpoint | null>(null);
 	let copied = $state(false);
 
 	const payload = $derived(envelope.payload);
 	const sidecar = $derived(payload.sidecar);
+	const actionBusy = $derived(
+		actionState === 'saving' || actionState === 'applying' || actionState === 'rejecting',
+	);
+	const actionFinal = $derived(actionState === 'accepted' || actionState === 'rejected');
+	const canStartAction = $derived(
+		!actionBusy && !actionFinal && actionState !== 'confirming' && actionState !== 'stale',
+	);
 
 	function formatProducedAt(value: string): string {
 		const date = new Date(value);
@@ -47,14 +79,62 @@
 		}
 	}
 
-	function handleAccept(): void {
-		acted = 'accepted';
-		onAccept?.(envelope);
+	function applyActionResult(
+		result: NovaArtifactActionResult<StageInlineSceneDraftResultData>,
+		successState: ActionState,
+	): void {
+		actionMessage = result.message;
+		if (result.data?.checkpoint) stagedCheckpoint = result.data.checkpoint;
+
+		if (result.status === 'succeeded') {
+			actionState = successState;
+			return;
+		}
+
+		actionState = result.status === 'stale_target' ? 'stale' : result.status === 'insufficient_context' ? 'blocked' : 'failed';
 	}
 
-	function handleReject(): void {
-		acted = 'rejected';
-		onReject?.(envelope);
+	async function handleAccept(): Promise<void> {
+		if (!canStartAction) return;
+		if (!onAccept) {
+			actionState = 'blocked';
+			actionMessage = 'This draft cannot be saved for review from the current chat context.';
+			return;
+		}
+
+		actionState = 'saving';
+		actionMessage = null;
+		const result = await onAccept(envelope);
+		applyActionResult(result, 'confirming');
+	}
+
+	async function handleConfirmAccept(forceOverwrite = false): Promise<void> {
+		if (!stagedCheckpoint || !onConfirmAccept || actionBusy || actionFinal) return;
+
+		actionState = 'applying';
+		actionMessage = null;
+		const result = await onConfirmAccept(envelope, stagedCheckpoint, { forceOverwrite });
+		applyActionResult(result, 'accepted');
+	}
+
+	function handleCancelConfirm(): void {
+		actionState = 'idle';
+		actionMessage = null;
+		stagedCheckpoint = null;
+	}
+
+	async function handleReject(): Promise<void> {
+		if (!canStartAction) return;
+		if (!onReject) {
+			actionState = 'blocked';
+			actionMessage = 'This draft cannot be rejected from the current chat context.';
+			return;
+		}
+
+		actionState = 'rejecting';
+		actionMessage = null;
+		const result = await onReject(envelope);
+		applyActionResult(result, 'rejected');
 	}
 </script>
 
@@ -113,21 +193,21 @@
 			type="button"
 			class="scene-draft-btn scene-draft-btn-accept"
 			data-testid="nova-scene-draft-accept"
-			aria-label="Accept scene draft and emit accept event"
-			disabled={acted !== null}
-			onclick={handleAccept}
+			aria-label="Save scene draft as checkpoint for review and confirmation"
+			disabled={!canStartAction}
+			onclick={() => void handleAccept()}
 		>
-			Accept
+			{actionState === 'saving' ? 'Saving...' : 'Accept'}
 		</button>
 		<button
 			type="button"
 			class="scene-draft-btn scene-draft-btn-reject"
 			data-testid="nova-scene-draft-reject"
 			aria-label="Reject scene draft"
-			disabled={acted !== null}
-			onclick={handleReject}
+			disabled={!canStartAction}
+			onclick={() => void handleReject()}
 		>
-			Reject
+			{actionState === 'rejecting' ? 'Rejecting...' : 'Reject'}
 		</button>
 		<button
 			type="button"
@@ -138,8 +218,53 @@
 		>
 			{copied ? 'Copied' : 'Copy'}
 		</button>
-		{#if acted !== null}
-			<p class="scene-draft-status" role="status">Marked as {acted}</p>
+		{#if actionMessage}
+			<p class="scene-draft-status" data-state={actionState} role={actionState === 'failed' || actionState === 'blocked' ? 'alert' : 'status'}>
+				{actionMessage}
+			</p>
+		{/if}
+		{#if (actionState === 'confirming' || actionState === 'applying') && stagedCheckpoint}
+			<div class="scene-draft-confirm" aria-label="Confirm scene draft apply">
+				<p class="scene-draft-confirm-title">Confirm apply</p>
+				<p class="scene-draft-confirm-copy">
+					This saved review checkpoint will replace the target scene only if server checks pass.
+				</p>
+				<div class="scene-draft-confirm-actions">
+					<button type="button" class="scene-draft-btn" onclick={handleCancelConfirm}>
+						Cancel
+					</button>
+					<button
+						type="button"
+						class="scene-draft-btn scene-draft-btn-accept"
+						data-testid="nova-scene-draft-confirm-accept"
+						disabled={actionBusy}
+						onclick={() => void handleConfirmAccept(false)}
+					>
+						{actionState === 'applying' ? 'Applying...' : 'Confirm apply'}
+					</button>
+				</div>
+			</div>
+		{:else if actionState === 'stale' && stagedCheckpoint}
+			<div class="scene-draft-confirm" aria-label="Scene draft stale target">
+				<p class="scene-draft-confirm-title">Scene changed</p>
+				<p class="scene-draft-confirm-copy">
+					Review the current scene before replacing it with this saved draft.
+				</p>
+				<div class="scene-draft-confirm-actions">
+					<button type="button" class="scene-draft-btn" onclick={handleCancelConfirm}>
+						Cancel
+					</button>
+					<button
+						type="button"
+						class="scene-draft-btn scene-draft-btn-accept"
+						data-testid="nova-scene-draft-force-accept"
+						disabled={actionBusy}
+						onclick={() => void handleConfirmAccept(true)}
+					>
+						Apply anyway
+					</button>
+				</div>
+			</div>
 		{/if}
 	</footer>
 </article>
@@ -259,5 +384,42 @@
 		margin: 0;
 		font-size: var(--text-xs);
 		color: var(--color-text-secondary);
+	}
+
+	.scene-draft-status[data-state='failed'],
+	.scene-draft-status[data-state='blocked'],
+	.scene-draft-status[data-state='stale'] {
+		color: var(--color-error);
+	}
+
+	.scene-draft-confirm {
+		flex-basis: 100%;
+		display: grid;
+		gap: var(--space-2);
+		padding: var(--space-2);
+		border: 1px solid var(--color-border-default);
+		border-radius: var(--radius-md);
+		background: var(--color-surface-ground);
+	}
+
+	.scene-draft-confirm-title,
+	.scene-draft-confirm-copy {
+		margin: 0;
+		font-size: var(--text-xs);
+	}
+
+	.scene-draft-confirm-title {
+		font-weight: var(--font-weight-semibold);
+		color: var(--color-text-primary);
+	}
+
+	.scene-draft-confirm-copy {
+		color: var(--color-text-secondary);
+	}
+
+	.scene-draft-confirm-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2);
 	}
 </style>

@@ -34,9 +34,11 @@ describe('NovaRevisionPackCard source contract', () => {
 		expect(source).toContain('Acknowledged');
 	});
 
-	it('emits a callback rather than mutating the manuscript', () => {
+	it('awaits acknowledgement callbacks rather than mutating the manuscript optimistically', () => {
 		expect(source).toContain('onAcknowledge?:');
-		expect(source).toContain('onAcknowledge?.(issueId, envelope)');
+		expect(source).toContain('await onAcknowledge(issueId, envelope)');
+		expect(source).toContain('acknowledgedIssueIds?:');
+		expect(source).toContain('localAcknowledgementError');
 		expect(source).not.toMatch(/from ['"][^'"]*editor[^'"]*['"]/);
 		expect(source).not.toMatch(/\binsertText\b|\bapplyEdit\b|manuscriptStore|editorStore/);
 	});

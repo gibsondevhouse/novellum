@@ -2,12 +2,12 @@
 title: Define Inline Artifact Action Contract
 slug: part-002-define-inline-artifact-action-contract
 part_number: 2
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-001-surface-inventory
-started_at: ~
-completed_at: ~
+started_at: 2026-06-15
+completed_at: 2026-06-15
 estimated_duration: 0.5d
 ---
 
@@ -50,9 +50,9 @@ Define the reusable contract for inline Nova artifact actions so later stages ca
 
 ## Acceptance Criteria
 
-- [ ] Contract distinguishes review decisions from non-mutating acknowledgements.
-- [ ] Contract carries enough data for user-visible status and test assertions.
-- [ ] Contract documents fallback behavior when an artifact cannot be acted on safely.
+- [x] Contract distinguishes review decisions from non-mutating acknowledgements.
+- [x] Contract carries enough data for user-visible status and test assertions.
+- [x] Contract documents fallback behavior when an artifact cannot be acted on safely.
 
 ## Edge Cases
 

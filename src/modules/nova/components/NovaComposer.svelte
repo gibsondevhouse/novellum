@@ -191,15 +191,6 @@
 				anchorEl={attachButtonEl}
 				onClose={() => { attachPopoverOpen = false; }}
 			/>
-			<button
-				type="button"
-				class="nova-action-slot"
-				aria-label="Commands"
-				title="Slash commands (coming soon)"
-				disabled
-			>
-				<span aria-hidden="true" class="nova-commands-glyph">&lt;/&gt;</span>
-			</button>
 			<select
 				id="nova-mode-select"
 				class="nova-mode-select"
@@ -394,12 +385,6 @@
 		background: color-mix(in srgb, var(--color-surface-overlay) 72%, transparent);
 		border-color: var(--color-border-subtle);
 		color: var(--color-text-secondary);
-	}
-
-	.nova-commands-glyph {
-		font-family: var(--font-mono);
-		font-size: 9px;
-		letter-spacing: -0.03em;
 	}
 
 	.nova-input {

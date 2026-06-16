@@ -2,7 +2,7 @@
 title: Artifact Action Contract
 slug: stage-001-artifact-action-contract
 stage_number: 1
-status: draft
+status: review
 owner: Planner Agent
 plan: plan-052-pipeline-nova-editor-trust-closure
 phases:
@@ -19,7 +19,7 @@ Define the exact behavior expected from inline Nova artifact actions before wiri
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Surface Inventory](phase-001-surface-inventory/phase.md) | `draft` | 0.5d |
+| 001 | [Surface Inventory](phase-001-surface-inventory/phase.md) | `review` | 0.5d |
 
 ## Entry Criteria
 
@@ -28,9 +28,9 @@ Define the exact behavior expected from inline Nova artifact actions before wiri
 
 ## Exit Criteria
 
-- [ ] Every inline artifact action is classified as mutation, review decision, acknowledgement, or local-only utility.
-- [ ] The implementation path for scene draft and revision pack actions is source-grounded and review-gated.
+- [x] Every inline artifact action is classified as mutation, review decision, acknowledgement, or local-only utility.
+- [x] The implementation path for scene draft and revision pack actions is source-grounded and review-gated.
 
 ## Notes
 
-Keep this stage in `draft` until execution starts. Preserve review gates and do not roll status upward until all child phases are ready.
+Stage implementation is in `review` pending real Reviewer Agent sign-off. Preserve review gates and do not mark complete until sign-off is real.

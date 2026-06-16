@@ -9,7 +9,12 @@
 		createOutlineCheckpointActions,
 		type OutlineCheckpointActions,
 	} from '../services/outline-checkpoint-actions.js';
-	import { reviewGateStatusLabel } from '$lib/review-gate-labels.js';
+	import {
+		artifactLifecycleLabel,
+		debugMetadataLabel,
+		formatArtifactTimestamp,
+		formatDebugValue,
+	} from '../services/artifact-display.js';
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 	import SecondaryButton from '$lib/components/ui/SecondaryButton.svelte';
 	import DestructiveButton from '$lib/components/ui/DestructiveButton.svelte';
@@ -46,10 +51,11 @@
 		return 'Proposed';
 	});
 	const lifecycleTitle = $derived(`${lifecycleWord} outline`);
-	const versionLabel = $derived(
+	const generatedLabel = $derived(formatArtifactTimestamp(activeCheckpoint.createdAt));
+	const versionWarning = $derived(
 		activeCheckpoint.version === OUTLINE_DRAFT_SCHEMA_VERSION
-			? `Schema ${activeCheckpoint.version}`
-			: `Unknown schema ${activeCheckpoint.version}`,
+			? null
+			: 'This proposal uses an older outline format. Review carefully before accepting.',
 	);
 	const includedDomains = $derived(
 		activeCheckpoint.draft.sourceContext.includedDomains.length > 0
@@ -195,9 +201,9 @@
 	}
 
 	function lifecycleChip(lifecycle: OutlineDraftLifecycle): string {
-		if (lifecycle === 'draft') return reviewGateStatusLabel('draft');
+		if (lifecycle === 'draft') return artifactLifecycleLabel('draft');
 		if (lifecycle === 'review') return pendingReviewLabel;
-		return reviewGateStatusLabel(lifecycle);
+		return artifactLifecycleLabel(lifecycle);
 	}
 
 	function orderLabel(order: number): string {
@@ -224,25 +230,33 @@
 		<dl>
 			<div>
 				<dt>Generated</dt>
-				<dd><time datetime={activeCheckpoint.createdAt}>{activeCheckpoint.createdAt}</time></dd>
-			</div>
-			<div>
-				<dt>Context</dt>
-				<dd>{activeCheckpoint.draft.sourceContext.contextHash ?? 'No context hash'}</dd>
-			</div>
-			<div>
-				<dt>Prompt</dt>
-				<dd>{activeCheckpoint.draft.sourceContext.promptVersion ?? 'No prompt version'}</dd>
+				<dd><time datetime={activeCheckpoint.createdAt}>{generatedLabel}</time></dd>
 			</div>
 			<div>
 				<dt>Domains</dt>
 				<dd>{includedDomains}</dd>
 			</div>
-			<div>
-				<dt>Version</dt>
-				<dd>{versionLabel}</dd>
-			</div>
 		</dl>
+		<details class="source-advanced">
+			<summary>Advanced details</summary>
+			<dl>
+				<div>
+					<dt>{debugMetadataLabel('contextHash')}</dt>
+					<dd>{formatDebugValue(activeCheckpoint.draft.sourceContext.contextHash)}</dd>
+				</div>
+				<div>
+					<dt>{debugMetadataLabel('promptVersion')}</dt>
+					<dd>{formatDebugValue(activeCheckpoint.draft.sourceContext.promptVersion)}</dd>
+				</div>
+				<div>
+					<dt>{debugMetadataLabel('schemaVersion')}</dt>
+					<dd>{formatDebugValue(activeCheckpoint.version)}</dd>
+				</div>
+			</dl>
+		</details>
+		{#if versionWarning}
+			<p class="warning-copy">{versionWarning}</p>
+		{/if}
 		{#if entityCounts.length > 0}
 			<ul class="source-counts" aria-label="Source entity counts">
 				{#each entityCounts as count (count)}
@@ -549,6 +563,34 @@
 		font-size: var(--text-xs);
 		line-height: var(--leading-normal);
 		overflow-wrap: anywhere;
+	}
+
+	.source-advanced {
+		border-top: var(--border-width-sm) solid var(--color-border-subtle);
+		padding-block-start: var(--space-2);
+	}
+
+	.source-advanced summary {
+		width: fit-content;
+		cursor: pointer;
+		color: var(--color-text-secondary);
+		font-size: var(--text-xs);
+		font-weight: var(--font-weight-semibold);
+		line-height: var(--leading-tight);
+	}
+
+	.source-advanced dl {
+		margin-block-start: var(--space-2);
+	}
+
+	.warning-copy {
+		padding: var(--space-2);
+		border: var(--border-width-sm) solid color-mix(in srgb, var(--color-warning) 32%, var(--color-border-subtle));
+		border-radius: var(--radius-sm);
+		background: color-mix(in srgb, var(--color-warning) 10%, transparent);
+		color: var(--color-text-secondary);
+		font-size: var(--text-xs);
+		line-height: var(--leading-normal);
 	}
 
 	.source-counts,
