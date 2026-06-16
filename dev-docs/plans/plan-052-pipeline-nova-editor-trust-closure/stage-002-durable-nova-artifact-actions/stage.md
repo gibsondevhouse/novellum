@@ -2,7 +2,7 @@
 title: Durable Nova Artifact Actions
 slug: stage-002-durable-nova-artifact-actions
 stage_number: 2
-status: draft
+status: review
 owner: Planner Agent
 plan: plan-052-pipeline-nova-editor-trust-closure
 phases:
@@ -20,8 +20,8 @@ Make the two functional blockers durable and review-gated: scene draft Accept/Re
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Scene Draft Action Bridge](phase-001-scene-draft-action-bridge/phase.md) | `draft` | 1.5d |
-| 002 | [Revision Pack Acknowledgement](phase-002-revision-pack-acknowledgement/phase.md) | `draft` | 1.5d |
+| 001 | [Scene Draft Action Bridge](phase-001-scene-draft-action-bridge/phase.md) | `review` | 1.5d |
+| 002 | [Revision Pack Acknowledgement](phase-002-revision-pack-acknowledgement/phase.md) | `review` | 1.5d |
 
 ## Entry Criteria
 
@@ -30,9 +30,9 @@ Make the two functional blockers durable and review-gated: scene draft Accept/Re
 
 ## Exit Criteria
 
-- [ ] Scene draft actions no longer look successful without a durable effect.
-- [ ] Revision acknowledgements persist across route changes and reloads.
+- [x] Scene draft actions no longer look successful without a durable effect.
+- [x] Revision acknowledgements persist across route changes and reloads.
 
 ## Notes
 
-Keep this stage in `draft` until execution starts. Preserve review gates and do not roll status upward until all child phases are ready.
+Stage implementation is in `review` pending real Reviewer Agent sign-off. Preserve review gates and do not mark complete until sign-off is real.

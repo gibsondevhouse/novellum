@@ -14,6 +14,7 @@
 	import { toast } from '$lib/stores/toast.svelte.js';
 	import { editorDirty } from '$lib/stores/editor-dirty.svelte.js';
 	import { dispatchSceneContentApplied } from '$lib/events/scene-content.js';
+	import { formatSceneDisplayLabel } from '../services/artifact-display.js';
 	import {
 		acceptSceneDraftCheckpoint,
 		fetchSceneById,
@@ -68,6 +69,7 @@
 	const draftWordCount = $derived(checkpoint?.artifactEnvelope.wordCount ?? 0);
 	const draftProse = $derived(checkpoint?.artifactEnvelope.prose ?? '');
 	const draftSidecar = $derived(checkpoint?.artifactEnvelope.sidecar ?? null);
+	const sceneDisplayLabel = $derived(formatSceneDisplayLabel({ title: scene.title, id: scene.id }));
 
 	const isSuperseded = $derived(
 		Boolean(checkpoint?.lifecycle === 'rejected' && checkpoint.rejectReason === 'Superseded by regeneration'),
@@ -240,7 +242,7 @@
 		<div class="checkpoint-identity">
 			<p class="checkpoint-title">{scene.title?.trim() || 'Untitled scene'}</p>
 			<p class="checkpoint-meta">
-				<span>Scene <code>{scene.id}</code></span>
+				<span>{sceneDisplayLabel}</span>
 				·
 				<span>{overwriteSummary}</span>
 				{#if checkpoint}
@@ -287,9 +289,9 @@
 
 		{#if draftSidecar && (draftSidecar.uncertainties.length > 0 || draftSidecar.continuityRisks.length > 0 || draftSidecar.usedCanonRefs.length > 0)}
 			<details class="checkpoint-sidecar">
-				<summary>Sidecar</summary>
+				<summary>Author notes</summary>
 				{#if draftSidecar.usedCanonRefs.length > 0}
-					<p class="checkpoint-sidecar-label">Used canon refs</p>
+					<p class="checkpoint-sidecar-label">Referenced canon</p>
 					<ul class="checkpoint-sidecar-list">
 						{#each draftSidecar.usedCanonRefs as item, i (i)}
 							<li>{item}</li>
@@ -427,11 +429,6 @@
 	.checkpoint-meta {
 		margin: 0;
 		font-size: 11px;
-		color: var(--color-text-secondary);
-	}
-
-	.checkpoint-meta code {
-		font-family: var(--font-mono);
 		color: var(--color-text-secondary);
 	}
 

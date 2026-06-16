@@ -2,12 +2,12 @@
 title: Persist Inline Scene Drafts As Review Artifacts
 slug: part-001-persist-inline-scene-drafts-as-review-artifacts
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-001-scene-draft-action-bridge
-started_at: ~
-completed_at: ~
+started_at: 2026-06-15
+completed_at: 2026-06-15
 estimated_duration: 1d
 ---
 
@@ -55,10 +55,10 @@ Bridge Nova Write-mode scene draft artifacts into the existing author draft revi
 
 ## Acceptance Criteria
 
-- [ ] Clicking Accept can no longer end in local-only “Marked as accepted” state.
-- [ ] Unsafe or insufficient-context Accept shows an actionable blocked state.
-- [ ] Successful Accept still requires explicit confirmation before replacing existing scene content.
-- [ ] Reject persists when a durable artifact/checkpoint exists.
+- [x] Clicking Accept can no longer end in local-only “Marked as accepted” state.
+- [x] Unsafe or insufficient-context Accept shows an actionable blocked state.
+- [x] Successful Accept still requires explicit confirmation before replacing existing scene content.
+- [x] Reject persists when a durable artifact/checkpoint exists.
 
 ## Edge Cases
 
@@ -75,4 +75,4 @@ Bridge Nova Write-mode scene draft artifacts into the existing author draft revi
 
 ## Notes
 
-This part is draft-only until explicitly activated. Keep review and mutation boundaries real.
+This part is in `review` pending real Reviewer Agent sign-off. Keep review and mutation boundaries real.

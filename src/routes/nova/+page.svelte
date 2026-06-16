@@ -8,10 +8,10 @@
 
 <div class="nova-agent-page">
 	<section class="nova-route-notice" data-testid="nova-route-notice" aria-label="Nova route status">
-		<p class="nova-route-notice__eyebrow">Legacy fullscreen route</p>
+		<p class="nova-route-notice__eyebrow">Nova workspace</p>
 		<p class="nova-route-notice__body">
-			The embedded editor sidepanel is the canonical Nova runtime for plan-030. This fullscreen
-			route is retained for exploratory chat and may not match sidepanel capabilities.
+			Use this focused workspace for exploratory chat. Project-aware writing actions remain in
+			the editor sidepanel where scene and chapter context are available.
 		</p>
 	</section>
 	<ChatInterface />

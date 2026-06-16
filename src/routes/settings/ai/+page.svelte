@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { OpenRouterPanel, OllamaPanel, ProviderComingSoon } from '$modules/settings';
+	import { OpenRouterPanel, OllamaPanel } from '$modules/settings';
 	import { featureFlags } from '$lib/feature-flags.svelte.js';
 
-	let activeProvider = $state<'openrouter' | 'ollama' | 'lm-studio'>('openrouter');
+	let activeProvider = $state<'openrouter' | 'ollama'>('openrouter');
 
 	onMount(async () => {
 		await featureFlags.hydrate();
@@ -37,29 +37,17 @@
 	>
 		Ollama
 	</button>
-	<button
-		role="tab"
-		aria-selected={activeProvider === 'lm-studio'}
-		data-active={activeProvider === 'lm-studio'}
-		class="provider-tab"
-		disabled
-		type="button"
-	>
-		LM Studio
-		<span class="badge-soon">Coming soon</span>
-	</button>
 </div>
 
 {#if activeProvider === 'openrouter'}
 	<OpenRouterPanel />
 {:else if activeProvider === 'ollama'}
 	<OllamaPanel />
-{:else}
-	<ProviderComingSoon
-		name="LM Studio"
-		description="Use any GGUF model via the LM Studio local server."
-	/>
 {/if}
+
+<p class="provider-note">
+	LM Studio is not available in this build. Use Ollama for local models or OpenRouter for hosted models.
+</p>
 
 <section class="labs-section" aria-labelledby="labs-heading">
 	<h3 id="labs-heading" class="labs-heading">Lab Features</h3>
@@ -122,16 +110,6 @@
 		cursor: not-allowed;
 	}
 
-	.badge-soon {
-		font-size: var(--text-xs);
-		text-transform: uppercase;
-		letter-spacing: var(--tracking-wide);
-		color: var(--color-text-muted);
-		background: var(--color-surface-elevated);
-		padding: var(--space-1) var(--space-2);
-		border-radius: var(--radius-sm);
-	}
-
 	.labs-section {
 		margin-top: var(--space-8);
 		padding-top: var(--space-6);
@@ -162,5 +140,11 @@
 
 	.labs-toggle {
 		cursor: pointer;
+	}
+
+	.provider-note {
+		margin: var(--space-4) 0 0;
+		font-size: var(--text-sm);
+		color: var(--color-text-muted);
 	}
 </style>

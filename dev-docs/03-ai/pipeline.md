@@ -1,6 +1,6 @@
 # AI Pipeline
 
-> Last verified: 2026-06-15 (plan-051 governed AI controller runtime)
+> Last verified: 2026-06-15 (plan-052 Nova/editor trust closure)
 
 Every AI feature in Novellum follows the same review-gated pipeline.
 The runtime agents (continuity / edit / rewrite / style) live in
@@ -176,12 +176,26 @@ Stage-003 phase-003 ships the author drafting + revision surface:
   below, and legacy outline artifact cards render read-only JSON/copy output.
 - `src/modules/nova/components/NovaSceneDraftCard.svelte` renders the
   scene-draft envelope with explicit `Accept` / `Reject` / `Copy`
-  controls (Copy goes through `navigator.clipboard`).
+  controls. `Accept` saves the inline artifact as a durable author-draft
+  checkpoint before the UI offers `Confirm apply`; confirmed apply uses
+  the existing checkpoint accept route with dirty-editor and stale-target
+  safeguards. `Reject` stages and rejects the saved checkpoint. `Copy`
+  remains a local clipboard utility.
 - `src/modules/nova/components/NovaRevisionPackCard.svelte` renders
   the revision-pack envelope as a severity-sorted issue list with a
-  per-issue `Acknowledge` action.
+  per-issue `Acknowledge` action. Acknowledgements are durable review
+  progress only; they do not modify manuscript or canon content.
 - `src/modules/nova/components/NovaMessageLog.svelte` branches on
   `message.artifact?.kind` to pick the right card.
+- `src/modules/nova/services/inline-scene-draft-actions.ts` stages
+  inline scene drafts through
+  `POST /api/author-draft/checkpoints/stage-inline` and maps missing
+  context, stale targets, failed persistence, and successful checkpoint
+  creation into typed Nova artifact action results.
+- `src/modules/nova/services/revision-pack-acknowledgements.ts` stores
+  acknowledged revision issue ids in project metadata under owner
+  `novaRevisionPackAcknowledgements.v1`, keyed by stable artifact
+  identity.
 
 The review-gate guardrail is enforced at three layers:
 
@@ -201,10 +215,12 @@ The review-gate guardrail is enforced at three layers:
    project. Manuscript content is never auto-mutated by the
    review-gate.
 
-`Accept` emits the parsed envelope to an `onAccept` callback so a
-later editor accept-pipeline can ledger the provenance (`taskKey`,
-`family`, `stage`, `model`, `createdAt`). That integration is out of
-scope for plan-027.
+Inline scene-draft action results carry artifact action audit vocabulary
+(`artifact.accept`, `artifact.reject`, target ids, checkpoint id, and
+optional controller run/job ids) so future controller-native ledgers can
+reuse the same semantics. The current shipped mutation boundary remains
+the author-draft checkpoint route; Nova chat cards never apply manuscript
+prose without explicit confirmation.
 
 ### vibe-outline generation flow (plan-040)
 

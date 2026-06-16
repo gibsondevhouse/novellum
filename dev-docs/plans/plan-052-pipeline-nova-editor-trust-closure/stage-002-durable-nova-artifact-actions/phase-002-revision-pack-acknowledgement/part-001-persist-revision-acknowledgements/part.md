@@ -2,12 +2,12 @@
 title: Persist Revision Acknowledgements
 slug: part-001-persist-revision-acknowledgements
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-002-revision-pack-acknowledgement
-started_at: ~
-completed_at: ~
+started_at: 2026-06-15
+completed_at: 2026-06-15
 estimated_duration: 1d
 ---
 
@@ -52,9 +52,9 @@ Store acknowledged revision-pack issue IDs in project metadata keyed by project,
 
 ## Acceptance Criteria
 
-- [ ] Acknowledged issue IDs persist and reload for a stable artifact.
-- [ ] Corrupted metadata is ignored with a safe empty state.
-- [ ] No manuscript or canon data is modified by acknowledgement.
+- [x] Acknowledged issue IDs persist and reload for a stable artifact.
+- [x] Corrupted metadata is ignored with a safe empty state.
+- [x] No manuscript or canon data is modified by acknowledgement.
 
 ## Edge Cases
 
@@ -70,4 +70,4 @@ Store acknowledged revision-pack issue IDs in project metadata keyed by project,
 
 ## Notes
 
-This part is draft-only until explicitly activated. Keep review and mutation boundaries real.
+This part is in `review` pending real Reviewer Agent sign-off. Keep review and mutation boundaries real.

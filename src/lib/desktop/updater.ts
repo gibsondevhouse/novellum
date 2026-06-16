@@ -9,7 +9,7 @@
  *
  * On web this module is inert: `checkForUpdates()` resolves to a
  * `none` result. On desktop it currently returns `unsupported` so
- * the UI can render a graceful "auto-updates ship in 1.x" message.
+ * the UI can render a graceful unsigned pre-release message.
  * When plan-018 wires `tauri-plugin-updater`, the desktop branch
  * will switch to a real check via `await import(...)`.
  */
@@ -33,7 +33,7 @@ export async function checkForUpdates(): Promise<UpdateStatus> {
 	return {
 		kind: 'unsupported',
 		currentVersion,
-		reason: 'Auto-updates are scheduled for the next release cycle.',
+		reason: 'Automatic updates are not available in this unsigned pre-release build.',
 	};
 }
 

@@ -59,7 +59,7 @@
 >
 	<header class="outline-card__header">
 		<div>
-			<p class="outline-card__eyebrow">Legacy artifact</p>
+			<p class="outline-card__eyebrow">Outline preview</p>
 			<h3 class="outline-card__title">Generated outline</h3>
 		</div>
 		<span class="outline-card__lifecycle">{envelope.lifecycle}</span>
@@ -88,7 +88,7 @@
 	{/if}
 
 	<details class="outline-card__payload">
-		<summary>JSON payload</summary>
+		<summary>Advanced outline data</summary>
 		<pre>{JSON.stringify(payload, null, 2)}</pre>
 	</details>
 
@@ -107,7 +107,7 @@
 				data-testid="nova-outline-copy-json"
 				onclick={handleCopyJson}
 			>
-				{copied ? 'Copied' : 'Copy Technical JSON'}
+				{copied ? 'Copied' : 'Copy outline data'}
 			</button>
 		</div>
 		<p class="outline-card__note">

@@ -2,7 +2,7 @@
 title: Shared Display Helpers
 slug: phase-001-shared-display-helpers
 phase_number: 1
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-003-author-facing-copy-and-metadata-polish
 parts:
@@ -18,14 +18,14 @@ Create reusable formatting helpers for AI artifact timestamps, IDs, task keys, l
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Add AI Artifact Display Helpers](part-001-add-ai-artifact-display-helpers/part.md) | `draft` | Codex | 0.5d |
+| 001 | [Add AI Artifact Display Helpers](part-001-add-ai-artifact-display-helpers/part.md) | `review` | Codex | 0.5d |
 
 ## Acceptance Criteria
 
-- [ ] Helpers cover timestamps, shortened IDs, readable task names, lifecycle names, and debug disclosure labels.
-- [ ] Helpers are unit-tested and imported instead of duplicating formatting in cards.
-- [ ] All parts reach `complete` after real Reviewer Agent sign-off.
+- [x] Helpers cover timestamps, shortened IDs, readable task names, lifecycle names, and debug disclosure labels.
+- [x] Helpers are unit-tested and imported instead of duplicating formatting in cards.
+- [x] All parts are in `review` with real Reviewer Agent sign-off still pending.
 
 ## Notes
 
-Phase remains draft until execution begins. Add implementation evidence under each part before moving to review.
+Phase implementation is in `review` pending real Reviewer Agent sign-off. Evidence is recorded under each part.

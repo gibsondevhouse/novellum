@@ -6,6 +6,7 @@ import type { PipelineArtifactEnvelope } from '$lib/ai/pipeline/contracts.js';
 import { OUTLINE_HIERARCHY } from '$lib/ai/pipeline/contracts.js';
 import type { AuthorOutline, AuthorRevisionPack } from '$lib/ai/pipeline/author-schemas.js';
 import type { AuthorSceneDraftPayload } from '$lib/ai/pipeline/author-agent.js';
+import type { AuthorDraftCheckpoint } from '$lib/ai/pipeline/author-draft-contract.js';
 import NovaOutlineCard from '$modules/nova/components/NovaOutlineCard.svelte';
 import NovaSceneDraftCard from '$modules/nova/components/NovaSceneDraftCard.svelte';
 import NovaRevisionPackCard from '$modules/nova/components/NovaRevisionPackCard.svelte';
@@ -95,6 +96,39 @@ const revisionPackEnvelope = makeEnvelope<AuthorRevisionPack>(
 	} as unknown as AuthorRevisionPack,
 );
 
+function makeCheckpoint(lifecycle: AuthorDraftCheckpoint['lifecycle'] = 'review'): AuthorDraftCheckpoint {
+	return {
+		id: 'checkpoint-1',
+		projectId: 'p1',
+		taskKey: 'vibe-author.scene-draft',
+		sceneId: 'scene-1',
+		chapterId: 'chapter-1',
+		artifactEnvelope: {
+			type: 'vibe-author.scene-draft',
+			version: 1,
+			projectId: 'p1',
+			sceneId: 'scene-1',
+			chapterId: 'chapter-1',
+			prose: sceneDraftEnvelope.payload.prose,
+			wordCount: 12,
+			sidecar: {
+				sceneId: 'scene-1',
+				chapterId: 'chapter-1',
+				povCharacterId: 'iri',
+				wordCount: 12,
+				usedCanonRefs: ['characterId:iri'],
+				uncertainties: [],
+				continuityRisks: [],
+			},
+		},
+		lifecycle,
+		createdAt: '2026-05-27T22:00:00.000Z',
+		updatedAt: '2026-05-27T22:00:00.000Z',
+		baseSceneUpdatedAt: '2026-05-27T21:00:00.000Z',
+		baseSceneContentHash: 'hash',
+	};
+}
+
 function installClipboard(writeText: ReturnType<typeof vi.fn>) {
 	Object.defineProperty(window.navigator, 'clipboard', {
 		value: { writeText },
@@ -118,22 +152,58 @@ describe('Nova artifact cards', () => {
 		flushSync();
 
 		expect(target.querySelector('[data-testid="nova-outline-card"]')).not.toBeNull();
-		expect(target.textContent).toContain('Legacy artifact');
+		expect(target.textContent).toContain('Outline preview');
 		expect(target.textContent).toContain('read-only');
 		expect(target.textContent).toContain('Only checkpoint proposals can be accepted');
-		expect(target.textContent).toContain('Copy Technical JSON');
+		expect(target.textContent).toContain('Copy outline data');
 		expect(target.textContent).not.toContain('Apply To Outline');
 		unmount(cmp);
 	});
 
-	it('scene draft card exposes explicit review actions and emits accept without direct mutation', () => {
-		const onAccept = vi.fn();
+	it('scene draft card saves for review before allowing confirmed apply', async () => {
+		const checkpoint = makeCheckpoint();
+		const onAccept = vi.fn(async () => ({
+			action: 'accept' as const,
+			classification: 'review_decision' as const,
+			status: 'succeeded' as const,
+			durability: 'durable' as const,
+			target: {
+				artifactId: sceneDraftEnvelope.id,
+				artifactKind: 'author-scene-draft' as const,
+				taskKey: sceneDraftEnvelope.taskKey,
+				projectId: 'p1',
+				sceneId: 'scene-1',
+				checkpointId: checkpoint.id,
+				issueId: null,
+				producedAt: sceneDraftEnvelope.producedAt,
+			},
+			message: 'Draft saved for review. Confirm before applying it to the scene.',
+			data: { checkpoint },
+		}));
+		const onConfirmAccept = vi.fn(async () => ({
+			action: 'accept' as const,
+			classification: 'review_decision' as const,
+			status: 'succeeded' as const,
+			durability: 'durable' as const,
+			target: {
+				artifactId: sceneDraftEnvelope.id,
+				artifactKind: 'author-scene-draft' as const,
+				taskKey: sceneDraftEnvelope.taskKey,
+				projectId: 'p1',
+				sceneId: 'scene-1',
+				checkpointId: checkpoint.id,
+				issueId: null,
+				producedAt: sceneDraftEnvelope.producedAt,
+			},
+			message: 'Draft applied to scene.',
+			data: { checkpoint: makeCheckpoint('accepted') },
+		}));
 		const onReject = vi.fn();
 		const target = document.createElement('div');
 		document.body.appendChild(target);
 		const cmp = mount(NovaSceneDraftCard, {
 			target,
-			props: { envelope: sceneDraftEnvelope, onAccept, onReject },
+			props: { envelope: sceneDraftEnvelope, onAccept, onConfirmAccept, onReject },
 		});
 		flushSync();
 
@@ -145,13 +215,26 @@ describe('Nova artifact cards', () => {
 		expect(copy).not.toBeNull();
 
 		accept.click();
+		await tick();
+		await tick();
 		flushSync();
 		expect(onAccept).toHaveBeenCalledTimes(1);
 		expect(onAccept).toHaveBeenCalledWith(sceneDraftEnvelope);
 		expect(onReject).not.toHaveBeenCalled();
 		expect(accept.disabled).toBe(true);
 		expect(reject.disabled).toBe(true);
-		expect(target.textContent).toContain('Marked as accepted');
+		expect(target.textContent).toContain('Confirm apply');
+		expect(target.textContent).not.toContain('Draft applied to scene.');
+
+		const confirm = target.querySelector('[data-testid="nova-scene-draft-confirm-accept"]') as HTMLButtonElement;
+		confirm.click();
+		await tick();
+		await tick();
+		flushSync();
+		expect(onConfirmAccept).toHaveBeenCalledWith(sceneDraftEnvelope, checkpoint, {
+			forceOverwrite: false,
+		});
+		expect(target.textContent).toContain('Draft applied to scene.');
 		unmount(cmp);
 	});
 
@@ -181,7 +264,11 @@ describe('Nova artifact cards', () => {
 	});
 
 	it('revision pack card preserves review-gate actions, provenance, and clipboard fallback path', async () => {
-		const onAcknowledge = vi.fn();
+		const onAcknowledge = vi.fn(async () => ({
+			artifactKey: 'revision-pack:vibe-author.revision-pack:1',
+			acknowledgedIssueIds: ['issue-1'],
+			updatedAt: '2026-06-15T12:00:00.000Z',
+		}));
 		const writeText = vi.fn().mockRejectedValue(new Error('blocked'));
 		installClipboard(writeText);
 		const target = document.createElement('div');
@@ -202,6 +289,8 @@ describe('Nova artifact cards', () => {
 			'[data-testid="nova-revision-acknowledge"]',
 		) as HTMLButtonElement;
 		acknowledge.click();
+		await tick();
+		await tick();
 		flushSync();
 		expect(onAcknowledge).toHaveBeenCalledWith('issue-1', revisionPackEnvelope);
 		expect(acknowledge.disabled).toBe(true);

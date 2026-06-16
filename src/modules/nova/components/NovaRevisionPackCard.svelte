@@ -3,8 +3,8 @@
 
 	Renders a parsed `vibe-author.revision-pack` artifact as a
 	severity-ranked issue list with per-issue Acknowledge controls. No
-	action mutates the manuscript; Acknowledge emits an `onAcknowledge`
-	callback that a later plan will wire into the editor.
+	action mutates the manuscript; Acknowledge persists review progress
+	through the provided callback.
 -->
 <script lang="ts">
 	import type { PipelineArtifactEnvelope } from '$lib/ai/pipeline/contracts.js';
@@ -12,20 +12,32 @@
 		AUTHOR_SEVERITY_ORDER,
 		type AuthorRevisionPack,
 	} from '$lib/ai/pipeline/author-schemas.js';
+	import type { RevisionPackAcknowledgementState } from '../services/revision-pack-acknowledgements.js';
 
 	interface Props {
 		envelope: PipelineArtifactEnvelope<AuthorRevisionPack>;
+		acknowledgedIssueIds?: string[];
+		acknowledgementLoading?: boolean;
+		acknowledgementError?: string | null;
 		onAcknowledge?: (
 			issueId: string,
 			envelope: PipelineArtifactEnvelope<AuthorRevisionPack>,
-		) => void;
+		) => Promise<RevisionPackAcknowledgementState>;
 	}
 
-	let { envelope, onAcknowledge }: Props = $props();
+	let {
+		envelope,
+		acknowledgedIssueIds = [],
+		acknowledgementLoading = false,
+		acknowledgementError = null,
+		onAcknowledge,
+	}: Props = $props();
 
 	const payload = $derived(envelope.payload);
 
 	let acknowledged = $state<Record<string, true>>({});
+	let pendingAcknowledgements = $state<Record<string, true>>({});
+	let localAcknowledgementError = $state<string | null>(null);
 	let copied = $state(false);
 
 	const sortedIssues = $derived(
@@ -40,9 +52,37 @@
 		return date.toLocaleString();
 	}
 
-	function handleAcknowledge(issueId: string): void {
-		acknowledged = { ...acknowledged, [issueId]: true };
-		onAcknowledge?.(issueId, envelope);
+	$effect(() => {
+		const next: Record<string, true> = {};
+		for (const issueId of acknowledgedIssueIds) {
+			if (issueId.trim()) next[issueId] = true;
+		}
+		acknowledged = next;
+	});
+
+	async function handleAcknowledge(issueId: string): Promise<void> {
+		if (acknowledged[issueId] || pendingAcknowledgements[issueId]) return;
+		if (!onAcknowledge) {
+			localAcknowledgementError = 'This revision note cannot be acknowledged from the current chat context.';
+			return;
+		}
+
+		localAcknowledgementError = null;
+		pendingAcknowledgements = { ...pendingAcknowledgements, [issueId]: true };
+		try {
+			const state = await onAcknowledge(issueId, envelope);
+			const next: Record<string, true> = {};
+			for (const acknowledgedIssueId of state.acknowledgedIssueIds) {
+				next[acknowledgedIssueId] = true;
+			}
+			acknowledged = next;
+		} catch (err) {
+			localAcknowledgementError =
+				err instanceof Error ? err.message : 'Could not save acknowledgement.';
+		} finally {
+			const { [issueId]: _removed, ...rest } = pendingAcknowledgements;
+			pendingAcknowledgements = rest;
+		}
 	}
 
 	async function handleCopy(): Promise<void> {
@@ -106,10 +146,10 @@
 					class="revision-pack-btn"
 					data-testid="nova-revision-acknowledge"
 					aria-label={`Acknowledge revision issue ${issue.id}`}
-					disabled={acknowledged[issue.id] === true}
-					onclick={() => handleAcknowledge(issue.id)}
+					disabled={acknowledgementLoading || acknowledged[issue.id] === true || pendingAcknowledgements[issue.id] === true}
+					onclick={() => void handleAcknowledge(issue.id)}
 				>
-					{acknowledged[issue.id] ? 'Acknowledged' : 'Acknowledge'}
+					{pendingAcknowledgements[issue.id] ? 'Saving...' : acknowledged[issue.id] ? 'Acknowledged' : 'Acknowledge'}
 				</button>
 			</li>
 		{/each}
@@ -125,7 +165,15 @@
 		>
 			{copied ? 'Copied' : 'Copy JSON'}
 		</button>
-		<p class="revision-pack-note">Draft only. No manuscript edits are applied automatically.</p>
+		<p class="revision-pack-note">Acknowledgements save review progress only. No manuscript edits are applied automatically.</p>
+		{#if acknowledgementLoading}
+			<p class="revision-pack-note" role="status">Loading acknowledgements...</p>
+		{/if}
+		{#if acknowledgementError || localAcknowledgementError}
+			<p class="revision-pack-error" role="alert">
+				{acknowledgementError ?? localAcknowledgementError}
+			</p>
+		{/if}
 	</footer>
 </article>
 
@@ -275,5 +323,11 @@
 		margin: 0;
 		font-size: var(--text-xs);
 		color: var(--color-text-muted);
+	}
+
+	.revision-pack-error {
+		margin: 0;
+		font-size: var(--text-xs);
+		color: var(--color-error);
 	}
 </style>

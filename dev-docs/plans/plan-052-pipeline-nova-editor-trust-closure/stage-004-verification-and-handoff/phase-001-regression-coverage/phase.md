@@ -2,7 +2,7 @@
 title: Regression Coverage
 slug: phase-001-regression-coverage
 phase_number: 1
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-004-verification-and-handoff
 parts:
@@ -18,14 +18,14 @@ Add targeted automated coverage for the P1 blockers and visible copy cleanup.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Add Nova Artifact Action Regression Tests](part-001-add-nova-artifact-action-regression-tests/part.md) | `draft` | Codex | 0.5d |
+| 001 | [Add Nova Artifact Action Regression Tests](part-001-add-nova-artifact-action-regression-tests/part.md) | `review` | Codex | 0.5d |
 
 ## Acceptance Criteria
 
-- [ ] Scene draft Accept/Reject and revision Acknowledge regressions fail if unwired again.
-- [ ] At least one browser-level path verifies visible copy and action state.
-- [ ] All parts reach `complete` after real Reviewer Agent sign-off.
+- [x] Scene draft Accept/Reject and revision Acknowledge regressions fail if unwired again.
+- [x] At least one browser-level path verifies visible copy and action state.
+- [x] All parts are in `review` with real Reviewer Agent sign-off still pending.
 
 ## Notes
 
-Phase remains draft until execution begins. Add implementation evidence under each part before moving to review.
+Phase implementation is in `review` pending real Reviewer Agent sign-off. Evidence is recorded under each part.

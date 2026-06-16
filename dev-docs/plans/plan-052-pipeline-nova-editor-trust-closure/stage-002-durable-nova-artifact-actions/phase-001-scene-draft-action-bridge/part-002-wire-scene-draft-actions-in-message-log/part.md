@@ -2,12 +2,12 @@
 title: Wire Scene Draft Actions In Message Log
 slug: part-002-wire-scene-draft-actions-in-message-log
 part_number: 2
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-001-scene-draft-action-bridge
-started_at: ~
-completed_at: ~
+started_at: 2026-06-15
+completed_at: 2026-06-15
 estimated_duration: 0.5d
 ---
 
@@ -51,9 +51,9 @@ Pass real scene draft action handlers from NovaMessageLog into NovaSceneDraftCar
 
 ## Acceptance Criteria
 
-- [ ] NovaSceneDraftCard receives non-empty handlers in chat view.
-- [ ] UI text never claims acceptance before the action service returns success.
-- [ ] Tests fail if handlers are omitted from the message log again.
+- [x] NovaSceneDraftCard receives non-empty handlers in chat view.
+- [x] UI text never claims acceptance before the action service returns success.
+- [x] Tests fail if handlers are omitted from the message log again.
 
 ## Edge Cases
 
@@ -68,4 +68,4 @@ Pass real scene draft action handlers from NovaMessageLog into NovaSceneDraftCar
 
 ## Notes
 
-This part is draft-only until explicitly activated. Keep review and mutation boundaries real.
+This part is in `review` pending real Reviewer Agent sign-off. Keep review and mutation boundaries real.

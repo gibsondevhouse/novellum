@@ -2,12 +2,12 @@
 title: Add Nova Artifact Action Regression Tests
 slug: part-001-add-nova-artifact-action-regression-tests
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-001-regression-coverage
-started_at: ~
-completed_at: ~
+started_at: 2026-06-15
+completed_at: 2026-06-15
 estimated_duration: 0.5d
 ---
 
@@ -51,9 +51,9 @@ Cover the corrected artifact action flows at unit/component and E2E levels.
 
 ## Acceptance Criteria
 
-- [ ] Tests prove Accept/Reject handlers are passed into chat cards.
-- [ ] Tests prove revision acknowledgements persist across reload/re-render.
-- [ ] E2E or browser evidence proves user-visible states are coherent.
+- [x] Tests prove Accept/Reject handlers are passed into chat cards.
+- [x] Tests prove revision acknowledgements persist across reload/re-render.
+- [x] E2E or browser evidence proves user-visible states are coherent.
 
 ## Edge Cases
 
@@ -69,4 +69,4 @@ Cover the corrected artifact action flows at unit/component and E2E levels.
 
 ## Notes
 
-This part is draft-only until explicitly activated. Keep review and mutation boundaries real.
+This part is in `review` pending real Reviewer Agent sign-off. Keep review and mutation boundaries real.

@@ -88,6 +88,50 @@ export {
 	type RejectOutlineCheckpointActionInput,
 	type ReviewOutlineCheckpointActionInput,
 } from './services/outline-checkpoint-actions.js';
+export {
+	NOVA_ARTIFACT_ACTION_OWNER_ID,
+	actionRequiresDurableWrite,
+	classifyNovaArtifactAction,
+	createInsufficientContextResult,
+	createNovaArtifactActionResult,
+	createNovaArtifactActionTarget,
+	createStaleTargetResult,
+	type NovaArtifactActionAuditMetadata,
+	type NovaArtifactActionClassification,
+	type NovaArtifactActionDurability,
+	type NovaArtifactActionInput,
+	type NovaArtifactActionKind,
+	type NovaArtifactActionResult,
+	type NovaArtifactActionStatus,
+	type NovaArtifactActionTarget,
+	type NovaInlineArtifactKind,
+} from './services/artifact-action-types.js';
+export {
+	rejectInlineSceneDraftCheckpoint,
+	stageInlineSceneDraftCheckpoint,
+	type InlineSceneDraftActionDeps,
+	type InlineSceneDraftBaseInput,
+	type RejectInlineSceneDraftInput,
+	type StageInlineSceneDraftResult,
+	type StageInlineSceneDraftResultData,
+} from './services/inline-scene-draft-actions.js';
+export {
+	REVISION_PACK_ACKNOWLEDGEMENT_OWNER_ID,
+	RevisionPackAcknowledgementError,
+	acknowledgeRevisionPackIssue,
+	loadRevisionPackAcknowledgements,
+	revisionPackAcknowledgementKey,
+	type RevisionPackAcknowledgementDeps,
+	type RevisionPackAcknowledgementState,
+} from './services/revision-pack-acknowledgements.js';
+export {
+	artifactLifecycleLabel,
+	artifactTaskLabel,
+	debugMetadataLabel,
+	formatArtifactTimestamp,
+	formatDebugValue,
+	formatSceneDisplayLabel,
+} from './services/artifact-display.js';
 export { dispatchTool } from './services/tool-router.js';
 export { runAgentLoop, MAX_AGENT_STEPS, type AgentLoopInput } from './services/agent-loop.js';
 export { registerAgentTools, type ProposalEnvelope } from './services/agent-tools.js';

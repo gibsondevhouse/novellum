@@ -31,7 +31,9 @@ describe('updater stub', () => {
 		const status = await checkForUpdates();
 		expect(status.kind).toBe('unsupported');
 		if (status.kind === 'unsupported') {
-			expect(status.reason).toMatch(/auto-update/i);
+			expect(status.reason).toBe(
+				'Automatic updates are not available in this unsigned pre-release build.',
+			);
 			expect(status.currentVersion).toBe(getAppVersion());
 		}
 	});

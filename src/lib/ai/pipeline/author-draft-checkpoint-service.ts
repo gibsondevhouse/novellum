@@ -213,6 +213,7 @@ export interface CreateCheckpointInput {
 	projectId: string;
 	sceneId: string;
 	chapterId: string;
+	checkpointId?: string;
 	artifact: Omit<AuthorDraftArtifact, 'wordCount' | 'sidecar'> & {
 		wordCount?: number;
 		sidecar: Omit<
@@ -281,7 +282,7 @@ export function createAuthorDraftCheckpointService(database: Database.Database =
 
 			const createdAt = nowIso();
 			const updatedAt = createdAt;
-			const checkpointId = randomUUID();
+			const checkpointId = input.checkpointId?.trim() || randomUUID();
 
 			if (existingActive && input.forceRegenerate) {
 				const superseded: AuthorDraftCheckpoint = {

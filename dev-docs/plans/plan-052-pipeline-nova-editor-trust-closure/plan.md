@@ -2,7 +2,7 @@
 title: Pipeline, Nova, and Editor Trust Closure
 slug: plan-052-pipeline-nova-editor-trust-closure
 version: 1.0.0
-status: draft
+status: review
 owner: Planner Agent
 created: 2026-06-15
 last_updated: 2026-06-15
@@ -57,10 +57,10 @@ Authors can trust every visible Nova action. If a button says Accept, Reject, Ac
 
 | # | Stage | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Artifact Action Contract](stage-001-artifact-action-contract/stage.md) | `draft` | 1d |
-| 002 | [Durable Nova Artifact Actions](stage-002-durable-nova-artifact-actions/stage.md) | `draft` | 3d |
-| 003 | [Author-Facing Copy And Metadata Polish](stage-003-author-facing-copy-and-metadata-polish/stage.md) | `draft` | 2d |
-| 004 | [Verification And Handoff](stage-004-verification-and-handoff/stage.md) | `draft` | 1d |
+| 001 | [Artifact Action Contract](stage-001-artifact-action-contract/stage.md) | `review` | 1d |
+| 002 | [Durable Nova Artifact Actions](stage-002-durable-nova-artifact-actions/stage.md) | `review` | 3d |
+| 003 | [Author-Facing Copy And Metadata Polish](stage-003-author-facing-copy-and-metadata-polish/stage.md) | `review` | 2d |
+| 004 | [Verification And Handoff](stage-004-verification-and-handoff/stage.md) | `review` | 1d |
 
 ## Guardrails
 
@@ -81,13 +81,13 @@ Authors can trust every visible Nova action. If a button says Accept, Reject, Ac
 
 All stages must pass the following gates before the plan is marked `complete`:
 
-- [ ] **lint** - zero lint errors
-- [ ] **lint:css** - zero CSS lint errors
-- [ ] **typecheck** - zero type errors and zero warnings
-- [ ] **tests** - relevant unit and integration suites pass
-- [ ] **e2e** - targeted Playwright coverage passes for changed product flows
-- [ ] **check:tokens** - zero visual token violations
-- [ ] **docs_sync** - docs and trackers reflect shipped behavior
+- [x] **lint** - zero lint errors
+- [x] **lint:css** - zero CSS lint errors
+- [x] **typecheck** - zero type errors and zero warnings
+- [x] **tests** - relevant unit and integration suites pass
+- [x] **e2e** - targeted Playwright coverage passes for changed product flows
+- [x] **check:tokens** - zero visual token violations
+- [x] **docs_sync** - docs and trackers reflect shipped behavior
 - [ ] **manual_verify** - Reviewer Agent validates user-facing behavior and review gates
 
 ## Risks & Mitigations
@@ -105,4 +105,4 @@ This plan expands `dev-docs/plans/candidate-plans/pipeline-nova-editor.md` into 
 
 ## Notes
 
-This is a draft/deferred implementation plan. Do not execute it or mark any child artifact `in-progress` until the plan is explicitly activated. Do not mark it `complete` until Reviewer Agent sign-off is real.
+This plan was explicitly activated for execution on 2026-06-15 and moved to `review` the same day after automated gates and evidence collection. Do not mark it `complete` until Reviewer Agent sign-off is real.
