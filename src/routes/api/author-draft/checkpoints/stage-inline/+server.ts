@@ -24,7 +24,27 @@ function asString(value: unknown): string | null {
 }
 
 function listValue(value: unknown): unknown {
-	return Array.isArray(value) || typeof value === 'string' ? value : [];
+	if (Array.isArray(value) || typeof value === 'string') {
+		return value;
+	}
+	if (isRecord(value)) {
+		throw new AuthorDraftCheckpointError('invalid_payload', 'Sidecar list fields must be arrays or strings, not objects.');
+	}
+	return [];
+}
+
+function usedCanonRefsValue(value: unknown): unknown {
+	if (Array.isArray(value) || typeof value === 'string') {
+		return value;
+	}
+	if (isRecord(value)) {
+		// Support object form with characterIds property
+		if (Array.isArray(value.characterIds)) {
+			return value.characterIds;
+		}
+		throw new AuthorDraftCheckpointError('invalid_payload', 'usedCanonRefs object must contain a characterIds array.');
+	}
+	return [];
 }
 
 function sceneIdFromEnvelope(envelope: PipelineArtifactEnvelope<AuthorSceneDraftPayload>): string | null {

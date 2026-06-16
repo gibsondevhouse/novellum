@@ -193,7 +193,7 @@
 			type="button"
 			class="scene-draft-btn scene-draft-btn-accept"
 			data-testid="nova-scene-draft-accept"
-			aria-label="Accept scene draft and emit accept event"
+			aria-label="Save scene draft as checkpoint for review and confirmation"
 			disabled={!canStartAction}
 			onclick={() => void handleAccept()}
 		>
