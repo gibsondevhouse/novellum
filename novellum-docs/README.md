@@ -1,6 +1,6 @@
 # Novellum Documentation
 
-> Last verified: 2026-06-01
+> Last verified: 2026-06-16
 
 Two audiences, two tracks:
 

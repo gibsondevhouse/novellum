@@ -1,6 +1,6 @@
 # Release Runbook
 
-> Last verified: 2026-06-01
+> Last verified: 2026-06-16
 
 Novellum ships as desktop binaries (Tauri) plus a runnable SvelteKit Node app. This runbook covers cutting a release.
 

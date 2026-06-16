@@ -1,6 +1,6 @@
 # Getting Started (Developers)
 
-> Last verified: 2026-06-01
+> Last verified: 2026-06-16
 
 This is the **fast path** for a new contributor. The deeper reference lives under [../../dev-docs/](../../dev-docs/) — read [../../dev-docs/01-project/journey.md](../../dev-docs/01-project/journey.md) for the project's history once you're set up.
 
@@ -36,6 +36,19 @@ pnpm desktop:dev
 ```
 
 This launches Tauri in dev mode: Vite serves the client, the SvelteKit Node server runs as a sidecar, and the Tauri WebView points at it. See [../../dev-docs/02-architecture/tauri-shell.md](../../dev-docs/02-architecture/tauri-shell.md) for what's happening under the hood.
+
+## Build for desktop
+
+To produce standalone binaries (e.g., `.dmg`, `.msi`, `.AppImage`):
+
+```bash
+pnpm run desktop:build
+```
+
+The output will be located in `src-tauri/target/release/bundle/`. 
+
+**Troubleshooting Build Mismatch:**
+If you see a Tauri version mismatch error (e.g., `tauri (v2.x.x) : @tauri-apps/api (v2.y.y)`), ensure the `tauri` version in `src-tauri/Cargo.toml` matches the major/minor version of `@tauri-apps/api` in `package.json`, then run `cd src-tauri && cargo update -p tauri`.
 
 ## Type-check, lint, format
 

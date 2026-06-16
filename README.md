@@ -7,8 +7,9 @@
 ## Features
 
 - **Manuscript editor** — TipTap scene editor with continuous autosave, snapshot history, and crash recovery.
-- **Structural outline** — Arc → Act → Chapter → Scene → Beat hierarchy with drilldown workspaces.
-- **World Building** — Personae, Atlas, Archive, Threads, and Chronicles in a unified shell.
+- **Structural outline** — Arc → Act → Chapter → Scene → Beat hierarchy with review-gated proposal flows.
+- **World Building** — Personae, Atlas, Archive, Threads, and Chronicles in a unified shell; reviewable canon merges.
+- **Governed AI** — Central AI Controller with policy enforcement, intent resolution, and artifact lifecycle management.
 - **Nova AI copilot** — chat-style assistant grounded in your project; bring your own OpenRouter key (no subscription).
 - **Continuity checks** — agentic consistency review across scenes, characters, locations, and timeline.
 - **Reader** — paginated, distraction-free read-through view.
