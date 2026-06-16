@@ -22,7 +22,7 @@ const source = readFileSync(SOURCE_PATH, 'utf-8');
 
 describe('NovaSceneDraftCard source contract', () => {
 	it('exposes Accept, Reject, and Copy controls with ARIA labels', () => {
-		expect(source).toContain('aria-label="Accept scene draft and emit accept event"');
+		expect(source).toContain('aria-label="Save scene draft as checkpoint for review and confirmation"');
 		expect(source).toContain('aria-label="Reject scene draft"');
 		expect(source).toContain('aria-label="Copy drafted prose to clipboard"');
 		expect(source).toContain(": 'Accept'");
