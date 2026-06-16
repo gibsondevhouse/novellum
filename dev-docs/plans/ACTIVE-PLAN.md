@@ -6,10 +6,12 @@
 
 ## Current
 
-[plan-052-pipeline-nova-editor-trust-closure](./plan-052-pipeline-nova-editor-trust-closure/plan.md) — Pipeline, Nova, and Editor Trust Closure. Implementation evidence and automated gates are ready for Reviewer Agent evaluation. Status: `review`.
+No active plan.
 
 ## Pending review
 
+- [plan-053-worldbuilding-outline-review-flow-closure](./plan-053-worldbuilding-outline-review-flow-closure/plan.md) — Worldbuilding and Outline Review Flow Closure. Proposal review, generation execution state, outline review polish, persistence error cleanup, docs sync, and final automated evidence are ready for Reviewer Agent evaluation. Status: `review`.
+- [plan-052-pipeline-nova-editor-trust-closure](./plan-052-pipeline-nova-editor-trust-closure/plan.md) — Pipeline, Nova, and Editor Trust Closure. Implementation evidence and automated gates are ready for Reviewer Agent evaluation. Status: `review`.
 - [plan-051-governed-ai-controller-runtime](./plan-051-governed-ai-controller-runtime/plan.md) — Governed AI Controller Runtime. Central controller runtime, policy guard, context builder, workflow registry, model gateway, output validation, artifact lifecycle, run logging, existing route audit wrappers, docs, and quality gates are ready for Reviewer Agent evaluation. Moved to review 2026-06-15.
 - [plan-048-frontend-experience-coherence](./plan-048-frontend-experience-coherence/plan.md) — Frontend Experience Coherence. Route/context contract, review-gate language, docs sync, quality gates, targeted E2E, and browser evidence are ready for Reviewer Agent evaluation. Moved to review 2026-06-15.
 

@@ -12,11 +12,12 @@
 
 	interface Props {
 		proposal: WorldbuildProposalRecord;
-		onAccept?: (proposalId: string, projectId: string) => void;
-		onReject?: (proposalId: string, reason: string, projectId: string) => void;
+		onAccept?: (proposalId: string, projectId: string) => void | Promise<void>;
+		onReject?: (proposalId: string, reason: string, projectId: string) => void | Promise<void>;
+		busy?: boolean;
 	}
 
-	let { proposal, onAccept, onReject }: Props = $props();
+	let { proposal, onAccept, onReject, busy = false }: Props = $props();
 
 	const domainLabel = $derived(
 		proposal.categoryId.replace(/-/g, ' '),
@@ -46,20 +47,20 @@
 	let rejectReason = $state('');
 
 	function handleAccept(): void {
-		onAccept?.(proposal.proposalId, proposal.projectId);
+		void onAccept?.(proposal.proposalId, proposal.projectId);
 	}
 
 	function handleRejectSubmit(): void {
 		const reason = rejectReason.trim();
 		if (reason) {
-			onReject?.(proposal.proposalId, reason, proposal.projectId);
+			void onReject?.(proposal.proposalId, reason, proposal.projectId);
 			rejecting = false;
 			rejectReason = '';
 		}
 	}
 </script>
 
-<div class="proposal-card">
+<div class="proposal-card" aria-busy={busy ? 'true' : 'false'}>
 	<div class="proposal-card__header">
 		<div class="proposal-card__meta">
 			<span class="proposal-card__domain">{domainLabel}</span>
@@ -95,17 +96,19 @@
 
 	<WorldbuildingProposalDiffView {proposal} maxPayloadFields={4} />
 
-	{#if proposal.status === 'pending_review'}
+	{#if proposal.status === 'pending_review' && onAccept && onReject}
 		<div class="proposal-card__actions">
 			{#if !rejecting}
 				<PrimaryButton
 					size="sm"
 					onclick={handleAccept}
+					disabled={busy}
 					aria-label="Accept proposal for {domainLabel}"
-				>Accept</PrimaryButton>
+				>{busy ? 'Working...' : 'Accept'}</PrimaryButton>
 				<DestructiveButton
 					size="sm"
 					onclick={() => (rejecting = true)}
+					disabled={busy}
 					aria-label="Reject proposal for {domainLabel}"
 				>Reject</DestructiveButton>
 			{:else}
@@ -119,11 +122,12 @@
 					/>
 					<DestructiveButton
 						size="sm"
-						disabled={!rejectReason.trim()}
+						disabled={busy || !rejectReason.trim()}
 						onclick={handleRejectSubmit}
-					>Confirm reject</DestructiveButton>
+					>{busy ? 'Working...' : 'Confirm reject'}</DestructiveButton>
 					<SecondaryButton
 						size="sm"
+						disabled={busy}
 						onclick={() => { rejecting = false; rejectReason = ''; }}
 					>Cancel</SecondaryButton>
 				</div>

@@ -2,12 +2,12 @@
 title: Replace Nova Prompt Seeding With Generation Action Service
 slug: part-001-replace-nova-prompt-seeding-with-generation-action-service
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-001-generation-action-contract
-started_at: ~
-completed_at: ~
+started_at: 2026-06-16
+completed_at: 2026-06-16
 estimated_duration: 1d
 ---
 
@@ -54,10 +54,10 @@ Move domain Generate buttons from open-Nova-only behavior to a service that perf
 
 ## Acceptance Criteria
 
-- [ ] Generate invokes a real generation path when readiness allows.
-- [ ] Missing context transitions to missing-context and shows the reason.
-- [ ] Successful generation transitions to review-ready and provides proposal/draft visibility.
-- [ ] Nova prompt opening is no longer mistaken for execution.
+- [x] Generate invokes a real generation path when readiness allows.
+- [x] Missing context transitions to missing-context and shows the reason.
+- [x] Successful generation transitions to review-ready and provides proposal/draft visibility.
+- [x] Nova prompt opening is no longer mistaken for execution.
 
 ## Edge Cases
 

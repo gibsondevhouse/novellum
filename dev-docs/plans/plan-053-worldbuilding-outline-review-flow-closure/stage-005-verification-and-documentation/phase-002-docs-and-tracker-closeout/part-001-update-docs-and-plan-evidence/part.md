@@ -2,12 +2,12 @@
 title: Update Docs And Plan Evidence
 slug: part-001-update-docs-and-plan-evidence
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-002-docs-and-tracker-closeout
-started_at: ~
-completed_at: ~
+started_at: 2026-06-16
+completed_at: 2026-06-16
 estimated_duration: 0.5d
 ---
 
@@ -37,7 +37,7 @@ Document the restored review flows and collect final evidence for plan review.
 
 **Create:**
 
-- `dev-docs/plans/plan-053-worldbuilding-outline-review-flow-closure/stage-005-verification-and-documentation/phase-002-docs-and-tracker-closeout/part-001-update-docs-and-plan-evidence/evidence/closeout-2026-06-15.md`
+- `dev-docs/plans/plan-053-worldbuilding-outline-review-flow-closure/stage-005-verification-and-documentation/phase-002-docs-and-tracker-closeout/part-001-update-docs-and-plan-evidence/evidence/closeout-2026-06-16.md`
 
 **Update:**
 
@@ -53,9 +53,9 @@ Document the restored review flows and collect final evidence for plan review.
 
 ## Acceptance Criteria
 
-- [ ] Docs describe worldbuilding proposal and outline checkpoint review state accurately.
-- [ ] Evidence links to final command output and browser validation.
-- [ ] Reviewer Agent sign-off remains pending until actually performed.
+- [x] Docs describe worldbuilding proposal and outline checkpoint review state accurately.
+- [x] Evidence links to final command output and browser validation.
+- [x] Reviewer Agent sign-off remains pending until actually performed.
 
 ## Edge Cases
 

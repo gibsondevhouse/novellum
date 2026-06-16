@@ -145,6 +145,48 @@ export const PIPELINE_TASK_CATALOG: Readonly<Record<PipelineTaskKey, PipelineTas
 	},
 };
 
+export const PIPELINE_TASK_DISPLAY_LABELS: Readonly<Record<PipelineTaskKey, string>> = {
+	[PIPELINE_TASK_KEYS.WORLDBUILD_PREMISE]: 'Worldbuilding premise',
+	[PIPELINE_TASK_KEYS.WORLDBUILD_WORLDSPEC]: 'World specification',
+	[PIPELINE_TASK_KEYS.WORLDBUILD_RESEARCH]: 'Research briefs',
+	[PIPELINE_TASK_KEYS.WORLDBUILD_WORLD_BIBLE]: 'Populated world bible',
+	[PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_PERSONAE]: 'Personae domain',
+	[PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_ATLAS]: 'Atlas domain',
+	[PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_ARCHIVE]: 'Archive domain',
+	[PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_THREADS]: 'Threads domain',
+	[PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_CHRONICLES]: 'Chronicles domain',
+	[PIPELINE_TASK_KEYS.AUTHOR_PREMISE]: 'Author premise',
+	[PIPELINE_TASK_KEYS.AUTHOR_OUTLINE]: 'Author outline',
+	[PIPELINE_TASK_KEYS.AUTHOR_SCENE_DRAFT]: 'Scene draft',
+	[PIPELINE_TASK_KEYS.AUTHOR_REVISION_PACK]: 'Revision pack',
+};
+
+function titleCaseToken(token: string): string {
+	return token ? `${token.charAt(0).toUpperCase()}${token.slice(1).toLowerCase()}` : token;
+}
+
+function humanizeTaskKeyTail(key: string): string {
+	const tail = key.split('.').filter(Boolean).at(-1) ?? key;
+	const words = tail
+		.replace(/[_:]+/g, '-')
+		.split('-')
+		.map((part) => part.trim())
+		.filter(Boolean)
+		.map(titleCaseToken);
+
+	return words.length > 0 ? `${words.join(' ')} task` : 'Pipeline task';
+}
+
+export function getPipelineTaskLabel(key: string): string {
+	const knownLabel = (PIPELINE_TASK_DISPLAY_LABELS as Record<string, string>)[key];
+	if (knownLabel) return knownLabel;
+
+	const definition = getPipelineTaskDefinition(key);
+	if (definition) return humanizeTaskKeyTail(definition.stage);
+
+	return humanizeTaskKeyTail(key);
+}
+
 export const WORLDBUILD_DOMAIN_PIPELINE_KEYS = [
 	PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_PERSONAE,
 	PIPELINE_TASK_KEYS.WORLDBUILD_DOMAIN_ATLAS,

@@ -2,12 +2,12 @@
 title: Clean Outline Detail Metadata
 slug: part-001-clean-outline-detail-metadata
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-002-checkpoint-detail-disclosure
-started_at: ~
-completed_at: ~
+started_at: 2026-06-16
+completed_at: 2026-06-16
 estimated_duration: 0.75d
 ---
 
@@ -51,9 +51,9 @@ Remove raw runtime metadata from default outline checkpoint detail rows and repl
 
 ## Acceptance Criteria
 
-- [ ] Default review panel does not show full JSON payload.
-- [ ] Raw payload is still available under an Advanced details disclosure.
-- [ ] Accept/reject warning copy names user impact, not internal task keys.
+- [x] Default review panel does not show full JSON payload.
+- [x] Raw payload is still available under an Advanced details disclosure.
+- [x] Accept/reject warning copy names user impact, not internal task keys.
 
 ## Edge Cases
 

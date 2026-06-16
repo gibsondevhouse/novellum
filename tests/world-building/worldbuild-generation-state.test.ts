@@ -5,6 +5,7 @@ import {
 	resetState,
 	getMissingContextReason,
 	evaluateReadiness,
+	markMissingContext,
 } from '../../src/modules/world-building/stores/worldbuilding-generation-state.svelte.js';
 import type { WorldbuildingDomainId } from '../../src/modules/world-building/worldbuilding-workflow.js';
 
@@ -230,6 +231,23 @@ describe('evaluateReadiness', () => {
 		transition('atlas', 'queued');
 		evaluateReadiness('atlas', allCounts(0));
 		expect(getState('atlas')).toBe('queued');
+	});
+});
+
+describe('markMissingContext', () => {
+	it('sets a custom missing-context reason from idle', () => {
+		markMissingContext('personae', 'No project loaded');
+
+		expect(getState('personae')).toBe('missing-context');
+		expect(getMissingContextReason('personae')).toBe('No project loaded');
+	});
+
+	it('does not overwrite active generation states', () => {
+		transition('personae', 'queued');
+		markMissingContext('personae', 'No project loaded');
+
+		expect(getState('personae')).toBe('queued');
+		expect(getMissingContextReason('personae')).toBeNull();
 	});
 });
 

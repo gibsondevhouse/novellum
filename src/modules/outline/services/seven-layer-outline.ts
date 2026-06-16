@@ -84,6 +84,21 @@ function sortByOrderThenTitle<T extends { order?: number; title?: string }>(item
 	});
 }
 
+export function normalizeMilestoneChapterIds(chapterIds: unknown): string[] {
+	if (Array.isArray(chapterIds)) {
+		return chapterIds.filter((id): id is string => typeof id === 'string' && id.trim().length > 0);
+	}
+
+	if (typeof chapterIds !== 'string' || chapterIds.trim().length === 0) return [];
+
+	try {
+		const parsed = JSON.parse(chapterIds) as unknown;
+		return normalizeMilestoneChapterIds(parsed);
+	} catch {
+		return [];
+	}
+}
+
 /**
  * Returns a normalized, deterministically-sorted seven-layer outline.
  *
@@ -115,7 +130,7 @@ export function normalizeSevenLayerOutline(raw: {
 	const chapterOrderIndex = new Map(chapters.map((c, i) => [c.id, i]));
 	const milestones = sortByOrderThenTitle(raw.milestones ?? []).map((m) => ({
 		...m,
-		chapterIds: [...(m.chapterIds ?? [])].sort((a, b) => {
+		chapterIds: normalizeMilestoneChapterIds(m.chapterIds).sort((a, b) => {
 			const ai = chapterOrderIndex.get(a) ?? Number.MAX_SAFE_INTEGER;
 			const bi = chapterOrderIndex.get(b) ?? Number.MAX_SAFE_INTEGER;
 			return ai - bi;

@@ -2,12 +2,12 @@
 title: Wire Proposal Accept Reject Refresh
 slug: part-002-wire-proposal-accept-reject-refresh
 part_number: 2
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-002-proposal-review-actions
-started_at: ~
-completed_at: ~
+started_at: 2026-06-16
+completed_at: 2026-06-16
 estimated_duration: 1d
 ---
 
@@ -55,10 +55,10 @@ Connect proposal review tile actions to accept/reject routes and refresh/upsert 
 
 ## Acceptance Criteria
 
-- [ ] Accept removes or relabels the pending proposal after server success.
-- [ ] Reject records a visible rejected state or removes from pending count after server success.
-- [ ] Failed actions are retryable and do not lose local proposal data.
-- [ ] E2E proves persisted proposals surface and can be acted on.
+- [x] Accept removes or relabels the pending proposal after server success.
+- [x] Reject records a visible rejected state or removes from pending count after server success.
+- [x] Failed actions are retryable and do not lose local proposal data.
+- [x] E2E proves persisted proposals surface and can be acted on.
 
 ## Edge Cases
 

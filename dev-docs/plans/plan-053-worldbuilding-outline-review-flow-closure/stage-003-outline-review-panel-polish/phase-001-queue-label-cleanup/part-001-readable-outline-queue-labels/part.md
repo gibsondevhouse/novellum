@@ -2,12 +2,12 @@
 title: Readable Outline Queue Labels
 slug: part-001-readable-outline-queue-labels
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-001-queue-label-cleanup
-started_at: ~
-completed_at: ~
+started_at: 2026-06-16
+completed_at: 2026-06-16
 estimated_duration: 0.75d
 ---
 
@@ -50,9 +50,9 @@ Translate outline checkpoint queue filters, lifecycle chips, and task keys into 
 
 ## Acceptance Criteria
 
-- [ ] Queue rows do not show raw task keys by default.
-- [ ] Lifecycle chips use Draft, In review, Accepted, and Rejected style labels.
-- [ ] Unknown task keys fall back safely without exposing raw internal jargon first.
+- [x] Queue rows do not show raw task keys by default.
+- [x] Lifecycle chips use Draft, In review, Accepted, and Rejected style labels.
+- [x] Unknown task keys fall back safely without exposing raw internal jargon first.
 
 ## Edge Cases
 

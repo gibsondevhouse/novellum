@@ -74,3 +74,8 @@ export function getWorldbuildingDomainConfig(
 ): WorldbuildingDomainConfig | undefined {
 	return WORLDBUILDING_DOMAIN_SEQUENCE.find((d) => d.id === id);
 }
+
+export function formatPendingSuggestionLabel(count: number, domainLabel: string): string {
+	const safeCount = Math.max(0, Math.trunc(count));
+	return `${safeCount} pending suggestion${safeCount === 1 ? '' : 's'} for ${domainLabel}`;
+}

@@ -2,7 +2,7 @@
 title: Checkpoint Detail Disclosure
 slug: phase-002-checkpoint-detail-disclosure
 phase_number: 2
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-003-outline-review-panel-polish
 parts:
@@ -19,13 +19,13 @@ Move raw payloads and runtime internals behind explicit advanced/debug disclosur
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Clean Outline Detail Metadata](part-001-clean-outline-detail-metadata/part.md) | `draft` | Codex | 0.75d |
-| 002 | [Add Outline Review Browser Evidence](part-002-add-outline-review-browser-evidence/part.md) | `draft` | Codex | 0.5d |
+| 001 | [Clean Outline Detail Metadata](part-001-clean-outline-detail-metadata/part.md) | `review` | Codex | 0.75d |
+| 002 | [Add Outline Review Browser Evidence](part-002-add-outline-review-browser-evidence/part.md) | `review` | Codex | 0.5d |
 
 ## Acceptance Criteria
 
-- [ ] Default detail panel shows summary, readiness, warnings, and action impact instead of raw JSON.
-- [ ] Raw payload remains reachable through an explicit advanced disclosure.
+- [x] Default detail panel shows summary, readiness, warnings, and action impact instead of raw JSON.
+- [x] Raw payload remains reachable through an explicit advanced disclosure.
 - [ ] All parts reach `complete` after real Reviewer Agent sign-off.
 
 ## Notes

@@ -93,6 +93,7 @@
 
 	type EditableCharacterField = Exclude<keyof CharacterRecord, 'id' | 'relationships'>;
 	type CharacterOption = { id: string; name: string; role?: string; summary?: string };
+	type PersistenceFailure = { message: string; cause: unknown };
 
 	const PHOTO_STORAGE_KEY_PREFIX = 'novellum.character.photo';
 
@@ -216,6 +217,11 @@
 	const hasPendingSaves = $derived(pendingSaveCount > 0);
 	const showSaveIndicator = $derived(hasPendingSaves || !!saveErrorMessage || !!lastSavedAt);
 
+	function reportPersistenceFailure(failure: PersistenceFailure): void {
+		if (!import.meta.env.DEV) return;
+		console.error(failure.message, failure.cause);
+	}
+
 	async function runWithPersistenceFeedback(
 		operation: () => Promise<void>,
 		errorMessage: string,
@@ -227,7 +233,7 @@
 			lastSavedAt = Date.now();
 			return true;
 		} catch (error) {
-			console.error(errorMessage, error);
+			reportPersistenceFailure({ message: errorMessage, cause: error });
 			saveErrorMessage = errorMessage;
 			return false;
 		} finally {
@@ -246,7 +252,7 @@
 			lastSavedAt = Date.now();
 			return result;
 		} catch (error) {
-			console.error(errorMessage, error);
+			reportPersistenceFailure({ message: errorMessage, cause: error });
 			saveErrorMessage = errorMessage;
 			return null;
 		} finally {

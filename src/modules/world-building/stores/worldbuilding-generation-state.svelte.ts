@@ -41,6 +41,30 @@ function makeInitialReasons(): Record<WorldbuildingDomainId, string | null> {
 
 const states = $state<Record<WorldbuildingDomainId, WorldbuildingGenerationStateValue>>(makeInitialState());
 const missingContextReasons = $state<Record<WorldbuildingDomainId, string | null>>(makeInitialReasons());
+const failureReasons = $state<Record<WorldbuildingDomainId, string | null>>(makeInitialReasons());
+
+export function normalizeGenerationFailureReason(error: unknown): string {
+	const raw =
+		error instanceof Error
+			? error.message
+			: typeof error === 'string'
+				? error
+				: 'Generation failed. Please try again.';
+	const message = raw.trim();
+
+	if (!message) return 'Generation failed. Please try again.';
+	if (/no ai provider credentials|missing.*credential|api key/i.test(message)) {
+		return 'Add AI provider credentials in Settings, then retry generation.';
+	}
+	if (/unexpected format|parse_failed|validation_failed|validat/i.test(message)) {
+		return 'The generated draft could not be validated. Try again.';
+	}
+	if (/failed to fetch|network|econnrefused|offline/i.test(message)) {
+		return 'Could not reach the generation service. Check your connection and retry.';
+	}
+
+	return message.length > 180 ? `${message.slice(0, 177)}...` : message;
+}
 
 export function getState(domainId: WorldbuildingDomainId): WorldbuildingGenerationStateValue {
 	return states[domainId];
@@ -62,15 +86,41 @@ export function transition(
 	if (newState !== 'missing-context') {
 		missingContextReasons[domainId] = null;
 	}
+	if (newState !== 'failed') {
+		failureReasons[domainId] = null;
+	}
 }
 
 export function resetState(domainId: WorldbuildingDomainId): void {
 	states[domainId] = 'idle';
 	missingContextReasons[domainId] = null;
+	failureReasons[domainId] = null;
 }
 
 export function getMissingContextReason(domainId: WorldbuildingDomainId): string | null {
 	return missingContextReasons[domainId];
+}
+
+export function getGenerationFailureReason(domainId: WorldbuildingDomainId): string | null {
+	return failureReasons[domainId];
+}
+
+export function markMissingContext(domainId: WorldbuildingDomainId, reason: string): void {
+	const current = states[domainId];
+	if (current !== 'idle' && current !== 'missing-context') return;
+	states[domainId] = 'missing-context';
+	missingContextReasons[domainId] = reason;
+	failureReasons[domainId] = null;
+}
+
+export function markGenerationFailed(domainId: WorldbuildingDomainId, reason: unknown): void {
+	const current = states[domainId];
+	if (current !== 'failed') {
+		const allowed = LEGAL_TRANSITIONS[current];
+		if (!allowed.includes('failed')) return;
+		transition(domainId, 'failed');
+	}
+	failureReasons[domainId] = normalizeGenerationFailureReason(reason);
 }
 
 export function evaluateReadiness(

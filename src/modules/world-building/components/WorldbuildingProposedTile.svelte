@@ -9,11 +9,12 @@
 
 	interface Props {
 		categoryId: WorldbuildingDomainId;
-		onAccept?: (proposalId: string, projectId: string) => void;
-		onReject?: (proposalId: string, reason: string, projectId: string) => void;
+		onAccept?: (proposalId: string, projectId: string) => void | Promise<void>;
+		onReject?: (proposalId: string, reason: string, projectId: string) => void | Promise<void>;
+		activeProposalId?: string | null;
 	}
 
-	let { categoryId, onAccept, onReject }: Props = $props();
+	let { categoryId, onAccept, onReject, activeProposalId = null }: Props = $props();
 
 	const proposals = $derived(getSuggestionsByCategory(categoryId));
 	const isLoading = $derived(getIsLoadingSuggestions());
@@ -56,6 +57,7 @@
 							{proposal}
 							{onAccept}
 							{onReject}
+							busy={activeProposalId === proposal.proposalId}
 						/>
 					{/each}
 				</div>
@@ -73,6 +75,7 @@
 							{proposal}
 							{onAccept}
 							{onReject}
+							busy={activeProposalId === proposal.proposalId}
 						/>
 					{/each}
 				</div>

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
 	normalizeSevenLayerOutline,
+	normalizeMilestoneChapterIds,
 	filterOutlineByStageStatus,
 	SEVEN_LAYER_HIERARCHY,
 } from '../../src/modules/outline/services/seven-layer-outline.js';
@@ -156,6 +157,25 @@ describe('seven-layer outline normalization', () => {
 			milestones: [milestone('m1', 'act1', 1, ['c3', 'c1', 'c2'])],
 		});
 		expect(outline.milestones[0].chapterIds).toEqual(['c1', 'c2', 'c3']);
+	});
+
+	it('accepts SQLite-encoded milestone chapterIds from API responses', () => {
+		const encodedMilestone = {
+			...milestone('m1', 'act1', 1, []),
+			chapterIds: '["c3","c1","c2"]',
+		} as unknown as Milestone;
+
+		const outline = normalizeSevenLayerOutline({
+			chapters: [chapter('c3', 3), chapter('c1', 1), chapter('c2', 2)],
+			milestones: [encodedMilestone],
+		});
+
+		expect(outline.milestones[0].chapterIds).toEqual(['c1', 'c2', 'c3']);
+	});
+
+	it('drops invalid milestone chapterIds instead of throwing', () => {
+		expect(normalizeMilestoneChapterIds('not-json')).toEqual([]);
+		expect(normalizeMilestoneChapterIds([null, 'c1', 42, ''])).toEqual(['c1']);
 	});
 
 	it('keeps scenes with beats but no stages intact (no null-crash, empty stages bucket)', () => {

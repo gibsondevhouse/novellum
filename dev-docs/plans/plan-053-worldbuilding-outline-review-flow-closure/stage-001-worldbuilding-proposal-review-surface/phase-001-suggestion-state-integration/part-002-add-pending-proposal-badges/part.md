@@ -2,12 +2,12 @@
 title: Add Pending Proposal Badges
 slug: part-002-add-pending-proposal-badges
 part_number: 2
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-001-suggestion-state-integration
-started_at: ~
-completed_at: ~
+started_at: 2026-06-16
+completed_at: 2026-06-16
 estimated_duration: 0.5d
 ---
 
@@ -53,9 +53,9 @@ Show pending proposal counts on worldbuilding domain cards and navigation afford
 
 ## Acceptance Criteria
 
-- [ ] Domains with pending proposals display a count and accessible label.
-- [ ] Domains without pending proposals do not show noisy empty badges.
-- [ ] Badges fit at desktop and mobile widths.
+- [x] Domains with pending proposals display a count and accessible label.
+- [x] Domains without pending proposals do not show noisy empty badges.
+- [x] Badges fit at desktop and mobile widths.
 
 ## Edge Cases
 

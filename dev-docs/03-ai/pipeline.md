@@ -1,6 +1,6 @@
 # AI Pipeline
 
-> Last verified: 2026-06-15 (plan-052 Nova/editor trust closure)
+> Last verified: 2026-06-16 (plan-053 worldbuilding/outline review-flow closure)
 
 Every AI feature in Novellum follows the same review-gated pipeline.
 The runtime agents (continuity / edit / rewrite / style) live in
@@ -156,6 +156,35 @@ discriminated `operation` payload (`upsert | review | accept | reject`).
 The vibe-author review-gate surface ships separately from this
 worldbuild checkpoint flow.
 
+### Worldbuilding proposal and generation review surfaces (plan-053)
+
+Plan-053 makes the existing worldbuilding review contracts visible from
+the product routes instead of leaving them as route-only or Nova-seeded
+behavior.
+
+- Persisted scan proposals from `/api/worldbuilding/scan` hydrate through
+  `worldbuild-suggestion-state.svelte.ts` and render in
+  `WorldbuildingProposalReviewSection` on the main worldbuilding and help
+  routes. Pending proposal badges keep scan output discoverable across
+  navigation and reload.
+- `worldbuild-proposal-actions.ts` is the client action boundary for
+  proposal review. Accept and reject call the persisted proposal routes,
+  refresh local proposal state, preserve retryable failure/conflict
+  messaging, and never write canon before explicit author approval.
+- Worldbuilding Generate controls call the shared generation action
+  service backed by `/api/worldbuilding/generate`. The old Nova prompt
+  seeding path remains only as a compatibility wrapper around real
+  generation.
+- `WorldbuildingGenerationStatus` reflects actual domain state:
+  missing context, running or queued, pending review, failed with retry,
+  accepted, or rejected. Successful generation leaves draft payloads in
+  the existing generation review modal path; it does not auto-accept
+  worldbuilding canon.
+- Browser coverage lives in focused specs for proposal review and
+  generation action state:
+  `tests/e2e/worldbuilding-proposal-review.spec.ts` and
+  `tests/e2e/worldbuilding-generation-actions.spec.ts`.
+
 ### vibe-author review-gate flow
 
 Stage-003 phase-003 ships the author drafting + revision surface:
@@ -257,6 +286,15 @@ the author explicitly accepts them.
 
 See [outline-generation.md](./outline-generation.md) for the complete
 contract, route surface, Nova states, and limitations.
+
+Plan-053 also polishes the outline checkpoint review surface on
+`/projects/[id]/outline`: queue rows and detail panels use readable
+task/lifecycle labels from `getPipelineTaskLabel()` and
+`checkpointLifecycleLabel()`, while raw task keys, checkpoint ids,
+pipeline/stage/parser metadata, hierarchy references, and payload JSON
+are hidden by default under an explicit `Advanced details` disclosure.
+The accept/reject copy is user-impact oriented and still uses the
+existing explicit review-gated materialization routes.
 
 ### Nova mode/workflow boundaries (plan-031)
 

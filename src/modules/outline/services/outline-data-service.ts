@@ -8,6 +8,7 @@ import { getScenesByProjectId } from '$modules/editor/services/scene-repository.
 import { getBeatsByProjectId } from '$modules/editor/services/beat-repository.js';
 import { getStagesByProjectId } from '$modules/editor/services/stage-repository.js';
 import {
+	normalizeMilestoneChapterIds,
 	normalizeSevenLayerOutline,
 	type SevenLayerOutline,
 } from './seven-layer-outline.js';
@@ -35,12 +36,17 @@ export async function getOutlineData(projectId: string): Promise<OutlineData> {
 		getStagesByProjectId(projectId),
 	]);
 
+	const normalizedMilestones = milestones.map((milestone) => ({
+		...milestone,
+		chapterIds: normalizeMilestoneChapterIds(milestone.chapterIds),
+	}));
+
 	const chapters: ChapterWithScenes[] = rawChapters.map((ch) => ({
 		...ch,
 		scenes: scenes.filter((s) => s.chapterId === ch.id).sort((a, b) => a.order - b.order),
 	}));
 
-	return { arcs, acts, milestones, chapters, scenes, characters, beats, stages };
+	return { arcs, acts, milestones: normalizedMilestones, chapters, scenes, characters, beats, stages };
 }
 
 /**

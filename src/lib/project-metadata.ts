@@ -82,6 +82,23 @@ export async function listProjectMetadata(
 	}
 }
 
+export async function listProjectMetadataStrict(
+	projectId: string,
+	scope: MetadataScope,
+	ownerId: string,
+): Promise<Record<string, unknown>> {
+	if (!isBrowser()) return {};
+
+	const res = await fetch(url(projectId, scope, ownerId), { method: 'GET' });
+	if (!res.ok) {
+		const payload = (await res.json().catch(() => ({}))) as { error?: string };
+		throw new Error(payload.error ?? `Failed to load project metadata: ${res.status}`);
+	}
+
+	const body = (await res.json()) as { data?: Record<string, unknown> };
+	return body.data ?? {};
+}
+
 export async function setProjectMetadata<T>(
 	projectId: string,
 	scope: MetadataScope,

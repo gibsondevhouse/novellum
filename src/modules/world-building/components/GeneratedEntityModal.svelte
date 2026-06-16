@@ -39,6 +39,12 @@
 		WorldbuildTimelineEventDraft,
 	} from '$lib/ai/pipeline/worldbuild-agent.js';
 
+	interface Props {
+		hideErrorPhase?: boolean;
+	}
+
+	let { hideErrorPhase = false }: Props = $props();
+
 	const phase = $derived(getPhase());
 	const entityKind = $derived(getEntityKind());
 	const drafts = $derived(getDrafts());
@@ -48,7 +54,7 @@
 	const projectContext = $derived(getProjectContext());
 	const contextWarning = $derived(hasWarning());
 
-	const visible = $derived(phase !== 'idle');
+	const visible = $derived(phase !== 'idle' && (!hideErrorPhase || phase !== 'error'));
 	const isBatch = $derived(drafts.length > 1);
 
 	let saving = $state(false);
@@ -380,10 +386,12 @@
 	></div>
 
 	<div
+		id="worldbuilding-generated-draft-review"
 		class="gen-modal"
 		role="dialog"
 		aria-modal="true"
 		aria-label={`Generate ${entityLabel}`}
+		tabindex="-1"
 	>
 		<!-- header -->
 		<div class="gen-modal-header">

@@ -2,36 +2,88 @@ import { novaMode, novaPanel } from '$modules/nova';
 import { WORLDBUILDING_DOMAIN_SEQUENCE } from './worldbuilding-workflow.js';
 import type { WorldbuildingDomainId } from './worldbuilding-workflow.js';
 import { PROMPT_SEEDS } from '$lib/ai/pipeline/prompt-library-seeds.js';
-import { checkDomainReadiness } from './worldbuilding-readiness.js';
+import {
+	canGenerateDomain,
+	runWorldbuildingDomainGeneration,
+	type GenerateGuardContext,
+	type GenerateGuardResult,
+	type WorldbuildingGenerationActionResult,
+} from './services/worldbuilding-generation-actions.js';
+import type { WorldbuildingGenerationStateValue } from './stores/worldbuilding-generation-state.svelte.js';
 
-export interface GenerateGuardContext {
-	projectId: string;
-	domainCounts: Record<WorldbuildingDomainId, number>;
+export { canGenerateDomain };
+export type {
+	GenerateGuardContext,
+	GenerateGuardResult,
+	WorldbuildingGenerationActionResult,
+};
+
+export interface WorldbuildingGenerateControlState {
+	disabled: boolean;
+	label: string;
+	ariaLabel: string;
+	title: string | null;
+	reviewReady: boolean;
 }
 
-export interface GenerateGuardResult {
-	allowed: boolean;
-	reason: string | null;
-}
+export function getWorldbuildingGenerateControlState(params: {
+	domainLabel: string;
+	guard: GenerateGuardResult;
+	state: WorldbuildingGenerationStateValue;
+}): WorldbuildingGenerateControlState {
+	const { domainLabel, guard, state } = params;
 
-export function canGenerateDomain(
-	domainId: WorldbuildingDomainId,
-	context: GenerateGuardContext,
-): GenerateGuardResult {
-	if (!context.projectId) {
-		return { allowed: false, reason: 'No project loaded' };
+	if (!guard.allowed) {
+		const reason = guard.reason ?? 'Missing required context';
+		return {
+			disabled: true,
+			label: 'Generate',
+			ariaLabel: `Generate ${domainLabel}: ${reason}`,
+			title: reason,
+			reviewReady: false,
+		};
 	}
 
-	const readiness = checkDomainReadiness(domainId, context.domainCounts);
-	if (!readiness.allowed) {
-		const missing = readiness.missingDeps.join(', ');
-		return { allowed: false, reason: `Requires ${missing} to have at least one record` };
+	if (state === 'queued') {
+		return {
+			disabled: true,
+			label: 'Queued...',
+			ariaLabel: `Generate ${domainLabel}: queued`,
+			title: 'Generation is queued for this domain.',
+			reviewReady: false,
+		};
 	}
 
-	return { allowed: true, reason: null };
+	if (state === 'running') {
+		return {
+			disabled: true,
+			label: 'Generating...',
+			ariaLabel: `Generate ${domainLabel}: running`,
+			title: 'Generation is already running for this domain.',
+			reviewReady: false,
+		};
+	}
+
+	if (state === 'review-ready') {
+		return {
+			disabled: true,
+			label: 'Review draft',
+			ariaLabel: `Generate ${domainLabel}: draft pending review`,
+			title: 'Review the current generated draft before starting another generation.',
+			reviewReady: true,
+		};
+	}
+
+	return {
+		disabled: false,
+		label: 'Generate',
+		ariaLabel: `Generate ${domainLabel}`,
+		title: null,
+		reviewReady: false,
+	};
 }
 
-function openNovaForDomain(projectId: string, domainId: WorldbuildingDomainId): void {
+export function openNovaGenerationHelp(projectId: string, domainId: WorldbuildingDomainId): void {
 	const config = WORLDBUILDING_DOMAIN_SEQUENCE.find((d) => d.id === domainId);
 	if (!config) return;
 
@@ -43,26 +95,49 @@ function openNovaForDomain(projectId: string, domainId: WorldbuildingDomainId): 
 	novaPanel.openWithPrompt(prompt);
 }
 
-export function generatePersonaeWithNova(projectId: string): void {
-	openNovaForDomain(projectId, 'personae');
+function defaultCounts(): Record<WorldbuildingDomainId, number> {
+	return { personae: 0, atlas: 0, archive: 0, threads: 0, chronicles: 0 };
 }
 
-export function generateAtlasWithNova(projectId: string): void {
-	openNovaForDomain(projectId, 'atlas');
+export function generatePersonaeWithNova(
+	projectId: string,
+	domainCounts: Record<WorldbuildingDomainId, number> = defaultCounts(),
+): Promise<WorldbuildingGenerationActionResult> {
+	return runWorldbuildingDomainGeneration({ projectId, domainId: 'personae', domainCounts });
 }
 
-export function generateArchiveWithNova(projectId: string): void {
-	openNovaForDomain(projectId, 'archive');
+export function generateAtlasWithNova(
+	projectId: string,
+	domainCounts: Record<WorldbuildingDomainId, number> = defaultCounts(),
+): Promise<WorldbuildingGenerationActionResult> {
+	return runWorldbuildingDomainGeneration({ projectId, domainId: 'atlas', domainCounts });
 }
 
-export function generateThreadsWithNova(projectId: string): void {
-	openNovaForDomain(projectId, 'threads');
+export function generateArchiveWithNova(
+	projectId: string,
+	domainCounts: Record<WorldbuildingDomainId, number> = defaultCounts(),
+): Promise<WorldbuildingGenerationActionResult> {
+	return runWorldbuildingDomainGeneration({ projectId, domainId: 'archive', domainCounts });
 }
 
-export function generateChroniclesWithNova(projectId: string): void {
-	openNovaForDomain(projectId, 'chronicles');
+export function generateThreadsWithNova(
+	projectId: string,
+	domainCounts: Record<WorldbuildingDomainId, number> = defaultCounts(),
+): Promise<WorldbuildingGenerationActionResult> {
+	return runWorldbuildingDomainGeneration({ projectId, domainId: 'threads', domainCounts });
 }
 
-export function generateDomainWithNova(projectId: string, domainId: WorldbuildingDomainId): void {
-	openNovaForDomain(projectId, domainId);
+export function generateChroniclesWithNova(
+	projectId: string,
+	domainCounts: Record<WorldbuildingDomainId, number> = defaultCounts(),
+): Promise<WorldbuildingGenerationActionResult> {
+	return runWorldbuildingDomainGeneration({ projectId, domainId: 'chronicles', domainCounts });
+}
+
+export function generateDomainWithNova(
+	projectId: string,
+	domainId: WorldbuildingDomainId,
+	domainCounts: Record<WorldbuildingDomainId, number> = defaultCounts(),
+): Promise<WorldbuildingGenerationActionResult> {
+	return runWorldbuildingDomainGeneration({ projectId, domainId, domainCounts });
 }

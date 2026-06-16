@@ -2,7 +2,7 @@
 title: Worldbuilding Proposal Review Surface
 slug: stage-001-worldbuilding-proposal-review-surface
 stage_number: 1
-status: draft
+status: review
 owner: Planner Agent
 plan: plan-053-worldbuilding-outline-review-flow-closure
 phases:
@@ -20,8 +20,8 @@ Make persisted agentic worldbuilding scan proposals visible and actionable in th
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Suggestion State Integration](phase-001-suggestion-state-integration/phase.md) | `draft` | 1d |
-| 002 | [Proposal Review Actions](phase-002-proposal-review-actions/phase.md) | `draft` | 2d |
+| 001 | [Suggestion State Integration](phase-001-suggestion-state-integration/phase.md) | `review` | 1d |
+| 002 | [Proposal Review Actions](phase-002-proposal-review-actions/phase.md) | `review` | 2d |
 
 ## Entry Criteria
 
@@ -30,8 +30,8 @@ Make persisted agentic worldbuilding scan proposals visible and actionable in th
 
 ## Exit Criteria
 
-- [ ] Authors can discover pending scan proposals from worldbuilding routes.
-- [ ] Proposal accept/reject actions refresh visible state and preserve review gates.
+- [x] Authors can discover pending scan proposals from worldbuilding routes.
+- [x] Proposal accept/reject actions refresh visible state and preserve review gates.
 
 ## Notes
 

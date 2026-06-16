@@ -48,7 +48,9 @@
 	import { createScene, updateScene } from '$modules/editor/services/scene-repository.js';
 	import { createBeat } from '$modules/editor/services/beat-repository.js';
 	import { runWorldbuildPipelineTask } from '$modules/outline/services/worldbuild-pipeline-runner.js';
-	import { PIPELINE_TASK_KEYS } from '$lib/ai/pipeline/task-catalog.js';
+	import { PIPELINE_TASK_KEYS, getPipelineTaskLabel } from '$lib/ai/pipeline/task-catalog.js';
+	import type { OutlineHierarchyReferences } from '$lib/ai/pipeline/contracts.js';
+	import { checkpointLifecycleLabel } from '$lib/review-gate-labels.js';
 	import type { CheckpointQueueFilter } from '$modules/world-building/stores/world-building-store.svelte.js';
 	import {
 		refreshWorldbuildCheckpoints,
@@ -360,6 +362,50 @@
 
 	const QUEUE_FILTERS: readonly CheckpointQueueFilter[] = ['all', 'pending', 'accepted', 'rejected'];
 
+	function checkpointQueueFilterLabel(filter: CheckpointQueueFilter): string {
+		switch (filter) {
+			case 'all':
+				return 'All';
+			case 'pending':
+				return 'Pending';
+			case 'accepted':
+				return 'Accepted';
+			case 'rejected':
+				return 'Rejected';
+		}
+	}
+
+	function emptyCheckpointQueueLabel(filter: CheckpointQueueFilter): string {
+		if (filter === 'all') return 'No checkpoints yet. Run a stage pipeline to generate artifacts.';
+		return `No ${checkpointQueueFilterLabel(filter).toLowerCase()} checkpoints.`;
+	}
+
+	function formatCheckpointDate(value: string): string {
+		const date = new Date(value);
+		return Number.isNaN(date.getTime()) ? 'Unknown date' : date.toLocaleString();
+	}
+
+	const HIERARCHY_SCOPE_LABELS: Record<string, string> = {
+		arcs: 'arc',
+		acts: 'act',
+		milestones: 'milestone',
+		chapters: 'chapter',
+		scenes: 'scene',
+		beats: 'beat',
+		stages: 'stage',
+	};
+
+	function formatHierarchyScope(references: OutlineHierarchyReferences): string {
+		const segments = Object.entries(references)
+			.filter(([, ids]) => ids.length > 0)
+			.map(([layer, ids]) => {
+				const label = HIERARCHY_SCOPE_LABELS[layer] ?? layer;
+				return `${ids.length} ${label}${ids.length === 1 ? '' : 's'}`;
+			});
+
+		return segments.length > 0 ? segments.join(', ') : 'Project-wide checkpoint';
+	}
+
 	async function handleRunStagePipeline(): Promise<void> {
 		if (!selectedStage || !stageReadiness.canRun) return;
 
@@ -636,29 +682,33 @@
 									class="checkpoint-queue__filter"
 									class:checkpoint-queue__filter--active={activeQueueFilter === filter}
 									aria-selected={activeQueueFilter === filter}
+									aria-label={`Show ${checkpointQueueFilterLabel(filter)} checkpoints`}
 									onclick={() => handleSelectQueueFilter(filter)}
 								>
-									{filter} ({queueCounts[filter]})
+									{checkpointQueueFilterLabel(filter)} ({queueCounts[filter]})
 								</button>
 							{/each}
 						</div>
 
 						{#if filteredCheckpoints.length === 0}
 							<p class="checkpoint-queue__empty">
-								{activeQueueFilter === 'all' ? 'No checkpoints yet. Run a stage pipeline to generate artifacts.' : `No ${activeQueueFilter} checkpoints.`}
+								{emptyCheckpointQueueLabel(activeQueueFilter)}
 							</p>
 						{:else}
 							<ul class="checkpoint-queue__list">
 								{#each filteredCheckpoints as cp (cp.id)}
+									{@const lifecycleLabel = checkpointLifecycleLabel(cp.lifecycle)}
+									{@const taskLabel = getPipelineTaskLabel(cp.taskKey)}
 									<li>
 										<button
 											type="button"
 											class="checkpoint-queue__item"
 											class:checkpoint-queue__item--selected={selectedReviewCheckpointIdValue === cp.id}
+											aria-label={`${taskLabel}, ${lifecycleLabel}, updated ${new Date(cp.updatedAt).toLocaleString()}`}
 											onclick={() => handleSelectCheckpointForReview(cp.id)}
 										>
-											<span class="checkpoint-queue__lifecycle" data-lifecycle={cp.lifecycle}>{cp.lifecycle}</span>
-											<span class="checkpoint-queue__task">{cp.taskKey}</span>
+											<span class="checkpoint-queue__lifecycle" data-lifecycle={cp.lifecycle}>{lifecycleLabel}</span>
+											<span class="checkpoint-queue__task" data-task-key={cp.taskKey}>{taskLabel}</span>
 											<time class="checkpoint-queue__time" datetime={cp.updatedAt}>
 												{new Date(cp.updatedAt).toLocaleString()}
 											</time>
@@ -679,32 +729,24 @@
 
 							<div class="checkpoint-detail__meta">
 								<dl class="checkpoint-detail__fields">
-									<dt>ID</dt>
-									<dd>{selectedReviewCheckpoint.id}</dd>
 									<dt>Task</dt>
-									<dd>{selectedReviewCheckpoint.taskKey}</dd>
-									<dt>Lifecycle</dt>
-									<dd><span class="checkpoint-queue__lifecycle" data-lifecycle={selectedReviewCheckpoint.lifecycle}>{selectedReviewCheckpoint.lifecycle}</span></dd>
-									<dt>Version</dt>
-									<dd>{selectedReviewCheckpoint.version}</dd>
-									<dt>Parser</dt>
-									<dd>{selectedReviewCheckpoint.artifact.parserVersion}</dd>
-									<dt>Produced</dt>
-									<dd>{new Date(selectedReviewCheckpoint.artifact.producedAt).toLocaleString()}</dd>
-									<dt>Updated</dt>
-									<dd>{new Date(selectedReviewCheckpoint.updatedAt).toLocaleString()}</dd>
-									<dt>Pipeline</dt>
-									<dd>{selectedReviewCheckpoint.artifact.pipeline}</dd>
-									<dt>Stage Key</dt>
-									<dd>{selectedReviewCheckpoint.artifact.stage}</dd>
-									<dt>Hierarchy</dt>
-									<dd class="checkpoint-detail__hierarchy">
-										{#each Object.entries(selectedReviewCheckpoint.artifact.hierarchy.references) as [layer, ids] (layer)}
-											{#if ids.length > 0}
-												<span class="checkpoint-detail__ref">{layer}: {ids.join(', ')}</span>
-											{/if}
-										{/each}
+									<dd>
+										<span data-task-key={selectedReviewCheckpoint.taskKey}>
+											{getPipelineTaskLabel(selectedReviewCheckpoint.taskKey)}
+										</span>
 									</dd>
+									<dt>Lifecycle</dt>
+									<dd>
+										<span class="checkpoint-queue__lifecycle" data-lifecycle={selectedReviewCheckpoint.lifecycle}>
+											{checkpointLifecycleLabel(selectedReviewCheckpoint.lifecycle)}
+										</span>
+									</dd>
+									<dt>Scope</dt>
+									<dd>{formatHierarchyScope(selectedReviewCheckpoint.artifact.hierarchy.references)}</dd>
+									<dt>Generated</dt>
+									<dd>{formatCheckpointDate(selectedReviewCheckpoint.artifact.producedAt)}</dd>
+									<dt>Updated</dt>
+									<dd>{formatCheckpointDate(selectedReviewCheckpoint.updatedAt)}</dd>
 								</dl>
 							</div>
 
@@ -752,7 +794,41 @@
 							{/if}
 
 							<details class="checkpoint-detail__payload">
-								<summary>Artifact Payload</summary>
+								<summary>Advanced details</summary>
+								<dl class="checkpoint-detail__developer-meta" aria-label="Developer checkpoint metadata">
+									<div>
+										<dt>Checkpoint ID</dt>
+										<dd><code>{selectedReviewCheckpoint.id}</code></dd>
+									</div>
+									<div>
+										<dt>Task key</dt>
+										<dd><code>{selectedReviewCheckpoint.taskKey}</code></dd>
+									</div>
+									<div>
+										<dt>Pipeline</dt>
+										<dd><code>{selectedReviewCheckpoint.artifact.pipeline}</code></dd>
+									</div>
+									<div>
+										<dt>Stage key</dt>
+										<dd><code>{selectedReviewCheckpoint.artifact.stage}</code></dd>
+									</div>
+									<div>
+										<dt>Checkpoint version</dt>
+										<dd>{selectedReviewCheckpoint.version}</dd>
+									</div>
+									<div>
+										<dt>Parser version</dt>
+										<dd>{selectedReviewCheckpoint.artifact.parserVersion}</dd>
+									</div>
+								</dl>
+								<div class="checkpoint-detail__hierarchy" aria-label="Raw hierarchy references">
+									{#each Object.entries(selectedReviewCheckpoint.artifact.hierarchy.references) as [layer, ids] (layer)}
+										{#if ids.length > 0}
+											<span class="checkpoint-detail__ref">{layer}: {ids.join(', ')}</span>
+										{/if}
+									{/each}
+								</div>
+								<h4 class="checkpoint-detail__payload-heading">Raw payload</h4>
 								<pre class="checkpoint-detail__payload-pre">{JSON.stringify(selectedReviewCheckpoint.artifact.payload, null, 2)}</pre>
 							</details>
 
@@ -761,7 +837,7 @@
 								<div class="checkpoint-decision" aria-label="Checkpoint decision controls">
 									<div class="checkpoint-decision__accept">
 										<p class="checkpoint-decision__scope">
-											Accepting will mark this artifact as canonical for task <strong>{selectedReviewCheckpoint.taskKey}</strong> in the current hierarchy scope.
+											Accepting will project the reviewed <strong>{getPipelineTaskLabel(selectedReviewCheckpoint.taskKey)}</strong> artifact into the current story scope. Nothing changes until you explicitly accept.
 										</p>
 										<button
 											type="button"
@@ -774,6 +850,9 @@
 									</div>
 
 									<div class="checkpoint-decision__reject">
+										<p class="checkpoint-decision__scope">
+											Rejecting keeps this artifact out of canon and records the reason for future review.
+										</p>
 										<label class="checkpoint-decision__label" for="reject-reason-input">Rejection reason</label>
 										<textarea
 											id="reject-reason-input"
@@ -1177,7 +1256,7 @@
 	.checkpoint-detail__fields dd {
 		margin: 0;
 		color: var(--color-text-secondary);
-		word-break: break-all;
+		overflow-wrap: anywhere;
 	}
 
 	.checkpoint-detail__hierarchy {
@@ -1227,11 +1306,52 @@
 	.checkpoint-detail__payload {
 		font-size: var(--text-xs);
 		color: var(--color-text-muted);
+		border: 1px solid var(--color-border-subtle);
+		border-radius: var(--radius-sm);
+		padding: var(--space-2);
+		background: color-mix(in srgb, var(--color-surface-ground) 38%, transparent);
 	}
 
 	.checkpoint-detail__payload summary {
 		cursor: pointer;
 		padding: var(--space-1) 0;
+		color: var(--color-text-secondary);
+		font-weight: var(--font-weight-medium);
+	}
+
+	.checkpoint-detail__developer-meta {
+		display: grid;
+		gap: var(--space-2);
+		margin: var(--space-2) 0;
+	}
+
+	.checkpoint-detail__developer-meta div {
+		display: grid;
+		grid-template-columns: 140px minmax(0, 1fr);
+		gap: var(--space-2);
+		align-items: start;
+	}
+
+	.checkpoint-detail__developer-meta dt {
+		color: var(--color-text-muted);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+		font-size: 0.6rem;
+	}
+
+	.checkpoint-detail__developer-meta dd {
+		margin: 0;
+		color: var(--color-text-secondary);
+		min-width: 0;
+		overflow-wrap: anywhere;
+	}
+
+	.checkpoint-detail__payload-heading {
+		margin: var(--space-3) 0 0;
+		font-size: var(--text-xs);
+		color: var(--color-text-muted);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
 	}
 
 	.checkpoint-detail__payload-pre {
@@ -1248,6 +1368,13 @@
 		overflow-y: auto;
 		white-space: pre-wrap;
 		word-break: break-word;
+	}
+
+	@media (max-width: 720px) {
+		.checkpoint-detail__developer-meta div,
+		.checkpoint-detail__fields {
+			grid-template-columns: 1fr;
+		}
 	}
 
 	/* ── Checkpoint Decision ── */

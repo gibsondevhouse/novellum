@@ -2,12 +2,12 @@
 title: Wire Help Route Generate Controls
 slug: part-002-wire-help-route-generate-controls
 part_number: 2
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-002-route-and-help-integration
-started_at: ~
-completed_at: ~
+started_at: 2026-06-16
+completed_at: 2026-06-16
 estimated_duration: 0.75d
 ---
 
@@ -49,9 +49,9 @@ Keep the worldbuilding help route behavior consistent with the main route genera
 
 ## Acceptance Criteria
 
-- [ ] Help route Generate behavior matches main route behavior.
-- [ ] Help route no longer opens Nova as the only execution effect.
-- [ ] Blocked generation gives clear missing dependency copy.
+- [x] Help route Generate behavior matches main route behavior.
+- [x] Help route no longer opens Nova as the only execution effect.
+- [x] Blocked generation gives clear missing dependency copy.
 
 ## Edge Cases
 

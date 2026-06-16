@@ -2,7 +2,7 @@
 title: Outline Review Panel Polish
 slug: stage-003-outline-review-panel-polish
 stage_number: 3
-status: draft
+status: review
 owner: Planner Agent
 plan: plan-053-worldbuilding-outline-review-flow-closure
 phases:
@@ -20,8 +20,8 @@ Make outline checkpoint queue and review details readable for authors and review
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Queue Label Cleanup](phase-001-queue-label-cleanup/phase.md) | `draft` | 0.75d |
-| 002 | [Checkpoint Detail Disclosure](phase-002-checkpoint-detail-disclosure/phase.md) | `draft` | 1.25d |
+| 001 | [Queue Label Cleanup](phase-001-queue-label-cleanup/phase.md) | `review` | 0.75d |
+| 002 | [Checkpoint Detail Disclosure](phase-002-checkpoint-detail-disclosure/phase.md) | `review` | 1.25d |
 
 ## Entry Criteria
 
@@ -30,8 +30,8 @@ Make outline checkpoint queue and review details readable for authors and review
 
 ## Exit Criteria
 
-- [ ] Queue and detail panels use readable lifecycle/task names.
-- [ ] Raw payload/debug metadata is not default visible UI.
+- [x] Queue and detail panels use readable lifecycle/task names.
+- [x] Raw payload/debug metadata is not default visible UI.
 
 ## Notes
 
