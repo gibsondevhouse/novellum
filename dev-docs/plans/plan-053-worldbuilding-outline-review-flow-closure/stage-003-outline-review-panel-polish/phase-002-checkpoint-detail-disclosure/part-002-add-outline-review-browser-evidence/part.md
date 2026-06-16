@@ -2,12 +2,12 @@
 title: Add Outline Review Browser Evidence
 slug: part-002-add-outline-review-browser-evidence
 part_number: 2
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-002-checkpoint-detail-disclosure
-started_at: ~
-completed_at: ~
+started_at: 2026-06-16
+completed_at: 2026-06-16
 estimated_duration: 0.5d
 ---
 
@@ -41,7 +41,7 @@ Capture browser-level evidence that the cleaned outline review queue and detail 
 
 **Update:**
 
-- `dev-docs/plans/plan-053-worldbuilding-outline-review-flow-closure/stage-003-outline-review-panel-polish/phase-002-checkpoint-detail-disclosure/part-002-add-outline-review-browser-evidence/evidence/outline-review-browser-2026-06-15.md`
+- `dev-docs/plans/plan-053-worldbuilding-outline-review-flow-closure/stage-003-outline-review-panel-polish/phase-002-checkpoint-detail-disclosure/part-002-add-outline-review-browser-evidence/evidence/outline-review-browser-2026-06-16.md`
 
 **Reference:**
 
@@ -50,9 +50,9 @@ Capture browser-level evidence that the cleaned outline review queue and detail 
 
 ## Acceptance Criteria
 
-- [ ] Browser evidence covers pending/review checkpoint detail.
-- [ ] Default view hides raw JSON/debug values.
-- [ ] Advanced disclosure can be opened intentionally.
+- [x] Browser evidence covers pending/review checkpoint detail.
+- [x] Default view hides raw JSON/debug values.
+- [x] Advanced disclosure can be opened intentionally.
 
 ## Edge Cases
 

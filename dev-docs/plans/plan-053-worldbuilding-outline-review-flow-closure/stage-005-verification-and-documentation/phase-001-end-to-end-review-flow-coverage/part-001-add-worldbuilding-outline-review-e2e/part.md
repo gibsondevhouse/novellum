@@ -2,12 +2,12 @@
 title: Add Worldbuilding Outline Review E2E
 slug: part-001-add-worldbuilding-outline-review-e2e
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-001-end-to-end-review-flow-coverage
-started_at: ~
-completed_at: ~
+started_at: 2026-06-16
+completed_at: 2026-06-16
 estimated_duration: 0.5d
 ---
 
@@ -38,7 +38,10 @@ Add targeted Playwright coverage for the restored worldbuilding and outline revi
 
 **Create:**
 
-- `tests/e2e/worldbuilding-outline-review-flow.spec.ts`
+- `tests/e2e/worldbuilding-proposal-review.spec.ts`
+- `tests/e2e/worldbuilding-generation-actions.spec.ts`
+- `tests/e2e/outline-review-polish.spec.ts`
+- `tests/e2e/character-persistence-errors.spec.ts`
 
 **Update:**
 
@@ -51,9 +54,9 @@ Add targeted Playwright coverage for the restored worldbuilding and outline revi
 
 ## Acceptance Criteria
 
-- [ ] E2E fails if proposal review tiles are not rendered.
-- [ ] E2E fails if generation controls only open Nova with no state transition.
-- [ ] E2E fails if outline default detail shows raw payload JSON.
+- [x] E2E fails if proposal review tiles are not rendered.
+- [x] E2E fails if generation controls only open Nova with no state transition.
+- [x] E2E fails if outline default detail shows raw payload JSON.
 
 ## Edge Cases
 

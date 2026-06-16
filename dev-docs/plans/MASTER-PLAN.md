@@ -1,17 +1,17 @@
 # MASTER PLAN: Novellum Development
 
-> Last reconciled: 2026-06-15
+> Last reconciled: 2026-06-16
 
 ## Active Plans
 
 - [plan-051-governed-ai-controller-runtime](./plan-051-governed-ai-controller-runtime/plan.md): Governed AI Controller Runtime — centralized control layer for AI intent resolution, policy enforcement, context assembly, workflow routing, model invocation, output validation, artifact lifecycle, and observability. Status: `review` (implementation evidence complete 2026-06-15; pending plan-level Reviewer Agent evaluation).
 - [plan-048-frontend-experience-coherence](./plan-048-frontend-experience-coherence/plan.md): Frontend Experience Coherence — final frontend pass to make route context, navigation, author workflows, review gates, and visual states read as one production app. Status: `review` (implementation evidence complete 2026-06-15; pending plan-level Reviewer Agent evaluation).
 - [plan-052-pipeline-nova-editor-trust-closure](./plan-052-pipeline-nova-editor-trust-closure/plan.md): Pipeline, Nova, and Editor Trust Closure — wire silent Nova artifact actions to durable review-gated behavior, persist revision acknowledgements, clean internal AI metadata/copy, and remove misleading pre-release chrome. Status: `review` (implementation evidence complete 2026-06-15; pending plan-level Reviewer Agent evaluation).
+- [plan-053-worldbuilding-outline-review-flow-closure](./plan-053-worldbuilding-outline-review-flow-closure/plan.md): Worldbuilding and Outline Review Flow Closure — surface persisted worldbuilding scan proposals, make generation controls reflect real execution state, polish outline review metadata, and clean worldbuilding persistence errors. Status: `review` (implementation evidence complete 2026-06-16; pending plan-level Reviewer Agent evaluation).
 
 ## Deferred (not yet scheduled)
 
 - [plan-043-brainstorm-agent](./plan-043-brainstorm-agent/plan.md): Brainstorm Agent — re-introduce BrainstormAgent with review-gated UI and worldbuild integration. Status: `draft` (scaffolded 2026-06-04). Stages: Agent contract & prompt, Nova UI integration, accept flow & worldbuild hookup, tests/docs/quality gates. Dependencies: plan-042.
-- [plan-053-worldbuilding-outline-review-flow-closure](./plan-053-worldbuilding-outline-review-flow-closure/plan.md): Worldbuilding and Outline Review Flow Closure — surface persisted worldbuilding scan proposals, make generation controls reflect real execution state, polish outline review metadata, and clean worldbuilding persistence errors. Status: `draft` (authored 2026-06-15 from `candidate-plans/worldbuilding-outline.md`; depends on plan-052 display/action foundations).
 - **Release engineering** — code signing, notarization, brand icons, formal smoke/keyring verification. Infrastructure exists; requires external procurement. Originally plan-024 stage-002.
 
 ## Completed Plans (Archived)

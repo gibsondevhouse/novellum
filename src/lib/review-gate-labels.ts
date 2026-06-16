@@ -29,3 +29,26 @@ export function reviewGateStatusLabel(status: ReviewGateStatus): string {
 			return 'No draft';
 	}
 }
+
+export function checkpointLifecycleLabel(status: ReviewGateStatus | string): string {
+	switch (status) {
+		case 'draft':
+			return 'Draft';
+		case 'review':
+		case 'pending_review':
+		case 'review-ready':
+			return 'In review';
+		case 'accepted':
+			return 'Accepted';
+		case 'rejected':
+			return 'Rejected';
+		case 'failed':
+			return 'Failed';
+		case 'failed_validation':
+			return 'Failed validation';
+		case 'none':
+			return 'No draft';
+		default:
+			return 'Unknown status';
+	}
+}

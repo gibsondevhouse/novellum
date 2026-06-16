@@ -1,6 +1,6 @@
 # Module: `outline`
 
-> Last verified: 2026-06-04 (plan-040 outline generation closeout)
+> Last verified: 2026-06-16 (plan-053 outline review polish)
 > Source: [src/modules/outline/](../../src/modules/outline/)
 
 ## Purpose
@@ -51,6 +51,27 @@ Important boundaries:
 
 See [outline-generation.md](../03-ai/outline-generation.md) and [data-model.md](../02-architecture/data-model.md#outline-draft-materialization-map).
 
+## Checkpoint Review Panel
+
+Plan-053 keeps the plan-040 review gate but makes the outline route
+review UI author-readable:
+
+- The checkpoint queue uses `getPipelineTaskLabel()` and
+  `checkpointLifecycleLabel()` so authors see labels such as "Outline
+  draft" and "In review" instead of raw task/lifecycle keys.
+- The default detail panel shows task, lifecycle, scope, generated and
+  updated timestamps, readiness/warning copy, and action impact.
+- Raw checkpoint ids, task keys, pipeline/stage/parser versions,
+  hierarchy references, and payload JSON are hidden by default under
+  `Advanced details` for developer inspection.
+- Accept/reject controls remain explicit. Accept materializes through
+  `/api/outline/checkpoints/{checkpointId}/accept`; reject records audit
+  metadata and leaves hierarchy rows untouched.
+- Milestone `chapterIds` are normalized when loading seven-layer outline
+  data so SQLite-encoded arrays render consistently in the route and E2E
+  coverage.
+
 ## Key Tests
 
 - `tests/outline/*`
+- `tests/e2e/outline-review-polish.spec.ts`

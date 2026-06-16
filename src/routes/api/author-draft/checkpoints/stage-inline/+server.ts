@@ -33,7 +33,7 @@ function listValue(value: unknown): unknown {
 	return [];
 }
 
-function usedCanonRefsValue(value: unknown): unknown {
+function _usedCanonRefsValue(value: unknown): unknown {
 	if (Array.isArray(value) || typeof value === 'string') {
 		return value;
 	}

@@ -2,7 +2,7 @@
 title: Worldbuilding Persistence Error Handling
 slug: stage-004-worldbuilding-persistence-error-handling
 stage_number: 4
-status: draft
+status: review
 owner: Planner Agent
 plan: plan-053-worldbuilding-outline-review-flow-closure
 phases:
@@ -19,7 +19,7 @@ Remove production console noise from worldbuilding character persistence and rou
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Character Persistence Error Cleanup](phase-001-character-persistence-error-cleanup/phase.md) | `draft` | 1d |
+| 001 | [Character Persistence Error Cleanup](phase-001-character-persistence-error-cleanup/phase.md) | `review` | 1d |
 
 ## Entry Criteria
 
@@ -28,8 +28,8 @@ Remove production console noise from worldbuilding character persistence and rou
 
 ## Exit Criteria
 
-- [ ] Save failures remain visible to users without raw console-only production errors.
-- [ ] Tests cover at least one failed persistence path.
+- [x] Save failures remain visible to users without raw console-only production errors.
+- [x] Tests cover at least one failed persistence path.
 
 ## Notes
 

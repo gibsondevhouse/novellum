@@ -2,7 +2,7 @@
 title: Verification And Documentation
 slug: stage-005-verification-and-documentation
 stage_number: 5
-status: draft
+status: review
 owner: Planner Agent
 plan: plan-053-worldbuilding-outline-review-flow-closure
 phases:
@@ -20,8 +20,8 @@ Validate the worldbuilding and outline review-flow closure with tests, browser e
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [End To End Review Flow Coverage](phase-001-end-to-end-review-flow-coverage/phase.md) | `draft` | 0.5d |
-| 002 | [Docs And Tracker Closeout](phase-002-docs-and-tracker-closeout/phase.md) | `draft` | 0.5d |
+| 001 | [End To End Review Flow Coverage](phase-001-end-to-end-review-flow-coverage/phase.md) | `review` | 0.5d |
+| 002 | [Docs And Tracker Closeout](phase-002-docs-and-tracker-closeout/phase.md) | `review` | 0.5d |
 
 ## Entry Criteria
 
@@ -29,8 +29,8 @@ Validate the worldbuilding and outline review-flow closure with tests, browser e
 
 ## Exit Criteria
 
-- [ ] Automated gates pass or unrelated baseline issues are documented.
-- [ ] Plan is ready for Reviewer Agent evaluation with evidence.
+- [x] Automated gates pass or unrelated baseline issues are documented.
+- [x] Plan is ready for Reviewer Agent evaluation with evidence.
 
 ## Notes
 

@@ -68,7 +68,7 @@ describe('artifact review detail — validation and provenance', () => {
 
 	it('artifact payload is available in a collapsible details element', () => {
 		expect(pageSource).toContain('checkpoint-detail__payload');
-		expect(pageSource).toContain('Artifact Payload');
+		expect(pageSource).toContain('Advanced details');
 		expect(pageSource).toContain('JSON.stringify');
 	});
 });

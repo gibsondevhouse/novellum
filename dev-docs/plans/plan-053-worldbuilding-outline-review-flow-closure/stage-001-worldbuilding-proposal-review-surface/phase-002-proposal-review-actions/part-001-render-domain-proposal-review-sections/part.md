@@ -2,12 +2,12 @@
 title: Render Domain Proposal Review Sections
 slug: part-001-render-domain-proposal-review-sections
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-002-proposal-review-actions
-started_at: ~
-completed_at: ~
+started_at: 2026-06-16
+completed_at: 2026-06-16
 estimated_duration: 1d
 ---
 
@@ -53,9 +53,9 @@ Add route-level proposal review sections that use the existing WorldbuildingProp
 
 ## Acceptance Criteria
 
-- [ ] WorldbuildingProposedTile is reachable from product UI.
-- [ ] Pending proposals are grouped with author-readable headings.
-- [ ] No proposal raw JSON is shown by default.
+- [x] WorldbuildingProposedTile is reachable from product UI.
+- [x] Pending proposals are grouped with author-readable headings.
+- [x] No proposal raw JSON is shown by default.
 
 ## Edge Cases
 

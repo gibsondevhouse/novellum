@@ -1,16 +1,37 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { SectionHeader } from '$lib/components/ui/index.js';
 	import { novaMode, novaPanel } from '$modules/nova';
 	import { WORLDBUILDING_HELP_SECTIONS } from '$modules/world-building/help/worldbuilding-help-content.js';
-	import { WorldbuildingHelpDrawer, WorldbuildingReadinessBadge } from '$modules/world-building';
-	import { WORLDBUILDING_DOMAIN_SEQUENCE } from '$modules/world-building/worldbuilding-workflow.js';
+	import {
+		WorldbuildingHelpDrawer,
+		WorldbuildingReadinessBadge,
+		WorldbuildingGenerationStatus,
+		WorldbuildingNotificationBadge,
+		WorldbuildingProposalReviewSection,
+		GeneratedEntityModal,
+		refreshSuggestionsForProjectRoute,
+		getPendingWorldbuildSuggestionCount,
+		getPendingWorldbuildSuggestionCountForCategory,
+		getWorldbuildSuggestionLoadError,
+		getIsLoadingWorldbuildSuggestions,
+	} from '$modules/world-building';
+	import {
+		WORLDBUILDING_DOMAIN_SEQUENCE,
+		formatPendingSuggestionLabel,
+	} from '$modules/world-building/worldbuilding-workflow.js';
 	import type { WorldbuildingDomainId } from '$modules/world-building/worldbuilding-workflow.js';
 	import {
 		canGenerateDomain,
 		generateDomainWithNova,
+		getWorldbuildingGenerateControlState,
 	} from '$modules/world-building/worldbuilding-generate-actions.js';
-	import { WorldbuildingGenerationStatus } from '$modules/world-building';
-	import { evaluateReadiness } from '$modules/world-building/stores/worldbuilding-generation-state.svelte.js';
+	import {
+		evaluateReadiness,
+		getState as getDomainGenerationState,
+		resetState as resetDomainGenerationState,
+	} from '$modules/world-building/stores/worldbuilding-generation-state.svelte.js';
+	import { getPhase as getDraftGenerationPhase } from '$modules/world-building/stores/generation-draft.svelte.js';
 	import type { DomainCounts } from './+page.js';
 
 	let { data }: { data: { projectId: string; domainCounts: DomainCounts } } = $props();
@@ -18,6 +39,7 @@
 	let showHelp = $state(false);
 	let expandedSection = $state<string | null>(null);
 	let activeDomain = $state<WorldbuildingDomainId | null>(null);
+	let activeGenerationDomain = $state<WorldbuildingDomainId | null>(null);
 
 	function toggleSection(id: string): void {
 		expandedSection = expandedSection === id ? null : id;
@@ -48,11 +70,31 @@
 		return data.domainCounts[domainId] ?? 0;
 	}
 
+	function getPendingSuggestionCount(domainId: WorldbuildingDomainId): number {
+		return getPendingWorldbuildSuggestionCountForCategory(domainId);
+	}
+
 	function getGenerateGuard(domainId: WorldbuildingDomainId) {
 		return canGenerateDomain(domainId, {
 			projectId: data.projectId,
 			domainCounts: data.domainCounts,
 		});
+	}
+
+	function focusGeneratedDraftReview(): void {
+		requestAnimationFrame(() => {
+			const target = document.getElementById('worldbuilding-generated-draft-review');
+			target?.scrollIntoView({ block: 'center' });
+			target?.focus({ preventScroll: true });
+		});
+	}
+
+	async function handleGenerateDomain(domainId: WorldbuildingDomainId): Promise<void> {
+		activeGenerationDomain = domainId;
+		const result = await generateDomainWithNova(data.projectId, domainId, data.domainCounts);
+		if (!result.ok || result.state !== 'review-ready') {
+			activeGenerationDomain = null;
+		}
 	}
 
 	const sections = $derived(
@@ -69,11 +111,31 @@
 			? WORLDBUILDING_HELP_SECTIONS.filter((s) => s.id === activeDomain)
 			: WORLDBUILDING_HELP_SECTIONS,
 	);
+	const pendingSuggestionCount = $derived(getPendingWorldbuildSuggestionCount());
+	const suggestionLoadError = $derived(getWorldbuildSuggestionLoadError());
+	const isLoadingSuggestions = $derived(getIsLoadingWorldbuildSuggestions());
+
+	$effect(() => {
+		const projectId = data.projectId;
+		untrack(() => {
+			void refreshSuggestionsForProjectRoute(projectId);
+		});
+	});
 
 	$effect(() => {
 		const counts = data.domainCounts;
 		for (const domain of WORLDBUILDING_DOMAIN_SEQUENCE) {
 			evaluateReadiness(domain.id, counts);
+		}
+	});
+
+	$effect(() => {
+		const domainId = activeGenerationDomain;
+		const draftPhase = getDraftGenerationPhase();
+		if (!domainId || draftPhase !== 'idle') return;
+		if (getDomainGenerationState(domainId) === 'review-ready') {
+			resetDomainGenerationState(domainId);
+			activeGenerationDomain = null;
 		}
 	});
 </script>
@@ -91,7 +153,18 @@
 			/>
 			<div class="hero-actions" role="navigation" aria-label="Jump to world-building domains">
 				{#each sections as section (section.id)}
-					<a class="hero-jump" href={`#${section.id}`}>{section.label}</a>
+					{@const domainId = section.id as WorldbuildingDomainId}
+					{@const pendingCount = getPendingSuggestionCount(domainId)}
+					<a
+						class="hero-jump"
+						href={`#${section.id}`}
+						aria-label={pendingCount > 0
+							? `${section.label}, ${formatPendingSuggestionLabel(pendingCount, section.label)}`
+							: section.label}
+					>
+						{section.label}
+						<WorldbuildingNotificationBadge count={pendingCount} />
+					</a>
 				{/each}
 				<button type="button" class="hero-jump hero-jump--nova" onclick={startWorldbuildWithNova}>
 					Build World Bible with Nova
@@ -99,11 +172,37 @@
 			</div>
 		</section>
 
+		{#if isLoadingSuggestions || suggestionLoadError || pendingSuggestionCount > 0}
+			<section
+				class="suggestion-route-state"
+				aria-live="polite"
+				aria-label="Worldbuilding proposal review state"
+			>
+				{#if isLoadingSuggestions}
+					<span>Loading worldbuilding suggestions for review...</span>
+				{:else if suggestionLoadError}
+					<span>Could not load worldbuilding suggestions. Try reloading this page.</span>
+				{:else}
+					<span>
+						<strong>{pendingSuggestionCount}</strong>
+						suggestion{pendingSuggestionCount === 1 ? '' : 's'} pending review.
+					</span>
+				{/if}
+			</section>
+		{/if}
+
 		<section class="domain-grid" aria-label="World-building domains">
 			{#each sections as section (section.id)}
 				{@const domainId = section.id as WorldbuildingDomainId}
 				{@const guard = getGenerateGuard(domainId)}
+				{@const generationState = getDomainGenerationState(domainId)}
+				{@const control = getWorldbuildingGenerateControlState({
+					domainLabel: section.label,
+					guard,
+					state: generationState,
+				})}
 				{@const count = getDomainCount(domainId)}
+				{@const pendingCount = getPendingSuggestionCount(domainId)}
 				<article class="domain-tile" id={section.id}>
 					<div class="domain-tile__top">
 						<div class="domain-tile__title-row">
@@ -112,6 +211,15 @@
 								label={WORLDBUILDING_DOMAIN_SEQUENCE.find((d) => d.id === domainId)?.generationReadiness ?? ''}
 								variant={getBadgeVariant(domainId)}
 							/>
+							{#if pendingCount > 0}
+								<span
+									class="domain-tile__pending"
+									aria-label={formatPendingSuggestionLabel(pendingCount, section.label)}
+								>
+									<WorldbuildingNotificationBadge count={pendingCount} />
+									<span>Pending suggestions</span>
+								</span>
+							{/if}
 						</div>
 						<p>{section.tagline}</p>
 					</div>
@@ -134,13 +242,17 @@
 						<button
 							type="button"
 							class="domain-tile__action domain-tile__action--generate"
-							aria-label="Generate {section.label} with Nova{guard.reason ? ': ' + guard.reason : ''}"
-							disabled={!guard.allowed}
-							title={guard.reason ?? undefined}
-							onclick={() => generateDomainWithNova(data.projectId, domainId)}
-						>Generate</button>
+							aria-label={control.ariaLabel}
+							disabled={control.disabled}
+							title={control.title ?? undefined}
+							onclick={() => void handleGenerateDomain(domainId)}
+						>{control.label}</button>
 					</div>
-					<WorldbuildingGenerationStatus domainId={domainId} />
+					<WorldbuildingGenerationStatus
+						domainId={domainId}
+						onRetry={() => handleGenerateDomain(domainId)}
+						onReviewReady={focusGeneratedDraftReview}
+					/>
 					<button
 						type="button"
 						class="domain-tile__guide-toggle"
@@ -150,6 +262,8 @@
 				</article>
 			{/each}
 		</section>
+
+		<WorldbuildingProposalReviewSection />
 
 		<section class="manifesto" aria-labelledby="manifesto-title">
 			<div class="manifesto-header">
@@ -225,6 +339,7 @@
 </div>
 
 <WorldbuildingHelpDrawer bind:open={showHelp} sections={helpSections} />
+<GeneratedEntityModal hideErrorPhase />
 
 <style>
 	.landing-shell {
@@ -262,6 +377,22 @@
 		border: 1px solid var(--color-border-subtle);
 		background: color-mix(in srgb, var(--color-surface-overlay) 92%, black 8%);
 		border-radius: var(--radius-lg);
+	}
+
+	.suggestion-route-state {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		padding: var(--space-3) var(--space-4);
+		border: 1px solid var(--color-border-subtle);
+		border-radius: var(--radius-md);
+		background: var(--color-surface-overlay);
+		color: var(--color-text-secondary);
+		font-size: var(--text-sm);
+	}
+
+	.suggestion-route-state strong {
+		color: var(--color-text-primary);
 	}
 
 	.hero-actions {
@@ -333,6 +464,17 @@
 		align-items: center;
 		gap: var(--space-2);
 		flex-wrap: wrap;
+	}
+
+	.domain-tile__pending {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-1);
+		max-width: 100%;
+		color: var(--color-text-muted);
+		font-size: var(--text-xs);
+		font-weight: var(--font-weight-medium);
+		white-space: nowrap;
 	}
 
 	.domain-tile__top p {

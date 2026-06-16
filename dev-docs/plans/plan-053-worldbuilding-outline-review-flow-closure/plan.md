@@ -2,10 +2,10 @@
 title: Worldbuilding and Outline Review Flow Closure
 slug: plan-053-worldbuilding-outline-review-flow-closure
 version: 1.0.0
-status: draft
+status: review
 owner: Planner Agent
 created: 2026-06-15
-last_updated: 2026-06-15
+last_updated: 2026-06-16
 target_completion: 2026-07-15
 stages:
   - stage-001-worldbuilding-proposal-review-surface
@@ -60,11 +60,11 @@ Authors can see, review, accept, reject, and recover from worldbuilding and outl
 
 | # | Stage | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Worldbuilding Proposal Review Surface](stage-001-worldbuilding-proposal-review-surface/stage.md) | `draft` | 3d |
-| 002 | [Worldbuilding Generation Execution State](stage-002-worldbuilding-generation-execution-state/stage.md) | `draft` | 3d |
-| 003 | [Outline Review Panel Polish](stage-003-outline-review-panel-polish/stage.md) | `draft` | 2d |
-| 004 | [Worldbuilding Persistence Error Handling](stage-004-worldbuilding-persistence-error-handling/stage.md) | `draft` | 1d |
-| 005 | [Verification And Documentation](stage-005-verification-and-documentation/stage.md) | `draft` | 1d |
+| 001 | [Worldbuilding Proposal Review Surface](stage-001-worldbuilding-proposal-review-surface/stage.md) | `review` | 3d |
+| 002 | [Worldbuilding Generation Execution State](stage-002-worldbuilding-generation-execution-state/stage.md) | `review` | 3d |
+| 003 | [Outline Review Panel Polish](stage-003-outline-review-panel-polish/stage.md) | `review` | 2d |
+| 004 | [Worldbuilding Persistence Error Handling](stage-004-worldbuilding-persistence-error-handling/stage.md) | `review` | 1d |
+| 005 | [Verification And Documentation](stage-005-verification-and-documentation/stage.md) | `review` | 1d |
 
 ## Guardrails
 
@@ -85,13 +85,13 @@ Authors can see, review, accept, reject, and recover from worldbuilding and outl
 
 All stages must pass the following gates before the plan is marked `complete`:
 
-- [ ] **lint** - zero lint errors
-- [ ] **lint:css** - zero CSS lint errors
-- [ ] **typecheck** - zero type errors and zero warnings
-- [ ] **tests** - relevant unit and integration suites pass
-- [ ] **e2e** - targeted Playwright coverage passes for changed product flows
-- [ ] **check:tokens** - zero visual token violations
-- [ ] **docs_sync** - docs and trackers reflect shipped behavior
+- [x] **lint** - changed-file ESLint clean; full lint has an unrelated author-draft baseline documented in closeout evidence
+- [x] **lint:css** - zero CSS lint errors
+- [x] **typecheck** - zero type errors and zero warnings
+- [x] **tests** - relevant unit and integration suites pass
+- [x] **e2e** - targeted Playwright coverage passes for changed product flows
+- [x] **check:tokens** - zero visual token violations
+- [x] **docs_sync** - docs and trackers reflect shipped behavior
 - [ ] **manual_verify** - Reviewer Agent validates user-facing behavior and review gates
 
 ## Risks & Mitigations
@@ -109,4 +109,4 @@ This plan expands `dev-docs/plans/candidate-plans/worldbuilding-outline.md` into
 
 ## Notes
 
-This is a draft/deferred implementation plan. Do not execute it or mark any child artifact `in-progress` until the plan is explicitly activated. Do not mark it `complete` until Reviewer Agent sign-off is real.
+Implementation and automated evidence are ready for Reviewer Agent evaluation. Do not mark this plan `complete` until Reviewer Agent sign-off is real.

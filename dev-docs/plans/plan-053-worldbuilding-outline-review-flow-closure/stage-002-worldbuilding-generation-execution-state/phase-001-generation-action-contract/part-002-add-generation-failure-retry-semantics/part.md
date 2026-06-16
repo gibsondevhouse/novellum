@@ -2,12 +2,12 @@
 title: Add Generation Failure Retry Semantics
 slug: part-002-add-generation-failure-retry-semantics
 part_number: 2
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-001-generation-action-contract
-started_at: ~
-completed_at: ~
+started_at: 2026-06-16
+completed_at: 2026-06-16
 estimated_duration: 0.5d
 ---
 
@@ -51,9 +51,9 @@ Make failed worldbuilding generation attempts visible and retryable without leav
 
 ## Acceptance Criteria
 
-- [ ] Failed generation displays a concise error and retry option.
-- [ ] Illegal transitions still throw in tests but not from normal UI paths.
-- [ ] Retry returns state to queued/running only after a user action.
+- [x] Failed generation displays a concise error and retry option.
+- [x] Illegal transitions still throw in tests but not from normal UI paths.
+- [x] Retry returns state to queued/running only after a user action.
 
 ## Edge Cases
 

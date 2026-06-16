@@ -2,12 +2,12 @@
 title: Route Character Save Errors Through UI State
 slug: part-001-route-character-save-errors-through-ui-state
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-001-character-persistence-error-cleanup
-started_at: ~
-completed_at: ~
+started_at: 2026-06-16
+completed_at: 2026-06-16
 estimated_duration: 1d
 ---
 
@@ -39,6 +39,7 @@ Clean up raw console.error calls in the worldbuilding character individuals rout
 **Create:**
 
 - `tests/world-building/character-persistence-errors.test.ts`
+- `tests/e2e/character-persistence-errors.spec.ts`
 
 **Update:**
 
@@ -50,9 +51,9 @@ Clean up raw console.error calls in the worldbuilding character individuals rout
 
 ## Acceptance Criteria
 
-- [ ] Save errors remain visible to the author.
-- [ ] Raw console errors are absent from the normal production route path or guarded to development only.
-- [ ] Tests prove failures do not disappear silently.
+- [x] Save errors remain visible to the author.
+- [x] Raw console errors are absent from the normal production route path or guarded to development only.
+- [x] Tests prove failures do not disappear silently.
 
 ## Edge Cases
 

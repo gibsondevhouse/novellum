@@ -36,7 +36,7 @@ describe('checkpoint decision flow — accept', () => {
 
 	it('accept scope disclosure is visible before decision', () => {
 		expect(pageSource).toContain('checkpoint-decision__scope');
-		expect(pageSource).toContain('Accepting will mark this artifact as canonical');
+		expect(pageSource).toContain('Accepting will project the reviewed');
 	});
 
 	it('store exposes acceptStagedWorldbuildCheckpoint for the accept transition', () => {

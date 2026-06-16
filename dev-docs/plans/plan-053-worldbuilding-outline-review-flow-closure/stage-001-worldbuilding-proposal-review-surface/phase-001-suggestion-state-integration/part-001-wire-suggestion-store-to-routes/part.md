@@ -2,12 +2,12 @@
 title: Wire Suggestion Store To Routes
 slug: part-001-wire-suggestion-store-to-routes
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
 assigned_to: Codex
 phase: phase-001-suggestion-state-integration
-started_at: ~
-completed_at: ~
+started_at: 2026-06-16
+completed_at: 2026-06-16
 estimated_duration: 0.5d
 ---
 
@@ -53,9 +53,9 @@ Connect the existing worldbuild suggestion store to project worldbuilding routes
 
 ## Acceptance Criteria
 
-- [ ] The proposal store has at least one real route caller.
-- [ ] Pending-count selectors are consumed outside the store.
-- [ ] Load errors are visible without breaking the page.
+- [x] The proposal store has at least one real route caller.
+- [x] Pending-count selectors are consumed outside the store.
+- [x] Load errors are visible without breaking the page.
 
 ## Edge Cases
 

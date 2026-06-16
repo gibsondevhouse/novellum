@@ -2,7 +2,7 @@
 title: Worldbuilding Generation Execution State
 slug: stage-002-worldbuilding-generation-execution-state
 stage_number: 2
-status: draft
+status: review
 owner: Planner Agent
 plan: plan-053-worldbuilding-outline-review-flow-closure
 phases:
@@ -20,8 +20,8 @@ Make worldbuilding Generate controls start real generation work and drive truthf
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Generation Action Contract](phase-001-generation-action-contract/phase.md) | `draft` | 1.5d |
-| 002 | [Route And Help Integration](phase-002-route-and-help-integration/phase.md) | `draft` | 1.5d |
+| 001 | [Generation Action Contract](phase-001-generation-action-contract/phase.md) | `review` | 1.5d |
+| 002 | [Route And Help Integration](phase-002-route-and-help-integration/phase.md) | `review` | 1.5d |
 
 ## Entry Criteria
 
@@ -30,8 +30,8 @@ Make worldbuilding Generate controls start real generation work and drive truthf
 
 ## Exit Criteria
 
-- [ ] Generate controls no longer only open a seeded Nova prompt while status widgets imply execution.
-- [ ] Readiness, running, review-ready, and failure states are user-visible and tested.
+- [x] Generate controls no longer only open a seeded Nova prompt while status widgets imply execution.
+- [x] Readiness, running, review-ready, and failure states are user-visible and tested.
 
 ## Notes
 

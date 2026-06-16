@@ -56,6 +56,7 @@ export { checkDomainReadiness } from './worldbuilding-readiness.js';
 export type { GenerateGuardContext, GenerateGuardResult } from './worldbuilding-generate-actions.js';
 export {
 	canGenerateDomain,
+	openNovaGenerationHelp,
 	generatePersonaeWithNova,
 	generateAtlasWithNova,
 	generateArchiveWithNova,
@@ -63,6 +64,7 @@ export {
 	generateChroniclesWithNova,
 	generateDomainWithNova,
 } from './worldbuilding-generate-actions.js';
+export type { WorldbuildingGenerationActionResult } from './worldbuilding-generate-actions.js';
 
 // Generation state machine
 export type { WorldbuildingGenerationStateValue } from './stores/worldbuilding-generation-state.svelte.js';
@@ -75,6 +77,17 @@ export {
 	evaluateReadiness,
 } from './stores/worldbuilding-generation-state.svelte.js';
 
+// Proposal suggestion state
+export {
+	refreshSuggestionsForProjectRoute,
+	getTotalPendingCount as getPendingWorldbuildSuggestionCount,
+	getPendingCountForCategory as getPendingWorldbuildSuggestionCountForCategory,
+	getSuggestionLoadError as getWorldbuildSuggestionLoadError,
+	getIsLoadingSuggestions as getIsLoadingWorldbuildSuggestions,
+} from './stores/worldbuild-suggestion-state.svelte.js';
+
 // Stage-003 components
 export { default as WorldbuildingProposalCard } from './components/WorldbuildingProposalCard.svelte';
 export { default as WorldbuildingGenerationStatus } from './components/WorldbuildingGenerationStatus.svelte';
+export { default as WorldbuildingNotificationBadge } from './components/WorldbuildingNotificationBadge.svelte';
+export { default as WorldbuildingProposalReviewSection } from './components/WorldbuildingProposalReviewSection.svelte';

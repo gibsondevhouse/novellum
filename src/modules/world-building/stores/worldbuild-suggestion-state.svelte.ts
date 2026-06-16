@@ -9,7 +9,7 @@
  * All proposals are non-canonical until the author explicitly accepts.
  */
 
-import { listProjectMetadata } from '$lib/project-metadata.js';
+import { listProjectMetadataStrict } from '$lib/project-metadata.js';
 import { WORLDBUILD_PROPOSAL_OWNER_ID } from '$lib/ai/pipeline/checkpoint-contract.js';
 import type { WorldbuildingDomainId } from '../worldbuilding-workflow.js';
 import { WORLDBUILDING_DOMAIN_SEQUENCE } from '../worldbuilding-workflow.js';
@@ -31,6 +31,7 @@ function isProposalRecord(value: unknown): value is WorldbuildProposalRecord {
 		typeof v.projectId === 'string' &&
 		typeof v.categoryId === 'string' &&
 		typeof v.entityKind === 'string' &&
+		typeof v.generatedAt === 'string' &&
 		isWorldbuildProposalStatus(v.status)
 	);
 }
@@ -53,6 +54,14 @@ function makeZeroCounts(): Record<WorldbuildingDomainId, number> {
 let suggestions: WorldbuildProposalRecord[] = $state([]);
 let suggestionLoadError: string | null = $state(null);
 let isLoadingSuggestions: boolean = $state(false);
+let refreshSequence = 0;
+let lastRouteRefreshProjectId: string | null = null;
+let inFlightRouteRefresh:
+	| {
+			projectId: string;
+			promise: Promise<void>;
+	  }
+	| null = null;
 
 /**
  * Per-category count of `pending_review` proposals.
@@ -82,26 +91,71 @@ const pendingCountByCategory: Record<WorldbuildingDomainId, number> = $derived(
  * accept/reject mutations to keep notification state consistent.
  */
 export async function refreshSuggestions(projectId: string | null): Promise<void> {
+	const sequence = ++refreshSequence;
+
 	if (!projectId) {
 		suggestions = [];
 		suggestionLoadError = null;
+		isLoadingSuggestions = false;
+		lastRouteRefreshProjectId = null;
 		return;
 	}
 
 	isLoadingSuggestions = true;
 	try {
-		const entries = await listProjectMetadata(projectId, 'pipeline', WORLDBUILD_PROPOSAL_OWNER_ID);
+		const entries = await listProjectMetadataStrict(
+			projectId,
+			'pipeline',
+			WORLDBUILD_PROPOSAL_OWNER_ID,
+		);
 		const parsed = Object.values(entries)
 			.filter(isProposalRecord)
 			.sort((a, b) => b.generatedAt.localeCompare(a.generatedAt));
+		if (sequence !== refreshSequence) return;
 		suggestions = parsed;
 		suggestionLoadError = null;
 	} catch (err) {
+		if (sequence !== refreshSequence) return;
 		suggestionLoadError =
 			err instanceof Error ? err.message : 'Failed to load worldbuild suggestions.';
 	} finally {
-		isLoadingSuggestions = false;
+		if (sequence === refreshSequence) {
+			isLoadingSuggestions = false;
+		}
 	}
+}
+
+/**
+ * Route lifecycle wrapper for proposal hydration.
+ *
+ * Routes use this instead of calling `refreshSuggestions` directly so repeated
+ * effects for the same project do not create duplicate metadata reads. Mutation
+ * paths should still call `refreshSuggestions(projectId)` directly when they
+ * need a forced post-accept/reject rehydrate.
+ */
+export function refreshSuggestionsForProjectRoute(projectId: string | null): Promise<void> {
+	if (!projectId) {
+		return refreshSuggestions(null);
+	}
+
+	if (inFlightRouteRefresh?.projectId === projectId) {
+		return inFlightRouteRefresh.promise;
+	}
+
+	if (lastRouteRefreshProjectId === projectId && suggestionLoadError === null) {
+		return Promise.resolve();
+	}
+
+	const promise = refreshSuggestions(projectId).finally(() => {
+		if (inFlightRouteRefresh?.projectId === projectId) {
+			inFlightRouteRefresh = null;
+		}
+		if (suggestionLoadError === null) {
+			lastRouteRefreshProjectId = projectId;
+		}
+	});
+	inFlightRouteRefresh = { projectId, promise };
+	return promise;
 }
 
 /**
@@ -121,6 +175,10 @@ export function upsertSuggestionLocal(updated: WorldbuildProposalRecord): void {
 
 export function getSuggestions(): WorldbuildProposalRecord[] {
 	return suggestions;
+}
+
+export function getSuggestionById(proposalId: string): WorldbuildProposalRecord | null {
+	return suggestions.find((p) => p.proposalId === proposalId) ?? null;
 }
 
 export function getSuggestionLoadError(): string | null {
