@@ -1,10 +1,10 @@
 # Data Model
 
-> Last verified: 2026-06-04 (plan-040 closeout docs sync)
+> Last verified: 2026-06-16 (plan-053 worldbuilding/outline review-flow closure)
 
 The single source of truth is the SQLite schema in [src/lib/server/db/schema.ts](../../src/lib/server/db/schema.ts). The Dexie mirror in [src/lib/db/](../../src/lib/db/) (currently schema **v11**) is used **only** for `.novellum.zip` portability — never for live reads/writes.
 
-## Tables (19 shipped + auxiliary)
+## Tables (28 shipped + auxiliary)
 
 ### Core narrative entities
 
@@ -35,6 +35,20 @@ The single source of truth is the SQLite schema in [src/lib/server/db/schema.ts]
 | `themes` | Narrative themes and motifs. |
 | `glossary_terms` | Terminology and lexicon. |
 
+### AI Agent Runtime (Hardened Runtime, Plan-049)
+
+| Table | Purpose |
+| --- | --- |
+| `agent_runs` | Durable record of an AI execution (family, intent, status). |
+| `agent_run_steps` | Granular steps within a run (kind, input/output hashes). |
+| `agent_tool_calls` | Individual tool invocations by an agent. |
+| `agent_artifacts` | Reviewable artifacts produced by a run (proposals, drafts). |
+| `agent_usage` | Token usage and cost estimates (estimated vs provider). |
+| `agent_run_errors` | Detailed, redacted error logs for failed runs. |
+| `agent_jobs` | SQLite-backed job queue for background agent tasks. |
+| `agent_trace_events` | Fine-grained execution traces (logs, metadata). |
+| `agent_trace_redactions` | Redaction rules applied to trace metadata. |
+
 ### AI / quality
 
 | Table | Purpose |
@@ -50,17 +64,20 @@ The single source of truth is the SQLite schema in [src/lib/server/db/schema.ts]
 | Table | Purpose |
 | --- | --- |
 | `export_settings` | Per-project export configuration. |
+| `assets` | Project assets (images, files) for export and Nova. |
 
 ### Auxiliary key-value tables
 
-These are not in the "16 core" count but are first-class:
+These are not in the core count but are first-class:
 
-- **`preferences`** — typed user preferences keyed by string. Foundation for [plan-022-settings-ia](../plans/plan-022-settings-ia/plan.md). REST under `/api/db/preferences/[key]`.
-- **`project_metadata`** — per-project flexible metadata (scoped by `projectId`/`scope`/`ownerId`/`key`). REST under `/api/db/project-metadata/...`. Supported scopes: `'scene' | 'chapter' | 'project' | 'pipeline'`. The `'pipeline'` scope stores `WorldbuildCheckpointRecord` JSON keyed by checkpoint id (owner `'vibe-worldbuild'`) and plan-040 `OutlineDraftCheckpointRecord` JSON keyed by checkpoint id (owner `'outlineDraftCheckpoints.v1'`). Accepted populated-bible checkpoints atomically project into worldbuilding canon tables. Accepted outline checkpoints atomically project into `arcs`, `acts`, `milestones`, `chapters`, `scenes`, and scene-scoped metadata through the dedicated outline accept route. See [ADR-0027](./adr/adr-0027-pipeline-entity-scope.md), [pipeline.md](../03-ai/pipeline.md), and [outline-generation.md](../03-ai/outline-generation.md).
+- **`app_preferences`** — typed user preferences keyed by string.
+- **`project_metadata`** — per-project flexible metadata (scoped by `projectId`/`scope`/`ownerId`/`key`). Supported scopes: `'scene' | 'chapter' | 'project' | 'pipeline'`.
+- **`schema_migrations`** — tracking of applied database migrations.
 
-The complete count, including auxiliary tables, is **16 shipped narrative + AI tables + 5 auxiliary** (preferences, project-metadata, etc.) — see [schema.ts](../../src/lib/server/db/schema.ts) for the canonical list.
+The complete count is **28 shipped narrative + AI tables + auxiliary** — see [schema.ts](../../src/lib/server/db/schema.ts) for the canonical list.
 
 ## Hierarchy
+...
 
 ```text
 Project

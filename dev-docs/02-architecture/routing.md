@@ -1,6 +1,6 @@
 # Routing
 
-> Last verified: 2026-06-01
+> Last verified: 2026-06-16
 
 SvelteKit file-based routing under [src/routes/](../../src/routes/).
 

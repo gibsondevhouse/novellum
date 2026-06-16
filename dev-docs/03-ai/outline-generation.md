@@ -1,6 +1,6 @@
 # Outline Generation
 
-> Last verified: 2026-06-12 (plan-043 outline consolidation)
+> Last verified: 2026-06-16 (plan-043 outline consolidation)
 
 Plan-040 adds the review-gated bridge from worldbuilding context to a canonical project outline.
 

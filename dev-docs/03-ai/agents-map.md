@@ -1,6 +1,6 @@
 # Agents Map
 
-> Last verified: 2026-06-15 (plan-048 frontend coherence)
+> Last verified: 2026-06-16 (plan-048 frontend coherence)
 
 Authoritative status of all Novellum runtime agents. Anchored to [src/lib/ai/](../../src/lib/ai/).
 The V1.1 staged pipeline (`vibe-worldbuild` / `vibe-author`) is

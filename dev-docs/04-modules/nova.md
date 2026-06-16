@@ -1,6 +1,6 @@
 # Module: `nova`
 
-> Last verified: 2026-06-12 (plan-043 outline consolidation)
+> Last verified: 2026-06-16 (plan-043 outline consolidation)
 > Source: [src/modules/nova/](../../src/modules/nova/)
 
 ## Purpose

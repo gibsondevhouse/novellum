@@ -1,6 +1,6 @@
 # Modular Boundaries
 
-> Last verified: 2026-06-01
+> Last verified: 2026-06-16
 
 Novellum follows a **Vertical Slice Architecture (VSA)** with **Feature-Sliced Design (FSD)** influences and **Single Responsibility (SRP)** at the file level. Boundaries are enforced mechanically by [eslint-plugin-boundaries](https://github.com/javierbrea/eslint-plugin-boundaries) configured in [eslint.config.js](../../eslint.config.js).
 

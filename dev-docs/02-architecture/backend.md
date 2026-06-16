@@ -1,6 +1,6 @@
 # Backend
 
-> Last verified: 2026-06-01
+> Last verified: 2026-06-16 (plan-053 implementation review)
 
 The "backend" is a SvelteKit server (Node adapter) that runs either via `pnpm dev` or as a Tauri sidecar. There is no separate backend service.
 
@@ -21,7 +21,7 @@ Location: [src/lib/server/db/](../../src/lib/server/db/).
 | File | Responsibility |
 | --- | --- |
 | `client.ts` | `better-sqlite3` singleton, WAL mode, `PRAGMA foreign_keys = ON`. |
-| `schema.ts` | SQL DDL for 16 tables and 22 indexes. |
+| `schema.ts` | SQL DDL for 28 tables and 40+ indexes. |
 | `migrations.ts` | Versioned migrations applied on startup. |
 | `serialize.ts` | JSON encode/decode helpers for TEXT columns that store structured data (e.g., character traits, scene snapshots). |
 
@@ -29,7 +29,7 @@ Schema and table relationships are documented in [data-model.md](./data-model.md
 
 ## API surface
 
-All endpoints are SvelteKit `+server.ts` files under [src/routes/api/](../../src/routes/api/). Listed exhaustively below as of 2026-05-07.
+All endpoints are SvelteKit `+server.ts` files under [src/routes/api/](../../src/routes/api/). Listed exhaustively below as of 2026-06-16.
 
 ### `/api/db/*` — entity REST
 
@@ -49,24 +49,43 @@ acts, arcs, beats, chapters, character_relationships, characters,
 chat_instructions, consistency_issues, export_settings, locations,
 lore_entries, milestones, plot_threads, projects, scene_snapshots,
 scenes, stages, story_frames, system_prompts, templates,
-timeline_events, writing_styles
+timeline_events, writing_styles, assets, agent_runs, agent_run_steps,
+agent_tool_calls, agent_artifacts, agent_usage, agent_run_errors,
+agent_jobs, agent_trace_events, agent_trace_redactions
 ```
 
 Special endpoints:
 
-- `GET|PUT /api/db/preferences/[key]` — typed user preferences (foundation for [plan-022](../plans/plan-022-settings-ia/plan.md)).
+- `GET|PUT /api/db/preferences/[key]` — typed user preferences.
 - `GET|PUT /api/db/project-metadata/[projectId]/[scope]/[ownerId][/<key>]` — flexible per-project metadata bag.
 - `POST /api/db/scene_snapshots/[id]/restore` — restore a scene to a prior snapshot.
 
-### `/api/ai/*` — OpenRouter proxy
+### `/api/ai-controller/*` — Governed Controller
+
+Plan-051 introduces the governed AI controller as the primary AI execution endpoint.
 
 | Path | Method | Purpose |
 | --- | --- | --- |
-| `/api/ai` | POST | Streaming proxy to OpenRouter; payload built by [src/lib/ai/prompt-builder.ts](../../src/lib/ai/prompt-builder.ts). |
+| `/api/ai-controller` | POST | Execute a governed AI workflow (resolves intent, applies policy, builds context packet, invokes workflow). |
+| `/api/ai-controller/runs` | GET | List historical agent runs for audit and tracing. |
+| `/api/ai-controller/runs/[id]`| GET | Get detailed run evidence (steps, tool calls, usage, artifacts). |
+
+### `/api/ai/*` — OpenRouter proxy (Legacy/Direct)
+
+| Path | Method | Purpose |
+| --- | --- | --- |
+| `/api/ai` | POST | Streaming completions for Ask/Write modes. |
 | `/api/ai/models` | GET | List available models from OpenRouter. |
 | `/api/ai/validate-key` | POST | Validate a candidate OpenRouter API key. |
 
 The OpenRouter key never reaches the browser. It is fetched server-side from the OS keyring via [src/lib/ai/credential-service.ts](../../src/lib/ai/credential-service.ts).
+
+### `/api/nova/*`
+
+| Path | Method | Purpose |
+| --- | --- | --- |
+| `/api/nova/context` | POST | Build a Nova chat context payload from project state. |
+| `/api/nova/agent` | POST | Non-streaming tool-capable completions for Agent mode. |
 
 ### `/api/settings/*`
 

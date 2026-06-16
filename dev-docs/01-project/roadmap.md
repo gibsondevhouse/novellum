@@ -1,6 +1,6 @@
 # Roadmap
 
-> Last verified: 2026-06-01
+> Last verified: 2026-06-16
 >
 > **Versioning convention.** Internal milestones (V1, V1.1, V2) are **development
 > checkpoints**, not public releases. Novellum has not yet cut a public release. When
@@ -11,7 +11,7 @@ This roadmap reflects what is **shipped to the working internal build**, what is
 flight** (active plans in [../plans/](../plans/)), and what is explicitly **planned but
 not started**. It does not promise dates.
 
-## Shipped to internal build (as of 2026-06-01)
+## Shipped to internal build (as of 2026-06-16)
 
 ### Foundation
 
@@ -56,6 +56,15 @@ not started**. It does not promise dates.
 - Context-priority generation (typed target/avoid hints, expanded character draft fields, faction/lineage extension) — closed by [plan-036-context-priority-generation](../plans/archive/plan-036-context-priority-generation/plan.md) (closed 2026-05-30).
 - Agentic worldbuild scan + review-gated proposal flow (scan contract, proposal schema, pending notification UI, atomic accept/reject) — closed by [plan-037-agentic-worldbuild-scan](../plans/archive/plan-037-agentic-worldbuild-scan/plan.md) (closed 2026-05-31; scan execution wired 2026-06-01).
 - Novel Engine v1 — Draft From Outline (guided checkpointed pipeline: outline → scene drafts → reviewable artifacts → explicit accept writes to `scenes.content`) — closed by [plan-038-novel-engine-v1](../plans/plan-038/plan.md) (closed 2026-06-01).
+- Manuscript export UI (subset selector, delivery helper, metadata/formatting controls) — closed by [plan-039-manuscript-export-ui](../plans/plan-039-manuscript-export-ui/plan.md) (closed 2026-06-03).
+- Outline generation (worldbuilding-to-outline review-gated proposal flow, atomic materialization) — closed by [plan-040-outline-generation](../plans/plan-040-outline-generation/plan.md) (closed 2026-06-04).
+- Quality Gates Closure (restored clean check/lint/test baselines) — closed by [plan-042-quality-gates-closure](../plans/plan-042-quality-gates-closure/plan.md) (closed 2026-06-04).
+- Nova Active Context Routing (resolved from routes instead of query params) — closed by [plan-044-nova-active-context-routing](../plans/plan-044-nova-active-context-routing/plan.md) (closed 2026-06-11).
+- Agent Tool Mutation Boundary (strict separation between AI reading and mutation) — closed by [plan-045-agent-tool-mutation-boundary](../plans/plan-045-agent-tool-mutation-boundary/plan.md) (closed 2026-06-12).
+- Outline Pipeline Consolidation (retired legacy apply paths; checkpoints only) — closed by [plan-043-outline-pipeline-consolidation](../plans/plan-043-outline-pipeline-consolidation/plan.md) (closed 2026-06-12).
+- Pipeline Checkpoint Contract Reconciliation (aligned schemas/routes across all pipelines) — closed by [plan-046-pipeline-checkpoint-contract-reconciliation](../plans/plan-046-pipeline-checkpoint-contract-reconciliation/plan.md) (closed 2026-06-14).
+- Worldbuilding Canon Merge Diff (reviewable canon diff/merge behavior) — closed by [plan-047-worldbuilding-canon-merge-diff](../plans/plan-047-worldbuilding-canon-merge-diff/plan.md) (closed 2026-06-14).
+- Agent Runtime Stack Hardening (durable runs, jobs, capabilities, traces) — closed by [plan-049-agent-runtime-stack-hardening](../plans/plan-049-agent-runtime-stack-hardening/plan.md) (closed 2026-06-15).
 
 ### Reader, navigation, theming
 
@@ -68,11 +77,16 @@ not started**. It does not promise dates.
 ### Codebase health
 
 - Codebase naming consistency (route/module/component alignment) — shipped organically via plans 020-028. Closed by plan-029 closeout (originally plan-019).
-- Documentation refresh of dev-docs and novellum-docs — closed by [plan-014-documentation-refresh](../plans/archive/plan-014-documentation-refresh/plan.md) (closed 2026-04-20). Re-baselined 2026-05-07. This page re-baselined again 2026-06-01 by [plan-041](../plans/plan-041-docs-rebaseline-internal-version/plan.md).
+- Documentation refresh of dev-docs and novellum-docs — closed by [plan-014-documentation-refresh](../plans/archive/plan-014-documentation-refresh/plan.md) (closed 2026-04-20). Re-baselined 2026-05-07. This page re-baselined again 2026-06-16 by Plan-053 implementation review.
 
 ## In flight
 
-No active plan as of 2026-06-01. Next candidates are tracked under "Drafted (skeleton plans)" below.
+The following plans are in **review** (implementation complete):
+
+- [plan-051-governed-ai-controller-runtime](../plans/plan-051-governed-ai-controller-runtime/plan.md) — Server-side governed AI controller.
+- [plan-048-frontend-experience-coherence](../plans/plan-048-frontend-experience-coherence/plan.md) — Unified navigation, review gates, and visual state.
+- [plan-052-pipeline-nova-editor-trust-closure](../plans/plan-052-pipeline-nova-editor-trust-closure/plan.md) — Durable review-gated Nova artifacts and revision acks.
+- [plan-053-worldbuilding-outline-review-flow-closure](../plans/plan-053-worldbuilding-outline-review-flow-closure/plan.md) — Persisted worldbuilding proposals and generation status polish.
 
 Release engineering (code signing, notarization, brand icons) remains deferred to a dedicated release plan — it requires external procurement, not software engineering.
 
@@ -80,8 +94,7 @@ Release engineering (code signing, notarization, brand icons) remains deferred t
 
 These plans have a `plan.md` skeleton but stages have not been authored yet. Pick one up to start the next era of work.
 
-- [plan-039-manuscript-export-ui](../plans/plan-039-manuscript-export-ui/plan.md) — wire the existing `exportProject()` services to a real UI (profile selector, format toggle, chapter-subset selection).
-- [plan-040-outline-generation](../plans/plan-040-outline-generation/plan.md) — Worldbuilding → Outline AI-assisted generation, completing the full Worldbuild → Outline → Draft → Manuscript loop.
+- [plan-043-brainstorm-agent](../plans/plan-043-brainstorm-agent/plan.md) — Re-introduce BrainstormAgent with review-gated UI and worldbuild integration.
 
 ## Next era — full AI integration
 

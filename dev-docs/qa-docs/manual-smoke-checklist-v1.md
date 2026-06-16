@@ -1,6 +1,6 @@
 # Novellum — Manual smoke checklist (packaged build)
 
-> Last verified: 2026-06-01
+> Last verified: 2026-06-16
 >
 > Originally cut for the internal V1 desktop checkpoint (plan-025). Still the
 > canonical smoke checklist for any packaged Tauri build.

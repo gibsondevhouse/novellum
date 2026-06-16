@@ -1,6 +1,6 @@
 # Planning Conventions
 
-> Last verified: 2026-06-01
+> Last verified: 2026-06-16
 
 Novellum uses a strict 4-tier planning system. Every non-trivial change goes through it. The canonical rules live in [.github/instructions/plan-conventions.instructions.md](../../.github/instructions/plan-conventions.instructions.md); this page is the developer-facing summary.
 

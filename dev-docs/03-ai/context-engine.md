@@ -1,6 +1,6 @@
 # Context Engine
 
-> Last verified: 2026-06-15 (plan-048 frontend coherence)
+> Last verified: 2026-06-16 (plan-048 frontend coherence)
 
 The Context Engine selects the **minimum viable context** for an AI task. Hallucination reduction at Novellum is mostly a context-discipline problem, not a prompt-tuning problem.
 

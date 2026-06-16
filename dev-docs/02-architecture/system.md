@@ -1,6 +1,6 @@
 # System Architecture
 
-> Last verified: 2026-06-01
+> Last verified: 2026-06-16 (plan-053 implementation review)
 
 Novellum is a **single-user, local-first desktop app** wrapping a SvelteKit web app over a server-side SQLite database. The desktop shell (Tauri 2) ships a Node.js binary and runs the SvelteKit server as a sidecar process. The browser variant exists for development.
 
@@ -28,7 +28,8 @@ Novellum is a **single-user, local-first desktop app** wrapping a SvelteKit web 
                                        │  SvelteKit server         │
                                        │  - serves /              │
                                        │  - /api/db/*  (REST)      │
-                                       │  - /api/ai/*  (proxy)     │
+                                       │  - /api/ai-controller/*   │
+                                       │  - /api/ai/*  (legacy)    │
                                        │  - /api/settings/*        │
                                        │  - /api/backup,restore/*  │
                                        │  - /api/local-files/*     │
@@ -67,12 +68,13 @@ Novellum is a **single-user, local-first desktop app** wrapping a SvelteKit web 
 ### 4. Server / API — SvelteKit `+server.ts`
 
 - All persistence flows through `/api/db/*` REST endpoints. Browser code uses [src/lib/api-client.ts](../../src/lib/api-client.ts) (`apiGet`/`apiPost`/`apiPut`/`apiDel`); it never touches SQLite directly.
+- Hardened AI execution flows through `/api/ai-controller/*` REST endpoints.
 - See [backend.md](./backend.md) for the endpoint taxonomy.
 
 ### 5. Database — single-file SQLite
 
 - [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) singleton with WAL mode, foreign keys ON.
-- 16 tables, 22 indexes. Schema in [src/lib/server/db/schema.ts](../../src/lib/server/db/schema.ts), migrations in [src/lib/server/db/migrations.ts](../../src/lib/server/db/migrations.ts).
+- 28 core tables, 40+ indexes. Schema in [src/lib/server/db/schema.ts](../../src/lib/server/db/schema.ts), migrations in [src/lib/server/db/migrations.ts](../../src/lib/server/db/migrations.ts).
 - DB file path resolved via `NOVELLUM_DB_PATH` (default `./novellum.db` in dev; OS app-data path in desktop builds).
 - See [data-model.md](./data-model.md).
 
@@ -81,10 +83,12 @@ Novellum is a **single-user, local-first desktop app** wrapping a SvelteKit web 
 - Tauri webview points at the local Node sidecar. The sidecar is the same SvelteKit server you run during `pnpm dev`, just bundled as `build/index.js`.
 - Lifecycle, packaging, and known fragilities are documented in [tauri-shell.md](./tauri-shell.md).
 
-### 7. AI layer
+### 7. AI layer — Governed Runtime
 
-- [src/lib/ai/](../../src/lib/ai/) — orchestrator, task resolver, context builder, prompt builder, model router, agents.
-- Calls go through `/api/ai/*` so the OpenRouter API key never reaches the browser.
+- [src/lib/server/ai/controller/](../../src/lib/server/ai/controller/) — Centralized AI control plane for intent resolution, policy enforcement, context assembly, and artifact lifecycle (Plan-051).
+- [src/lib/ai/](../../src/lib/ai/) — Frontend orchestrator and client-side agent logic.
+- **Hardened Runtime** (Plan-049) — SQLite-backed job queue, durable run records, granular steps, tool call logging, and fine-grained tracing.
+- Calls go through `/api/ai-controller/*` so the OpenRouter API key never reaches the browser.
 - See [03-ai/pipeline.md](../03-ai/pipeline.md).
 
 ### 8. Portability — Dexie 4
@@ -100,12 +104,21 @@ Novellum is a **single-user, local-first desktop app** wrapping a SvelteKit web 
 4. The SvelteKit endpoint validates the payload (Zod), serializes JSON columns, writes via the better-sqlite3 singleton.
 5. Response returns the persisted record; the editor store updates `$state`; UI reflects "Saved".
 
+## AI Data flow (Governed Controller)
+
+1. User clicks "Generate" in a module.
+2. Module calls `aiController.execute({ intent, context })`.
+3. Server-side controller resolves intent → checks policy → assembles context packet.
+4. Workflow is routed to a specific agent/model; execution is logged as an `agent_run`.
+5. Output is validated against Zod schemas; if valid, a reviewable `agent_artifact` is created.
+6. Frontend renders the artifact for author review; author accepts/rejects.
+
 ## Why this shape
 
 - **Local-first, single-binary distribution.** The user owns their data; the app works offline (apart from explicit AI calls).
-- **One source of truth.** Eliminating client-side persistence removed an entire class of sync bugs (closed by [plan-008-local-sqlite](../plans/archive/plan-008-local-sqlite/plan.md)).
+- **One source of truth.** Eliminating client-side persistence removed an entire class of sync bugs.
+- **Governed AI execution.** Centralizing AI logic in a server-side controller allows for strict policy enforcement, durable audit logs, and a unified artifact lifecycle.
 - **Modular boundaries.** Vertical slices keep features movable and reviewable; ESLint stops cross-module shortcuts at PR time.
-- **Sidecar over Electron.** Smaller binary, simpler build, no separate renderer/main process model — the SvelteKit server is the only "main process" we have to reason about. Trade-off: the Node binary must be packaged per platform.
 
 ## See also
 

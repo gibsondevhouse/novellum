@@ -1,6 +1,6 @@
 # Novellum Dev Docs
 
-> Last verified: 2026-06-02
+> Last verified: 2026-06-16
 > Source of truth for the Novellum codebase. Audience: contributors, reviewers, and the AI agents in `.github/agents/`.
 
 This directory is a **living developer reference**, not marketing copy. Every page is anchored to real files in [src/](../src) and [src-tauri/](../src-tauri). When code and docs disagree, the code wins — open a PR to fix the doc.

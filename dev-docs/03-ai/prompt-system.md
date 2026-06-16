@@ -1,6 +1,6 @@
 # Prompt System
 
-> Last verified: 2026-06-03 (plan-040 outline generation prompt)
+> Last verified: 2026-06-16 (plan-040 outline generation prompt)
 
 Every prompt Novellum sends to an LLM follows a fixed five-section template. This is enforced by [prompt-builder.ts](../../src/lib/ai/prompt-builder.ts) and tested per agent.
 

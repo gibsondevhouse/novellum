@@ -1,6 +1,6 @@
 # Module: `export`
 
-> Last verified: 2026-06-02
+> Last verified: 2026-06-16
 > Source: [src/modules/export/](../../src/modules/export/)
 
 ## Purpose

@@ -1,6 +1,6 @@
 # Journey: How Novellum got to where it is
 
-> Last verified: 2026-06-01
+> Last verified: 2026-06-16
 > Audience: a collaborator joining now who wants to trace the workflow from inception to today.
 
 This is the chronological narrative built from [plans/MASTER-PLAN.md](../plans/MASTER-PLAN.md), [plans/archive/](../plans/archive/), and [../../CHANGELOG.md](../../CHANGELOG.md). Read it top-down to see the order in which the codebase was built.
@@ -105,9 +105,33 @@ Nova production refactor, VS Code Copilot parity, worldbuilding generation pipel
 
 - [plan-030-nova-production-refactor](../plans/archive/plan-030-nova-production-refactor/plan.md), [plan-031-nova-vscode-copilot-parity](../plans/archive/plan-031-nova-vscode-copilot-parity/plan.md), [plan-032-worldbuilding-generation-engine](../plans/archive/plan-032-worldbuilding-generation-engine/plan.md), [plan-034](../plans/archive/plan-034/plan.md), [plan-035-fix-json-double-encoding](../plans/archive/plan-035-fix-json-double-encoding/plan.md), [plan-036-context-priority-generation](../plans/archive/plan-036-context-priority-generation/plan.md), [plan-037-agentic-worldbuild-scan](../plans/archive/plan-037-agentic-worldbuild-scan/plan.md), [plan-038-novel-engine-v1](../plans/plan-038/plan.md), [plan-041-docs-rebaseline-internal-version](../plans/plan-041-docs-rebaseline-internal-version/plan.md). All complete. See [../01-project/roadmap.md](./roadmap.md) for the per-plan summary.
 
-## Era 11 — Next: full AI integration
+## Era 11 — AI integration milestones (closed 2026-06-04)
 
-The next development era opens with **full AI integration**, including **API-based image-generation models** alongside the existing text agents (Continuity, Edit, Rewrite, Style). Two skeleton plans — [plan-039-manuscript-export-ui](../plans/plan-039-manuscript-export-ui/plan.md) and [plan-040-outline-generation](../plans/plan-040-outline-generation/plan.md) — are drafted and ready to be picked up. New plans will be drafted under [../plans/](../plans/).
+Manuscript export UI, outline generation, and quality gate restoration.
+
+- [plan-039-manuscript-export-ui](../plans/plan-039-manuscript-export-ui/plan.md) — Manuscript export UI (subset selector, delivery helper).
+- [plan-040-outline-generation](../plans/plan-040-outline-generation/plan.md) — Worldbuilding-to-Outline review-gated proposal flow.
+- [plan-042-quality-gates-closure](../plans/plan-042-quality-gates-closure/plan.md) — Restored clean check/lint/test baselines.
+
+## Era 12 — Infrastructure hardening (closed 2026-06-15)
+
+Active context routing, mutation boundaries, pipeline reconciliation, and agent runtime hardening.
+
+- [plan-044-nova-active-context-routing](../plans/plan-044-nova-active-context-routing/plan.md) — Resolved Nova context from routes.
+- [plan-045-agent-tool-mutation-boundary](../plans/plan-045-agent-tool-mutation-boundary/plan.md) — Separated AI reading from manuscript mutation.
+- [plan-043-outline-pipeline-consolidation](../plans/plan-043-outline-pipeline-consolidation/plan.md) — Checkpoints as the sole outline materialization path.
+- [plan-046-pipeline-checkpoint-contract-reconciliation](../plans/plan-046-pipeline-checkpoint-contract-reconciliation/plan.md) — Aligned pipeline schemas and routes.
+- [plan-047-worldbuilding-canon-merge-diff](../plans/plan-047-worldbuilding-canon-merge-diff/plan.md) — Reviewable worldbuilding canon diff/merge.
+- [plan-049-agent-runtime-stack-hardening](../plans/plan-049-agent-runtime-stack-hardening/plan.md) — Durable agent runs, job execution, and traces.
+
+## Era 13 — Governed runtime & trust closure (active review)
+
+Centralized AI control, frontend coherence, and trust-closing product polish.
+
+- [plan-051-governed-ai-controller-runtime](../plans/plan-051-governed-ai-controller-runtime/plan.md) — Server-side governed AI controller. **Status:** Review.
+- [plan-048-frontend-experience-coherence](../plans/plan-048-frontend-experience-coherence/plan.md) — Unified navigation, review gates, and visual state. **Status:** Review.
+- [plan-052-pipeline-nova-editor-trust-closure](../plans/plan-052-pipeline-nova-editor-trust-closure/plan.md) — Durable review-gated Nova artifacts and revision acks. **Status:** Review.
+- [plan-053-worldbuilding-outline-review-flow-closure](../plans/plan-053-worldbuilding-outline-review-flow-closure/plan.md) — Persisted worldbuilding proposals and generation status polish. **Status:** Review.
 
 ---
 
@@ -120,3 +144,4 @@ The next development era opens with **full AI integration**, including **API-bas
 - **Planning conventions:** [../05-workflow/planning-conventions.md](../05-workflow/planning-conventions.md) — how the 4-tier system works.
 
 If a plan you see in [../plans/MASTER-PLAN.md](../plans/MASTER-PLAN.md) is missing from this page, the page is out of date — please add it.
+

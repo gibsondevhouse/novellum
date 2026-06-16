@@ -1,6 +1,6 @@
 # Module: `story-bible` (deprecated)
 
-> Last verified: 2026-05-25
+> Last verified: 2026-06-16
 > Source: [src/modules/story-bible/](../../src/modules/story-bible/)
 
 ## Status

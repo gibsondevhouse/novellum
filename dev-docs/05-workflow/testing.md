@@ -1,6 +1,6 @@
 # Testing
 
-> Last verified: 2026-06-01
+> Last verified: 2026-06-16 (plan-053 implementation review)
 
 Novellum has three test tiers. All three must pass before a release.
 
@@ -19,20 +19,22 @@ Configured in [vitest.config.ts](../../vitest.config.ts). Setup in [tests/setup.
 | Area | Coverage |
 | --- | --- |
 | `ai/` | Agent parsers, context builders, credential handling, model routing. |
+| `ai-controller/` | Governed AI controller runtime, intent resolution, policy guards, context assembly. |
 | `editor/` | Autosave, recovery, snapshots, toolbar, geometry, mode mgmt. |
-| `nova/` | Chat, tools, error handling, stream control, sessions. |
+| `nova/` | Chat, tools, error handling, stream control, sessions, agent loop. |
 | `settings/` | Theme, AI settings, backup, appearance, defaults. |
 | `sqlite/` | Route persistence (characters, chapters, scenes, projects, …). |
 | `routes/` | API endpoints (backup, restore, AI key, storage location). |
 | `repositories/` | Data layer (Act, Arc, Scene, Character, Project, Beat, Hierarchy). |
 | `continuity/` | Consistency engine. |
-| `outline/` | Story workspace hierarchy + migration. |
+| `outline/` | Story workspace hierarchy + migration, generation checkpoints. |
 | `project/` | Project health, hub UI. |
 | `reader/` | Virtualization, pagination, deep linking, page geometry. |
 | `export/` | DOCX, EPUB, Markdown, Assembler. |
 | `portability/` | Backup roundtrip, failure modes. |
 | `backup/` | Parse, restore, checksums, manifest, credential exclusion. |
 | `lib/` | Preferences, i18n, platform, desktop, version, error handling. |
+| `agent-runtime/` | Hardened runtime: runs, jobs, steps, tool calls, traces (Plan-049). |
 | `assets/`, `onboarding/`, `db/`, `server/` | Misc. |
 | `ci/` | Workflow lint, version sync. |
 
@@ -46,9 +48,13 @@ Configured in [playwright.config.ts](../../playwright.config.ts).
 | --- | --- |
 | `pnpm test:e2e` | Runs [tests/e2e/](../../tests/e2e/). |
 
-E2E covers cross-route flows (project creation, scene editing → save → reload, backup/restore round-trip).
+E2E covers cross-route flows:
+- Project creation, scene editing → save → reload, backup/restore round-trip.
+- **AI Pipeline:** worldbuilding proposal review (`worldbuilding-proposal-review.spec.ts`), worldbuilding generation actions (`worldbuilding-generation-actions.spec.ts`), and author review gates (`vibe-author-review-gates.spec.ts`).
+- **Hierarchy:** traverse, run, review, and accept flows for outline generation.
 
 ## Tier 3 — Visual regression
+...
 
 | Command | Purpose |
 | --- | --- |

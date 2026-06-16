@@ -1,6 +1,6 @@
 # Novellum Agent Ecosystem
 
-> Last verified: 2026-05-27
+> Last verified: 2026-06-16
 
 Novellum is built around a dual-layer agent architecture. Rather than relying on a single general-purpose AI, the system delegates tasks to specialized, focused agents.
 

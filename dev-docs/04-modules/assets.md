@@ -1,6 +1,6 @@
 # Module: `assets`
 
-> Last verified: 2026-05-25
+> Last verified: 2026-06-16
 > Source: [src/modules/assets/](../../src/modules/assets/)
 
 ## Purpose

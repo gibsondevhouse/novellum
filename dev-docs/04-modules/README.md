@@ -1,6 +1,6 @@
 # Modules
 
-> Last verified: 2026-06-01
+> Last verified: 2026-06-16
 
 One page per shipped slice under [src/modules/](../../src/modules/). Each page describes purpose, public API (re-exports from `index.ts`), structure, and key tests. Modules are private by default — only barrel-exported symbols are public.
 
