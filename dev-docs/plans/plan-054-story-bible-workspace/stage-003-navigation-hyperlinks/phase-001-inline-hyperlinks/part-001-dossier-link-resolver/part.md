@@ -2,12 +2,12 @@
 title: Dossier Hyperlink Resolver
 slug: part-001-dossier-link-resolver
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 assigned_to: —
 phase: phase-001-inline-hyperlinks
-started_at: ~
-completed_at: ~
+started_at: 2026-06-25
+completed_at: 2026-06-25
 estimated_duration: undefined
 ---
 
@@ -36,15 +36,19 @@ Parse lore descriptions dynamically to replace entity markup tags with interacti
 **Create:**
 
 - `src/modules/story-bible/services/dossier-link-resolver.ts`
+- `src/modules/story-bible/components/BiographyPanel.svelte`
+- `tests/story-bible/dossier-link-resolver.test.ts`
+- `tests/story-bible/biography-panel.svelte.test.ts`
 
 **Update:**
 
-- `src/modules/story-bible/components/BiographyPanel.svelte`
+- `src/modules/story-bible/components/StoryBibleWorkspacePage.svelte`
+- `src/modules/story-bible/index.ts`
 
 ## Acceptance Criteria
 
-- [ ] Regex correctly matches entity markers.
-- [ ] Clicking navigates to targeted workspace view.
+- [x] Regex correctly matches entity markers.
+- [x] Clicking navigates to targeted workspace view.
 
 ## Edge Cases
 

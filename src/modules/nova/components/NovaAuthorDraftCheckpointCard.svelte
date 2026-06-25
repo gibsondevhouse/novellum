@@ -14,6 +14,10 @@
 	import { toast } from '$lib/stores/toast.svelte.js';
 	import { editorDirty } from '$lib/stores/editor-dirty.svelte.js';
 	import { dispatchSceneContentApplied } from '$lib/events/scene-content.js';
+	import {
+		dispatchProsePartialInjection,
+		type ProsePartialInjectionRange,
+	} from '$lib/events/prose-injection.js';
 	import { formatSceneDisplayLabel } from '../services/artifact-display.js';
 	import {
 		acceptSceneDraftCheckpoint,
@@ -25,11 +29,13 @@
 	import SecondaryButton from '$lib/components/ui/SecondaryButton.svelte';
 	import DestructiveButton from '$lib/components/ui/DestructiveButton.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
+	import ProseDiffPanel from './ProseDiffPanel.svelte';
 
 	interface Props {
 		projectId: string | null;
 		scene: Scene;
 		checkpoint: AuthorDraftCheckpoint | null;
+		activeSceneId?: string | null;
 		isGenerating?: boolean;
 		onRegenerate?: () => void;
 		onCheckpointUpdated?: (checkpoint: AuthorDraftCheckpoint) => void;
@@ -39,6 +45,7 @@
 		projectId,
 		scene,
 		checkpoint,
+		activeSceneId = null,
 		isGenerating = false,
 		onRegenerate,
 		onCheckpointUpdated,
@@ -70,6 +77,7 @@
 	const draftProse = $derived(checkpoint?.artifactEnvelope.prose ?? '');
 	const draftSidecar = $derived(checkpoint?.artifactEnvelope.sidecar ?? null);
 	const sceneDisplayLabel = $derived(formatSceneDisplayLabel({ title: scene.title, id: scene.id }));
+	const canInjectIntoActiveScene = $derived(Boolean(projectId && activeSceneId === scene.id));
 
 	const isSuperseded = $derived(
 		Boolean(checkpoint?.lifecycle === 'rejected' && checkpoint.rejectReason === 'Superseded by regeneration'),
@@ -217,6 +225,15 @@
 		rejectReasonDraft = '';
 	}
 
+	function handleInjectSelected(ranges: ProsePartialInjectionRange[]): void {
+		if (!projectId || !canInjectIntoActiveScene) return;
+		dispatchProsePartialInjection({
+			projectId,
+			sceneId: scene.id,
+			ranges,
+		});
+	}
+
 	function lifecycleLabel(value: AuthorDraftCheckpoint['lifecycle'] | 'none'): string {
 		switch (value) {
 			case 'review':
@@ -230,11 +247,6 @@
 		}
 	}
 
-	function prosePreview(text: string): string {
-		const trimmed = text.trim();
-		if (trimmed.length <= 600) return trimmed;
-		return `${trimmed.slice(0, 600)}…`;
-	}
 </script>
 
 <article class="checkpoint-card" aria-label="Scene draft checkpoint" data-testid="author-draft-checkpoint-card">
@@ -282,9 +294,13 @@
 		{/if}
 
 		{#if draftProse.trim().length > 0}
-			<section class="checkpoint-prose" aria-label="Draft prose preview">
-				<p>{prosePreview(draftProse)}</p>
-			</section>
+			<ProseDiffPanel
+				currentText={scene.content ?? ''}
+				generatedText={draftProse}
+				title="Review changes"
+				canInject={canInjectIntoActiveScene}
+				onInjectSelected={handleInjectSelected}
+			/>
 		{/if}
 
 		{#if draftSidecar && (draftSidecar.uncertainties.length > 0 || draftSidecar.continuityRisks.length > 0 || draftSidecar.usedCanonRefs.length > 0)}
@@ -460,16 +476,6 @@
 		margin: 0;
 		font-size: 12px;
 		color: var(--color-error);
-	}
-
-	.checkpoint-prose {
-		font-size: var(--text-sm);
-		line-height: var(--leading-relaxed);
-	}
-
-	.checkpoint-prose p {
-		margin: 0;
-		white-space: pre-wrap;
 	}
 
 	.checkpoint-sidecar {

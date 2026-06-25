@@ -175,6 +175,7 @@ export async function acceptOutlineDraftCheckpointAction(
 		note: input.note,
 		expectedUpdatedAt: input.expectedUpdatedAt ?? input.checkpoint.updatedAt,
 		expectedVersion: input.expectedVersion ?? input.checkpoint.version,
+		selectedNodeIds: input.selectedNodeIds,
 	});
 	const payload = await fetchJson<unknown>(deps, acceptEndpoint(checkpointId), {
 		method: 'POST',

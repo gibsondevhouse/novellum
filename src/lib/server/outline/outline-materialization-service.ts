@@ -4,9 +4,7 @@ import {
 	type OutlineDraftCheckpointRecord,
 	validateOutlineDraftCheckpoint,
 } from '$lib/ai/pipeline/outline-draft-contract.js';
-import {
-	OUTLINE_CHECKPOINT_OWNER_ID,
-} from '$lib/ai/pipeline/outline-checkpoint-contract.js';
+import { OUTLINE_CHECKPOINT_OWNER_ID } from '$lib/ai/pipeline/outline-checkpoint-contract.js';
 import { PIPELINE_METADATA_SCOPE } from '$lib/ai/pipeline/checkpoint-contract.js';
 import { db, encodeJson, type SqliteDatabase } from '$lib/server/db/index.js';
 import {
@@ -32,6 +30,23 @@ export type OutlineMaterializationErrorCode =
 
 export interface OutlineMaterializationErrorMeta {
 	[key: string]: unknown;
+}
+
+export interface ManualSceneOverwriteConflict {
+	id: string;
+	title: string;
+	chapterId: string;
+	wordCount: number;
+	hasContent: boolean;
+	hasNotes: boolean;
+	updatedAt: string;
+}
+
+export interface OutlineMergeSafetyPreflight {
+	conflict: ReturnType<typeof getOutlineConflictPreflight>;
+	manualSceneConflicts: ManualSceneOverwriteConflict[];
+	requiresDestructiveConfirmation: boolean;
+	message: string;
 }
 
 export class OutlineMaterializationServiceError extends Error {
@@ -60,6 +75,7 @@ export interface AcceptOutlineCheckpointInput {
 	note?: string | null;
 	expectedUpdatedAt?: string | null;
 	expectedVersion?: string | null;
+	selectedNodeIds?: readonly string[];
 }
 
 export interface AcceptOutlineCheckpointResult {
@@ -70,6 +86,8 @@ export interface AcceptOutlineCheckpointResult {
 interface MetadataRow {
 	value: string;
 }
+
+type ProjectScopedHierarchyTable = 'arcs' | 'acts' | 'milestones' | 'chapters' | 'scenes';
 
 function nowIso(): string {
 	return new Date().toISOString();
@@ -188,21 +206,152 @@ function assertCheckpointPreconditions(
 	}
 }
 
-function assertNoExistingHierarchy(database: SqliteDatabase, projectId: string): void {
+function listManualSceneOverwriteConflicts(
+	database: SqliteDatabase,
+	projectId: string,
+	selectedSceneIds?: ReadonlySet<string>,
+): ManualSceneOverwriteConflict[] {
+	const rows = database
+		.prepare(
+			`SELECT id, title, chapterId, wordCount, content, notes, updatedAt
+			 FROM scenes
+			 WHERE projectId = ?
+				AND (
+					TRIM(COALESCE(content, '')) <> ''
+					OR TRIM(COALESCE(notes, '')) <> ''
+					OR wordCount > 0
+				)
+			 ORDER BY "order" ASC, title ASC, id ASC`,
+		)
+		.all(projectId) as Array<{
+		id: string;
+		title: string;
+		chapterId: string;
+		wordCount: number;
+		content: string | null;
+		notes: string | null;
+		updatedAt: string;
+	}>;
+
+	return rows
+		.filter((row) => !selectedSceneIds || selectedSceneIds.has(row.id))
+		.map((row) => ({
+			id: row.id,
+			title: row.title,
+			chapterId: row.chapterId,
+			wordCount: row.wordCount,
+			hasContent: asTrimmedString(row.content).length > 0,
+			hasNotes: asTrimmedString(row.notes).length > 0,
+			updatedAt: row.updatedAt,
+		}));
+}
+
+export function getOutlineMergeSafetyPreflight(
+	projectId: string,
+	database: SqliteDatabase = db,
+	selectedSceneIds?: ReadonlySet<string>,
+): OutlineMergeSafetyPreflight {
 	const conflict = getOutlineConflictPreflight(projectId, database);
-	if (!conflict.hasConflict) return;
+	const manualSceneConflicts = listManualSceneOverwriteConflicts(
+		database,
+		projectId,
+		selectedSceneIds,
+	);
+	return {
+		conflict,
+		manualSceneConflicts,
+		requiresDestructiveConfirmation: conflict.hasConflict || manualSceneConflicts.length > 0,
+		message:
+			manualSceneConflicts.length > 0
+				? 'Existing manuscript scene prose requires review before outline merge.'
+				: conflict.message,
+	};
+}
+
+function outlineConflictMeta(preflight: OutlineMergeSafetyPreflight): OutlineMaterializationErrorMeta {
+	const { conflict, manualSceneConflicts } = preflight;
+	return {
+		counts: conflict.counts,
+		state: conflict.state,
+		total: conflict.total,
+		conflict,
+		manualSceneConflicts,
+		requiresDestructiveConfirmation: preflight.requiresDestructiveConfirmation,
+		preflightMessage: preflight.message,
+	};
+}
+
+function assertMergeSafety(
+	database: SqliteDatabase,
+	projectId: string,
+	map: OutlineMaterializationMap,
+	hasExplicitSelection: boolean,
+): void {
+	const selectedSceneIds = hasExplicitSelection
+		? new Set(map.scenes.map((scene) => scene.id))
+		: undefined;
+	const preflight = getOutlineMergeSafetyPreflight(projectId, database, selectedSceneIds);
+
+	if (!hasExplicitSelection && preflight.conflict.hasConflict) {
+		throw new OutlineMaterializationServiceError(
+			OUTLINE_CONFLICT_CODE,
+			'Existing outline hierarchy is populated.',
+			409,
+			outlineConflictMeta(preflight),
+		);
+	}
+
+	if (preflight.manualSceneConflicts.length > 0) {
+		throw new OutlineMaterializationServiceError(
+			OUTLINE_CONFLICT_CODE,
+			preflight.message,
+			409,
+			outlineConflictMeta(preflight),
+		);
+	}
+}
+
+function assertNoCrossProjectCollisions(
+	database: SqliteDatabase,
+	projectId: string,
+	table: ProjectScopedHierarchyTable,
+	ids: readonly string[],
+): void {
+	if (ids.length === 0) return;
+	const placeholders = ids.map(() => '?').join(', ');
+	const row = database
+		.prepare(`SELECT id FROM ${table} WHERE id IN (${placeholders}) AND projectId <> ? LIMIT 1`)
+		.get(...ids, projectId) as { id: string } | undefined;
+	if (!row) return;
 
 	throw new OutlineMaterializationServiceError(
-		OUTLINE_CONFLICT_CODE,
-		'Existing outline hierarchy is populated.',
-		409,
-		{
-			counts: conflict.counts,
-			state: conflict.state,
-			total: conflict.total,
-			conflict,
-		},
+		'invalid_payload',
+		`Selected outline node ${row.id} collides with existing ${table} data from another project.`,
+		400,
+		{ table, id: row.id },
 	);
+}
+
+function assertNoMaterializationCollisions(
+	database: SqliteDatabase,
+	projectId: string,
+	map: OutlineMaterializationMap,
+): void {
+	assertNoCrossProjectCollisions(database, projectId, 'arcs', map.arcs.map((arc) => arc.id));
+	assertNoCrossProjectCollisions(database, projectId, 'acts', map.acts.map((act) => act.id));
+	assertNoCrossProjectCollisions(
+		database,
+		projectId,
+		'milestones',
+		map.milestones.map((milestone) => milestone.id),
+	);
+	assertNoCrossProjectCollisions(
+		database,
+		projectId,
+		'chapters',
+		map.chapters.map((chapter) => chapter.id),
+	);
+	assertNoCrossProjectCollisions(database, projectId, 'scenes', map.scenes.map((scene) => scene.id));
 }
 
 function writeSceneIntentMetadata(
@@ -262,8 +411,8 @@ export function acceptOutlineCheckpointMaterialization(
 	input: AcceptOutlineCheckpointInput,
 	database: SqliteDatabase = db,
 ): AcceptOutlineCheckpointResult {
-		const projectId = asTrimmedString(input.projectId);
-		const checkpointId = asTrimmedString(input.checkpointId);
+	const projectId = asTrimmedString(input.projectId);
+	const checkpointId = asTrimmedString(input.checkpointId);
 	if (!projectId || !checkpointId) {
 		throw new OutlineMaterializationServiceError(
 			'invalid_request',
@@ -277,30 +426,73 @@ export function acceptOutlineCheckpointMaterialization(
 		const checkpoint = loadCheckpoint(database, projectId, checkpointId);
 		assertCheckpointReviewable(checkpoint);
 		assertCheckpointPreconditions(checkpoint, input);
-		assertNoExistingHierarchy(database, projectId);
 
 		const acceptedAt = nowIso();
-		const map = buildOutlineMaterializationMap(checkpoint.draft, { nowIso: acceptedAt });
+		const map = buildOutlineMaterializationMap(checkpoint.draft, {
+			nowIso: acceptedAt,
+			selectedNodeIds: input.selectedNodeIds,
+		});
+		assertMergeSafety(database, projectId, map, input.selectedNodeIds !== undefined);
+		assertNoMaterializationCollisions(database, projectId, map);
 
 		const insertArc = database.prepare(
 			`INSERT INTO arcs (id, projectId, title, description, purpose, arcType, status, "order", createdAt, updatedAt)
-			 VALUES (@id, @projectId, @title, @description, @purpose, @arcType, @status, @order, @createdAt, @updatedAt)`,
+			 VALUES (@id, @projectId, @title, @description, @purpose, @arcType, @status, @order, @createdAt, @updatedAt)
+			 ON CONFLICT(id) DO UPDATE SET
+			 title = excluded.title,
+			 description = excluded.description,
+			 purpose = excluded.purpose,
+			 arcType = excluded.arcType,
+			 status = excluded.status,
+			 "order" = excluded."order",
+			 updatedAt = excluded.updatedAt`,
 		);
 		const insertAct = database.prepare(
 			`INSERT INTO acts (id, projectId, arcId, title, "order", planningNotes, createdAt, updatedAt)
-			 VALUES (@id, @projectId, @arcId, @title, @order, @planningNotes, @createdAt, @updatedAt)`,
+			 VALUES (@id, @projectId, @arcId, @title, @order, @planningNotes, @createdAt, @updatedAt)
+			 ON CONFLICT(id) DO UPDATE SET
+			 arcId = excluded.arcId,
+			 title = excluded.title,
+			 "order" = excluded."order",
+			 planningNotes = excluded.planningNotes,
+			 updatedAt = excluded.updatedAt`,
 		);
 		const insertMilestone = database.prepare(
 			`INSERT INTO milestones (id, actId, projectId, title, description, "order", chapterIds, createdAt, updatedAt)
-			 VALUES (@id, @actId, @projectId, @title, @description, @order, @chapterIds, @createdAt, @updatedAt)`,
+			 VALUES (@id, @actId, @projectId, @title, @description, @order, @chapterIds, @createdAt, @updatedAt)
+			 ON CONFLICT(id) DO UPDATE SET
+			 actId = excluded.actId,
+			 title = excluded.title,
+			 description = excluded.description,
+			 "order" = excluded."order",
+			 updatedAt = excluded.updatedAt`,
 		);
 		const insertChapter = database.prepare(
 			`INSERT INTO chapters (id, projectId, title, "order", summary, wordCount, actId, arcRefs, createdAt, updatedAt)
-			 VALUES (@id, @projectId, @title, @order, @summary, @wordCount, @actId, @arcRefs, @createdAt, @updatedAt)`,
+			 VALUES (@id, @projectId, @title, @order, @summary, @wordCount, @actId, @arcRefs, @createdAt, @updatedAt)
+			 ON CONFLICT(id) DO UPDATE SET
+			 title = excluded.title,
+			 "order" = excluded."order",
+			 summary = excluded.summary,
+			 actId = excluded.actId,
+			 arcRefs = excluded.arcRefs,
+			 updatedAt = excluded.updatedAt`,
 		);
 		const insertScene = database.prepare(
 			`INSERT INTO scenes (id, chapterId, projectId, title, summary, povCharacterId, locationId, timelineEventId, "order", content, wordCount, notes, characterIds, locationIds, arcRefs, createdAt, updatedAt)
-			 VALUES (@id, @chapterId, @projectId, @title, @summary, @povCharacterId, @locationId, @timelineEventId, @order, @content, @wordCount, @notes, @characterIds, @locationIds, @arcRefs, @createdAt, @updatedAt)`,
+			 VALUES (@id, @chapterId, @projectId, @title, @summary, @povCharacterId, @locationId, @timelineEventId, @order, @content, @wordCount, @notes, @characterIds, @locationIds, @arcRefs, @createdAt, @updatedAt)
+			 ON CONFLICT(id) DO UPDATE SET
+			 chapterId = excluded.chapterId,
+			 title = excluded.title,
+			 summary = excluded.summary,
+			 povCharacterId = excluded.povCharacterId,
+			 locationId = excluded.locationId,
+			 timelineEventId = excluded.timelineEventId,
+			 "order" = excluded."order",
+			 characterIds = excluded.characterIds,
+			 locationIds = excluded.locationIds,
+			 arcRefs = excluded.arcRefs,
+			 updatedAt = excluded.updatedAt`,
 		);
 		const insertBeat = database.prepare(
 			`INSERT INTO beats (id, sceneId, arcId, projectId, title, type, "order", notes, createdAt, updatedAt)

@@ -1,0 +1,34 @@
+# Outline Diff Engine Implementation Evidence
+
+Date: 2026-06-25
+Part: part-001-outline-diff-engine-service
+Agent: Codex
+
+## Changed Files
+
+- Added `src/lib/server/outline/outline-diff-engine.ts`.
+- Added `tests/server/outline/outline-diff-engine.test.ts`.
+
+## Behavior Added
+
+- `calculateOutlineDiff()` compares an `OutlineDraft` against existing
+  arc/act/chapter/scene hierarchy rows.
+- The result reports:
+  - root-first `insertions`
+  - root-first `modifications` with changed field lists
+  - leaf-first `deletions`
+  - counts and `isEmpty`
+- The engine detects parent changes as `parentId` modifications so moved acts,
+  chapters, or scenes can be handled separately from insert/delete pairs.
+
+## Validation
+
+- `pnpm exec vitest run tests/server/outline/outline-diff-engine.test.ts`
+  - Passed: 1 file, 5 tests.
+- `pnpm check`
+  - Passed.
+  - `svelte-check found 0 errors and 0 warnings`.
+- `pnpm lint`
+  - Passed.
+- `pnpm lint:css`
+  - Passed.

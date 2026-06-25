@@ -2,7 +2,7 @@
 title: Database Queries & Repositories
 slug: stage-001-wiki-database-queries
 stage_number: 1
-status: in-progress
+status: complete
 owner: Planner Agent
 plan: plan-054-story-bible-workspace
 phases:
@@ -17,9 +17,9 @@ Consolidate data access logic for all story-bible entities into high-level read 
 
 ## Phases
 
-| #   | Phase | Status | Est. Duration |
-| --- | --- | --- | --- |
-| 001 | [Database Queries & Repositories Phase](phase-001-story-bible-queries/phase.md) | `draft` | 1d |
+| #   | Phase                                                                           | Status     | Est. Duration |
+| --- | ------------------------------------------------------------------------------- | ---------- | ------------- |
+| 001 | [Database Queries & Repositories Phase](phase-001-story-bible-queries/phase.md) | `complete` | 1d            |
 
 ## Entry Criteria
 

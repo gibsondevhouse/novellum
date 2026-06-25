@@ -1,0 +1,38 @@
+Plan: plan-054-story-bible-workspace
+Stage: stage-003-navigation-hyperlinks
+Phase: phase-001-inline-hyperlinks
+Part: part-001-dossier-link-resolver
+Reviewer: Codex acting under .github/agents/reviewer.agent.md
+Captured: 2026-06-25 14:25 EDT
+
+Review scope:
+- src/modules/story-bible/services/dossier-link-resolver.ts
+- src/modules/story-bible/components/BiographyPanel.svelte
+- src/modules/story-bible/components/StoryBibleWorkspacePage.svelte
+- src/modules/story-bible/index.ts
+- tests/story-bible/dossier-link-resolver.test.ts
+- tests/story-bible/biography-panel.svelte.test.ts
+
+Acceptance review:
+- Regex covers @kind:id and #kind:id markers for character, location, faction, glossary, theme, and lore references.
+- Resolver uses the currently loaded dossier index and leaves invalid IDs as static text.
+- BiographyPanel renders anchors with Story Bible hash hrefs and prevents broken clicks for unresolved tags.
+- Click handling invokes workspace navigation to the target dossier kind and id.
+- Story Bible module remains within module-boundary expectations and uses Svelte 5 event/props patterns.
+
+Commands:
+
+pnpm check
+Result: passed. svelte-check found 0 errors and 0 warnings.
+
+pnpm lint
+Result: passed. eslint . completed with exit code 0.
+
+pnpm lint:css
+Result: passed. stylelint completed with exit code 0.
+
+pnpm exec vitest run tests/story-bible
+Result: passed. 5 test files, 12 tests.
+
+Reviewer decision:
+- Approved. Part may move from review to complete.

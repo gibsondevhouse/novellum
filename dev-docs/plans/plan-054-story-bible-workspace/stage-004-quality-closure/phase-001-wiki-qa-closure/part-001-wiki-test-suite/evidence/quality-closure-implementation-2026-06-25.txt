@@ -1,0 +1,47 @@
+# Stage 004 Quality Closure Implementation Evidence
+
+Date: 2026-06-25
+Part: part-001-wiki-test-suite
+Agent: Codex
+
+## Changed Files
+
+- Added `tests/e2e/wiki-workspace.spec.ts`.
+- Updated `dev-docs/04-modules/story-bible.md`.
+
+## Coverage Added
+
+- Playwright E2E verifies the Story Bible workspace creates a character through
+  the browser form, shows validation for missing names, persists the record via
+  `/api/db/characters`, and updates the category count.
+- Playwright E2E verifies a seeded lore entry containing `@character:id` renders
+  an inline dossier link and clicking it navigates to the target character editor.
+
+## Validation
+
+- `pnpm check`
+  - Passed.
+  - `svelte-check found 0 errors and 0 warnings`.
+- `pnpm run build`
+  - Passed.
+  - Existing Lightning CSS warnings for Tailwind-style `@theme`/`@utility`
+    rules were printed by the build but did not fail the build.
+- `pnpm exec playwright test tests/e2e/wiki-workspace.spec.ts --project=chromium`
+  - First run failed before app execution because the local Playwright Chromium
+    headless-shell binary was missing.
+  - Ran `pnpm exec playwright install chromium`.
+  - Rerun passed: 2 tests passed.
+- `pnpm exec vitest run tests/story-bible tests/db/json-encoding.test.ts`
+  - Passed: 6 files, 20 tests.
+- `pnpm lint`
+  - Passed.
+- `pnpm lint:css`
+  - Passed.
+- `pnpm check:tokens`
+  - Passed: 357 files scanned, 0 violations.
+
+## Notes
+
+- The Playwright browser install changed only the local tool cache under
+  `~/Library/Caches/ms-playwright`; no repository files were written for that
+  setup step.

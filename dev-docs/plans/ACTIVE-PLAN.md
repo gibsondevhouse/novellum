@@ -6,7 +6,7 @@
 
 ## Current
 
-- [plan-054-story-bible-workspace](./plan-054-story-bible-workspace/plan.md) — Interactive Story Bible Workspace. Developing the unified read queries service. Status: `in-progress`.
+- [plan-043-brainstorm-agent](./plan-043-brainstorm-agent/plan.md) — Brainstorm Agent. Starting Stage 001 contract/schema work after plan-056 closeout. Status: `in-progress`.
 
 ## Pending review
 
@@ -17,6 +17,9 @@
 
 ## Recently completed
 
+- [plan-056-visual-manuscript-diff](./plan-056-visual-manuscript-diff/plan.md) — Visual Manuscript Diff & Prose Injector. Shipped character-level prose diffing, Nova split/unified review UI, selectable insertion hunks, active-editor injection event bridge, DB-free editor injector service, docs sync, and reviewer evidence. Closed 2026-06-25.
+- [plan-055-outline-diff-merge](./plan-055-outline-diff-merge/plan.md) — Structural Outline Diff & Merge. Shipped outline diff calculation, selected Nova merge tree, selected-node accept payloads, selected insert/update materialization with manual scene safety preflights, E2E coverage, docs sync, and reviewer evidence. Closed 2026-06-25.
+- [plan-054-story-bible-workspace](./plan-054-story-bible-workspace/plan.md) — Interactive Story Bible Workspace. Shipped a project-scoped Story Bible workspace with SQLite read queries, dossier CRUD forms, resolved inline cross-reference navigation, E2E coverage, docs sync, and reviewer evidence. Closed 2026-06-25.
 - [plan-049-agent-runtime-stack-hardening](./plan-049-agent-runtime-stack-hardening/plan.md) — Agent Runtime Stack Hardening. Move long-running agent work onto a local SQLite-backed job execution model with durable runs, model capabilities, budget enforcement, search baseline, tracing, evals, and diagnostics. Closed 2026-06-15.
 - [plan-047-worldbuilding-canon-merge-diff](./plan-047-worldbuilding-canon-merge-diff/plan.md) — Worldbuilding Canon Merge Diff. Upgraded worldbuilding proposal acceptance from insert-only projection to reviewable canon diff/merge behavior with audit metadata, duplicate evidence, and E2E coverage. Closed 2026-06-14 after plan-level reviewer evaluation.
 - [plan-046-pipeline-checkpoint-contract-reconciliation](./plan-046-pipeline-checkpoint-contract-reconciliation/plan.md) — Pipeline Checkpoint Contract Reconciliation. Reconciled checkpoint route ownership, schema versions, docs, and full E2E expectations across current generation pipelines. Closed 2026-06-14 after plan-level reviewer evaluation.

@@ -272,6 +272,27 @@ function createCheckpoint(
 	};
 }
 
+function createTwoSceneCheckpoint(): OutlineDraftCheckpointRecord {
+	const checkpoint = createCheckpoint('review');
+	const chapter = checkpoint.draft.arcs[0]!.acts[0]!.chapters[0]!;
+	const firstScene = chapter.scenes[0]!;
+	chapter.scenes.push({
+		...firstScene,
+		id: 'scene-extra-proj-1',
+		slug: 'scene-extra-proj-1',
+		title: 'Scene Two',
+		order: 1,
+		summary: 'The courier chooses the unsafe bridge.',
+		intent: {
+			goal: 'Cross the bridge before the patrol arrives.',
+			conflict: 'The bridge keeper demands the ledger as payment.',
+			turn: 'The bridge begins to collapse.',
+			outcome: 'The courier loses the easy route home.',
+		},
+	});
+	return checkpoint;
+}
+
 function insertCheckpoint(checkpoint: OutlineDraftCheckpointRecord): void {
 	dbState.database
 		.prepare(
@@ -418,6 +439,202 @@ describe('POST /api/outline/checkpoints/[checkpointId]/accept', () => {
 		});
 	});
 
+	it('materializes only selected outline nodes while preserving required parents', async () => {
+		insertCheckpoint(createTwoSceneCheckpoint());
+
+		const response = await postAccept(
+			acceptBody('proj-1', {
+				selectedNodeIds: ['scene:scene-extra-proj-1'],
+			}),
+		);
+
+		expect(response.status).toBe(200);
+		const body = (await response.json()) as {
+			checkpoint: OutlineDraftCheckpointRecord;
+			materialization: { counts: Record<string, number> };
+		};
+		expect(body.checkpoint.lifecycle).toBe('accepted');
+		expect(body.checkpoint.acceptance?.materializedCounts).toMatchObject({
+			arcs: 1,
+			acts: 1,
+			milestones: 1,
+			chapters: 1,
+			scenes: 1,
+			beats: 0,
+			stages: 0,
+		});
+		expect(body.materialization.counts).toMatchObject({
+			arcs: 1,
+			acts: 1,
+			milestones: 1,
+			chapters: 1,
+			scenes: 1,
+			sceneIntentMetadata: 3,
+		});
+		expect(countRows('arcs')).toBe(1);
+		expect(countRows('acts')).toBe(1);
+		expect(countRows('milestones')).toBe(1);
+		expect(countRows('chapters')).toBe(1);
+		expect(countRows('scenes')).toBe(1);
+		const sceneRows = dbState.database
+			.prepare('SELECT id FROM scenes WHERE projectId = ? ORDER BY id ASC')
+			.all('proj-1') as Array<{ id: string }>;
+		expect(sceneRows).toEqual([{ id: 'scene-extra-proj-1' }]);
+		expect(metadataValue('scene-extra-proj-1', 'quickIntent')).toMatchObject({
+			goal: 'Cross the bridge before the patrol arrives.',
+			outcome: 'The courier loses the easy route home.',
+		});
+	});
+
+	it('merges selected outline nodes into existing hierarchy without touching unselected manual scenes', async () => {
+		insertCheckpoint(createTwoSceneCheckpoint());
+		dbState.database
+			.prepare(
+				`INSERT INTO arcs (id, projectId, title, description, purpose, arcType, status, "order", createdAt, updatedAt)
+				 VALUES (?, ?, ?, '', '', NULL, 'planned', 0, ?, ?)`,
+			)
+			.run('arc-proj-1', 'proj-1', 'Existing Arc Title', now, now);
+		dbState.database
+			.prepare(
+				`INSERT INTO acts (id, projectId, arcId, title, "order", planningNotes, createdAt, updatedAt)
+				 VALUES (?, ?, ?, ?, 0, '', ?, ?)`,
+			)
+			.run('act-proj-1', 'proj-1', 'arc-proj-1', 'Existing Act Title', now, now);
+		dbState.database
+			.prepare(
+				`INSERT INTO chapters (id, projectId, title, "order", summary, wordCount, actId, arcRefs, createdAt, updatedAt)
+				 VALUES (?, ?, ?, 0, '', 0, ?, '[]', ?, ?)`,
+			)
+			.run('chapter-proj-1', 'proj-1', 'Existing Chapter Title', 'act-proj-1', now, now);
+		dbState.database
+			.prepare(
+				`INSERT INTO scenes (id, chapterId, projectId, title, summary, povCharacterId, locationId, timelineEventId, "order", content, wordCount, notes, characterIds, locationIds, arcRefs, createdAt, updatedAt)
+				 VALUES (?, ?, ?, ?, '', NULL, NULL, NULL, 0, ?, 7, ?, '[]', '[]', '[]', ?, ?)`,
+			)
+			.run(
+				'manual-scene',
+				'chapter-proj-1',
+				'proj-1',
+				'Manual Scene',
+				'Manual prose remains untouched.',
+				'Manual notes remain untouched.',
+				now,
+				now,
+			);
+
+		const response = await postAccept(acceptBody('proj-1', {
+			selectedNodeIds: ['scene:scene-extra-proj-1'],
+		}));
+
+		expect(response.status).toBe(200);
+		const body = (await response.json()) as {
+			checkpoint: OutlineDraftCheckpointRecord;
+			materialization: { counts: Record<string, number> };
+		};
+		expect(body.checkpoint.lifecycle).toBe('accepted');
+		expect(body.materialization.counts.scenes).toBe(1);
+		expect(countRows('arcs')).toBe(1);
+		expect(countRows('acts')).toBe(1);
+		expect(countRows('chapters')).toBe(1);
+		expect(countRows('scenes')).toBe(2);
+		const rows = dbState.database
+			.prepare('SELECT id, title, content, notes FROM scenes WHERE projectId = ? ORDER BY id ASC')
+			.all('proj-1') as Array<{ id: string; title: string; content: string; notes: string }>;
+		expect(rows).toEqual([
+			{
+				id: 'manual-scene',
+				title: 'Manual Scene',
+				content: 'Manual prose remains untouched.',
+				notes: 'Manual notes remain untouched.',
+			},
+			{
+				id: 'scene-extra-proj-1',
+				title: 'Scene Two',
+				content: '',
+				notes: '',
+			},
+		]);
+	});
+
+	it('blocks selected scene merges when that scene already contains manuscript prose', async () => {
+		insertCheckpoint(createTwoSceneCheckpoint());
+		dbState.database
+			.prepare(
+				`INSERT INTO arcs (id, projectId, title, description, purpose, arcType, status, "order", createdAt, updatedAt)
+				 VALUES (?, ?, ?, '', '', NULL, 'planned', 0, ?, ?)`,
+			)
+			.run('arc-proj-1', 'proj-1', 'Existing Arc Title', now, now);
+		dbState.database
+			.prepare(
+				`INSERT INTO acts (id, projectId, arcId, title, "order", planningNotes, createdAt, updatedAt)
+				 VALUES (?, ?, ?, ?, 0, '', ?, ?)`,
+			)
+			.run('act-proj-1', 'proj-1', 'arc-proj-1', 'Existing Act Title', now, now);
+		dbState.database
+			.prepare(
+				`INSERT INTO chapters (id, projectId, title, "order", summary, wordCount, actId, arcRefs, createdAt, updatedAt)
+				 VALUES (?, ?, ?, 0, '', 0, ?, '[]', ?, ?)`,
+			)
+			.run('chapter-proj-1', 'proj-1', 'Existing Chapter Title', 'act-proj-1', now, now);
+		dbState.database
+			.prepare(
+				`INSERT INTO scenes (id, chapterId, projectId, title, summary, povCharacterId, locationId, timelineEventId, "order", content, wordCount, notes, characterIds, locationIds, arcRefs, createdAt, updatedAt)
+				 VALUES (?, ?, ?, ?, '', NULL, NULL, NULL, 1, ?, 19, ?, '[]', '[]', '[]', ?, ?)`,
+			)
+			.run(
+				'scene-extra-proj-1',
+				'chapter-proj-1',
+				'proj-1',
+				'Existing Scene Two',
+				'Existing prose must not be overwritten.',
+				'Private notes must not leak.',
+				now,
+				now,
+			);
+
+		const response = await postAccept(acceptBody('proj-1', {
+			selectedNodeIds: ['scene:scene-extra-proj-1'],
+		}));
+
+		expect(response.status).toBe(409);
+		const body = (await response.json()) as {
+			code: string;
+			meta: { manualSceneConflicts: Array<{ id: string; hasContent: boolean; hasNotes: boolean }> };
+		};
+		expect(body.code).toBe('outline_conflict');
+		expect(body.meta.manualSceneConflicts).toEqual([
+			expect.objectContaining({
+				id: 'scene-extra-proj-1',
+				hasContent: true,
+				hasNotes: true,
+			}),
+		]);
+		expect(JSON.stringify(body)).not.toContain('Existing prose must not be overwritten.');
+		expect(JSON.stringify(body)).not.toContain('Private notes must not leak.');
+		expect(storedCheckpoint().lifecycle).toBe('review');
+	});
+
+	it('rejects malformed or unknown selected outline nodes', async () => {
+		insertCheckpoint(createTwoSceneCheckpoint());
+
+		const invalidShapeResponse = await postAccept(acceptBody('proj-1', {
+			selectedNodeIds: 'scene:scene-extra-proj-1',
+		}));
+		expect(invalidShapeResponse.status).toBe(400);
+		expect((await invalidShapeResponse.json()) as { code: string }).toMatchObject({
+			code: 'invalid_request',
+		});
+
+		const unknownNodeResponse = await postAccept(acceptBody('proj-1', {
+			selectedNodeIds: ['scene:missing-scene'],
+		}));
+		expect(unknownNodeResponse.status).toBe(400);
+		expect((await unknownNodeResponse.json()) as { code: string }).toMatchObject({
+			code: 'invalid_payload',
+		});
+		expect(countHierarchyRows()).toBe(0);
+	});
+
 	it('blocks accept when existing hierarchy rows would be overwritten', async () => {
 		insertCheckpoint(createCheckpoint('review'));
 		dbState.database
@@ -435,6 +652,80 @@ describe('POST /api/outline/checkpoints/[checkpointId]/accept', () => {
 		expect(body.meta.counts.arcs).toBe(1);
 		expect(storedCheckpoint().lifecycle).toBe('review');
 		expect(countRows('arcs')).toBe(1);
+	});
+
+	it('reports manual scene prose conflicts without leaking manuscript text', async () => {
+		insertCheckpoint(createCheckpoint('review'));
+		dbState.database
+			.prepare(
+				`INSERT INTO arcs (id, projectId, title, description, purpose, arcType, status, "order", createdAt, updatedAt)
+				 VALUES (?, ?, ?, '', '', NULL, 'planned', 0, ?, ?)`,
+			)
+			.run('manual-arc', 'proj-1', 'Manual Arc', now, now);
+		dbState.database
+			.prepare(
+				`INSERT INTO acts (id, projectId, arcId, title, "order", planningNotes, createdAt, updatedAt)
+				 VALUES (?, ?, ?, ?, 0, '', ?, ?)`,
+			)
+			.run('manual-act', 'proj-1', 'manual-arc', 'Manual Act', now, now);
+		dbState.database
+			.prepare(
+				`INSERT INTO chapters (id, projectId, title, "order", summary, wordCount, actId, arcRefs, createdAt, updatedAt)
+				 VALUES (?, ?, ?, 0, '', 0, ?, '[]', ?, ?)`,
+			)
+			.run('manual-chapter', 'proj-1', 'Manual Chapter', 'manual-act', now, now);
+		dbState.database
+			.prepare(
+				`INSERT INTO scenes (id, chapterId, projectId, title, summary, povCharacterId, locationId, timelineEventId, "order", content, wordCount, notes, characterIds, locationIds, arcRefs, createdAt, updatedAt)
+				 VALUES (?, ?, ?, ?, '', NULL, NULL, NULL, 0, ?, 42, ?, '[]', '[]', '[]', ?, ?)`,
+			)
+			.run(
+				'manual-scene',
+				'manual-chapter',
+				'proj-1',
+				'Manual Scene',
+				'Draft prose that must not leak.',
+				'Private revision notes.',
+				now,
+				now,
+			);
+
+		const response = await postAccept(acceptBody());
+
+		expect(response.status).toBe(409);
+		const body = (await response.json()) as {
+			code: string;
+			meta: {
+				manualSceneConflicts: Array<{
+					id: string;
+					title: string;
+					chapterId: string;
+					wordCount: number;
+					hasContent: boolean;
+					hasNotes: boolean;
+				}>;
+				requiresDestructiveConfirmation: boolean;
+				preflightMessage: string;
+			};
+		};
+		expect(body.code).toBe('outline_conflict');
+		expect(body.meta.requiresDestructiveConfirmation).toBe(true);
+		expect(body.meta.preflightMessage).toBe(
+			'Existing manuscript scene prose requires review before outline merge.',
+		);
+		expect(body.meta.manualSceneConflicts).toEqual([
+			expect.objectContaining({
+				id: 'manual-scene',
+				title: 'Manual Scene',
+				chapterId: 'manual-chapter',
+				wordCount: 42,
+				hasContent: true,
+				hasNotes: true,
+			}),
+		]);
+		expect(JSON.stringify(body)).not.toContain('Draft prose that must not leak.');
+		expect(JSON.stringify(body)).not.toContain('Private revision notes.');
+		expect(storedCheckpoint().lifecycle).toBe('review');
 	});
 
 	it('rolls back hierarchy and scene metadata when the checkpoint update fails', async () => {

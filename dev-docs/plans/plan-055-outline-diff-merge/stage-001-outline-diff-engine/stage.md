@@ -2,7 +2,7 @@
 title: Outline Diff Computation Engine
 slug: stage-001-outline-diff-engine
 stage_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-055-outline-diff-merge
 phases:
@@ -19,7 +19,7 @@ Develop server-side diff utility to compare generated outline drafts against exi
 
 | #   | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Outline Diff Computation Engine Phase](phase-001-diff-calculator/phase.md) | `draft` | 2d |
+| 001 | [Outline Diff Computation Engine Phase](phase-001-diff-calculator/phase.md) | `complete` | 2d |
 
 ## Entry Criteria
 

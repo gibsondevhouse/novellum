@@ -269,6 +269,7 @@ describe('NovaOutlineDraftCheckpointCard', () => {
 				projectId: 'project-1',
 				acceptedBy: 'author',
 				checkpoint: expect.objectContaining({ id: 'checkpoint-1', lifecycle: 'review' }),
+				selectedNodeIds: ['arc:arc-1', 'act:act-1', 'chapter:chapter-1', 'scene:scene-1'],
 			}),
 		);
 		expect(onCheckpointUpdated).toHaveBeenCalledWith(accepted);
@@ -340,6 +341,45 @@ describe('NovaOutlineDraftCheckpointCard', () => {
 		expect(target.textContent).toContain('Existing outline hierarchy is populated.');
 		expect(target.textContent).toContain('Pending review');
 		expect(onCheckpointUpdated).not.toHaveBeenCalled();
+		unmount(component);
+	});
+
+	it('surfaces manual prose preflight conflicts without leaking scene text', async () => {
+		const actions = createActions({
+			accept: vi.fn(async () => {
+				throw new OutlineCheckpointActionError(
+					409,
+					'Existing outline hierarchy is populated.',
+					'outline_conflict',
+					{
+						preflightMessage:
+							'Existing manuscript scene prose requires review before outline merge.',
+						manualSceneConflicts: [
+							{
+								id: 'scene-1',
+								title: 'The Archive Door',
+								hasContent: true,
+								hasNotes: true,
+								content: 'Draft prose that must not render.',
+							},
+						],
+					},
+				);
+			}),
+		});
+		const { target, component } = mountCardWithProps(createCheckpoint('review'), { actions });
+
+		(target.querySelector('[data-testid="nova-outline-accept"]') as HTMLButtonElement).click();
+		flushSync();
+		(target.querySelector('[data-testid="nova-outline-confirm-accept"]') as HTMLButtonElement).click();
+		await settle();
+
+		expect(target.textContent).toContain('Accept blocked.');
+		expect(target.textContent).toContain(
+			'Existing manuscript scene prose requires review before outline merge.',
+		);
+		expect(target.textContent).toContain('1 scene has drafted content or notes.');
+		expect(target.textContent).not.toContain('Draft prose that must not render.');
 		unmount(component);
 	});
 

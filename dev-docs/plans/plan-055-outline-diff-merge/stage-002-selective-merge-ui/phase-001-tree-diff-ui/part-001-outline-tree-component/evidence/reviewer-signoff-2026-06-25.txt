@@ -1,0 +1,37 @@
+# Reviewer Sign-off: Outline Merge Tree Component
+
+Date: 2026-06-25
+Reviewer: Reviewer Agent (local Codex pass following `.github/agents/reviewer.agent.md`)
+Part: part-001-outline-tree-component
+
+## Reviewed Scope
+
+- `src/modules/nova/components/OutlineMergeTree.svelte`
+- `src/modules/nova/components/NovaOutlineDraftCheckpointCard.svelte`
+- `tests/nova/OutlineMergeTree.svelte.test.ts`
+- Stage 002 tracker files and implementation evidence
+
+## Findings
+
+- No blocking findings.
+- The merge tree uses Svelte 5 runes-compatible array state and avoids direct
+  server or database imports.
+- The checkpoint card still keeps accept/reject behavior behind
+  `createOutlineCheckpointActions`.
+- The UI state is local preview selection only; Stage 003 will wire payload
+  semantics into the accept route.
+
+## Validation Confirmed
+
+- `git diff --check`: passed.
+- `pnpm exec vitest run tests/nova/OutlineMergeTree.svelte.test.ts tests/nova/NovaOutlineDraftCheckpointCard.test.ts`:
+  passed, 2 files, 11 tests.
+- `pnpm exec vitest run tests/nova/outline-generation-ux-states.test.ts`:
+  passed, 1 file, 3 tests.
+- `pnpm check`: passed, 0 errors, 0 warnings.
+- `pnpm lint`: passed.
+- `pnpm lint:css`: passed.
+
+## Decision
+
+Approved for completion. Stage 002 acceptance criteria are satisfied.

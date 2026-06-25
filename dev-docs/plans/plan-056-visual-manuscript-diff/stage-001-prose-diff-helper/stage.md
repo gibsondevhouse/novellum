@@ -2,7 +2,7 @@
 title: Text Diff Computation Helper
 slug: stage-001-prose-diff-helper
 stage_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-056-visual-manuscript-diff
 phases:
@@ -19,7 +19,7 @@ Integrate or build lightweight markdown text diff helper to compute character-le
 
 | #   | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Text Diff Computation Helper Phase](phase-001-prose-diff-helper/phase.md) | `draft` | 1d |
+| 001 | [Text Diff Computation Helper Phase](phase-001-prose-diff-helper/phase.md) | `complete` | 1d |
 
 ## Entry Criteria
 

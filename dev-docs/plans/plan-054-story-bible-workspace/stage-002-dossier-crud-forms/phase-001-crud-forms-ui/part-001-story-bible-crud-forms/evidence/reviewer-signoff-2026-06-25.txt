@@ -1,0 +1,46 @@
+Plan: plan-054-story-bible-workspace
+Stage: stage-002-dossier-crud-forms
+Phase: phase-001-crud-forms-ui
+Part: part-001-story-bible-crud-forms
+Reviewer: Codex acting under .github/agents/reviewer.agent.md
+Captured: 2026-06-25 14:20 EDT
+
+Review scope:
+- src/modules/story-bible/components/CharacterForm.svelte
+- src/modules/story-bible/components/LocationForm.svelte
+- src/modules/story-bible/components/FactionForm.svelte
+- src/modules/story-bible/components/GlossaryTermForm.svelte
+- src/modules/story-bible/components/ThemeForm.svelte
+- src/modules/story-bible/components/LoreEntryForm.svelte
+- src/modules/story-bible/components/StoryBibleWorkspacePage.svelte
+- src/modules/story-bible/components/StoryBiblePlaceholder.svelte
+- src/modules/story-bible/services/story-bible-crud.ts
+- src/routes/projects/[id]/story-bible/+page.svelte
+- src/routes/projects/[id]/story-bible/+page.ts
+- tests/story-bible/story-bible-crud.test.ts
+- tests/story-bible/story-bible-forms.svelte.test.ts
+
+Acceptance review:
+- All six requested forms exist under the Story Bible module and use Svelte 5 props/event attributes.
+- Required name/title/term validation prevents save callbacks before API requests.
+- Workspace loads project-scoped lists, opens create/edit modes, saves through typed CRUD wrappers, and refreshes after mutation.
+- CRUD wrappers route to the existing /api/db/* table endpoints; each save/update/delete is a single table request.
+- No $lib/server imports, better-sqlite3 imports, or world-building module internals were introduced into the Story Bible UI/service surface.
+- Existing JSON double-encoding regression coverage still passes.
+
+Commands:
+
+pnpm check
+Result: passed. svelte-check found 0 errors and 0 warnings.
+
+pnpm lint
+Result: passed. eslint . completed with exit code 0.
+
+pnpm lint:css
+Result: passed. stylelint completed with exit code 0.
+
+pnpm exec vitest run tests/story-bible tests/db/json-encoding.test.ts
+Result: passed. 4 test files, 16 tests.
+
+Reviewer decision:
+- Approved. Part may move from review to complete.

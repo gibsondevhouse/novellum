@@ -1,0 +1,34 @@
+Plan: plan-054-story-bible-workspace
+Stage: stage-003-navigation-hyperlinks
+Phase: phase-001-inline-hyperlinks
+Part: part-001-dossier-link-resolver
+Captured: 2026-06-25 14:24 EDT
+
+Implementation summary:
+- Added src/modules/story-bible/services/dossier-link-resolver.ts.
+- Added src/modules/story-bible/components/BiographyPanel.svelte.
+- Integrated BiographyPanel into StoryBibleWorkspacePage.svelte for selected dossier detail previews.
+- Resolved @character:id and #location:id style markers, plus faction/glossary/theme/lore markers, against the currently loaded dossier index.
+- Invalid IDs render as static text so no broken links are produced.
+- Link clicks call back into the workspace and switch to the target dossier category and id.
+- Added tests/story-bible/dossier-link-resolver.test.ts and tests/story-bible/biography-panel.svelte.test.ts.
+
+Commands:
+
+pnpm exec prettier --write src/modules/story-bible/services/dossier-link-resolver.ts src/modules/story-bible/components/BiographyPanel.svelte src/modules/story-bible/components/StoryBibleWorkspacePage.svelte src/modules/story-bible/index.ts tests/story-bible/dossier-link-resolver.test.ts tests/story-bible/biography-panel.svelte.test.ts
+Result: passed.
+
+pnpm exec vitest run tests/story-bible
+Result: passed. 5 test files, 12 tests.
+
+pnpm check
+Result: passed. svelte-check found 0 errors and 0 warnings.
+
+pnpm exec eslint src/modules/story-bible 'src/routes/projects/[id]/story-bible/+page.svelte' 'src/routes/projects/[id]/story-bible/+page.ts' tests/story-bible
+Result: passed.
+
+pnpm lint:css
+Result: passed. stylelint completed with exit code 0.
+
+pnpm lint
+Result: passed. eslint . completed with exit code 0.

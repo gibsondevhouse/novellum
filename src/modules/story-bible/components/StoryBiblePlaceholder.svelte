@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { featureFlags } from '$lib/feature-flags.svelte.js';
+	import StoryBibleWorkspacePage from './StoryBibleWorkspacePage.svelte';
+
+	let { projectId }: { projectId: string } = $props();
 </script>
 
-{#if featureFlags.labsEnabled}
-	<p>Story Bible is in Labs preview.</p>
-{/if}
+<StoryBibleWorkspacePage {projectId} />

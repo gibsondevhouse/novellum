@@ -1,0 +1,22 @@
+# Reviewer Sign-off - Prose Partial Injector Service - 2026-06-25
+
+Verdict: Approved.
+
+## Findings
+
+- No blocking findings.
+
+## Acceptance Review
+
+- Highlighted range injection is covered by pure text tests and editor-chain adapter tests.
+- Cursor placement after insertion/replacement is deterministic.
+- Missing cursor bounds fall back to document end.
+- Undo grouping is preserved by a single TipTap-like command chain invocation.
+- The service does not bypass editor/autosave boundaries or write directly to SQLite.
+
+## Gate Results
+
+- `pnpm exec vitest run 'tests/editor/prose-partial-injector.test.ts'`: passed.
+- `pnpm check`: passed.
+- `pnpm lint`: passed.
+- `git diff --check`: passed.

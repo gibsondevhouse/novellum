@@ -2,7 +2,7 @@
 title: Partial Prose Injector Actions
 slug: stage-003-partial-injector
 stage_number: 3
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-056-visual-manuscript-diff
 phases:
@@ -19,7 +19,7 @@ Wire UI controls to inject only highlighted paragraphs or changes into the activ
 
 | #   | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Partial Prose Injector Actions Phase](phase-001-partial-inject-logic/phase.md) | `draft` | 2d |
+| 001 | [Partial Prose Injector Actions Phase](phase-001-partial-inject-logic/phase.md) | `complete` | 2d |
 
 ## Entry Criteria
 

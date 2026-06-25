@@ -1,6 +1,6 @@
 # MASTER PLAN: Novellum Development
 
-> Last reconciled: 2026-06-16
+> Last reconciled: 2026-06-25
 
 ## Active Plans
 
@@ -8,13 +8,10 @@
 - [plan-048-frontend-experience-coherence](./plan-048-frontend-experience-coherence/plan.md): Frontend Experience Coherence — final frontend pass to make route context, navigation, author workflows, review gates, and visual states read as one production app. Status: `review` (implementation evidence complete 2026-06-15; pending plan-level Reviewer Agent evaluation).
 - [plan-052-pipeline-nova-editor-trust-closure](./plan-052-pipeline-nova-editor-trust-closure/plan.md): Pipeline, Nova, and Editor Trust Closure — wire silent Nova artifact actions to durable review-gated behavior, persist revision acknowledgements, clean internal AI metadata/copy, and remove misleading pre-release chrome. Status: `review` (implementation evidence complete 2026-06-15; pending plan-level Reviewer Agent evaluation).
 - [plan-053-worldbuilding-outline-review-flow-closure](./plan-053-worldbuilding-outline-review-flow-closure/plan.md): Worldbuilding and Outline Review Flow Closure — surface persisted worldbuilding scan proposals, make generation controls reflect real execution state, polish outline review metadata, and clean worldbuilding persistence errors. Status: `review` (implementation evidence complete 2026-06-16; pending plan-level Reviewer Agent evaluation).
+- [plan-043-brainstorm-agent](./plan-043-brainstorm-agent/plan.md): Brainstorm Agent — review-gated brainstorm proposal generation and worldbuilding context prefill flow. Status: `in-progress` (activated 2026-06-25 after plan-056 closeout; Stage 001 contract/schema started).
 
 ## Deferred (not yet scheduled)
 
-- [plan-043-brainstorm-agent](./plan-043-brainstorm-agent/plan.md): Brainstorm Agent — re-introduce BrainstormAgent with review-gated UI and worldbuild integration. Status: `draft` (scaffolded 2026-06-04). Stages: Agent contract & prompt, Nova UI integration, accept flow & worldbuild hookup, tests/docs/quality gates. Dependencies: plan-042.
-- [plan-054-story-bible-workspace](./plan-054-story-bible-workspace/plan.md): Interactive Story Bible Workspace — Replace Svelte placeholder with dynamic wiki dashboard listing characters, locations, factions, and resolving cross-references. Status: `draft` (scaffolded 2026-06-25).
-- [plan-055-outline-diff-merge](./plan-055-outline-diff-merge/plan.md): Structural Outline Diff & Merge — Selective merge controls and engine to update or refine outlines without overwriting manual scenes. Status: `draft` (scaffolded 2026-06-25).
-- [plan-056-visual-manuscript-diff](./plan-056-visual-manuscript-diff/plan.md): Visual Manuscript Diff & Prose Injector — Side-by-side split screen and partial applies for AI-generated scene prose. Status: `draft` (scaffolded 2026-06-25).
 - [plan-057-context-control-panel](./plan-057-context-control-panel/plan.md): AI Context Control Panel — Grounding controls for pinning or excluding lore entries during LLM queries. Status: `draft` (scaffolded 2026-06-25).
 - [plan-058-beat-stage-generator](./plan-058-beat-stage-generator/plan.md): Beat & Stage Generator — Narrative beats generation and integration with database hierarchy. Status: `draft` (scaffolded 2026-06-25).
 - [plan-059-docx-epub-exporter](./plan-059-docx-epub-exporter/plan.md): Robust Document Exporting — Shunn layout formatted Docx and TOC-compliant ePub compilers. Status: `draft` (scaffolded 2026-06-25).
@@ -23,6 +20,9 @@
 
 ## Completed Plans (Archived)
 
+- [plan-056-visual-manuscript-diff](./plan-056-visual-manuscript-diff/plan.md): Visual Manuscript Diff & Prose Injector — shipped character-level prose diffing, Nova split/unified review UI, selectable insertion hunks, active-editor injection event bridge, DB-free partial injector service, final verification, docs sync, and closeout evidence. Status: `complete` (closed 2026-06-25 after Reviewer Agent sign-off).
+- [plan-054-story-bible-workspace](./plan-054-story-bible-workspace/plan.md): Interactive Story Bible Workspace — replaced the placeholder route with a project-scoped wiki dashboard, consolidated Story Bible read queries, dossier CRUD forms, inline cross-reference navigation, E2E coverage, docs sync, and closeout evidence. Status: `complete` (closed 2026-06-25 after Reviewer Agent sign-off).
+- [plan-055-outline-diff-merge](./plan-055-outline-diff-merge/plan.md): Structural Outline Diff & Merge — shipped outline diff calculation, selected Nova merge tree controls, selected-node accept payloads, selected insert/update materialization with manual scene safety preflights, E2E coverage, docs sync, and closeout evidence. Status: `complete` (closed 2026-06-25 after Reviewer Agent sign-off).
 - [plan-049-agent-runtime-stack-hardening](./plan-049-agent-runtime-stack-hardening/plan.md): Agent Runtime Stack Hardening — local-first infrastructure for durable agent runs, job execution, model capabilities, budgets, search memory, traces, evals, and diagnostics. Status: `complete` (closed 2026-06-15).
 - [plan-047-worldbuilding-canon-merge-diff](./plan-047-worldbuilding-canon-merge-diff/plan.md): Worldbuilding Canon Merge Diff — upgraded worldbuilding proposal acceptance from insert-only projection to reviewable canon diff/merge behavior with field-level diffs, duplicate evidence, audit metadata, and E2E coverage. Status: `complete` (closed 2026-06-14 after plan-level reviewer evaluation).
 - [plan-046-pipeline-checkpoint-contract-reconciliation](./plan-046-pipeline-checkpoint-contract-reconciliation/plan.md): Pipeline Checkpoint Contract Reconciliation — aligned checkpoint routes, schemas, tests, and docs around canonical pipeline contracts. Status: `complete` (closed 2026-06-14 after plan-level reviewer evaluation).

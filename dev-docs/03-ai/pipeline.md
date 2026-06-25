@@ -1,6 +1,6 @@
 # AI Pipeline
 
-> Last verified: 2026-06-16 (plan-053 worldbuilding/outline review-flow closure)
+> Last verified: 2026-06-25 (plan-056 visual manuscript diff and prose injector)
 
 Every AI feature in Novellum follows the same review-gated pipeline.
 The runtime agents (continuity / edit / rewrite / style) live in
@@ -129,6 +129,7 @@ checkpoints.
 | `outline-generation-prompt.ts` | ROLE / TASK / CONTEXT / CONSTRAINTS / OUTPUT prompt bundle and bounded repair prompt for outline generation. |
 | `outline-draft-contract.ts` | `OutlineDraft`, `OutlineDraftCheckpointRecord`, `outlineDraftSchema`, and validation helpers for plan-040 outline generation checkpoints. |
 | `outline-checkpoint-service.ts` / `outline-checkpoint-contract.ts` | Metadata-route lifecycle helpers and typed client actions for outline draft checkpoints. |
+| `prose-diff-helper.ts` | Character-level current-vs-generated prose diff segments plus escaped `<ins>` / `<del>` markup helpers for plan-056 manuscript review UI. |
 | `worldbuild-schemas.ts` | Zod schemas for the four `vibe-worldbuild.*` payloads (premise / worldspec / research / populated-bible). |
 | `worldbuild-agent.ts` | `parseWorldbuildOutput()`, `createWorldbuildArtifactFromModelOutput()`, populated-bible normalizer. |
 | `checkpoint-contract.ts` | `PIPELINE_CHECKPOINT_SCHEMA_VERSION='1.0.0'`, `WorldbuildCheckpointRecord`, lifecycle guards. |
@@ -210,6 +211,18 @@ Stage-003 phase-003 ships the author drafting + revision surface:
   the existing checkpoint accept route with dirty-editor and stale-target
   safeguards. `Reject` stages and rejects the saved checkpoint. `Copy`
   remains a local clipboard utility.
+- Plan-056 adds visual manuscript diff review for persisted author-draft
+  checkpoints. `NovaAuthorDraftCheckpointCard.svelte` renders
+  `ProseDiffPanel.svelte` before accept/reject actions so the author sees
+  current scene prose beside generated draft prose, can toggle split or
+  unified diff views, and can choose inserted diff hunks for editor
+  insertion. The insertion request dispatches
+  `novellum:prose-partial-injection`; `EditorShell.svelte` handles that
+  event only for the active scene and applies the selected text through
+  `src/modules/editor/services/prose-partial-injector.ts`. The injector is
+  DB-free: it uses the active TipTap command chain and relies on normal
+  editor update/autosave behavior instead of writing `scenes.content`
+  directly.
 - `src/modules/nova/components/NovaRevisionPackCard.svelte` renders
   the revision-pack envelope as a severity-sorted issue list with a
   per-issue `Acknowledge` action. Acknowledgements are durable review

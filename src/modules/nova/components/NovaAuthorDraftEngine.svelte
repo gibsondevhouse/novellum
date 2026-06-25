@@ -22,9 +22,10 @@
 	interface Props {
 		projectId?: string | null;
 		activeChapterId?: string | null;
+		activeSceneId?: string | null;
 	}
 
-	let { projectId = null, activeChapterId = null }: Props = $props();
+	let { projectId = null, activeChapterId = null, activeSceneId = null }: Props = $props();
 
 	type RunnerState = 'idle' | 'generating' | 'aborted' | 'failed' | 'done';
 
@@ -250,6 +251,7 @@
 					{scene}
 					projectId={projectId}
 					checkpoint={bestCheckpointForScene(scene.id)}
+					activeSceneId={activeSceneId}
 					isGenerating={runnerState === 'generating' && orderedScenes[activeIndex]?.id === scene.id}
 					onRegenerate={() => void handleRegenerate(scene.id)}
 					onCheckpointUpdated={(cp) => upsertCheckpoint(cp)}

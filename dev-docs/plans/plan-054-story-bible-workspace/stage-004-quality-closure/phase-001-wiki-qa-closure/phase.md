@@ -2,7 +2,7 @@
 title: Wiki Verification & Cleanup
 slug: phase-001-wiki-qa-closure
 phase_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-004-quality-closure
 parts:
@@ -18,13 +18,13 @@ Run quality checks, clear any code analysis exceptions, and update files.
 
 | #   | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Wiki Module Integration Tests](part-001-wiki-test-suite/part.md) | `draft` | — | 1d |
+| 001 | [Wiki Module Integration Tests](part-001-wiki-test-suite/part.md) | `complete` | — | 1d |
 
 ## Acceptance Criteria
 
-- [ ] All parts reach `complete`
-- [ ] Unit tests cover dossier creation and query parameters.
-- [ ] Zero lint exceptions in Story Bible workspace.
+- [x] All parts reach `complete`
+- [x] Unit tests cover dossier creation and query parameters.
+- [x] Zero lint exceptions in Story Bible workspace.
 
 ## Notes
 

@@ -1,0 +1,23 @@
+Plan: plan-055-outline-diff-merge
+Stage: stage-004-verification
+Phase: phase-001-diff-qa-closure
+Part: part-001-outline-merge-e2e
+Date: 2026-06-25
+Reviewer: Codex local reviewer pass
+
+Review result: Approved.
+
+Findings:
+- None.
+
+Review notes:
+- Confirmed selected outline node ids flow from `OutlineMergeTree` through `NovaOutlineDraftCheckpointCard`, `outline-checkpoint-actions`, the accept route, and the materialization service.
+- Confirmed selected upserts preserve manuscript scene prose, notes, and word count, and selected scenes with manual prose metadata return safe `outline_conflict` metadata without leaking manuscript text.
+- Confirmed the route rejects malformed/unknown selected node ids and cross-project hierarchy id collisions before transactional writes.
+- Confirmed the Playwright spec exercises the browser-visible Nova merge tree and verifies that only the checked scene is materialized.
+
+Validation reviewed:
+- Focused Vitest: 7 files / 41 tests passed.
+- Full Vitest: 294 files / 2014 tests passed.
+- Playwright: `tests/e2e/outline-merge.spec.ts --project=chromium` passed.
+- `pnpm check`, `pnpm lint`, `pnpm lint:css`, `pnpm check:tokens`, `pnpm run build`, and `git diff --check` passed.

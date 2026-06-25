@@ -2,7 +2,7 @@
 title: Prose Diff Calculator Integration
 slug: phase-001-prose-diff-helper
 phase_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-001-prose-diff-helper
 parts:
@@ -18,12 +18,12 @@ Set up lightweight markdown comparison logic to compute insertions and deletions
 
 | #   | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Prose Diff Calculator Utility](part-001-prose-diff-calculator/part.md) | `draft` | — | 1d |
+| 001 | [Prose Diff Calculator Utility](part-001-prose-diff-calculator/part.md) | `complete` | — | 1d |
 
 ## Acceptance Criteria
 
-- [ ] All parts reach `complete`
-- [ ] Helper maps changes with correct operational markup tags.
+- [x] All parts reach `complete`
+- [x] Helper maps changes with correct operational markup tags.
 
 ## Notes
 

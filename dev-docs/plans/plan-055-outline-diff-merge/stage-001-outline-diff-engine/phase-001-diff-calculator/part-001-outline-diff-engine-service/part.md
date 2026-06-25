@@ -2,12 +2,12 @@
 title: Outline Diff Engine Service
 slug: part-001-outline-diff-engine-service
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 assigned_to: —
 phase: phase-001-diff-calculator
-started_at: ~
-completed_at: ~
+started_at: 2026-06-25
+completed_at: 2026-06-25
 estimated_duration: undefined
 ---
 
@@ -44,8 +44,8 @@ Develop server-side diff calculation logic comparing checkpoint outline structur
 
 ## Acceptance Criteria
 
-- [ ] Diff engine detects added nodes.
-- [ ] Diff engine lists deleted elements correctly.
+- [x] Diff engine detects added nodes.
+- [x] Diff engine lists deleted elements correctly.
 
 ## Edge Cases
 

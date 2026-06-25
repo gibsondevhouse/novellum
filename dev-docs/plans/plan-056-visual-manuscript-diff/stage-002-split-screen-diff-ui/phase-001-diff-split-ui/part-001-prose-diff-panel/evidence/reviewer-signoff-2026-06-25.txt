@@ -1,0 +1,23 @@
+# Reviewer Sign-off - Split-Screen Prose Diff Panel - 2026-06-25
+
+Verdict: Approved.
+
+## Findings
+
+- No blocking findings.
+
+## Acceptance Review
+
+- Side-by-side view renders current and draft prose with insertion/deletion highlights.
+- Toggle controls switch to unified layout and are covered by direct Svelte tests.
+- Styling uses project tokens, bounded scroll regions, and accessible button labels.
+- Existing Nova author draft accept/reject review gates remain unchanged.
+
+## Gate Results
+
+- `pnpm exec vitest run 'tests/nova/ProseDiffPanel.svelte.test.ts' 'tests/nova/checkpoint-card.contract.test.ts'`: passed.
+- `pnpm check`: passed.
+- `pnpm lint`: passed.
+- `pnpm lint:css`: passed.
+- `pnpm check:tokens`: passed.
+- `git diff --check`: passed.

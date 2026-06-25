@@ -1,0 +1,38 @@
+Plan: plan-055-outline-diff-merge
+Stage: stage-004-verification
+Phase: phase-001-diff-qa-closure
+Part: part-001-outline-merge-e2e
+Date: 2026-06-25
+Agent: Codex
+
+Implementation summary:
+- Added `selectedNodeIds` to the outline checkpoint accept contract and client action path.
+- Wired `OutlineMergeTree` selection changes into `NovaOutlineDraftCheckpointCard` so accepts submit checked merge node ids.
+- Extended outline materialization to filter selected nodes, include required parents, and upsert selected hierarchy rows.
+- Preserved safety gates: full accepts still block populated outlines; selected accepts block selected scenes with manuscript prose, notes, or word count; unselected manual scenes remain untouched; cross-project id collisions fail before transaction.
+- Added Playwright coverage for Nova merge tree selection and selected accept materialization.
+- Updated `dev-docs/03-ai/outline-generation.md` for selected-node payload, upsert behavior, and conflict policy.
+
+Validation:
+- `pnpm exec vitest run tests/routes/outline-accept.test.ts tests/nova/OutlineMergeTree.svelte.test.ts tests/nova/NovaOutlineDraftCheckpointCard.test.ts tests/nova/outline-generation-ux-states.test.ts tests/nova/outline-checkpoint-actions.test.ts tests/ai/pipeline/outline-checkpoint-contract.test.ts tests/server/outline/outline-diff-engine.test.ts`
+  - Passed: 7 files / 41 tests.
+- `pnpm check`
+  - Passed: 0 errors, 0 warnings.
+- `pnpm run build`
+  - Passed. Existing Lightning CSS warnings for Tailwind `@theme` / `@utility` at-rules remain unrelated baseline noise.
+- `pnpm exec playwright test tests/e2e/outline-merge.spec.ts --project=chromium`
+  - Passed: 1 Chromium test.
+- `pnpm lint`
+  - Passed.
+- `pnpm lint:css`
+  - Passed.
+- `pnpm check:tokens`
+  - Passed: 358 files scanned, 0 violations.
+- `git diff --check`
+  - Passed.
+- `pnpm test`
+  - Passed: 294 files / 2014 tests.
+
+Notes:
+- The E2E routes only the browser `ai-status` request to avoid reading or mutating real local AI credentials.
+- Delete-style merge semantics remain out of the shipped behavior; plan-055 now supports selected insert/update materialization and selected manuscript-scene safety blocking.

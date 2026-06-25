@@ -1,0 +1,29 @@
+# Prose Diff Injector Verification Evidence - 2026-06-25
+
+## Scope
+
+- Created `tests/editor/prose-diff-inject.test.ts`.
+- Updated `tests/nova/ProseDiffPanel.svelte.test.ts`.
+- Updated `tests/nova/checkpoint-card.contract.test.ts`.
+- Updated `dev-docs/03-ai/pipeline.md`.
+- Added the UI-to-editor bridge for selected insertion hunks.
+
+## Behavior Verified
+
+- Diff insertions from `createProseDiff()` convert into selected prose injection ranges.
+- Selected diff ranges can be applied through `applyPartialProseInjection()`.
+- Selected prose can be applied through a single TipTap-like command chain.
+- `dispatchProsePartialInjection()` publishes the expected window event detail.
+- `EditorShell.svelte` listens for the prose injection event and routes it through `injectPartialProseIntoEditor()` instead of direct persistence.
+- Nova author draft cards gate insertion to the active editor scene.
+
+## Validation
+
+- Focused verification: `pnpm exec vitest run 'tests/editor/prose-diff-inject.test.ts' 'tests/editor/prose-partial-injector.test.ts' 'tests/nova/ProseDiffPanel.svelte.test.ts' 'tests/nova/checkpoint-card.contract.test.ts'` passed: 4 files, 20 tests.
+- `pnpm check` passed: 0 errors, 0 warnings.
+- `pnpm lint` passed.
+- `pnpm lint:css` passed.
+- `pnpm check:tokens` passed: 359 files scanned, 0 violations.
+- `pnpm test` passed: 298 files, 2037 tests.
+- `pnpm run build` passed. Existing Lightning CSS warnings for Tailwind `@theme` / `@utility` at-rules remain non-blocking.
+- `git diff --check` passed.

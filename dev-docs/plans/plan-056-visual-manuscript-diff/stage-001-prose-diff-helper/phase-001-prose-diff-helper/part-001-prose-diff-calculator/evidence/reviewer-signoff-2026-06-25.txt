@@ -1,0 +1,20 @@
+# Reviewer Sign-off - Prose Diff Calculator Utility - 2026-06-25
+
+Verdict: Approved.
+
+## Findings
+
+- No blocking findings.
+
+## Acceptance Review
+
+- Additions and deletions are highlighted through semantic operational tags.
+- Unit tests verify exact string outputs for additions, deletions, replacements, unchanged text, empty input behavior, and escaping.
+- The helper is pure pipeline code and does not introduce Svelte, database, or module-boundary changes.
+
+## Gate Results
+
+- `pnpm exec vitest run 'tests/ai/pipeline/prose-diff-helper.test.ts'`: passed.
+- `pnpm check`: passed.
+- `pnpm lint`: passed.
+- `git diff --check`: passed.

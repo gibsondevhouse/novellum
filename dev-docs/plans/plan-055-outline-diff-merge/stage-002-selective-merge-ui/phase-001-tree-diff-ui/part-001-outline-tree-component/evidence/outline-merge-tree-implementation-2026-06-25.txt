@@ -1,0 +1,35 @@
+# Outline Merge Tree Implementation Evidence
+
+Date: 2026-06-25
+Part: part-001-outline-tree-component
+Agent: Codex
+
+## Changed Files
+
+- Added `src/modules/nova/components/OutlineMergeTree.svelte`.
+- Added `tests/nova/OutlineMergeTree.svelte.test.ts`.
+- Updated `src/modules/nova/components/NovaOutlineDraftCheckpointCard.svelte`.
+
+## Behavior Added
+
+- Replaced the static outline preview with a selectable merge tree in the Nova
+  outline checkpoint card.
+- The tree renders arcs, acts, chapters, and scenes with hierarchy indentation.
+- Parent checkboxes select/deselect descendant nodes.
+- Checking a child node auto-checks its parent chapter, act, and arc.
+- The tree displays a selected-node count and disables checkboxes for read-only
+  checkpoint lifecycles.
+
+## Validation
+
+- `pnpm exec vitest run tests/nova/OutlineMergeTree.svelte.test.ts tests/nova/NovaOutlineDraftCheckpointCard.test.ts`
+  - Passed: 2 files, 11 tests.
+- `pnpm exec vitest run tests/nova/outline-generation-ux-states.test.ts`
+  - Passed: 1 file, 3 tests.
+- `pnpm check`
+  - Passed.
+  - `svelte-check found 0 errors and 0 warnings`.
+- `pnpm lint`
+  - Passed.
+- `pnpm lint:css`
+  - Passed.

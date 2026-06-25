@@ -2,7 +2,7 @@
 title: Structural Outline Diff & Merge
 slug: plan-055-outline-diff-merge
 version: 1.0.0
-status: draft
+status: complete
 owner: Planner Agent
 created: 2026-06-25
 last_updated: 2026-06-25
@@ -41,17 +41,17 @@ Evolve the outline materialization route from an all-or-nothing overwrite (which
 
 | #   | Stage | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Outline Diff Computation Engine](stage-001-outline-diff-engine/stage.md) | `draft` | 2d |
-| 002 | [Selective Merge Tree UI & Actions](stage-002-selective-merge-ui/stage.md) | `draft` | 2d |
-| 003 | [Preflight Safeguards & Transactions](stage-003-safety-preflights/stage.md) | `draft` | 1d |
-| 004 | [Verification & Quality Gate Closure](stage-004-verification/stage.md) | `draft` | 1d |
+| 001 | [Outline Diff Computation Engine](stage-001-outline-diff-engine/stage.md) | `complete` | 2d |
+| 002 | [Selective Merge Tree UI & Actions](stage-002-selective-merge-ui/stage.md) | `complete` | 2d |
+| 003 | [Preflight Safeguards & Transactions](stage-003-safety-preflights/stage.md) | `complete` | 1d |
+| 004 | [Verification & Quality Gate Closure](stage-004-verification/stage.md) | `complete` | 1d |
 
 ## Quality Gates
 
-- [ ] **lint** — zero ESLint or CSS warnings
-- [ ] **typecheck** — zero compilation warnings in `pnpm check`
-- [ ] **tests** — unit coverage of diff computation and merge transaction safety
-- [ ] **docs_sync** — update [outline-generation.md](../../03-ai/outline-generation.md)
+- [x] **lint** — zero ESLint or CSS warnings
+- [x] **typecheck** — zero compilation warnings in `pnpm check`
+- [x] **tests** — unit coverage of diff computation and merge transaction safety
+- [x] **docs_sync** — update [outline-generation.md](../../03-ai/outline-generation.md)
 
 ## Risks & Mitigations
 - **Risk:** Authors might accidentally delete manual scenes by unchecking them or accepting deletions.

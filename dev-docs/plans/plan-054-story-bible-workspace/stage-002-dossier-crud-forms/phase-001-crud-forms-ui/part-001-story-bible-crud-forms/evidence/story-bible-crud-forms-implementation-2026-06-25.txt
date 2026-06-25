@@ -1,0 +1,40 @@
+Plan: plan-054-story-bible-workspace
+Stage: stage-002-dossier-crud-forms
+Phase: phase-001-crud-forms-ui
+Part: part-001-story-bible-crud-forms
+Captured: 2026-06-25 14:18 EDT
+
+Implementation summary:
+- Added Story Bible-owned Svelte 5 forms for characters, locations, factions, glossary terms, themes, and lore entries.
+- Added src/modules/story-bible/services/story-bible-crud.ts as the typed CRUD API wrapper for the six dossier tables.
+- Added StoryBibleWorkspacePage.svelte and routed the existing StoryBiblePlaceholder to render the workspace with projectId from the route.
+- Updated the Story Bible module barrel to export workspace/forms and CRUD DTO types.
+- Added tests/story-bible/story-bible-crud.test.ts and tests/story-bible/story-bible-forms.svelte.test.ts.
+- Kept saves as one API request per dossier table operation; no AI generation or GeneratedEntityModal behavior was changed.
+
+Commands:
+
+pnpm exec prettier --write src/modules/story-bible/services/story-bible-crud.ts src/modules/story-bible/components/CharacterForm.svelte src/modules/story-bible/components/LocationForm.svelte src/modules/story-bible/components/FactionForm.svelte src/modules/story-bible/components/GlossaryTermForm.svelte src/modules/story-bible/components/ThemeForm.svelte src/modules/story-bible/components/LoreEntryForm.svelte src/modules/story-bible/components/StoryBibleWorkspacePage.svelte src/modules/story-bible/components/StoryBiblePlaceholder.svelte src/modules/story-bible/index.ts 'src/routes/projects/[id]/story-bible/+page.svelte' 'src/routes/projects/[id]/story-bible/+page.ts' tests/story-bible/story-bible-crud.test.ts tests/story-bible/story-bible-forms.svelte.test.ts
+Result: passed.
+
+pnpm check
+Result: passed. svelte-check found 0 errors and 0 warnings.
+
+pnpm exec eslint src/modules/story-bible 'src/routes/projects/[id]/story-bible/+page.svelte' 'src/routes/projects/[id]/story-bible/+page.ts' tests/story-bible
+Result: passed.
+
+pnpm exec vitest run tests/story-bible
+Result: passed. 3 test files, 8 tests.
+
+pnpm lint
+Result: passed. eslint . completed with exit code 0.
+
+pnpm lint:css
+Result: passed. stylelint completed with exit code 0.
+
+pnpm exec vitest run tests/story-bible tests/db/json-encoding.test.ts
+Result: passed. 4 test files, 16 tests.
+
+Notes:
+- An intermediate `pnpm check` failed before plan completion because `SectionHeader` snippet forwarding used the wrong prop shape; fixed by rendering the actions snippet as a SectionHeader child.
+- An intermediate changed-file ESLint run failed because two `{#each}` blocks were unkeyed; fixed with stable keys.

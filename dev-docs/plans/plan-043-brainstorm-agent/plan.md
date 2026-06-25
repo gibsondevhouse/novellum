@@ -2,10 +2,10 @@
 title: Brainstorm Agent
 slug: plan-043-brainstorm-agent
 version: 1.0.0
-status: draft
+status: in-progress
 owner: Planner Agent
 created: 2026-06-04
-last_updated: 2026-06-04
+last_updated: 2026-06-25
 target_completion: TBD
 stages:
   - stage-001-agent-contract
@@ -53,7 +53,7 @@ worldbuilding context or saved as reference notes.
 
 | # | Stage | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Agent Contract & Prompt](stage-001-agent-contract/stage.md) | `draft` | 1d |
+| 001 | [Agent Contract & Prompt](stage-001-agent-contract/stage.md) | `in-progress` | 1d |
 | 002 | [Nova UI Integration](stage-002-nova-ui/stage.md) | `draft` | 1.5d |
 | 003 | [Accept Flow & Worldbuild Hookup](stage-003-accept-flow/stage.md) | `draft` | 1d |
 | 004 | [Tests, Docs & Quality Gates](stage-004-qa-docs/stage.md) | `draft` | 0.5d |

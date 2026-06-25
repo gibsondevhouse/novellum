@@ -11,6 +11,10 @@
 		SCENE_CONTENT_APPLIED_EVENT,
 		type SceneContentAppliedDetail,
 	} from '$lib/events/scene-content.js';
+	import {
+		PROSE_PARTIAL_INJECTION_EVENT,
+		type ProsePartialInjectionDetail,
+	} from '$lib/events/prose-injection.js';
 	import { editorState } from '../stores/editor.svelte.js';
 	import * as autosaveService from '../services/autosave-service.js';
 	import type { AutosaveResult } from '../services/autosave-types.js';
@@ -31,6 +35,7 @@
 	import SceneCompassPanel from './SceneCompassPanel.svelte';
 	import SceneSignalNudge from './SceneSignalNudge.svelte';
 	import { useSceneSignals } from '../services/scene-signals.svelte.js';
+	import { injectPartialProseIntoEditor } from '../services/prose-partial-injector.js';
 	import { countWords } from '../services/scene-analysis-utils.js';
 	import type { OutcomeType, SceneLengthEstimate, SceneDefinition } from '../services/scene-signals.svelte.js';
 	import { SHORTCUT_EVENT, type ShortcutEventDetail } from '$lib/keyboard/index.js';
@@ -96,6 +101,17 @@
 			autosaveService.acknowledgeExternalOverwrite(detail.sceneId, detail.updatedAt);
 			activeContent = detail.content;
 		}
+	}
+
+	function handleProsePartialInjection(detail: ProsePartialInjectionDetail): void {
+		if (!tipTapEditor) return;
+		if (editorState.activeSceneId !== detail.sceneId) return;
+
+		const result = injectPartialProseIntoEditor({
+			editor: tipTapEditor,
+			ranges: detail.ranges,
+		});
+		if (result.applied) editorTick += 1;
 	}
 
 	// Phase 2: hydrate editor preferences when project is available
@@ -182,6 +198,17 @@
 		};
 		window.addEventListener(SCENE_CONTENT_APPLIED_EVENT, handler);
 		return () => window.removeEventListener(SCENE_CONTENT_APPLIED_EVENT, handler);
+	});
+
+	$effect(() => {
+		if (typeof window === 'undefined') return;
+		const handler = (event: Event) => {
+			const detail = (event as CustomEvent<ProsePartialInjectionDetail>).detail;
+			if (!detail) return;
+			handleProsePartialInjection(detail);
+		};
+		window.addEventListener(PROSE_PARTIAL_INJECTION_EVENT, handler);
+		return () => window.removeEventListener(PROSE_PARTIAL_INJECTION_EVENT, handler);
 	});
 
 	const totalCurrentWords = $derived.by(() => {

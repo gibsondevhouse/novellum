@@ -1,0 +1,25 @@
+# Prose Diff Panel Implementation Evidence - 2026-06-25
+
+## Scope
+
+- Created `src/modules/nova/components/ProseDiffPanel.svelte`.
+- Updated `src/modules/nova/components/NovaAuthorDraftCheckpointCard.svelte`.
+- Added `tests/nova/ProseDiffPanel.svelte.test.ts`.
+- Updated `tests/nova/checkpoint-card.contract.test.ts`.
+
+## Behavior Verified
+
+- Split layout renders current and draft prose side by side.
+- Unified layout toggles from the same component.
+- Insertions and deletions render with operation-specific markup and styling.
+- Long prose regions use bounded scroll containers.
+- Nova author draft checkpoints show the visual diff panel before accept/reject actions.
+
+## Validation
+
+- `pnpm exec vitest run 'tests/nova/ProseDiffPanel.svelte.test.ts' 'tests/nova/checkpoint-card.contract.test.ts'` passed: 2 files, 8 tests.
+- `pnpm check` passed: 0 errors, 0 warnings.
+- `pnpm lint` passed.
+- `pnpm lint:css` passed.
+- `pnpm check:tokens` passed: 359 files scanned, 0 violations.
+- `git diff --check` passed.

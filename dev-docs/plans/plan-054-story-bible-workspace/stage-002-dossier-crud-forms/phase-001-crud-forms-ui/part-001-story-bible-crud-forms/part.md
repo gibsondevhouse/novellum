@@ -2,12 +2,12 @@
 title: CRUD Forms for Lore Dossiers
 slug: part-001-story-bible-crud-forms
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 assigned_to: —
 phase: phase-001-crud-forms-ui
-started_at: ~
-completed_at: ~
+started_at: 2026-06-25
+completed_at: 2026-06-25
 estimated_duration: undefined
 ---
 
@@ -42,16 +42,22 @@ Build responsive forms allowing users to manually create, read, update, and dele
 - `src/modules/story-bible/components/GlossaryTermForm.svelte`
 - `src/modules/story-bible/components/ThemeForm.svelte`
 - `src/modules/story-bible/components/LoreEntryForm.svelte`
+- `src/modules/story-bible/components/StoryBibleWorkspacePage.svelte`
+- `src/modules/story-bible/services/story-bible-crud.ts`
+- `tests/story-bible/story-bible-crud.test.ts`
+- `tests/story-bible/story-bible-forms.svelte.test.ts`
 
 **Update:**
 
 - `src/modules/story-bible/components/StoryBiblePlaceholder.svelte`
 - `src/modules/story-bible/index.ts`
+- `src/routes/projects/[id]/story-bible/+page.svelte`
+- `src/routes/projects/[id]/story-bible/+page.ts`
 
 ## Acceptance Criteria
 
-- [ ] Form save updates database tables atomically.
-- [ ] Validation flags missing name/title inputs before sending API requests.
+- [x] Form save updates database tables atomically.
+- [x] Validation flags missing name/title inputs before sending API requests.
 
 ## Edge Cases
 

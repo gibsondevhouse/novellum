@@ -2,7 +2,7 @@
 title: Visual Manuscript Diff & Prose Injector
 slug: plan-056-visual-manuscript-diff
 version: 1.0.0
-status: draft
+status: complete
 owner: Planner Agent
 created: 2026-06-25
 last_updated: 2026-06-25
@@ -41,17 +41,17 @@ Build a visual split-screen diff interface and a partial prose injector. This re
 
 | #   | Stage | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Text Diff Computation Helper](stage-001-prose-diff-helper/stage.md) | `draft` | 1d |
-| 002 | [Split-Screen Diff UI Component](stage-002-split-screen-diff-ui/stage.md) | `draft` | 2d |
-| 003 | [Partial Prose Injector Actions](stage-003-partial-injector/stage.md) | `draft` | 2d |
-| 004 | [Verification & Quality Gate Closure](stage-004-quality-closure/stage.md) | `draft` | 1d |
+| 001 | [Text Diff Computation Helper](stage-001-prose-diff-helper/stage.md) | `complete` | 1d |
+| 002 | [Split-Screen Diff UI Component](stage-002-split-screen-diff-ui/stage.md) | `complete` | 2d |
+| 003 | [Partial Prose Injector Actions](stage-003-partial-injector/stage.md) | `complete` | 2d |
+| 004 | [Verification & Quality Gate Closure](stage-004-verification/stage.md) | `complete` | 1d |
 
 ## Quality Gates
 
-- [ ] **lint** — zero ESLint or CSS warnings
-- [ ] **typecheck** — zero compilation warnings in `pnpm check`
-- [ ] **tests** — unit coverage for partial insertion text calculations
-- [ ] **docs_sync** — update [pipeline.md](../../03-ai/pipeline.md)
+- [x] **lint** — zero ESLint or CSS warnings
+- [x] **typecheck** — zero compilation warnings in `pnpm check`
+- [x] **tests** — unit coverage for partial insertion text calculations
+- [x] **docs_sync** — update [pipeline.md](../../03-ai/pipeline.md)
 
 ## Risks & Mitigations
 - **Risk:** Complex diff blocks (such as major re-orderings) might look messy in a standard inline diff view.

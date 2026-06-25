@@ -166,12 +166,14 @@ describe('outline checkpoint helper contract', () => {
 				acceptedBy: ' author ',
 				expectedUpdatedAt: ' 2026-06-04T15:00:00.000Z ',
 				expectedVersion: ` ${OUTLINE_DRAFT_SCHEMA_VERSION} `,
+				selectedNodeIds: ['arc:arc-1', 'scene:scene-1'],
 			}),
 		).toEqual({
 			operation: 'accept',
 			acceptedBy: 'author',
 			expectedUpdatedAt: '2026-06-04T15:00:00.000Z',
 			expectedVersion: OUTLINE_DRAFT_SCHEMA_VERSION,
+			selectedNodeIds: ['arc:arc-1', 'scene:scene-1'],
 		});
 		expect(createOutlineCheckpointRejectBody({ rejectedBy: 'author', reason: ' conflict ' })).toEqual({
 			operation: 'reject',

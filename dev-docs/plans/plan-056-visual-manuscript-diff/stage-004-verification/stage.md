@@ -2,7 +2,7 @@
 title: Verification & Quality Gate Closure
 slug: stage-004-verification
 stage_number: 4
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-056-visual-manuscript-diff
 phases:
@@ -19,7 +19,7 @@ Verify text insertion edge cases, run integration tests, and finalize styling po
 
 | #   | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Verification & Quality Gate Closure Phase](phase-001-diff-inject-qa/phase.md) | `draft` | 1d |
+| 001 | [Verification & Quality Gate Closure Phase](phase-001-diff-inject-qa/phase.md) | `complete` | 1d |
 
 ## Entry Criteria
 

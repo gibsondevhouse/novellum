@@ -2,7 +2,7 @@
 title: Verification & Quality Gate Closure
 slug: stage-004-quality-closure
 stage_number: 4
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-054-story-bible-workspace
 phases:
@@ -19,7 +19,7 @@ Address any remaining warnings, write comprehensive integration tests, and updat
 
 | #   | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Verification & Quality Gate Closure Phase](phase-001-wiki-qa-closure/phase.md) | `draft` | 1d |
+| 001 | [Verification & Quality Gate Closure Phase](phase-001-wiki-qa-closure/phase.md) | `complete` | 1d |
 
 ## Entry Criteria
 

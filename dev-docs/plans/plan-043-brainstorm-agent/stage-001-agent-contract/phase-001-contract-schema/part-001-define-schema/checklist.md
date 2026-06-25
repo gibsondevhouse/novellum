@@ -7,10 +7,10 @@ last_updated: 2026-06-04
 
 ## Pre-Implementation
 
-- [ ] Parent phase and stage are `in-progress`
-- [ ] Existing agent types in `src/lib/ai/types.ts` reviewed
-- [ ] `part.md` has been reviewed and accepted
-- [ ] Dev environment is ready
+- [x] Parent phase and stage are `in-progress`
+- [x] Existing agent types in `src/lib/ai/types.ts` reviewed
+- [x] `part.md` has been reviewed and accepted
+- [x] Dev environment is ready
 
 ## Implementation
 

@@ -1,0 +1,23 @@
+# Prose Diff Helper Implementation Evidence - 2026-06-25
+
+## Scope
+
+- Created `src/lib/ai/pipeline/prose-diff-helper.ts`.
+- Created `tests/ai/pipeline/prose-diff-helper.test.ts`.
+
+## Behavior Verified
+
+- Character-level comparison is backed by the existing `diff` package.
+- Output segments use stable `equal`, `insert`, and `delete` operations.
+- Markup output wraps insertions in `<ins>` and deletions in `<del>`.
+- Markup text is HTML-escaped before rendering.
+- Empty current text is treated as a full insertion.
+- Empty generated text is treated as a full deletion.
+- Nullish text values normalize to empty prose.
+
+## Validation
+
+- `pnpm exec vitest run 'tests/ai/pipeline/prose-diff-helper.test.ts'` passed: 1 file, 7 tests.
+- `pnpm check` passed: 0 errors, 0 warnings.
+- `pnpm lint` passed.
+- `git diff --check` passed.

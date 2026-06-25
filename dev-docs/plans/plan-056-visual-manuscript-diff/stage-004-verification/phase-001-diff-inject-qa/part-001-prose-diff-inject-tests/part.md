@@ -2,12 +2,12 @@
 title: Prose Diff Injector Tests
 slug: part-001-prose-diff-inject-tests
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 assigned_to: —
 phase: phase-001-diff-inject-qa
-started_at: ~
-completed_at: ~
+started_at: 2026-06-25
+completed_at: 2026-06-25
 estimated_duration: undefined
 ---
 
@@ -43,8 +43,8 @@ Verify text insertion edge cases and close checks.
 
 ## Acceptance Criteria
 
-- [ ] All unit tests pass.
-- [ ] Quality gates pass.
+- [x] All unit tests pass.
+- [x] Quality gates pass.
 
 ## Edge Cases
 

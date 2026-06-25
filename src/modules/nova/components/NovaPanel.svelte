@@ -350,7 +350,11 @@
 				</EmptyStatePanel>
 			{:else}
 				{#if hasProjectContext && (isEditorRoute || isChapterRoute)}
-					<NovaAuthorDraftEngine projectId={projectId} activeChapterId={activeChapterId} />
+					<NovaAuthorDraftEngine
+						projectId={projectId}
+						activeChapterId={activeChapterId}
+						activeSceneId={activeSceneId}
+					/>
 				{/if}
 				{#if messages.length === 0}
 					<div class="nova-greeting">

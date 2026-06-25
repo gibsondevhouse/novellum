@@ -4,6 +4,7 @@
 		type OutlineDraftCheckpointRecord,
 		type OutlineDraftLifecycle,
 	} from '$lib/ai/pipeline/outline-draft-contract.js';
+	import type { OutlineMergeNodeKey } from '$lib/ai/pipeline/outline-checkpoint-contract.js';
 	import {
 		OutlineCheckpointActionError,
 		createOutlineCheckpointActions,
@@ -18,6 +19,7 @@
 	import PrimaryButton from '$lib/components/ui/PrimaryButton.svelte';
 	import SecondaryButton from '$lib/components/ui/SecondaryButton.svelte';
 	import DestructiveButton from '$lib/components/ui/DestructiveButton.svelte';
+	import OutlineMergeTree from './OutlineMergeTree.svelte';
 
 	interface Props {
 		checkpoint: OutlineDraftCheckpointRecord;
@@ -36,11 +38,25 @@
 	type AcceptState = 'idle' | 'confirming' | 'accepting' | 'accepted' | 'conflict' | 'failed';
 	type RejectState = 'idle' | 'confirming' | 'rejecting' | 'rejected' | 'failed';
 
+	function collectDraftNodeIds(draft: OutlineDraftCheckpointRecord['draft']): OutlineMergeNodeKey[] {
+		return draft.arcs.flatMap((arc) => [
+			`arc:${arc.id}` as OutlineMergeNodeKey,
+			...arc.acts.flatMap((act) => [
+				`act:${act.id}` as OutlineMergeNodeKey,
+				...act.chapters.flatMap((chapter) => [
+					`chapter:${chapter.id}` as OutlineMergeNodeKey,
+					...chapter.scenes.map((scene) => `scene:${scene.id}` as OutlineMergeNodeKey),
+				]),
+			]),
+		]);
+	}
+
 	let returnedCheckpoint = $state<OutlineDraftCheckpointRecord | null>(null);
 	let acceptState = $state<AcceptState>('idle');
 	let rejectState = $state<RejectState>('idle');
 	let rejectReasonDraft = $state('');
 	let errorMessage = $state<string | null>(null);
+	let selectedNodeIds = $state<OutlineMergeNodeKey[]>([]);
 	const pendingReviewLabel = 'Pending review';
 
 	const activeCheckpoint = $derived(returnedCheckpoint ?? checkpoint);
@@ -69,6 +85,7 @@
 	);
 	const currentProjectId = $derived(projectId?.trim() || activeCheckpoint.projectId);
 	const actionBusy = $derived(acceptState === 'accepting' || rejectState === 'rejecting');
+	const hasMergeSelection = $derived(selectedNodeIds.length > 0);
 	const actionErrorHeading = $derived.by(() => {
 		if (acceptState === 'conflict') return 'Accept blocked.';
 		if (acceptState === 'failed') return 'Accept failed.';
@@ -85,22 +102,27 @@
 		return warnings.filter((warning): warning is string => typeof warning === 'string' && warning.trim().length > 0);
 	});
 
-	function resetActionState(): void {
+	function resetActionState(nextCheckpoint: OutlineDraftCheckpointRecord): void {
 		acceptState = 'idle';
 		rejectState = 'idle';
 		rejectReasonDraft = '';
 		errorMessage = null;
+		selectedNodeIds = collectDraftNodeIds(nextCheckpoint.draft);
 	}
 
 	$effect(() => {
 		const nextCheckpoint = checkpoint;
 		returnedCheckpoint = null;
-		void nextCheckpoint;
-		resetActionState();
+		resetActionState(nextCheckpoint);
 	});
 
 	function canAccept(): boolean {
-		return Boolean(currentProjectId && activeCheckpoint.lifecycle === 'review' && !actionBusy);
+		return Boolean(
+			currentProjectId &&
+				activeCheckpoint.lifecycle === 'review' &&
+				hasMergeSelection &&
+				!actionBusy,
+		);
 	}
 
 	function canReject(): boolean {
@@ -118,6 +140,10 @@
 
 	function actionErrorMessage(err: unknown, fallback: string): string {
 		if (err instanceof OutlineCheckpointActionError) {
+			if (err.code === 'outline_conflict') {
+				const manualConflictMessage = manualSceneConflictMessage(err.meta);
+				if (manualConflictMessage) return manualConflictMessage;
+			}
 			if (err.code === 'materialization_failed') {
 				return 'Materialization failed and was rolled back. This proposal is still pending review; check the project state and retry accept when ready.';
 			}
@@ -126,6 +152,22 @@
 			}
 		}
 		return err instanceof Error ? err.message : fallback;
+	}
+
+	function isRecord(value: unknown): value is Record<string, unknown> {
+		return typeof value === 'object' && value !== null && !Array.isArray(value);
+	}
+
+	function manualSceneConflictMessage(meta: unknown): string | null {
+		if (!isRecord(meta)) return null;
+		const manualSceneConflicts = meta.manualSceneConflicts;
+		if (!Array.isArray(manualSceneConflicts) || manualSceneConflicts.length === 0) return null;
+		const preflightMessage =
+			typeof meta.preflightMessage === 'string'
+				? meta.preflightMessage
+				: 'Existing manuscript scene prose requires review before outline merge.';
+		const sceneLabel = manualSceneConflicts.length === 1 ? 'scene has' : 'scenes have';
+		return `${preflightMessage} ${manualSceneConflicts.length} ${sceneLabel} drafted content or notes.`;
 	}
 
 	function handleBeginAccept(): void {
@@ -149,6 +191,7 @@
 				projectId: currentProjectId,
 				checkpoint: activeCheckpoint,
 				acceptedBy: 'author',
+				selectedNodeIds,
 			});
 			applyReturnedCheckpoint(result.checkpoint);
 			acceptState = 'accepted';
@@ -196,18 +239,10 @@
 		}
 	}
 
-	function nodeLabel(kind: 'arc' | 'act' | 'chapter' | 'scene'): string {
-		return `${lifecycleWord} ${kind}`;
-	}
-
 	function lifecycleChip(lifecycle: OutlineDraftLifecycle): string {
 		if (lifecycle === 'draft') return artifactLifecycleLabel('draft');
 		if (lifecycle === 'review') return pendingReviewLabel;
 		return artifactLifecycleLabel(lifecycle);
-	}
-
-	function orderLabel(order: number): string {
-		return String(order + 1).padStart(2, '0');
 	}
 </script>
 
@@ -367,75 +402,14 @@
 		{/if}
 	{/if}
 
-	<div class="outline-tree" aria-label="Proposed hierarchy">
-		{#each activeCheckpoint.draft.arcs as arc (arc.id)}
-			<details class="outline-node outline-node--arc" open>
-				<summary>
-					<span>{nodeLabel('arc')}</span>
-					<strong>{orderLabel(arc.order)} {arc.title}</strong>
-				</summary>
-				{#if arc.summary}
-					<p class="node-summary">{arc.summary}</p>
-				{/if}
-				{#if arc.purpose}
-					<p class="node-purpose">{arc.purpose}</p>
-				{/if}
-				{#each arc.acts as act (act.id)}
-					<details class="outline-node outline-node--act" open>
-						<summary>
-							<span>{nodeLabel('act')}</span>
-							<strong>{orderLabel(act.order)} {act.title}</strong>
-						</summary>
-						{#if act.summary}
-							<p class="node-summary">{act.summary}</p>
-						{/if}
-						{#each act.chapters as chapter (chapter.id)}
-							<details class="outline-node outline-node--chapter" open>
-								<summary>
-									<span>{nodeLabel('chapter')}</span>
-									<strong>{orderLabel(chapter.order)} {chapter.title}</strong>
-								</summary>
-								{#if chapter.summary}
-									<p class="node-summary">{chapter.summary}</p>
-								{/if}
-								<div class="scene-list">
-									{#each chapter.scenes as scene (scene.id)}
-										<article class="scene-card" aria-label={`${nodeLabel('scene')}: ${scene.title}`}>
-											<header>
-												<p>{nodeLabel('scene')}</p>
-												<h4>{orderLabel(scene.order)} {scene.title}</h4>
-											</header>
-											{#if scene.summary}
-												<p class="node-summary">{scene.summary}</p>
-											{/if}
-											<dl class="intent-grid">
-												<div>
-													<dt>Goal</dt>
-													<dd>{scene.intent.goal}</dd>
-												</div>
-												<div>
-													<dt>Conflict</dt>
-													<dd>{scene.intent.conflict}</dd>
-												</div>
-												<div>
-													<dt>Turn</dt>
-													<dd>{scene.intent.turn}</dd>
-												</div>
-												<div>
-													<dt>Outcome</dt>
-													<dd>{scene.intent.outcome}</dd>
-												</div>
-											</dl>
-										</article>
-									{/each}
-								</div>
-							</details>
-						{/each}
-					</details>
-				{/each}
-			</details>
-		{/each}
-	</div>
+	<OutlineMergeTree
+		draft={activeCheckpoint.draft}
+		labelPrefix={lifecycleWord}
+		disabled={activeCheckpoint.lifecycle !== 'review' || actionBusy}
+		onSelectionChange={(nextSelectedNodeIds) => {
+			selectedNodeIds = nextSelectedNodeIds;
+		}}
+	/>
 </article>
 
 <style>
@@ -470,18 +444,12 @@
 	.action-error,
 	.action-confirm-title,
 	.action-confirm-copy,
-	.node-summary,
-	.node-purpose,
-	.scene-card h4,
-	.scene-card header p,
 	.source-counts,
 	.warning-list {
 		margin: 0;
 	}
 
 	.draft-card-eyebrow,
-	.outline-node summary span,
-	.scene-card header p,
 	.source-context dt {
 		font-size: var(--text-xs);
 		font-weight: var(--font-weight-semibold);
@@ -491,8 +459,7 @@
 		color: var(--color-text-muted);
 	}
 
-	.draft-card-title-group h3,
-	.scene-card h4 {
+	.draft-card-title-group h3 {
 		font-size: var(--text-sm);
 		font-weight: var(--font-weight-semibold);
 		line-height: var(--leading-tight);
@@ -537,27 +504,20 @@
 	.source-context p,
 	.action-status,
 	.action-error,
-	.action-confirm-copy,
-	.node-summary,
-	.node-purpose {
+	.action-confirm-copy {
 		font-size: var(--text-xs);
 		line-height: var(--leading-normal);
 		color: var(--color-text-secondary);
 	}
 
-	.source-context dl,
-	.intent-grid {
+	.source-context dl {
 		display: grid;
 		gap: var(--space-2);
 		margin: 0;
-	}
-
-	.source-context dl {
 		grid-template-columns: repeat(auto-fit, minmax(var(--space-16), 1fr));
 	}
 
-	.source-context dd,
-	.intent-grid dd {
+	.source-context dd {
 		margin: 0;
 		color: var(--color-text-primary);
 		font-size: var(--text-xs);
@@ -694,68 +654,4 @@
 		resize: vertical;
 	}
 
-	.outline-tree,
-	.scene-list {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-2);
-	}
-
-	.outline-node {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-2);
-		padding: var(--space-2);
-		border: var(--border-width-sm) solid var(--color-border-subtle);
-		border-radius: var(--radius-sm);
-		background: color-mix(in srgb, var(--color-surface-ground) 86%, transparent);
-	}
-
-	.outline-node summary {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr);
-		gap: var(--space-1);
-		cursor: pointer;
-	}
-
-	.outline-node summary strong {
-		color: var(--color-text-primary);
-		font-size: var(--text-sm);
-		line-height: var(--leading-tight);
-		overflow-wrap: anywhere;
-	}
-
-	.outline-node--act,
-	.outline-node--chapter {
-		margin-block-start: var(--space-2);
-	}
-
-	.scene-card {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-2);
-		padding: var(--space-2);
-		border: var(--border-width-sm) solid var(--color-border-subtle);
-		border-radius: var(--radius-sm);
-		background: var(--color-surface-overlay);
-	}
-
-	.scene-card header {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-1);
-	}
-
-	.intent-grid div {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-1);
-	}
-
-	.intent-grid dt {
-		color: var(--color-text-muted);
-		font-size: var(--text-xs);
-		font-weight: var(--font-weight-semibold);
-		line-height: var(--leading-tight);
-	}
 </style>

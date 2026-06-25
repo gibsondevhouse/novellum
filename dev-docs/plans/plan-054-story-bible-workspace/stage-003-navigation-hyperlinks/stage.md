@@ -2,7 +2,7 @@
 title: Wiki Hyperlinking & Cross-References
 slug: stage-003-navigation-hyperlinks
 stage_number: 3
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-054-story-bible-workspace
 phases:
@@ -17,9 +17,9 @@ Implement inline text link parser to automatically resolve cross-references in d
 
 ## Phases
 
-| #   | Phase | Status | Est. Duration |
-| --- | --- | --- | --- |
-| 001 | [Wiki Hyperlinking & Cross-References Phase](phase-001-inline-hyperlinks/phase.md) | `draft` | 1d |
+| #   | Phase                                                                              | Status     | Est. Duration |
+| --- | ---------------------------------------------------------------------------------- | ---------- | ------------- |
+| 001 | [Wiki Hyperlinking & Cross-References Phase](phase-001-inline-hyperlinks/phase.md) | `complete` | 1d            |
 
 ## Entry Criteria
 

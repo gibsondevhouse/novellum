@@ -2,7 +2,7 @@
 title: Dossier CRUD Forms & Grid
 slug: stage-002-dossier-crud-forms
 stage_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-054-story-bible-workspace
 phases:
@@ -17,9 +17,9 @@ Build responsive edit and creation forms for characters, locations, factions, gl
 
 ## Phases
 
-| #   | Phase | Status | Est. Duration |
-| --- | --- | --- | --- |
-| 001 | [Dossier CRUD Forms & Grid Phase](phase-001-crud-forms-ui/phase.md) | `draft` | 2d |
+| #   | Phase                                                               | Status     | Est. Duration |
+| --- | ------------------------------------------------------------------- | ---------- | ------------- |
+| 001 | [Dossier CRUD Forms & Grid Phase](phase-001-crud-forms-ui/phase.md) | `complete` | 2d            |
 
 ## Entry Criteria
 

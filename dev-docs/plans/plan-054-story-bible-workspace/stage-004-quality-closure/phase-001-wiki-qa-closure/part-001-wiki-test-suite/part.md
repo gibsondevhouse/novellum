@@ -2,12 +2,12 @@
 title: Wiki Module Integration Tests
 slug: part-001-wiki-test-suite
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 assigned_to: —
 phase: phase-001-wiki-qa-closure
-started_at: ~
-completed_at: ~
+started_at: 2026-06-25
+completed_at: 2026-06-25
 estimated_duration: undefined
 ---
 
@@ -39,12 +39,12 @@ Verify Story Bible workflow coherence and perform quality gate testing.
 
 **Update:**
 
-- _(none)_
+- `dev-docs/04-modules/story-bible.md`
 
 ## Acceptance Criteria
 
-- [ ] E2E tests pass for creation and navigation.
-- [ ] Check type safety and token usage.
+- [x] E2E tests pass for creation and navigation.
+- [x] Check type safety and token usage.
 
 ## Edge Cases
 

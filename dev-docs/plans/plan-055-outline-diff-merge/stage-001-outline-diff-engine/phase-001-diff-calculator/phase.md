@@ -2,7 +2,7 @@
 title: Diff Calculation Logic
 slug: phase-001-diff-calculator
 phase_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-001-outline-diff-engine
 parts:
@@ -18,13 +18,13 @@ Build the server-side comparison engine to align generated drafts and database t
 
 | #   | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Outline Diff Engine Service](part-001-outline-diff-engine-service/part.md) | `draft` | — | 2d |
+| 001 | [Outline Diff Engine Service](part-001-outline-diff-engine-service/part.md) | `complete` | — | 2d |
 
 ## Acceptance Criteria
 
-- [ ] All parts reach `complete`
-- [ ] Engine returns clean JSON lists of differences.
-- [ ] Recursive matching of acts, chapters, and scenes is fully tested.
+- [x] All parts reach `complete`
+- [x] Engine returns clean JSON lists of differences.
+- [x] Recursive matching of acts, chapters, and scenes is fully tested.
 
 ## Notes
 

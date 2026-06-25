@@ -6,6 +6,10 @@ import type {
 	OutlineDraftScene,
 	OutlineDraftSceneIntent,
 } from '$lib/ai/pipeline/outline-draft-contract.js';
+import type {
+	OutlineMergeNodeKey,
+	OutlineMergeNodeKind,
+} from '$lib/ai/pipeline/outline-checkpoint-contract.js';
 
 export class OutlineMaterializationMapError extends Error {
 	constructor(message: string) {
@@ -16,6 +20,7 @@ export class OutlineMaterializationMapError extends Error {
 
 export interface OutlineMaterializationMapOptions {
 	nowIso?: string;
+	selectedNodeIds?: readonly string[];
 }
 
 export interface MaterializedArcRef {
@@ -160,6 +165,7 @@ export interface OutlineMaterializationMap {
 }
 
 const DEFAULT_TIMESTAMP = '1970-01-01T00:00:00.000Z';
+const NODE_KIND_PREFIXES: OutlineMergeNodeKind[] = ['arc', 'act', 'chapter', 'scene'];
 
 function compareByOrderTitleId<T extends { order: number; title: string; id: string }>(a: T, b: T): number {
 	return a.order - b.order || a.title.localeCompare(b.title) || a.id.localeCompare(b.id);
@@ -205,6 +211,115 @@ function collectAndValidateIds(draft: OutlineDraft): void {
 			}
 		}
 	}
+}
+
+function nodeKey(kind: OutlineMergeNodeKind, id: string): OutlineMergeNodeKey {
+	return `${kind}:${id}`;
+}
+
+function parseNodeKey(value: string): OutlineMergeNodeKey {
+	const trimmed = value.trim();
+	for (const kind of NODE_KIND_PREFIXES) {
+		const prefix = `${kind}:`;
+		if (trimmed.startsWith(prefix) && trimmed.length > prefix.length) {
+			return trimmed as OutlineMergeNodeKey;
+		}
+	}
+	throw new OutlineMaterializationMapError(
+		`Selected outline node "${trimmed || '(empty)'}" is not a valid merge node id.`,
+	);
+}
+
+function collectDraftNodeKeys(draft: OutlineDraft): Set<OutlineMergeNodeKey> {
+	const keys = new Set<OutlineMergeNodeKey>();
+	for (const arc of draft.arcs) {
+		keys.add(nodeKey('arc', arc.id));
+		for (const act of arc.acts) {
+			keys.add(nodeKey('act', act.id));
+			for (const chapter of act.chapters) {
+				keys.add(nodeKey('chapter', chapter.id));
+				for (const scene of chapter.scenes) {
+					keys.add(nodeKey('scene', scene.id));
+				}
+			}
+		}
+	}
+	return keys;
+}
+
+function normalizeSelectedNodeIds(
+	draft: OutlineDraft,
+	selectedNodeIds: readonly string[] | undefined,
+): Set<OutlineMergeNodeKey> | null {
+	if (selectedNodeIds === undefined) return null;
+	if (selectedNodeIds.length === 0) {
+		throw new OutlineMaterializationMapError('At least one outline node must be selected.');
+	}
+
+	const draftKeys = collectDraftNodeKeys(draft);
+	const selectedKeys = new Set<OutlineMergeNodeKey>();
+	for (const rawKey of selectedNodeIds) {
+		if (typeof rawKey !== 'string') {
+			throw new OutlineMaterializationMapError('Selected outline node ids must be strings.');
+		}
+		const key = parseNodeKey(rawKey);
+		if (!draftKeys.has(key)) {
+			throw new OutlineMaterializationMapError(
+				`Selected outline node "${key}" does not exist in checkpoint draft.`,
+			);
+		}
+		selectedKeys.add(key);
+	}
+
+	if (selectedKeys.size === 0) {
+		throw new OutlineMaterializationMapError('At least one outline node must be selected.');
+	}
+	return selectedKeys;
+}
+
+function isNodeSelected(
+	selectedKeys: ReadonlySet<OutlineMergeNodeKey> | null,
+	kind: OutlineMergeNodeKind,
+	id: string,
+): boolean {
+	return selectedKeys === null || selectedKeys.has(nodeKey(kind, id));
+}
+
+function shouldIncludeScene(
+	selectedKeys: ReadonlySet<OutlineMergeNodeKey> | null,
+	scene: OutlineDraftScene,
+): boolean {
+	return isNodeSelected(selectedKeys, 'scene', scene.id);
+}
+
+function shouldIncludeChapter(
+	selectedKeys: ReadonlySet<OutlineMergeNodeKey> | null,
+	chapter: OutlineDraftChapter,
+): boolean {
+	return (
+		isNodeSelected(selectedKeys, 'chapter', chapter.id) ||
+		chapter.scenes.some((scene) => shouldIncludeScene(selectedKeys, scene))
+	);
+}
+
+function shouldIncludeAct(
+	selectedKeys: ReadonlySet<OutlineMergeNodeKey> | null,
+	act: OutlineDraftAct,
+): boolean {
+	return (
+		isNodeSelected(selectedKeys, 'act', act.id) ||
+		act.chapters.some((chapter) => shouldIncludeChapter(selectedKeys, chapter))
+	);
+}
+
+function shouldIncludeArc(
+	selectedKeys: ReadonlySet<OutlineMergeNodeKey> | null,
+	arc: OutlineDraftArc,
+): boolean {
+	return (
+		isNodeSelected(selectedKeys, 'arc', arc.id) ||
+		arc.acts.some((act) => shouldIncludeAct(selectedKeys, act))
+	);
 }
 
 function arcRef(arc: OutlineDraftArc): MaterializedArcRef[] {
@@ -378,6 +493,7 @@ export function buildOutlineMaterializationMap(
 
 	const projectId = draft.projectId;
 	const nowIso = options.nowIso ?? DEFAULT_TIMESTAMP;
+	const selectedKeys = normalizeSelectedNodeIds(draft, options.selectedNodeIds);
 	const arcs: MaterializedArcRow[] = [];
 	const acts: MaterializedActRow[] = [];
 	const milestones: MaterializedMilestoneRow[] = [];
@@ -386,14 +502,18 @@ export function buildOutlineMaterializationMap(
 	const sceneIntentMetadata: SceneIntentMetadataRow[] = [];
 
 	for (const arc of sortNodes(draft.arcs)) {
+		if (!shouldIncludeArc(selectedKeys, arc)) continue;
 		arcs.push(mapArc(projectId, arc, nowIso));
 		for (const act of sortNodes(arc.acts)) {
+			if (!shouldIncludeAct(selectedKeys, act)) continue;
 			acts.push(mapAct(projectId, arc, act, nowIso));
 			const chapterIdsForAct: string[] = [];
 			for (const chapter of sortNodes(act.chapters)) {
+				if (!shouldIncludeChapter(selectedKeys, chapter)) continue;
 				chapters.push(mapChapter(projectId, arc, act, chapter, nowIso));
 				chapterIdsForAct.push(chapter.id);
 				for (const scene of sortNodes(chapter.scenes)) {
+					if (!shouldIncludeScene(selectedKeys, scene)) continue;
 					scenes.push(mapScene(projectId, arc, chapter, scene, nowIso));
 					sceneIntentMetadata.push(...sceneIntentRows(projectId, scene));
 				}

@@ -2,11 +2,11 @@
 title: Define Schema
 slug: part-001-define-schema
 part_number: 1
-status: draft
+status: in-progress
 owner: Planner Agent
 assigned_to: —
 phase: phase-001-contract-schema
-started_at: ~
+started_at: 2026-06-25
 completed_at: ~
 estimated_duration: 0.5d
 ---

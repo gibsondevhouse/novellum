@@ -2,12 +2,12 @@
 title: Outline Merge E2E Specifications
 slug: part-001-outline-merge-e2e
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 assigned_to: —
 phase: phase-001-diff-qa-closure
-started_at: ~
-completed_at: ~
+started_at: 2026-06-25
+completed_at: 2026-06-25
 estimated_duration: undefined
 ---
 
@@ -43,8 +43,8 @@ Write E2E test verification files confirming selective merge capabilities.
 
 ## Acceptance Criteria
 
-- [ ] Playwright tests confirm merge tree execution.
-- [ ] All quality check gates pass.
+- [x] Playwright tests confirm merge tree execution.
+- [x] All quality check gates pass.
 
 ## Edge Cases
 

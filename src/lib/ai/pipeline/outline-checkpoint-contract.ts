@@ -32,6 +32,7 @@ export interface OutlineCheckpointAcceptInput {
 	note?: string;
 	expectedUpdatedAt?: string;
 	expectedVersion?: string;
+	selectedNodeIds?: OutlineMergeNodeKey[];
 }
 
 export interface OutlineCheckpointRejectInput {
@@ -56,6 +57,7 @@ export type OutlineCheckpointAcceptBody = {
 	note?: string;
 	expectedUpdatedAt?: string;
 	expectedVersion?: string;
+	selectedNodeIds?: OutlineMergeNodeKey[];
 };
 
 export type OutlineCheckpointRejectBody = {
@@ -91,6 +93,9 @@ export class OutlineCheckpointHelperError extends Error {
 		this.name = 'OutlineCheckpointHelperError';
 	}
 }
+
+export type OutlineMergeNodeKind = 'arc' | 'act' | 'chapter' | 'scene';
+export type OutlineMergeNodeKey = `${OutlineMergeNodeKind}:${string}`;
 
 function stripUndefined<T extends Record<string, unknown>>(body: T): T {
 	return Object.fromEntries(
@@ -134,6 +139,7 @@ export function createOutlineCheckpointAcceptBody(
 		note: input.note?.trim() || undefined,
 		expectedUpdatedAt: input.expectedUpdatedAt?.trim() || undefined,
 		expectedVersion: input.expectedVersion?.trim() || undefined,
+		selectedNodeIds: input.selectedNodeIds,
 	});
 }
 

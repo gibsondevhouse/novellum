@@ -158,6 +158,7 @@ describe('outline checkpoint actions', () => {
 			checkpoint: createCheckpoint('review'),
 			acceptedBy: ' author ',
 			note: ' looks good ',
+			selectedNodeIds: ['arc:arc-1', 'scene:scene-1'],
 		});
 
 		expect(result.checkpoint.lifecycle).toBe('accepted');
@@ -172,6 +173,7 @@ describe('outline checkpoint actions', () => {
 			note: 'looks good',
 			expectedUpdatedAt: now,
 			expectedVersion: OUTLINE_DRAFT_SCHEMA_VERSION,
+			selectedNodeIds: ['arc:arc-1', 'scene:scene-1'],
 		});
 	});
 

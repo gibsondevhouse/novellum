@@ -2,12 +2,12 @@
 title: Split-Screen Prose Diff Panel
 slug: part-001-prose-diff-panel
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 assigned_to: —
 phase: phase-001-diff-split-ui
-started_at: ~
-completed_at: ~
+started_at: 2026-06-25
+completed_at: 2026-06-25
 estimated_duration: undefined
 ---
 
@@ -43,8 +43,8 @@ Design visual split-screen component illustrating differences side-by-side.
 
 ## Acceptance Criteria
 
-- [ ] Side-by-side panel renders correct colors.
-- [ ] Toggle buttons toggle layout views cleanly.
+- [x] Side-by-side panel renders correct colors.
+- [x] Toggle buttons toggle layout views cleanly.
 
 ## Edge Cases
 

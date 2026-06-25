@@ -1,0 +1,34 @@
+# Outline Merge Safety Preflight Evidence
+
+Date: 2026-06-25
+Part: part-001-outline-merge-transaction
+Agent: Codex
+
+## Changed Files
+
+- Updated `src/lib/server/outline/outline-materialization-service.ts`.
+- Updated `src/modules/nova/components/NovaOutlineDraftCheckpointCard.svelte`.
+- Updated `tests/routes/outline-accept.test.ts`.
+- Updated `tests/nova/NovaOutlineDraftCheckpointCard.test.ts`.
+
+## Behavior Added
+
+- Added manual scene overwrite conflict detection for scenes with non-empty
+  content, notes, or positive word count.
+- Existing outline hierarchy still blocks accept; conflict metadata now includes
+  safe scene IDs/titles/flags and avoids returning manuscript prose.
+- Nova accept-blocked copy now uses the manual-prose preflight message when the
+  server returns manual scene conflicts.
+- Existing atomic materialization and rollback behavior remains unchanged.
+
+## Validation
+
+- `pnpm exec vitest run tests/routes/outline-accept.test.ts tests/nova/NovaOutlineDraftCheckpointCard.test.ts`
+  - Passed: 2 files, 15 tests.
+- `pnpm check`
+  - Passed.
+  - `svelte-check found 0 errors and 0 warnings`.
+- `pnpm lint`
+  - Passed.
+- `pnpm lint:css`
+  - Passed.

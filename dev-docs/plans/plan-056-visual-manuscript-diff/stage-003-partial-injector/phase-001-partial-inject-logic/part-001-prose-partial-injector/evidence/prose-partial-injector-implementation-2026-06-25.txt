@@ -1,0 +1,22 @@
+# Prose Partial Injector Implementation Evidence - 2026-06-25
+
+## Scope
+
+- Created `src/modules/editor/services/prose-partial-injector.ts`.
+- Created `tests/editor/prose-partial-injector.test.ts`.
+
+## Behavior Verified
+
+- Selected paragraph ranges are filtered, ordered, and joined deterministically.
+- Highlighted cursor ranges are replaced with selected prose.
+- Empty cursor insertions place text at the cursor and move the cursor after inserted prose.
+- Missing cursor bounds append to the end of the current text.
+- TipTap-like editor insertion uses one focused command chain: `focus()`, `insertContentAt(...)`, `setTextSelection(...)`, `run()`.
+- The service does not update the database directly.
+
+## Validation
+
+- `pnpm exec vitest run 'tests/editor/prose-partial-injector.test.ts'` passed: 1 file, 7 tests.
+- `pnpm check` passed: 0 errors, 0 warnings.
+- `pnpm lint` passed.
+- `git diff --check` passed.

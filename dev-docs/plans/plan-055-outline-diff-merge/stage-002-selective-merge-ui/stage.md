@@ -2,7 +2,7 @@
 title: Selective Merge Tree UI & Actions
 slug: stage-002-selective-merge-ui
 stage_number: 2
-status: draft
+status: complete
 owner: Planner Agent
 plan: plan-055-outline-diff-merge
 phases:
@@ -19,7 +19,7 @@ Build an interactive Svelte tree visualizer for diff changes with individual sel
 
 | #   | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Selective Merge Tree UI & Actions Phase](phase-001-tree-diff-ui/phase.md) | `draft` | 2d |
+| 001 | [Selective Merge Tree UI & Actions Phase](phase-001-tree-diff-ui/phase.md) | `complete` | 2d |
 
 ## Entry Criteria
 

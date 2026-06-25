@@ -11,12 +11,25 @@ interface AcceptBody {
 	note?: unknown;
 	expectedUpdatedAt?: unknown;
 	expectedVersion?: unknown;
+	selectedNodeIds?: unknown;
 }
 
 function asOptionalString(value: unknown): string | undefined {
 	if (typeof value !== 'string') return undefined;
 	const trimmed = value.trim();
 	return trimmed.length > 0 ? trimmed : undefined;
+}
+
+function asOptionalStringArray(value: unknown): string[] | undefined {
+	if (value === undefined) return undefined;
+	if (!Array.isArray(value)) {
+		throw new OutlineMaterializationServiceError(
+			'invalid_request',
+			'selectedNodeIds must be an array of outline node ids.',
+			400,
+		);
+	}
+	return value.map((item) => (typeof item === 'string' ? item : ''));
 }
 
 function errorResponse(error: OutlineMaterializationServiceError): Response {
@@ -46,6 +59,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
 			note: asOptionalString(body.note),
 			expectedUpdatedAt: asOptionalString(body.expectedUpdatedAt),
 			expectedVersion: asOptionalString(body.expectedVersion),
+			selectedNodeIds: asOptionalStringArray(body.selectedNodeIds),
 		});
 		return json({
 			ok: true,

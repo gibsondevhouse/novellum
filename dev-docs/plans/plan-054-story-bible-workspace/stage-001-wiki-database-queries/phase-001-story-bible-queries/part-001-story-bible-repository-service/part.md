@@ -2,12 +2,12 @@
 title: Story Bible Repository Service Class
 slug: part-001-story-bible-repository-service
 part_number: 1
-status: in-progress
+status: complete
 owner: Planner Agent
 assigned_to: —
 phase: phase-001-story-bible-queries
 started_at: ~
-completed_at: ~
+completed_at: 2026-06-25
 estimated_duration: undefined
 ---
 
@@ -45,8 +45,8 @@ Construct a unified read service mapping all worldbuilding tables in SQLite to S
 
 ## Acceptance Criteria
 
-- [ ] StoryBibleRepository exposes getCharacters, getLocations, getFactions, getLoreEntries, getGlossaryTerms, getTimelineEvents, and getThemes.
-- [ ] Unit tests verify return values.
+- [x] StoryBibleRepository exposes getCharacters, getLocations, getFactions, getLoreEntries, getGlossaryTerms, getTimelineEvents, and getThemes.
+- [x] Unit tests verify return values.
 
 ## Edge Cases
 

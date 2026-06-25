@@ -2,12 +2,12 @@
 title: Outline Merge Transaction Logic
 slug: part-001-outline-merge-transaction
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 assigned_to: —
 phase: phase-001-preflight-validations
-started_at: ~
-completed_at: ~
+started_at: 2026-06-25
+completed_at: 2026-06-25
 estimated_duration: undefined
 ---
 
@@ -40,11 +40,14 @@ Write database transaction logic to safely apply selected merge nodes and alert 
 **Update:**
 
 - `src/lib/server/outline/outline-materialization-service.ts`
+- `src/modules/nova/components/NovaOutlineDraftCheckpointCard.svelte`
+- `tests/routes/outline-accept.test.ts`
+- `tests/nova/NovaOutlineDraftCheckpointCard.test.ts`
 
 ## Acceptance Criteria
 
-- [ ] Db transaction rollbacks cleanly on writing error.
-- [ ] Unsaved editor text displays conflict warning dialog.
+- [x] Db transaction rollbacks cleanly on writing error.
+- [x] Unsaved editor text displays conflict warning dialog.
 
 ## Edge Cases
 

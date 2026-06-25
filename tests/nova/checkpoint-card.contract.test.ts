@@ -63,4 +63,13 @@ describe('NovaAuthorDraftCheckpointCard source contracts', () => {
 		// The stale state must be visible in the confirmation UI.
 		expect(src).toContain("acceptState === 'stale'");
 	});
+
+	it('contract 5: scene draft prose is reviewed through the visual diff panel before accept actions', () => {
+		expect(src).toContain("import ProseDiffPanel from './ProseDiffPanel.svelte'");
+		expect(src).toContain('<ProseDiffPanel');
+		expect(src).toContain("currentText={scene.content ?? ''}");
+		expect(src).toContain('generatedText={draftProse}');
+		expect(src).toContain('dispatchProsePartialInjection');
+		expect(src).toContain('canInject={canInjectIntoActiveScene}');
+	});
 });

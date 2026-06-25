@@ -2,7 +2,7 @@
 title: Split-Screen visualizer UI
 slug: phase-001-diff-split-ui
 phase_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 stage: stage-002-split-screen-diff-ui
 parts:
@@ -18,13 +18,13 @@ Implement side-by-side highlighting views inside Svelte.
 
 | #   | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Split-Screen Prose Diff Panel](part-001-prose-diff-panel/part.md) | `draft` | — | 2d |
+| 001 | [Split-Screen Prose Diff Panel](part-001-prose-diff-panel/part.md) | `complete` | — | 2d |
 
 ## Acceptance Criteria
 
-- [ ] All parts reach `complete`
-- [ ] Visual split-panel toggle refreshes layout correctly.
-- [ ] Styling tokens applied.
+- [x] All parts reach `complete`
+- [x] Visual split-panel toggle refreshes layout correctly.
+- [x] Styling tokens applied.
 
 ## Notes
 

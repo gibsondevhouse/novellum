@@ -1,6 +1,6 @@
 # Outline Generation
 
-> Last verified: 2026-06-16 (plan-043 outline consolidation)
+> Last verified: 2026-06-25 (plan-055 selective outline merge)
 
 Plan-040 adds the review-gated bridge from worldbuilding context to a canonical project outline.
 
@@ -24,8 +24,9 @@ Generated outlines are non-canonical checkpoints until the author explicitly acc
 | Generation route | [src/routes/api/ai/outline/generate/+server.ts](../../src/routes/api/ai/outline/generate/+server.ts) |
 | Accept route | [src/routes/api/outline/checkpoints/[checkpointId]/accept/+server.ts](../../src/routes/api/outline/checkpoints/%5BcheckpointId%5D/accept/+server.ts) |
 | Materialization service | [outline-materialization-service.ts](../../src/lib/server/outline/outline-materialization-service.ts) |
+| Diff engine | [outline-diff-engine.ts](../../src/lib/server/outline/outline-diff-engine.ts) |
 | Conflict preflight | [outline-conflict-preflight.ts](../../src/lib/server/outline/outline-conflict-preflight.ts) |
-| Nova UI | [NovaOutlineGenerationPanel.svelte](../../src/modules/nova/components/NovaOutlineGenerationPanel.svelte), [NovaOutlineDraftCheckpointCard.svelte](../../src/modules/nova/components/NovaOutlineDraftCheckpointCard.svelte) |
+| Nova UI | [NovaOutlineGenerationPanel.svelte](../../src/modules/nova/components/NovaOutlineGenerationPanel.svelte), [NovaOutlineDraftCheckpointCard.svelte](../../src/modules/nova/components/NovaOutlineDraftCheckpointCard.svelte), [OutlineMergeTree.svelte](../../src/modules/nova/components/OutlineMergeTree.svelte) |
 
 ## Readiness Gate
 
@@ -94,11 +95,13 @@ The accept body must include the stale guard:
 {
   "projectId": "project-id",
   "expectedUpdatedAt": "checkpoint updatedAt",
-  "expectedVersion": "1.0.0"
+  "expectedVersion": "1.0.0",
+  "selectedNodeIds": ["arc:arc-id", "act:act-id", "chapter:chapter-id", "scene:scene-id"]
 }
 ```
 
 Missing preconditions return `400 invalid_request`. Mismatched preconditions return `409 stale_checkpoint`.
+`selectedNodeIds` is optional for compatibility; omitting it accepts the entire checkpoint. When supplied, it must contain merge node ids in the `kind:id` format for `arc`, `act`, `chapter`, or `scene`. The server validates that each id exists in the checkpoint draft and materializes only the selected nodes, automatically including required parent rows so selected scenes still have an arc, act, milestone, and chapter. Selected accepts upsert generated arcs, acts, chapters, scenes, default milestones, and scene-intent metadata; scene upserts preserve existing prose, notes, and word count.
 
 ## Materialization
 
@@ -109,7 +112,7 @@ Missing preconditions return `400 invalid_request`. Mismatched preconditions ret
 3. Requires lifecycle `review` and schema version `1.0.0`.
 4. Checks stale preconditions.
 5. Runs `getOutlineConflictPreflight()`.
-6. Builds a deterministic `OutlineMaterializationMap`.
+6. Builds a deterministic `OutlineMaterializationMap`, optionally filtered by `selectedNodeIds`.
 7. Writes hierarchy rows and scene intent metadata inside one SQLite transaction.
 8. Updates the checkpoint lifecycle to `accepted` as the final transactional write.
 
@@ -131,9 +134,15 @@ The former `/api/nova/outline/apply` route is retired and returns
 rows from a Nova artifact card; acceptance must go through the checkpoint route
 above.
 
+## Diff and Merge Selection
+
+Plan-055 adds `calculateOutlineDiff()` for comparing a generated checkpoint against existing Arc -> Act -> Chapter -> Scene rows. The Nova review card now renders `OutlineMergeTree`, a checkbox tree that publishes selected merge node ids to the accept action. Parent selection includes descendants in the UI; selecting a child restores the required ancestor chain.
+
+The materialization service accepts the selected ids and writes only that subset. This supports partial import or refinement of generated branches without requiring a second provider call. Existing hierarchy rows are allowed only on the selected-node path; the legacy full-accept path still returns `outline_conflict` when canonical outline rows already exist.
+
 ## Conflict Policy
 
-Plan-040 does not merge or overwrite an existing outline. If any canonical hierarchy rows exist for the project, accept returns:
+If any canonical hierarchy rows exist for the project and `selectedNodeIds` is omitted, accept returns:
 
 ```json
 {
@@ -147,6 +156,7 @@ Plan-040 does not merge or overwrite an existing outline. If any canonical hiera
 ```
 
 Generation itself is still allowed when hierarchy exists. The generation response includes `outlineConflict` so Nova can warn that the checkpoint is review-only until the conflict is resolved.
+Plan-055 extends conflict metadata with safe manual-scene preflight data when selected existing manuscript scenes have prose, notes, or word count. The response includes ids, titles, chapter ids, word counts, booleans for content/notes presence, and timestamps; it does not return manuscript prose or private notes. Unselected manual scenes do not block selected-node accepts and are not modified.
 
 ## Nova States
 
@@ -167,7 +177,7 @@ Panel states:
 
 Card states:
 
-- proposed/review checkpoint with Arc -> Act -> Chapter -> Scene tree and scene intent
+- proposed/review checkpoint with selectable Arc -> Act -> Chapter -> Scene merge tree and scene intent
 - accept confirmation with stale-guard payload
 - reject confirmation requiring a reason
 - accepted audit summary with materialized counts and root arc ids
@@ -177,7 +187,7 @@ Card states:
 ## Limits
 
 - No in-place regeneration of an existing outline.
-- No semantic merge, structural diff, or non-destructive import of generated nodes into a populated outline.
+- No deletion merge into a populated outline; generated nodes are inserted or updated only when selected.
 - No automatic manuscript edits or draft generation after outline acceptance.
 - No client-side provider keys and no browser-side SQLite access.
 - No generated beats/stages in V1; materialization preserves compatibility by leaving them empty.

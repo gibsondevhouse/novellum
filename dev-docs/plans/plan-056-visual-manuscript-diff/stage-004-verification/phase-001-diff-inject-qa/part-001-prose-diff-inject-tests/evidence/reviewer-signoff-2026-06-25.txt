@@ -1,0 +1,25 @@
+# Reviewer Sign-off - Prose Diff Injector Verification - 2026-06-25
+
+Verdict: Approved.
+
+## Findings
+
+- No blocking findings.
+
+## Acceptance Review
+
+- Unit tests and final verification coverage pass.
+- Quality gates pass: typecheck, ESLint, stylelint, tokens, full Vitest, build, and whitespace.
+- The selected prose injection bridge keeps manuscript writes inside the active editor/TipTap command boundary and does not introduce a direct DB mutation path.
+- Documentation now reflects the visual diff and partial insertion mechanics.
+
+## Gate Results
+
+- `pnpm exec vitest run 'tests/editor/prose-diff-inject.test.ts' 'tests/editor/prose-partial-injector.test.ts' 'tests/nova/ProseDiffPanel.svelte.test.ts' 'tests/nova/checkpoint-card.contract.test.ts'`: passed.
+- `pnpm check`: passed.
+- `pnpm lint`: passed.
+- `pnpm lint:css`: passed.
+- `pnpm check:tokens`: passed.
+- `pnpm test`: passed.
+- `pnpm run build`: passed with existing Lightning CSS Tailwind at-rule warnings.
+- `git diff --check`: passed.

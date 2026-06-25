@@ -2,12 +2,12 @@
 title: Prose Diff Calculator Utility
 slug: part-001-prose-diff-calculator
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 assigned_to: —
 phase: phase-001-prose-diff-helper
-started_at: ~
-completed_at: ~
+started_at: 2026-06-25
+completed_at: 2026-06-25
 estimated_duration: undefined
 ---
 
@@ -44,8 +44,8 @@ Create simple text comparison helper to compute character-level insertions and d
 
 ## Acceptance Criteria
 
-- [ ] Helper correctly highlights additions and deletions.
-- [ ] Unit tests verify string outputs.
+- [x] Helper correctly highlights additions and deletions.
+- [x] Unit tests verify string outputs.
 
 ## Edge Cases
 

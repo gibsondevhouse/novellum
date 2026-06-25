@@ -1,0 +1,35 @@
+# Reviewer Sign-off: Outline Merge Safety Preflight
+
+Date: 2026-06-25
+Reviewer: Reviewer Agent (local Codex pass following `.github/agents/reviewer.agent.md`)
+Part: part-001-outline-merge-transaction
+
+## Reviewed Scope
+
+- `src/lib/server/outline/outline-materialization-service.ts`
+- `src/modules/nova/components/NovaOutlineDraftCheckpointCard.svelte`
+- `tests/routes/outline-accept.test.ts`
+- `tests/nova/NovaOutlineDraftCheckpointCard.test.ts`
+- Stage 003 tracker files and implementation evidence
+
+## Findings
+
+- No blocking findings.
+- Existing accept materialization remains transaction-wrapped.
+- Conflict metadata identifies manual scene prose without returning manuscript
+  content or private notes.
+- Nova warning copy consumes the safe metadata and leaves the checkpoint in
+  review state after blocked accept.
+
+## Validation Confirmed
+
+- `git diff --check`: passed.
+- `pnpm exec vitest run tests/routes/outline-accept.test.ts tests/nova/NovaOutlineDraftCheckpointCard.test.ts`:
+  passed, 2 files, 15 tests.
+- `pnpm check`: passed, 0 errors, 0 warnings.
+- `pnpm lint`: passed.
+- `pnpm lint:css`: passed.
+
+## Decision
+
+Approved for completion. Stage 003 acceptance criteria are satisfied.

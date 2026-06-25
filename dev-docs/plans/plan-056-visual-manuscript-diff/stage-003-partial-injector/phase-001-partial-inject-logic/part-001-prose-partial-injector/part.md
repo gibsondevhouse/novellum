@@ -2,12 +2,12 @@
 title: Prose Partial Injector Service
 slug: part-001-prose-partial-injector
 part_number: 1
-status: draft
+status: complete
 owner: Planner Agent
 assigned_to: —
 phase: phase-001-partial-inject-logic
-started_at: ~
-completed_at: ~
+started_at: 2026-06-25
+completed_at: 2026-06-25
 estimated_duration: undefined
 ---
 
@@ -43,8 +43,8 @@ Connect highlighted range selections in UI to editor inputs.
 
 ## Acceptance Criteria
 
-- [ ] Highlight ranges inject correctly.
-- [ ] Cursor moves cleanly.
+- [x] Highlight ranges inject correctly.
+- [x] Cursor moves cleanly.
 
 ## Edge Cases
 
