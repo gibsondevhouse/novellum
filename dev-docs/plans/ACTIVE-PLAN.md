@@ -6,7 +6,7 @@
 
 ## Current
 
-No active plan.
+- [plan-054-story-bible-workspace](./plan-054-story-bible-workspace/plan.md) — Interactive Story Bible Workspace. Developing the unified read queries service. Status: `in-progress`.
 
 ## Pending review
 

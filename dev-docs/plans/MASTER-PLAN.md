@@ -12,6 +12,13 @@
 ## Deferred (not yet scheduled)
 
 - [plan-043-brainstorm-agent](./plan-043-brainstorm-agent/plan.md): Brainstorm Agent — re-introduce BrainstormAgent with review-gated UI and worldbuild integration. Status: `draft` (scaffolded 2026-06-04). Stages: Agent contract & prompt, Nova UI integration, accept flow & worldbuild hookup, tests/docs/quality gates. Dependencies: plan-042.
+- [plan-054-story-bible-workspace](./plan-054-story-bible-workspace/plan.md): Interactive Story Bible Workspace — Replace Svelte placeholder with dynamic wiki dashboard listing characters, locations, factions, and resolving cross-references. Status: `draft` (scaffolded 2026-06-25).
+- [plan-055-outline-diff-merge](./plan-055-outline-diff-merge/plan.md): Structural Outline Diff & Merge — Selective merge controls and engine to update or refine outlines without overwriting manual scenes. Status: `draft` (scaffolded 2026-06-25).
+- [plan-056-visual-manuscript-diff](./plan-056-visual-manuscript-diff/plan.md): Visual Manuscript Diff & Prose Injector — Side-by-side split screen and partial applies for AI-generated scene prose. Status: `draft` (scaffolded 2026-06-25).
+- [plan-057-context-control-panel](./plan-057-context-control-panel/plan.md): AI Context Control Panel — Grounding controls for pinning or excluding lore entries during LLM queries. Status: `draft` (scaffolded 2026-06-25).
+- [plan-058-beat-stage-generator](./plan-058-beat-stage-generator/plan.md): Beat & Stage Generator — Narrative beats generation and integration with database hierarchy. Status: `draft` (scaffolded 2026-06-25).
+- [plan-059-docx-epub-exporter](./plan-059-docx-epub-exporter/plan.md): Robust Document Exporting — Shunn layout formatted Docx and TOC-compliant ePub compilers. Status: `draft` (scaffolded 2026-06-25).
+- [plan-060-backups-recovery-ui](./plan-060-backups-recovery-ui/plan.md): Local Backups & Auto-Save Recovery — Database restores, scheduling, and revision history panels. Status: `draft` (scaffolded 2026-06-25).
 - **Release engineering** — code signing, notarization, brand icons, formal smoke/keyring verification. Infrastructure exists; requires external procurement. Originally plan-024 stage-002.
 
 ## Completed Plans (Archived)
