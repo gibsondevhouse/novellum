@@ -38,12 +38,19 @@ describe('task-resolver', () => {
 		expect(task.taskType).toBe('continue');
 	});
 
-	it('falls back to "continue" for cut TaskTypes (brainstorm/outline/draft/summarize)', () => {
-		// plan-025: these actions were removed from the V1 surface.
-		// They now fall through to the DEFAULT_TASK rather than
-		// producing a structured prompt for a runtime agent that does
-		// not exist.
-		for (const action of ['brainstorm', 'outline', 'draft', 'summarize_scene']) {
+	it('resolves "brainstorm" to the review-gated BrainstormAgent contract', () => {
+		const task = resolveTask('brainstorm', ctx);
+		expect(task.taskType).toBe('brainstorm');
+		expect(task.contextPolicy).toBe('worldbuilding_scope');
+		expect(task.outputFormat).toBe('json_brainstorm_session');
+		expect(task.targetEntityId).toBe('proj-1');
+	});
+
+	it('falls back to "continue" for remaining cut TaskTypes (outline/draft/summarize)', () => {
+		// plan-025 removed these runtime agents from the V1 surface.
+		// plan-043 reintroduces BrainstormAgent separately, so only the
+		// still-cut actions fall through to the DEFAULT_TASK.
+		for (const action of ['outline', 'draft', 'summarize_scene']) {
 			expect(resolveTask(action, ctx).taskType).toBe('continue');
 		}
 	});

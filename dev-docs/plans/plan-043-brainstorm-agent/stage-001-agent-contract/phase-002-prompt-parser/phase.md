@@ -2,7 +2,7 @@
 title: Prompt & Parser
 slug: phase-002-prompt-parser
 phase_number: 2
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-001-agent-contract
 parts:
@@ -20,8 +20,8 @@ CONSTRAINTS → OUTPUT) and the parser that reliably deserializes brainstorm out
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Prompt Builder](part-001-prompt-builder/part.md) | `draft` | — | 0.3d |
-| 002 | [Parser Tests](part-002-parser-tests/part.md) | `draft` | — | 0.2d |
+| 001 | [Prompt Builder](part-001-prompt-builder/part.md) | `review` | Codex | 0.3d |
+| 002 | [Parser Tests](part-002-parser-tests/part.md) | `review` | Codex | 0.2d |
 
 ## Acceptance Criteria
 

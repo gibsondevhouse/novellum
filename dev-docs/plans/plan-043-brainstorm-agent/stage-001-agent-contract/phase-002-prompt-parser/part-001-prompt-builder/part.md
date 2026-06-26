@@ -2,12 +2,12 @@
 title: Prompt Builder
 slug: part-001-prompt-builder
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-002-prompt-parser
-started_at: ~
-completed_at: ~
+started_at: 2026-06-25
+completed_at: 2026-06-25
 estimated_duration: 0.3d
 ---
 

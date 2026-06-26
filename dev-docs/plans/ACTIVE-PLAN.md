@@ -6,7 +6,7 @@
 
 ## Current
 
-- [plan-043-brainstorm-agent](./plan-043-brainstorm-agent/plan.md) — Brainstorm Agent. Starting Stage 001 contract/schema work after plan-056 closeout. Status: `in-progress`.
+- [plan-043-brainstorm-agent](./plan-043-brainstorm-agent/plan.md) — Brainstorm Agent. Stages 001 and 002 are in `review`; Stage 003 Accept Flow & Worldbuild Hookup is next. Status: `in-progress`.
 
 ## Pending review
 

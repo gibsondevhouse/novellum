@@ -14,18 +14,18 @@ last_updated: 2026-06-04
 
 ## Implementation
 
-- [ ] `BrainstormAgentRequest` type defined
-- [ ] `BrainstormProposal` type defined with categories
-- [ ] `BrainstormSession` type defined
-- [ ] JSDoc comments added to all types
-- [ ] Example fixtures created
-- [ ] `pnpm check` passes with zero errors
-- [ ] `pnpm test` passes for type fixtures
+- [x] `BrainstormAgentRequest` type defined
+- [x] `BrainstormProposal` type defined with categories
+- [x] `BrainstormSession` type defined
+- [x] JSDoc comments added to all types
+- [x] Example fixtures created
+- [x] `pnpm check` passes with zero errors
+- [x] `pnpm test` passes for type fixtures
 
 ## Post-Implementation
 
-- [ ] Type definitions saved to evidence or documented in `impl.log.md`
-- [ ] At least one artifact added to `evidence/`
-- [ ] `impl.log.md` updated with final entry
-- [ ] Part `status` updated to `review` in `part.md` frontmatter
-- [ ] Reviewer notified / Reviewer Agent invoked
+- [x] Type definitions saved to evidence or documented in `impl.log.md`
+- [x] At least one artifact added to `evidence/`
+- [x] `impl.log.md` updated with final entry
+- [x] Part `status` updated to `review` in `part.md` frontmatter
+- [x] Reviewer notified / Reviewer Agent invoked

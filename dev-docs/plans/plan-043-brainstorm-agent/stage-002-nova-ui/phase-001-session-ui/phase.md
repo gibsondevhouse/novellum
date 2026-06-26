@@ -2,7 +2,7 @@
 title: Brainstorm Session UI
 slug: phase-001-session-ui
 phase_number: 1
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-002-nova-ui
 parts:
@@ -19,7 +19,7 @@ display surface that shows categorized creative seeds.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Brainstorm Interface](part-001-brainstorm-interface/part.md) | `draft` | — | 0.75d |
+| 001 | [Brainstorm Interface](part-001-brainstorm-interface/part.md) | `review` | Codex | 0.75d |
 
 ## Acceptance Criteria
 

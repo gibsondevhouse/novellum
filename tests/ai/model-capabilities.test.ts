@@ -150,6 +150,11 @@ describe('getTaskRequirements', () => {
 		expect(req.requireJsonSchemaOutput).toBe(true);
 	});
 
+	it('returns json schema requirement for brainstorm tasks', () => {
+		const req = getTaskRequirements('brainstorm');
+		expect(req.requireJsonSchemaOutput).toBe(true);
+	});
+
 	it('returns empty requirements for unconstrained tasks', () => {
 		const req = getTaskRequirements('chat');
 		expect(Object.keys(req).length).toBe(0);

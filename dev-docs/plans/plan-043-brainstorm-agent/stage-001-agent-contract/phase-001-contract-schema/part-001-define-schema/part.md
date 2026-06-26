@@ -2,12 +2,12 @@
 title: Define Schema
 slug: part-001-define-schema
 part_number: 1
-status: in-progress
+status: review
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-contract-schema
 started_at: 2026-06-25
-completed_at: ~
+completed_at: 2026-06-25
 estimated_duration: 0.5d
 ---
 

@@ -19,6 +19,8 @@
 	import NovaMessageLog from './NovaMessageLog.svelte';
 	import NovaComposer from './NovaComposer.svelte';
 	import NovaAuthorDraftEngine from './NovaAuthorDraftEngine.svelte';
+	import BrainstormSession from './brainstorm/BrainstormSession.svelte';
+	import { runNovaBrainstormSession } from '../services/brainstorm-generation-runner.js';
 
 	interface Props {
 		projectId?: string | null;
@@ -108,6 +110,15 @@
 			return;
 		}
 		novaPanel.openWithPrompt(prompt);
+	}
+
+	function handleBrainstormSubmit(seedIdea: string): void {
+		void runNovaBrainstormSession({
+			seedIdea,
+			projectId,
+			activeSceneId,
+			activeChapterId,
+		});
 	}
 
 	function handleRetry(): void {
@@ -359,6 +370,11 @@
 				{#if messages.length === 0}
 					<div class="nova-greeting">
 						<p class="nova-greeting-eyebrow">Nova</p>
+						<BrainstormSession
+							loading={novaSession.isStreaming}
+							showProposalList={false}
+							onSubmit={handleBrainstormSubmit}
+						/>
 						<div class="nova-starter-prompts" aria-label="Starter prompts">
 							{#each starterPrompts as prompt (prompt)}
 								<button

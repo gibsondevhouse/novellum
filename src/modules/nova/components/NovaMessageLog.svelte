@@ -39,6 +39,7 @@
 	import NovaOutlineCard from './NovaOutlineCard.svelte';
 	import NovaSceneDraftCard from './NovaSceneDraftCard.svelte';
 	import NovaRevisionPackCard from './NovaRevisionPackCard.svelte';
+	import BrainstormSession from './brainstorm/BrainstormSession.svelte';
 	import { classifyNovaError } from '../utils/classify-nova-error.js';
 
 	interface Props {
@@ -293,7 +294,13 @@
 							</p>
 						{/if}
 					{:else if message.artifact}
-						{#if message.artifact.kind === 'author-outline'}
+						{#if message.artifact.kind === 'brainstorm-session'}
+							<BrainstormSession
+								session={message.artifact.session}
+								initialSeedIdea={message.artifact.session.seedIdea}
+								showInput={false}
+							/>
+						{:else if message.artifact.kind === 'author-outline'}
 							<NovaOutlineCard envelope={message.artifact.envelope} {projectId} />
 						{:else if message.artifact.kind === 'author-scene-draft'}
 							<NovaSceneDraftCard

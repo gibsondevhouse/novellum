@@ -10,6 +10,7 @@
 import type { AuthorSceneDraftPayload } from '$lib/ai/pipeline/author-agent.js';
 import type { AuthorOutline, AuthorRevisionPack } from '$lib/ai/pipeline/author-schemas.js';
 import type { PipelineArtifactEnvelope } from '$lib/ai/pipeline/contracts.js';
+import type { BrainstormSession } from '$lib/ai/types.js';
 
 export type NovaMode = 'ask' | 'write' | 'agent';
 
@@ -83,6 +84,7 @@ export interface NovaMessage {
  * future families append additional `kind` variants.
  */
 export type NovaArtifact =
+	| { kind: 'brainstorm-session'; session: BrainstormSession }
 	| { kind: 'author-outline'; envelope: PipelineArtifactEnvelope<AuthorOutline> }
 	| { kind: 'author-scene-draft'; envelope: PipelineArtifactEnvelope<AuthorSceneDraftPayload> }
 	| { kind: 'author-revision-pack'; envelope: PipelineArtifactEnvelope<AuthorRevisionPack> };

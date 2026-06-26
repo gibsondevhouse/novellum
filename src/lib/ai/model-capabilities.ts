@@ -248,6 +248,7 @@ export function listRegisteredModels(): ModelCapabilities[] {
 const TASK_REQUIREMENTS: Partial<Record<TaskType, TaskCapabilityRequirements>> = {
 	agent: { requireToolCalling: true },
 	pipeline: { requireJsonSchemaOutput: true },
+	brainstorm: { requireJsonSchemaOutput: true },
 	continuity_check: { requireJsonSchemaOutput: false }, // JSON via prompt, not schema API
 	edit: { requireJsonSchemaOutput: false },
 	style_check: { requireJsonSchemaOutput: false },

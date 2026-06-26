@@ -2,7 +2,7 @@
 title: Nova UI Integration
 slug: stage-002-nova-ui
 stage_number: 2
-status: draft
+status: review
 owner: Planner Agent
 plan: plan-043-brainstorm-agent
 phases:
@@ -21,8 +21,8 @@ and receives a set of structured proposals displayed in a review interface.
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Brainstorm Session UI](phase-001-session-ui/phase.md) | `draft` | 0.75d |
-| 002 | [Nova Integration](phase-002-integration/phase.md) | `draft` | 0.75d |
+| 001 | [Brainstorm Session UI](phase-001-session-ui/phase.md) | `review` | 0.75d |
+| 002 | [Nova Integration](phase-002-integration/phase.md) | `review` | 0.75d |
 
 ## Entry Criteria
 

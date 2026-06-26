@@ -2,7 +2,7 @@
 title: Nova Integration
 slug: phase-002-integration
 phase_number: 2
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-002-nova-ui
 parts:
@@ -19,7 +19,7 @@ brainstorm sessions from Nova's task menu.
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Wire to Nova](part-001-wire-to-nova/part.md) | `draft` | — | 0.75d |
+| 001 | [Wire to Nova](part-001-wire-to-nova/part.md) | `review` | Codex | 0.75d |
 
 ## Acceptance Criteria
 

@@ -2,12 +2,12 @@
 title: Brainstorm Interface
 slug: part-001-brainstorm-interface
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-session-ui
-started_at: ~
-completed_at: ~
+started_at: 2026-06-25
+completed_at: 2026-06-25
 estimated_duration: 0.75d
 ---
 

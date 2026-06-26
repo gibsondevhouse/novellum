@@ -40,6 +40,10 @@ export { default as NovaSceneDraftCard } from './components/NovaSceneDraftCard.s
 export { default as NovaOutlineGenerationPanel } from './components/NovaOutlineGenerationPanel.svelte';
 export { default as NovaOutlineDraftCheckpointCard } from './components/NovaOutlineDraftCheckpointCard.svelte';
 export { default as NovaRevisionPackCard } from './components/NovaRevisionPackCard.svelte';
+export { default as BrainstormSession } from './components/brainstorm/BrainstormSession.svelte';
+export { default as BrainstormInput } from './components/brainstorm/BrainstormInput.svelte';
+export { default as ProposalList } from './components/brainstorm/ProposalList.svelte';
+export { default as ProposalCard } from './components/brainstorm/ProposalCard.svelte';
 export { novaPanel } from './stores/nova-panel.svelte.js';
 export { novaSession } from './stores/nova-session.svelte.js';
 export { novaMode } from './stores/nova-mode.svelte.js';
@@ -73,6 +77,18 @@ export {
 	type OutlineGenerationRunnerSuccess,
 	type OutlineGenerationRunnerCancellation,
 } from './services/outline-generation-runner.js';
+export {
+	BRAINSTORM_GENERATION_ENDPOINT,
+	requestBrainstormGeneration,
+	runNovaBrainstormSession,
+	type BrainstormGenerationError,
+	type BrainstormGenerationFailure,
+	type BrainstormGenerationInput,
+	type BrainstormGenerationOptions,
+	type BrainstormGenerationResult,
+	type BrainstormGenerationSuccess,
+	type BrainstormGenerationCancellation,
+} from './services/brainstorm-generation-runner.js';
 export {
 	OutlineCheckpointActionError,
 	createOutlineCheckpointActions,

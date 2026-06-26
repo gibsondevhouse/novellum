@@ -7,29 +7,29 @@ last_updated: 2026-06-04
 
 ## Pre-Implementation
 
-- [ ] Parent phase and stage are `in-progress`
-- [ ] Stage-001 (Agent Contract) is complete
-- [ ] Nova component patterns reviewed
-- [ ] Design token guide reviewed
-- [ ] `part.md` has been reviewed and accepted
-- [ ] Dev environment is ready
+- [x] Parent phase and stage are `in-progress`
+- [x] Stage-001 (Agent Contract) is implementation-complete and in `review`
+- [x] Nova component patterns reviewed
+- [x] Design token guide reviewed
+- [x] `part.md` has been reviewed and accepted
+- [x] Dev environment is ready
 
 ## Implementation
 
-- [ ] All component files created in `src/modules/nova/components/brainstorm/`
-- [ ] Input form collects and passes seed idea
-- [ ] Proposal cards render with categories
-- [ ] Layout is responsive and accessible
-- [ ] Design tokens used throughout (no hardcoded values)
-- [ ] `pnpm lint:css` passes
-- [ ] `pnpm check` passes with zero errors
-- [ ] `pnpm lint` passes with zero errors
+- [x] All component files created in `src/modules/nova/components/brainstorm/`
+- [x] Input form collects and passes seed idea
+- [x] Proposal cards render with categories
+- [x] Layout is responsive and accessible
+- [x] Design tokens used throughout (no hardcoded values)
+- [x] `pnpm lint:css` passes
+- [x] `pnpm check` passes with zero errors
+- [x] `pnpm lint` passes with zero errors
 
 ## Post-Implementation
 
-- [ ] Component screenshots saved to `evidence/`
-- [ ] Accessibility audit notes saved to `evidence/`
-- [ ] At least one artifact added to `evidence/`
-- [ ] `impl.log.md` updated with final entry
-- [ ] Part `status` updated to `review` in `part.md` frontmatter
-- [ ] Reviewer notified / Reviewer Agent invoked
+- [x] Component screenshots saved to `evidence/`
+- [x] Accessibility audit notes saved to `evidence/`
+- [x] At least one artifact added to `evidence/`
+- [x] `impl.log.md` updated with final entry
+- [x] Part `status` updated to `review` in `part.md` frontmatter
+- [x] Reviewer notified / Reviewer Agent invoked

@@ -69,6 +69,13 @@ const TASK_MAP: Record<string, TaskDefinition> = {
 		outputFormat: 'json_rewrite_options',
 		role: 'You are a creative writing assistant offering alternative prose for an author to choose from.',
 	},
+	brainstorm: {
+		taskType: 'brainstorm',
+		contextPolicy: 'worldbuilding_scope',
+		outputFormat: 'json_brainstorm_session',
+		role:
+			'You are the Novellum BrainstormAgent. Turn an author seed idea into structured creative proposals for review-gated worldbuilding prefill.',
+	},
 	chat: {
 		taskType: 'chat',
 		contextPolicy: 'scene_plus_adjacent',
@@ -164,7 +171,10 @@ export function resolveTask(action: string, uiCtx: UiContext): AiTask {
 	}
 
 	const def = TASK_MAP[action] ?? DEFAULT_TASK;
-	const targetEntityId = uiCtx.activeSceneId ?? uiCtx.activeChapterId ?? uiCtx.activeProjectId;
+	const targetEntityId =
+		action === 'brainstorm'
+			? uiCtx.activeProjectId
+			: uiCtx.activeSceneId ?? uiCtx.activeChapterId ?? uiCtx.activeProjectId;
 	return {
 		taskType: def.taskType,
 		role: def.role,

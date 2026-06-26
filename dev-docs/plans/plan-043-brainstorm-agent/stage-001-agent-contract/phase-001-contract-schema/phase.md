@@ -2,7 +2,7 @@
 title: Contract & Schema
 slug: phase-001-contract-schema
 phase_number: 1
-status: in-progress
+status: review
 owner: Planner Agent
 stage: stage-001-agent-contract
 parts:
@@ -19,7 +19,7 @@ Define the `BrainstormAgent` contract and output schema that captures creative s
 
 | # | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Define Schema](part-001-define-schema/part.md) | `in-progress` | — | 0.5d |
+| 001 | [Define Schema](part-001-define-schema/part.md) | `review` | Codex | 0.5d |
 
 ## Acceptance Criteria
 

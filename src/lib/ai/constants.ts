@@ -32,6 +32,7 @@ export const MODEL_MAP: Record<TaskType, string> = {
 	continuity_check: 'openai/gpt-4o',
 	edit: 'openai/gpt-4o',
 	style_check: 'openai/gpt-4o',
+	brainstorm: 'openai/gpt-4o-mini',
 	chat: 'openai/gpt-4o-mini',
 	write: 'openai/gpt-4o-mini',
 	agent: 'openai/gpt-4o-mini',
@@ -102,6 +103,13 @@ export const CONSTRAINTS_BY_TYPE: Record<string, string[]> = {
 		'Only flag deviations that meaningfully conflict with the provided style guide rules — do not invent additional rules',
 		'If no deviations found, return an empty array: []',
 	],
+	brainstorm: [
+		'Return one JSON object only. Do not include markdown, commentary, or prose outside the object.',
+		'Every idea is a proposal for author review, never canon and never an automatic manuscript or worldbuilding mutation.',
+		'Use provided project and worldbuilding context only as grounding. When inventing new material, keep it clearly framed as a creative seed.',
+		'Include all four proposal groups even when a group is empty: premiseVariants, thematicThreads, genreHooks, protagonistSketches.',
+		'Keep each proposal concrete enough to prefill a later review-gated worldbuilding form.',
+	],
 	write: [
 		'You are generating a structured writing proposal — an outline, scene draft, or revision plan — for the author to review.',
 		'Every artifact you produce is a proposal only. The author must explicitly accept or reject it; nothing is auto-applied to the manuscript.',
@@ -126,6 +134,8 @@ export const TASK_DESCRIPTIONS: Record<string, string> = {
 	edit: 'Identify specific improvements in the provided text and return each as a targeted edit suggestion.',
 	style_check:
 		'Identify passages that deviate from the provided style guide rules and suggest corrections that bring the prose in line with the target style.',
+	brainstorm:
+		'Generate review-gated creative seed proposals from the author\'s seed idea. Return grouped premise variants, thematic threads, genre hooks, and protagonist sketches as structured JSON.',
 	write:
 		'Generate a structured writing proposal — outline, scene draft, or revision plan — based on the author\'s request and project context. Every output is a proposal the author reviews; nothing is auto-applied.',
 	agent:
@@ -145,6 +155,8 @@ export const OUTPUT_FORMAT_DESCRIPTIONS: Record<string, string> = {
 		'Return a JSON array of StyleDeviation objects with: spanStart, spanEnd, original, suggestion, reason.',
 	json_rewrite_options:
 		'Return a JSON array of exactly 3 rewrite option objects: [{"index":1,"text":"..."},{"index":2,"text":"..."},{"index":3,"text":"..."}]',
+	json_brainstorm_session:
+		'Return one BrainstormSession JSON object with schemaVersion, seedIdea, and proposals grouped as premiseVariants[], thematicThreads[], genreHooks[], and protagonistSketches[]. Each proposal requires id, category, title, description, and rationale.',
 	json_worldbuild_premise:
 		'Return a JSON object with fields: hook, genreBlend, readerPromise, coreConflict, worldPressure, tone, scope, nonNegotiables, openQuestions.',
 	json_worldbuild_worldspec:

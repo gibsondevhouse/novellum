@@ -2,7 +2,7 @@
 title: Agent Contract & Prompt
 slug: stage-001-agent-contract
 stage_number: 1
-status: in-progress
+status: review
 owner: Planner Agent
 plan: plan-043-brainstorm-agent
 phases:
@@ -21,8 +21,8 @@ prompt builder and parser logic that transforms brainstorm output into a structu
 
 | # | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Contract & Schema](phase-001-contract-schema/phase.md) | `in-progress` | 0.5d |
-| 002 | [Prompt & Parser](phase-002-prompt-parser/phase.md) | `draft` | 0.5d |
+| 001 | [Contract & Schema](phase-001-contract-schema/phase.md) | `review` | 0.5d |
+| 002 | [Prompt & Parser](phase-002-prompt-parser/phase.md) | `review` | 0.5d |
 
 ## Entry Criteria
 
