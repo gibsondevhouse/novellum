@@ -29,13 +29,13 @@
 		return 'Empty';
 	});
 
-	const pathLabel = $derived(pathSegments.length > 0 ? pathSegments.join(' / ') : 'No active hierarchy path');
+	const pathLabel = $derived(pathSegments.length > 0 ? pathSegments.join(' / ') : 'No outline item selected');
 </script>
 
-<section class="scope-summary" aria-label="Pipeline scope summary">
+<section class="scope-summary" aria-label="Outline focus summary">
 	<div class="scope-summary__row">
 		<div class="scope-summary__labels">
-			<span class="scope-summary__layer">Current Layer: {currentLayerLabel}</span>
+			<span class="scope-summary__layer">Focus: {currentLayerLabel}</span>
 			<span class="scope-summary__path" title={pathLabel}>{pathLabel}</span>
 		</div>
 		<span class="scope-summary__status" data-readiness={readiness}>{readinessLabel}</span>

@@ -11,13 +11,20 @@
 		Beat,
 		Stage,
 	} from '$lib/db/domain-types';
-	import type { ChapterWithScenes } from '$modules/outline/types.js';
+	import type {
+		ChapterWithScenes,
+		ManualCreateAction,
+		ManualCreateKind,
+	} from '$modules/outline/types.js';
 	import { WorkspaceShell, WorkspaceHero } from '$lib/components/ui/index.js';
+	import { NovaOutlineGenerationPanel, outlineGenerationState } from '$modules/nova/index.js';
 	import HierarchyNavigator from '$modules/outline/components/HierarchyNavigator.svelte';
+	import OutlineWorkflowWorkbench from '$modules/outline/components/OutlineWorkflowWorkbench.svelte';
 	import OutlineSummaryBar from '$modules/outline/components/OutlineSummaryBar.svelte';
 	import ActClarityPanel from '$modules/outline/components/ActClarityPanel.svelte';
 	import ChapterClarityPanel from '$modules/outline/components/ChapterClarityPanel.svelte';
 	import SceneClarityPanel from '$modules/outline/components/SceneClarityPanel.svelte';
+	import { getOutlineData } from '$modules/outline/services/outline-data-service.js';
 	import {
 		getSelectionPath,
 		getSelectionReadiness,
@@ -43,10 +50,17 @@
 		getStageRunButtonLabel,
 		isStageRunActive,
 	} from '$modules/outline/stores/outline-store.svelte.js';
-	import { updateAct } from '$modules/outline/services/story-structure-service.js';
-	import { updateChapter } from '$modules/project/services/chapter-repository.js';
+	import {
+		createAct,
+		createMilestone,
+		updateAct,
+		updateMilestone,
+	} from '$modules/outline/services/story-structure-service.js';
+	import { createArc } from '$modules/project/services/arc-repository.js';
+	import { createChapter, updateChapter } from '$modules/project/services/chapter-repository.js';
 	import { createScene, updateScene } from '$modules/editor/services/scene-repository.js';
 	import { createBeat } from '$modules/editor/services/beat-repository.js';
+	import { createStage } from '$modules/editor/services/stage-repository.js';
 	import { runWorldbuildPipelineTask } from '$modules/outline/services/worldbuild-pipeline-runner.js';
 	import { PIPELINE_TASK_KEYS, getPipelineTaskLabel } from '$lib/ai/pipeline/task-catalog.js';
 	import type { OutlineHierarchyReferences } from '$lib/ai/pipeline/contracts.js';
@@ -359,6 +373,12 @@
 	let decisionError: string | null = $state(null);
 	let decisionInFlight: boolean = $state(false);
 	let rejectReasonDraft: string = $state('');
+	let manualActionTitle: string = $state('');
+	let manualActionBusy: boolean = $state(false);
+	let manualActionError: string | null = $state(null);
+	let activeManualActionKind: ManualCreateKind | null = $state(null);
+	let outlineRefreshStatus: string | null = $state(null);
+	let lastAcceptedCheckpointRefreshId: string | null = $state(null);
 
 	const QUEUE_FILTERS: readonly CheckpointQueueFilter[] = ['all', 'pending', 'accepted', 'rejected'];
 
@@ -404,6 +424,353 @@
 			});
 
 		return segments.length > 0 ? segments.join(', ') : 'Project-wide checkpoint';
+	}
+
+	const manualCreateAction = $derived.by<ManualCreateAction>(() => {
+		if (selectedStage) {
+			return {
+				kind: 'stage',
+				kicker: 'Selected stage',
+				title: 'Add another stage',
+				description: `Create a sibling stage under ${selectedStageBeat?.title ?? 'the selected beat'}.`,
+				placeholder: `Stage ${stages.filter((stage) => stage.beatId === selectedStage.beatId).length + 1}`,
+				buttonLabel: 'Create stage',
+				canCreate: Boolean(selectedStageBeat),
+				disabledReason: selectedStageBeat ? null : 'Select a beat before adding another stage.',
+			};
+		}
+
+		if (selectedStageId !== undefined) {
+			return {
+				kind: 'stage',
+				kicker: 'Missing stage',
+				title: 'Recover the stage selection',
+				description: 'The selected stage no longer exists. Choose a beat or stage before adding more work.',
+				placeholder: 'Stage title',
+				buttonLabel: 'Create stage',
+				canCreate: false,
+				disabledReason: 'Select an existing beat first.',
+			};
+		}
+
+		if (selectedBeat) {
+			return {
+				kind: 'stage',
+				kicker: 'Selected beat',
+				title: 'Break the beat into stages',
+				description: `Create a production stage under ${selectedBeat.title}.`,
+				placeholder: `Stage ${stages.filter((stage) => stage.beatId === selectedBeat.id).length + 1}`,
+				buttonLabel: 'Create stage',
+				canCreate: true,
+				disabledReason: null,
+			};
+		}
+
+		if (selectedBeatId !== undefined) {
+			return {
+				kind: 'stage',
+				kicker: 'Missing beat',
+				title: 'Recover the beat selection',
+				description: 'The selected beat no longer exists. Choose a scene or beat before adding stages.',
+				placeholder: 'Stage title',
+				buttonLabel: 'Create stage',
+				canCreate: false,
+				disabledReason: 'Select an existing beat first.',
+			};
+		}
+
+		if (selectedScene) {
+			return {
+				kind: 'beat',
+				kicker: 'Selected scene',
+				title: 'Add the next beat',
+				description: `Create a beat inside ${selectedScene.title}.`,
+				placeholder: `Beat ${beats.filter((beat) => beat.sceneId === selectedScene.id).length + 1}`,
+				buttonLabel: 'Create beat',
+				canCreate: true,
+				disabledReason: null,
+			};
+		}
+
+		if (selectedSceneId !== undefined) {
+			return {
+				kind: 'beat',
+				kicker: 'Missing scene',
+				title: 'Recover the scene selection',
+				description: 'The selected scene no longer exists. Choose a chapter or scene before adding beats.',
+				placeholder: 'Beat title',
+				buttonLabel: 'Create beat',
+				canCreate: false,
+				disabledReason: 'Select an existing scene first.',
+			};
+		}
+
+		if (selectedChapter) {
+			return {
+				kind: 'scene',
+				kicker: 'Selected chapter',
+				title: 'Add a scene',
+				description: `Create a scene inside ${selectedChapter.title}.`,
+				placeholder: `Scene ${selectedChapter.scenes.length + 1}`,
+				buttonLabel: 'Create scene',
+				canCreate: true,
+				disabledReason: null,
+			};
+		}
+
+		if (selectedChapterId !== undefined) {
+			return {
+				kind: 'scene',
+				kicker: 'Missing chapter',
+				title: 'Recover the chapter selection',
+				description: 'The selected chapter no longer exists. Choose a milestone or chapter before adding scenes.',
+				placeholder: 'Scene title',
+				buttonLabel: 'Create scene',
+				canCreate: false,
+				disabledReason: 'Select an existing chapter first.',
+			};
+		}
+
+		if (selectedMilestone) {
+			return {
+				kind: 'chapter',
+				kicker: 'Selected milestone',
+				title: 'Add a chapter',
+				description: `Create a chapter linked to ${selectedMilestone.title}.`,
+				placeholder: `Chapter ${chapters.filter((chapter) => chapter.actId === selectedMilestone.actId).length + 1}`,
+				buttonLabel: 'Create chapter',
+				canCreate: Boolean(selectedMilestoneAct),
+				disabledReason: selectedMilestoneAct ? null : 'Select a milestone with an act before adding chapters.',
+			};
+		}
+
+		if (selectedMilestoneId !== undefined) {
+			return {
+				kind: 'chapter',
+				kicker: 'Missing milestone',
+				title: 'Recover the milestone selection',
+				description: 'The selected milestone no longer exists. Choose an act or milestone before adding chapters.',
+				placeholder: 'Chapter title',
+				buttonLabel: 'Create chapter',
+				canCreate: false,
+				disabledReason: 'Select an existing milestone first.',
+			};
+		}
+
+		if (selectedAct) {
+			return {
+				kind: 'milestone',
+				kicker: 'Selected act',
+				title: 'Set an act milestone',
+				description: `Create a milestone under ${selectedAct.title}.`,
+				placeholder: `Milestone ${milestones.filter((milestone) => milestone.actId === selectedAct.id).length + 1}`,
+				buttonLabel: 'Create milestone',
+				canCreate: true,
+				disabledReason: null,
+			};
+		}
+
+		if (selectedActId !== undefined) {
+			return {
+				kind: 'milestone',
+				kicker: 'Missing act',
+				title: 'Recover the act selection',
+				description: 'The selected act no longer exists. Choose an arc or act before adding milestones.',
+				placeholder: 'Milestone title',
+				buttonLabel: 'Create milestone',
+				canCreate: false,
+				disabledReason: 'Select an existing act first.',
+			};
+		}
+
+		if (selectedArcId !== undefined) {
+			const arcId = selectedArc?.id ?? null;
+			const childCount = acts.filter((act) => (arcId ? act.arcId === arcId : !act.arcId)).length;
+			return {
+				kind: 'act',
+				kicker: selectedArc ? 'Selected arc' : 'Unassigned arc',
+				title: 'Add an act',
+				description: selectedArc
+					? `Create an act under ${selectedArc.title}.`
+					: 'Create an unassigned act for structure that has not joined an arc yet.',
+				placeholder: `Act ${childCount + 1}`,
+				buttonLabel: 'Create act',
+				canCreate: true,
+				disabledReason: null,
+			};
+		}
+
+		return {
+			kind: 'arc',
+			kicker: arcs.length === 0 ? 'Empty outline' : 'Top level',
+			title: arcs.length === 0 ? 'Start with an arc' : 'Add another arc',
+			description: 'Create the next major throughline for this project.',
+			placeholder: `Arc ${arcs.length + 1}`,
+			buttonLabel: 'Create arc',
+			canCreate: true,
+			disabledReason: null,
+		};
+	});
+
+	const manualTitleInputId = $derived(`outline-manual-title-${manualCreateAction.kind}`);
+
+	$effect(() => {
+		const nextKind = manualCreateAction.kind;
+		if (nextKind !== activeManualActionKind) {
+			activeManualActionKind = nextKind;
+			manualActionTitle = '';
+			manualActionError = null;
+		}
+	});
+
+	async function refreshOutlineWorkspaceData(successMessage: string | null = null): Promise<void> {
+		try {
+			const outline = await getOutlineData(projectId);
+			arcs = outline.arcs;
+			acts = outline.acts;
+			milestones = outline.milestones;
+			characters = outline.characters;
+			chapters = outline.chapters;
+			beats = outline.beats;
+			stages = outline.stages;
+			outlineRefreshStatus = successMessage;
+		} catch (err) {
+			outlineRefreshStatus = err instanceof Error ? err.message : 'Outline refresh failed.';
+		}
+	}
+
+	function handleOutlineProposalGenerated(): void {
+		outlineRefreshStatus = 'Outline proposal ready for review. The outline has not changed yet.';
+	}
+
+	$effect(() => {
+		const checkpoint = outlineGenerationState.checkpoint;
+		if (outlineGenerationState.status !== 'accepted' || !checkpoint) return;
+		if (lastAcceptedCheckpointRefreshId === checkpoint.id) return;
+		lastAcceptedCheckpointRefreshId = checkpoint.id;
+		void refreshOutlineWorkspaceData('Accepted outline proposal applied.');
+	});
+
+	async function handleManualQuickCreate(event: SubmitEvent): Promise<void> {
+		event.preventDefault();
+		const title = manualActionTitle.trim();
+		const action = manualCreateAction;
+
+		if (!action.canCreate) {
+			manualActionError = action.disabledReason ?? 'This outline layer is not ready for creation.';
+			return;
+		}
+		if (!title) {
+			manualActionError = 'Add a title first.';
+			return;
+		}
+
+		manualActionBusy = true;
+		manualActionError = null;
+		outlineRefreshStatus = null;
+
+		try {
+			if (action.kind === 'arc') {
+				const arc = await createArc({
+					projectId,
+					title,
+					description: '',
+					purpose: '',
+					order: arcs.length,
+				});
+				arcs = [...arcs, arc];
+				setSelectedArc(arc.id);
+			} else if (action.kind === 'act') {
+				const arcId = selectedArcId === undefined ? undefined : selectedArcId ?? undefined;
+				const actOrder = acts.filter((act) => (arcId ? act.arcId === arcId : !act.arcId)).length;
+				const act = await createAct(projectId, title, actOrder, arcId);
+				acts = [...acts, act];
+				setSelectedAct(act.id);
+			} else if (action.kind === 'milestone') {
+				if (!selectedAct) throw new Error('Select an act before creating a milestone.');
+				const milestone = await createMilestone(
+					selectedAct.id,
+					projectId,
+					title,
+					milestones.filter((item) => item.actId === selectedAct.id).length,
+				);
+				milestones = [...milestones, milestone];
+				setSelectedMilestone(milestone.id);
+			} else if (action.kind === 'chapter') {
+				if (!selectedMilestone || !selectedMilestoneAct) {
+					throw new Error('Select a milestone before creating a chapter.');
+				}
+				const chapter = await createChapter({
+					projectId,
+					actId: selectedMilestoneAct.id,
+					title,
+					summary: '',
+					order: chapters.filter((item) => item.actId === selectedMilestoneAct.id).length,
+					wordCount: 0,
+				});
+				chapters = [...chapters, { ...chapter, scenes: [] }];
+				const chapterIds = Array.from(new Set([...selectedMilestone.chapterIds, chapter.id]));
+				await updateMilestone(selectedMilestone.id, { chapterIds });
+				milestones = milestones.map((item) =>
+					item.id === selectedMilestone.id
+						? { ...item, chapterIds, updatedAt: new Date().toISOString() }
+						: item,
+				);
+				setSelectedChapter(chapter.id);
+			} else if (action.kind === 'scene') {
+				if (!selectedChapter) throw new Error('Select a chapter before creating a scene.');
+				const scene = await createScene({
+					chapterId: selectedChapter.id,
+					projectId,
+					title,
+					summary: '',
+					content: '',
+					wordCount: 0,
+					notes: '',
+					order: selectedChapter.scenes.length,
+					povCharacterId: null,
+					locationId: null,
+					timelineEventId: null,
+					characterIds: [],
+					locationIds: [],
+				});
+				chapters = chapters.map((item) =>
+					item.id === selectedChapter.id ? { ...item, scenes: [...item.scenes, scene] } : item,
+				);
+				setSelectedScene(scene.id);
+			} else if (action.kind === 'beat') {
+				if (!selectedScene) throw new Error('Select a scene before creating a beat.');
+				const beat = await createBeat({
+					sceneId: selectedScene.id,
+					projectId,
+					title,
+					type: 'beat',
+					order: beats.filter((item) => item.sceneId === selectedScene.id).length,
+					notes: '',
+				});
+				beats = [...beats, beat];
+				setSelectedBeat(beat.id);
+			} else {
+				const parentBeat = selectedStageBeat ?? selectedBeat;
+				if (!parentBeat) throw new Error('Select a beat before creating a stage.');
+				const stage = await createStage({
+					beatId: parentBeat.id,
+					projectId,
+					title,
+					description: '',
+					order: stages.filter((item) => item.beatId === parentBeat.id).length,
+					status: 'planned',
+				});
+				stages = [...stages, stage];
+				setSelectedStage(stage.id);
+			}
+
+			manualActionTitle = '';
+		} catch (err) {
+			manualActionError = err instanceof Error ? err.message : `Failed to ${action.buttonLabel.toLowerCase()}.`;
+		} finally {
+			manualActionBusy = false;
+		}
 	}
 
 	async function handleRunStagePipeline(): Promise<void> {
@@ -650,6 +1017,25 @@
 	{/snippet}
 
 	{#snippet main()}
+		<OutlineWorkflowWorkbench
+			{manualCreateAction}
+			{manualTitleInputId}
+			{manualActionTitle}
+			{manualActionBusy}
+			{manualActionError}
+			{outlineRefreshStatus}
+			onManualTitleInput={(value) => (manualActionTitle = value)}
+			onManualSubmit={handleManualQuickCreate}
+		>
+			{#snippet aiPanel()}
+				<NovaOutlineGenerationPanel
+					{projectId}
+					generationState={outlineGenerationState}
+					onGenerated={handleOutlineProposalGenerated}
+				/>
+			{/snippet}
+		</OutlineWorkflowWorkbench>
+
 		{#if selectedStage || selectedStageId !== undefined}
 			<div class="layer-shell">
 				<h2>Stage Detail</h2>
@@ -970,8 +1356,8 @@
 			</div>
 		{:else}
 			<div class="outline-main-empty">
-				<h2>Select a Layer</h2>
-				<p>Choose an Arc -> Stage node to view layer-specific planning details.</p>
+				<h2>Outline Workspace</h2>
+				<p>Create the first arc, generate a reviewed proposal, or choose an existing layer to edit its planning details.</p>
 			</div>
 		{/if}
 	{/snippet}

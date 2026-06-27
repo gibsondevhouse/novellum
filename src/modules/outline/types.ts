@@ -10,6 +10,19 @@ export type OutlineNodeId = number;
 export type ChapterWithScenes = Chapter & { scenes: Scene[] };
 export type ChapterWithScenesAndAct = ChapterWithScenes & { actTitle?: string };
 
+export type ManualCreateKind = 'arc' | 'act' | 'milestone' | 'chapter' | 'scene' | 'beat' | 'stage';
+
+export interface ManualCreateAction {
+	kind: ManualCreateKind;
+	kicker: string;
+	title: string;
+	description: string;
+	placeholder: string;
+	buttonLabel: string;
+	canCreate: boolean;
+	disabledReason: string | null;
+}
+
 /** Focused beat state passed between outline components. */
 export type BeatFocus = {
 	id: string;

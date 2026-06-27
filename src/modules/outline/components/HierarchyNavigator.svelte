@@ -114,13 +114,13 @@
 	}
 </script>
 
-<div class="hierarchy-navigator" aria-label="Pipeline hierarchy navigator">
+<div class="hierarchy-navigator" aria-label="Outline hierarchy navigator">
 	<HierarchyBreadcrumb crumbs={crumbs} />
 
 	{#if !hasAnyRows}
 		<div class="navigator-empty">
 			<h3>Outline hierarchy is empty</h3>
-			<p>Create an arc, then drill down layer by layer to build a complete Arc -> Stage path.</p>
+			<p>Create an arc to anchor acts, milestones, chapters, scenes, beats, and stages.</p>
 		</div>
 	{/if}
 
