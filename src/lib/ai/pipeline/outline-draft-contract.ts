@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { outlineBeatSchema } from './worldbuild-schemas.js';
 
 export const OUTLINE_DRAFT_SCHEMA_VERSION = '1.0.0' as const;
 export const OUTLINE_DRAFT_CHECKPOINT_OWNER_ID = 'outlineDraftCheckpoints.v1' as const;
@@ -62,6 +63,7 @@ export const outlineDraftSceneSchema = z
 		locationIds: z.array(nonEmptyString.max(128)).default([]),
 		plotThreadIds: z.array(nonEmptyString.max(128)).default([]),
 		targetWordCount: z.number().int().positive().optional(),
+		beats: z.array(outlineBeatSchema).optional(),
 	})
 	.strict();
 

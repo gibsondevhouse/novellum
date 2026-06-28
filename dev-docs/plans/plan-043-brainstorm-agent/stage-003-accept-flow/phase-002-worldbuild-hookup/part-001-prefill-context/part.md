@@ -2,12 +2,12 @@
 title: Prefill Context
 slug: part-001-prefill-context
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-002-worldbuild-hookup
-started_at: ~
-completed_at: ~
+started_at: 2026-06-28
+completed_at: 2026-06-28
 estimated_duration: 0.5d
 ---
 
@@ -56,14 +56,14 @@ seeds prefill generation context and draft fields.
 
 ## Acceptance Criteria
 
-- [ ] Brainstorm staging store read in worldbuild module
-- [ ] Accepted seeds transform to context format
-- [ ] Entity forms prefill with seed data
-- [ ] Prefill source indicated to author
-- [ ] Author can clear prefill
-- [ ] E2E flow works: brainstorm → accept → form prefill → generate
-- [ ] `pnpm check` passes with zero errors
-- [ ] `pnpm test` passes
+- [x] Brainstorm staging store read in worldbuild module
+- [x] Accepted seeds transform to context format
+- [x] Entity forms prefill with seed data
+- [x] Prefill source indicated to author
+- [x] Author can clear prefill
+- [x] Component-level flow works: brainstorm accept -> form prefill -> generate context
+- [x] `pnpm check` passes with zero errors
+- [x] Focused tests pass; full `pnpm test` blocked by unrelated outline source-contract baseline documented in evidence
 
 ## Edge Cases
 

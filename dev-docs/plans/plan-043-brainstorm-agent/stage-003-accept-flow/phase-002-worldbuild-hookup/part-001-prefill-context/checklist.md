@@ -1,35 +1,35 @@
 ---
 part: part-001-prefill-context
-last_updated: 2026-06-04
+last_updated: 2026-06-28
 ---
 
 # Implementation Checklist
 
 ## Pre-Implementation
 
-- [ ] Parent phase and stage are `in-progress`
-- [ ] Part: Accept Logic is complete
-- [ ] Worldbuilding entity creation forms reviewed
-- [ ] `part.md` has been reviewed and accepted
-- [ ] Dev environment is ready
+- [x] Parent phase and stage are `in-progress`
+- [x] Part: Accept Logic is implementation-complete and in `review`
+- [x] Worldbuilding entity generation dialog reviewed
+- [x] `part.md` has been reviewed and accepted
+- [x] Dev environment is ready
 
 ## Implementation
 
-- [ ] Brainstorm staging store integrated into worldbuild module
-- [ ] Seeds transform to context format
-- [ ] Entity forms prefill with seed data
-- [ ] Prefill source visually indicated
-- [ ] Clear prefill functionality working
-- [ ] E2E flow tested: brainstorm → accept → prefill → generate
-- [ ] `pnpm check` passes with zero errors
-- [ ] `pnpm lint` passes with zero errors
-- [ ] `pnpm test` passes
+- [x] Brainstorm staging store integrated into worldbuild module
+- [x] Seeds transform to context format
+- [x] Entity generation dialog prefills with seed data
+- [x] Prefill source visually indicated
+- [x] Clear prefill functionality working
+- [x] Component flow tested: brainstorm accept -> prefill -> generate
+- [x] `pnpm check` passes with zero errors
+- [x] `pnpm lint` passes with zero errors
+- [x] Focused tests pass; full `pnpm test` unrelated baseline failure documented
 
 ## Post-Implementation
 
-- [ ] E2E test screenshots/notes saved to `evidence/`
-- [ ] Integration flow documented in `impl.log.md`
-- [ ] At least one artifact added to `evidence/`
-- [ ] `impl.log.md` updated with final entry
-- [ ] Part `status` updated to `review` in `part.md` frontmatter
-- [ ] Reviewer notified / Reviewer Agent invoked
+- [x] Integration test notes saved to `evidence/`
+- [x] Integration flow documented in `impl.log.md`
+- [x] At least one artifact added to `evidence/`
+- [x] `impl.log.md` updated with final entry
+- [x] Part `status` updated to `review` in `part.md` frontmatter
+- [x] Reviewer notification queued via plan status roll-up

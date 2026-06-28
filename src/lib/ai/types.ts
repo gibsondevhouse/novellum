@@ -24,6 +24,7 @@ import type {
 	WritingStyle
 } from '$lib/db/domain-types';
 import type { SceneIntentSnapshot } from '$lib/stores/scene-intent.svelte.js';
+import type { PipelineFamily } from './pipeline/contracts.js';
 import type { OutlineContextPacket } from './pipeline/outline-context-builder.js';
 
 export type ContextPolicy =
@@ -298,7 +299,7 @@ export interface AiTask {
 
 export interface PipelineTaskReference {
 	key: string;
-	family: 'vibe-worldbuild' | 'vibe-worldbuild-domain' | 'vibe-author';
+	family: PipelineFamily;
 	stage: string;
 }
 

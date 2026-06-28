@@ -1,5 +1,5 @@
 export type GenerationHintIntent = 'target' | 'avoid' | 'neutral';
-export type GenerationHintSource = 'title' | 'synopsis' | 'manual' | 'legacy';
+export type GenerationHintSource = 'title' | 'synopsis' | 'manual' | 'legacy' | 'brainstorm';
 
 export interface GenerationContextHint {
 	name: string;
@@ -23,6 +23,13 @@ function normalizeName(value: unknown): string | null {
 	return trimmed.slice(0, 120);
 }
 
+function normalizeNote(value: unknown): string | null {
+	if (typeof value !== 'string') return null;
+	const trimmed = value.trim();
+	if (!trimmed) return null;
+	return trimmed.slice(0, 1200);
+}
+
 function toStringList(value: unknown): string[] {
 	if (!Array.isArray(value)) return [];
 	return value
@@ -38,7 +45,13 @@ function normalizeIntent(value: unknown): GenerationHintIntent {
 }
 
 function normalizeSource(value: unknown): GenerationHintSource {
-	if (value === 'title' || value === 'synopsis' || value === 'manual' || value === 'legacy') {
+	if (
+		value === 'title' ||
+		value === 'synopsis' ||
+		value === 'manual' ||
+		value === 'legacy' ||
+		value === 'brainstorm'
+	) {
 		return value;
 	}
 	return 'manual';
@@ -87,7 +100,7 @@ export function normalizeGenerationContext(input: unknown): GenerationContextPay
 		hints.push({ name, intent: 'avoid', source: 'manual' });
 	}
 
-	const note = normalizeName(input.note);
+	const note = normalizeNote(input.note);
 	const dedupedHints = dedupeHints(hints.slice(0, MAX_HINTS));
 
 	if (!note && dedupedHints.length === 0) return undefined;
@@ -98,22 +111,107 @@ export function normalizeGenerationContext(input: unknown): GenerationContextPay
 	};
 }
 
-export function legacyStringToGenerationContext(input?: string): GenerationContextPayload | undefined {
+export function legacyStringToGenerationContext(
+	input?: string,
+): GenerationContextPayload | undefined {
 	const note = normalizeName(input);
 	if (!note) return undefined;
 	return { note };
 }
 
 const NAME_CANDIDATE_STOPWORDS = new Set([
-	'A', 'An', 'The', 'In', 'On', 'At', 'By', 'For', 'Of', 'To', 'And', 'Or', 'But',
-	'With', 'From', 'Into', 'Her', 'His', 'Its', 'Their', 'My', 'Our', 'Your', 'Is',
-	'Are', 'Was', 'Were', 'Has', 'Have', 'Had', 'That', 'This', 'When', 'Where',
-	'Which', 'Who', 'Whose', 'What', 'How', 'Why', 'As', 'If', 'Be', 'Been', 'Being',
-	'Do', 'Does', 'Did', 'Not', 'No', 'All', 'Any', 'Each', 'Every', 'Both',
-	'One', 'Two', 'Three', 'First', 'Last', 'New', 'Old', 'After', 'Before', 'Then',
-	'Now', 'So', 'Up', 'Down', 'Out', 'Over', 'Under', 'Through', 'About', 'Between',
-	'During', 'Without', 'Within', 'He', 'She', 'They', 'We', 'You', 'It', 'Will',
-	'Would', 'Could', 'Should', 'May', 'Might', 'Must', 'Can',
+	'A',
+	'An',
+	'The',
+	'In',
+	'On',
+	'At',
+	'By',
+	'For',
+	'Of',
+	'To',
+	'And',
+	'Or',
+	'But',
+	'With',
+	'From',
+	'Into',
+	'Her',
+	'His',
+	'Its',
+	'Their',
+	'My',
+	'Our',
+	'Your',
+	'Is',
+	'Are',
+	'Was',
+	'Were',
+	'Has',
+	'Have',
+	'Had',
+	'That',
+	'This',
+	'When',
+	'Where',
+	'Which',
+	'Who',
+	'Whose',
+	'What',
+	'How',
+	'Why',
+	'As',
+	'If',
+	'Be',
+	'Been',
+	'Being',
+	'Do',
+	'Does',
+	'Did',
+	'Not',
+	'No',
+	'All',
+	'Any',
+	'Each',
+	'Every',
+	'Both',
+	'One',
+	'Two',
+	'Three',
+	'First',
+	'Last',
+	'New',
+	'Old',
+	'After',
+	'Before',
+	'Then',
+	'Now',
+	'So',
+	'Up',
+	'Down',
+	'Out',
+	'Over',
+	'Under',
+	'Through',
+	'About',
+	'Between',
+	'During',
+	'Without',
+	'Within',
+	'He',
+	'She',
+	'They',
+	'We',
+	'You',
+	'It',
+	'Will',
+	'Would',
+	'Could',
+	'Should',
+	'May',
+	'Might',
+	'Must',
+	'Can',
 ]);
 
 /**
@@ -153,15 +251,9 @@ export function buildPromptContextNote(context?: GenerationContextPayload): stri
 	}
 
 	const hints = context.hints ?? [];
-	const targets = hints
-		.filter((hint) => hint.intent === 'target')
-		.map((hint) => hint.name);
-	const avoids = hints
-		.filter((hint) => hint.intent === 'avoid')
-		.map((hint) => hint.name);
-	const related = hints
-		.filter((hint) => hint.intent === 'neutral')
-		.map((hint) => hint.name);
+	const targets = hints.filter((hint) => hint.intent === 'target').map((hint) => hint.name);
+	const avoids = hints.filter((hint) => hint.intent === 'avoid').map((hint) => hint.name);
+	const related = hints.filter((hint) => hint.intent === 'neutral').map((hint) => hint.name);
 
 	if (targets.length > 0) {
 		lines.push(`Prioritize these entities if relevant: ${targets.join(', ')}`);

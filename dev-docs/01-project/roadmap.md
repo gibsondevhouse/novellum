@@ -77,12 +77,20 @@ not started**. It does not promise dates.
 ### Codebase health
 
 - Codebase naming consistency (route/module/component alignment) — shipped organically via plans 020-028. Closed by plan-029 closeout (originally plan-019).
-- Documentation refresh of dev-docs and novellum-docs — closed by [plan-014-documentation-refresh](../plans/archive/plan-014-documentation-refresh/plan.md) (closed 2026-04-20). Re-baselined 2026-05-07. This page re-baselined again 2026-06-16 by Plan-053 implementation review.
+- Documentation refresh of dev-docs and novellum-docs — closed by [plan-014-documentation-refresh](../plans/archive/plan-014-documentation-refresh/plan.md) (closed 2026-04-20). Re-baselined 2026-05-07. This page re-baselined again 2026-06-28 by Plan-043 implementation review.
 
 ## In flight
 
+### Active implementation
+
+- [plan-057-context-control-panel](../plans/plan-057-context-control-panel/plan.md) — AI Context Control Panel. Stages 001-004 are in `review`; implementation evidence is ready for Reviewer Agent evaluation.
+- [plan-058-beat-stage-generator](../plans/plan-058-beat-stage-generator/plan.md) — Beat & Stage Generator. Stages 001-002 are in `review`; Stage 003 beat outline tree UI is next.
+
+### Pending review
+
 The following plans are in **review** (implementation complete):
 
+- [plan-043-brainstorm-agent](../plans/plan-043-brainstorm-agent/plan.md) — Review-gated Nova brainstorm proposals, staged accept/reject state, and worldbuilding generation context prefill.
 - [plan-051-governed-ai-controller-runtime](../plans/plan-051-governed-ai-controller-runtime/plan.md) — Server-side governed AI controller.
 - [plan-048-frontend-experience-coherence](../plans/plan-048-frontend-experience-coherence/plan.md) — Unified navigation, review gates, and visual state.
 - [plan-052-pipeline-nova-editor-trust-closure](../plans/plan-052-pipeline-nova-editor-trust-closure/plan.md) — Durable review-gated Nova artifacts and revision acks.
@@ -92,9 +100,11 @@ Release engineering (code signing, notarization, brand icons) remains deferred t
 
 ## Drafted (skeleton plans)
 
-These plans have a `plan.md` skeleton but stages have not been authored yet. Pick one up to start the next era of work.
+These plans have a `plan.md` skeleton but implementation has not started yet. Pick one up after the active plan reaches review.
 
-- [plan-043-brainstorm-agent](../plans/plan-043-brainstorm-agent/plan.md) — Re-introduce BrainstormAgent with review-gated UI and worldbuild integration.
+- [plan-058-beat-stage-generator](../plans/plan-058-beat-stage-generator/plan.md) — Narrative beat and stage generation integrated with the database hierarchy.
+- [plan-059-docx-epub-exporter](../plans/plan-059-docx-epub-exporter/plan.md) — Shunn-style DOCX and TOC-compliant EPUB export compilers.
+- [plan-060-backups-recovery-ui](../plans/plan-060-backups-recovery-ui/plan.md) — Local database restores, scheduling, and revision-history panels.
 
 ## Next era — full AI integration
 
@@ -102,7 +112,7 @@ Following the internal V1 trust + product foundation, the next development era e
 
 ## Planned but not started
 
-> Cut from internal V1 (2026-05-13, plan-025): `BrainstormAgent`, `OutlineAgent`, `DraftAgent`, `SummaryAgent` were removed from the internal V1 task-resolver surface. Re-introducing any is a new feature plan (see plan-040 for Outline).
+> Cut from internal V1 (2026-05-13, plan-025): `OutlineAgent`, `DraftAgent`, and `SummaryAgent` remain removed from the internal V1 task-resolver surface. `BrainstormAgent` is being reintroduced by plan-043 as a review-gated feature; re-introducing the remaining cut agents requires a new feature plan (see plan-040 for Outline-style checkpoint generation).
 
 ### Deferred (not yet scheduled)
 

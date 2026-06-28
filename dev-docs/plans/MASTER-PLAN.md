@@ -1,6 +1,6 @@
 # MASTER PLAN: Novellum Development
 
-> Last reconciled: 2026-06-25
+> Last reconciled: 2026-06-28
 
 ## Active Plans
 
@@ -8,12 +8,12 @@
 - [plan-048-frontend-experience-coherence](./plan-048-frontend-experience-coherence/plan.md): Frontend Experience Coherence — final frontend pass to make route context, navigation, author workflows, review gates, and visual states read as one production app. Status: `review` (implementation evidence complete 2026-06-15; pending plan-level Reviewer Agent evaluation).
 - [plan-052-pipeline-nova-editor-trust-closure](./plan-052-pipeline-nova-editor-trust-closure/plan.md): Pipeline, Nova, and Editor Trust Closure — wire silent Nova artifact actions to durable review-gated behavior, persist revision acknowledgements, clean internal AI metadata/copy, and remove misleading pre-release chrome. Status: `review` (implementation evidence complete 2026-06-15; pending plan-level Reviewer Agent evaluation).
 - [plan-053-worldbuilding-outline-review-flow-closure](./plan-053-worldbuilding-outline-review-flow-closure/plan.md): Worldbuilding and Outline Review Flow Closure — surface persisted worldbuilding scan proposals, make generation controls reflect real execution state, polish outline review metadata, and clean worldbuilding persistence errors. Status: `review` (implementation evidence complete 2026-06-16; pending plan-level Reviewer Agent evaluation).
-- [plan-043-brainstorm-agent](./plan-043-brainstorm-agent/plan.md): Brainstorm Agent — review-gated brainstorm proposal generation and worldbuilding context prefill flow. Status: `in-progress` (Stages 001 and 002 in `review`; Stage 003 Accept Flow & Worldbuild Hookup next).
+- [plan-043-brainstorm-agent](./plan-043-brainstorm-agent/plan.md): Brainstorm Agent — review-gated brainstorm proposal generation and worldbuilding context prefill flow. Status: `review` (implementation evidence complete 2026-06-28; pending plan-level Reviewer Agent evaluation).
+- [plan-057-context-control-panel](./plan-057-context-control-panel/plan.md): AI Context Control Panel — grounding controls for pinning or excluding lore entries during LLM queries. Status: `review` (implementation evidence complete 2026-06-28; pending plan-level Reviewer Agent evaluation).
+- [plan-058-beat-stage-generator](./plan-058-beat-stage-generator/plan.md): Beat & Stage Generator — Narrative beats generation and integration with database hierarchy. Status: `in-progress` (Stages 001-002 in `review`; Stage 003 Beat Outline Tree UI Components next).
 
 ## Deferred (not yet scheduled)
 
-- [plan-057-context-control-panel](./plan-057-context-control-panel/plan.md): AI Context Control Panel — Grounding controls for pinning or excluding lore entries during LLM queries. Status: `draft` (scaffolded 2026-06-25).
-- [plan-058-beat-stage-generator](./plan-058-beat-stage-generator/plan.md): Beat & Stage Generator — Narrative beats generation and integration with database hierarchy. Status: `draft` (scaffolded 2026-06-25).
 - [plan-059-docx-epub-exporter](./plan-059-docx-epub-exporter/plan.md): Robust Document Exporting — Shunn layout formatted Docx and TOC-compliant ePub compilers. Status: `draft` (scaffolded 2026-06-25).
 - [plan-060-backups-recovery-ui](./plan-060-backups-recovery-ui/plan.md): Local Backups & Auto-Save Recovery — Database restores, scheduling, and revision history panels. Status: `draft` (scaffolded 2026-06-25).
 - **Release engineering** — code signing, notarization, brand icons, formal smoke/keyring verification. Infrastructure exists; requires external procurement. Originally plan-024 stage-002.

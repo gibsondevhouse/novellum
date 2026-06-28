@@ -2,13 +2,13 @@
 title: Beat Schema Prompts Definition
 slug: part-001-beat-schema-prompts-definition
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-beat-schema-prompts
-started_at: ~
-completed_at: ~
-estimated_duration: undefined
+started_at: 2026-06-28
+completed_at: 2026-06-28
+estimated_duration: 1d
 ---
 
 ## Objective
@@ -44,7 +44,7 @@ Define Zod array structures and prompt templates mapping scene summaries into pa
 
 ## Acceptance Criteria
 
-- [ ] Zod correctly parses array structures of narrative beats.
+- [x] Zod correctly parses array structures of narrative beats.
 
 ## Edge Cases
 

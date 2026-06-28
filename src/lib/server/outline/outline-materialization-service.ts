@@ -87,7 +87,14 @@ interface MetadataRow {
 	value: string;
 }
 
-type ProjectScopedHierarchyTable = 'arcs' | 'acts' | 'milestones' | 'chapters' | 'scenes';
+type ProjectScopedHierarchyTable =
+	| 'arcs'
+	| 'acts'
+	| 'milestones'
+	| 'chapters'
+	| 'scenes'
+	| 'beats'
+	| 'stages';
 
 function nowIso(): string {
 	return new Date().toISOString();
@@ -352,6 +359,8 @@ function assertNoMaterializationCollisions(
 		map.chapters.map((chapter) => chapter.id),
 	);
 	assertNoCrossProjectCollisions(database, projectId, 'scenes', map.scenes.map((scene) => scene.id));
+	assertNoCrossProjectCollisions(database, projectId, 'beats', map.beats.map((beat) => beat.id));
+	assertNoCrossProjectCollisions(database, projectId, 'stages', map.stages.map((stage) => stage.id));
 }
 
 function writeSceneIntentMetadata(
@@ -496,11 +505,26 @@ export function acceptOutlineCheckpointMaterialization(
 		);
 		const insertBeat = database.prepare(
 			`INSERT INTO beats (id, sceneId, arcId, projectId, title, type, "order", notes, createdAt, updatedAt)
-			 VALUES (@id, @sceneId, @arcId, @projectId, @title, @type, @order, @notes, @createdAt, @updatedAt)`,
+			 VALUES (@id, @sceneId, @arcId, @projectId, @title, @type, @order, @notes, @createdAt, @updatedAt)
+			 ON CONFLICT(id) DO UPDATE SET
+			 sceneId = excluded.sceneId,
+			 arcId = excluded.arcId,
+			 title = excluded.title,
+			 type = excluded.type,
+			 "order" = excluded."order",
+			 notes = excluded.notes,
+			 updatedAt = excluded.updatedAt`,
 		);
 		const insertStage = database.prepare(
 			`INSERT INTO stages (id, beatId, projectId, title, description, "order", status, createdAt, updatedAt)
-			 VALUES (@id, @beatId, @projectId, @title, @description, @order, @status, @createdAt, @updatedAt)`,
+			 VALUES (@id, @beatId, @projectId, @title, @description, @order, @status, @createdAt, @updatedAt)
+			 ON CONFLICT(id) DO UPDATE SET
+			 beatId = excluded.beatId,
+			 title = excluded.title,
+			 description = excluded.description,
+			 "order" = excluded."order",
+			 status = excluded.status,
+			 updatedAt = excluded.updatedAt`,
 		);
 		const insertMetadata = database.prepare(
 			`INSERT INTO project_metadata (projectId, scope, ownerId, key, value, updatedAt)

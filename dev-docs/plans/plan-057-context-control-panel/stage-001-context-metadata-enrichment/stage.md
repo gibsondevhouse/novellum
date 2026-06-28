@@ -2,7 +2,7 @@
 title: Context Selection API Overrides
 slug: stage-001-context-metadata-enrichment
 stage_number: 1
-status: draft
+status: review
 owner: Planner Agent
 plan: plan-057-context-control-panel
 phases:
@@ -17,9 +17,9 @@ Extend context builder payload schemas to support explicit pin/exclude ID lists.
 
 ## Phases
 
-| #   | Phase | Status | Est. Duration |
-| --- | --- | --- | --- |
-| 001 | [Context Selection API Overrides Phase](phase-001-context-metadata-api/phase.md) | `draft` | 2d |
+| #   | Phase                                                                            | Status   | Est. Duration |
+| --- | -------------------------------------------------------------------------------- | -------- | ------------- |
+| 001 | [Context Selection API Overrides Phase](phase-001-context-metadata-api/phase.md) | `review` | 2d            |
 
 ## Entry Criteria
 
@@ -28,8 +28,8 @@ Extend context builder payload schemas to support explicit pin/exclude ID lists.
 ## Exit Criteria
 
 - Context builder respects manual client override arrays.
-- All phases complete
-- All quality gates passed
+- All phases are implementation-complete and ready for review
+- Focused quality gates passed
 
 ## Notes
 

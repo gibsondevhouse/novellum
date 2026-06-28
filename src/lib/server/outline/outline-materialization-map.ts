@@ -6,6 +6,7 @@ import type {
 	OutlineDraftScene,
 	OutlineDraftSceneIntent,
 } from '$lib/ai/pipeline/outline-draft-contract.js';
+import type { StageLifecycleStatus } from '$lib/ai/pipeline/contracts.js';
 import type {
 	OutlineMergeNodeKey,
 	OutlineMergeNodeKind,
@@ -123,7 +124,7 @@ export interface MaterializedStageRow {
 	title: string;
 	description: string;
 	order: number;
-	status: 'planned';
+	status: StageLifecycleStatus;
 	createdAt: string;
 	updatedAt: string;
 	sourceId: string;
@@ -193,6 +194,14 @@ function assertUniqueNodeId(
 	seen.set(id, label);
 }
 
+function beatIdForScene(sceneId: string, order: number): string {
+	return `beat:${sceneId}:${order}`;
+}
+
+function stageIdForBeat(beatId: string, order: number): string {
+	return `stage:${beatId}:${order}`;
+}
+
 function collectAndValidateIds(draft: OutlineDraft): void {
 	const seen = new Map<string, string>();
 	assertNonEmpty(draft.arcs, 'Outline draft must include at least one arc.');
@@ -207,6 +216,13 @@ function collectAndValidateIds(draft: OutlineDraft): void {
 				assertNonEmpty(chapter.scenes, `Chapter ${chapter.id} must include at least one scene.`);
 				for (const scene of chapter.scenes) {
 					assertUniqueNodeId(seen, scene.id, `scene ${scene.title}`);
+					for (const beat of scene.beats ?? []) {
+						const beatId = beatIdForScene(scene.id, beat.order);
+						assertUniqueNodeId(seen, beatId, `beat ${beat.title}`);
+						for (const stage of beat.stages) {
+							assertUniqueNodeId(seen, stageIdForBeat(beatId, stage.order), `stage ${stage.title}`);
+						}
+					}
 				}
 			}
 		}
@@ -465,6 +481,58 @@ function mapScene(
 	};
 }
 
+function beatNotes(summary: string, purpose: string): string {
+	return `${summary}\n\nPurpose: ${purpose}`.trim();
+}
+
+function mapBeatsAndStages(
+	projectId: string,
+	arc: OutlineDraftArc,
+	scene: OutlineDraftScene,
+	nowIso: string,
+): { beats: MaterializedBeatRow[]; stages: MaterializedStageRow[] } {
+	const beats: MaterializedBeatRow[] = [];
+	const stages: MaterializedStageRow[] = [];
+
+	for (const beat of sortNodes(
+		(scene.beats ?? []).map((item) => ({ ...item, id: beatIdForScene(scene.id, item.order) })),
+	)) {
+		const beatId = beat.id;
+		beats.push({
+			id: beatId,
+			sceneId: scene.id,
+			arcId: arc.id,
+			projectId,
+			title: beat.title,
+			type: beat.type,
+			order: beat.order,
+			notes: beatNotes(beat.summary, beat.purpose),
+			createdAt: nowIso,
+			updatedAt: nowIso,
+			sourceId: beatId,
+		});
+
+		for (const stage of sortNodes(
+			beat.stages.map((item) => ({ ...item, id: stageIdForBeat(beatId, item.order) })),
+		)) {
+			stages.push({
+				id: stage.id,
+				beatId,
+				projectId,
+				title: stage.title,
+				description: stage.purpose,
+				order: stage.order,
+				status: stage.status,
+				createdAt: nowIso,
+				updatedAt: nowIso,
+				sourceId: stage.id,
+			});
+		}
+	}
+
+	return { beats, stages };
+}
+
 function mapMilestone(
 	projectId: string,
 	act: OutlineDraftAct,
@@ -499,6 +567,8 @@ export function buildOutlineMaterializationMap(
 	const milestones: MaterializedMilestoneRow[] = [];
 	const chapters: MaterializedChapterRow[] = [];
 	const scenes: MaterializedSceneRow[] = [];
+	const beats: MaterializedBeatRow[] = [];
+	const stages: MaterializedStageRow[] = [];
 	const sceneIntentMetadata: SceneIntentMetadataRow[] = [];
 
 	for (const arc of sortNodes(draft.arcs)) {
@@ -515,6 +585,9 @@ export function buildOutlineMaterializationMap(
 				for (const scene of sortNodes(chapter.scenes)) {
 					if (!shouldIncludeScene(selectedKeys, scene)) continue;
 					scenes.push(mapScene(projectId, arc, chapter, scene, nowIso));
+					const mapped = mapBeatsAndStages(projectId, arc, scene, nowIso);
+					beats.push(...mapped.beats);
+					stages.push(...mapped.stages);
 					sceneIntentMetadata.push(...sceneIntentRows(projectId, scene));
 				}
 			}
@@ -532,8 +605,8 @@ export function buildOutlineMaterializationMap(
 		milestones,
 		chapters,
 		scenes,
-		beats: [],
-		stages: [],
+		beats,
+		stages,
 		sceneIntentMetadata,
 		counts: {
 			arcs: arcs.length,
@@ -541,8 +614,8 @@ export function buildOutlineMaterializationMap(
 			milestones: milestones.length,
 			chapters: chapters.length,
 			scenes: scenes.length,
-			beats: 0,
-			stages: 0,
+			beats: beats.length,
+			stages: stages.length,
 			sceneIntentMetadata: sceneIntentMetadata.length,
 		},
 	};

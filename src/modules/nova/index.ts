@@ -27,13 +27,16 @@ registerStubTools();
  * window bridge so tests can write via the real session store.
  */
 if (typeof window !== 'undefined') {
-	(window as Window & {
-		__NOVELLUM_NOVA_TEST__?: { session: typeof novaSession };
-	}).__NOVELLUM_NOVA_TEST__ = { session: novaSession };
+	(
+		window as Window & {
+			__NOVELLUM_NOVA_TEST__?: { session: typeof novaSession };
+		}
+	).__NOVELLUM_NOVA_TEST__ = { session: novaSession };
 }
 
 export { default as NovaPanel } from './components/NovaPanel.svelte';
 export { default as ContextDisclosurePill } from './components/ContextDisclosurePill.svelte';
+export { default as ContextSidebarDrawer } from './components/ContextSidebarDrawer.svelte';
 export { default as ModelPickerDropdown } from './components/ModelPickerDropdown.svelte';
 export { default as NovaErrorBoundary } from './components/NovaErrorBoundary.svelte';
 export { default as NovaSceneDraftCard } from './components/NovaSceneDraftCard.svelte';
@@ -47,6 +50,14 @@ export { default as ProposalCard } from './components/brainstorm/ProposalCard.sv
 export { novaPanel } from './stores/nova-panel.svelte.js';
 export { novaSession } from './stores/nova-session.svelte.js';
 export { novaMode } from './stores/nova-mode.svelte.js';
+export {
+	contextControl,
+	ContextControlStore,
+	estimateContextTokens,
+	type ContextControlEntity,
+	type ContextControlEntityKind,
+	type ContextOverrideState,
+} from './stores/context-control.svelte.js';
 export type { ContextDisclosureState } from './stores/nova-session.svelte.js';
 export {
 	outlineGenerationState,
@@ -167,14 +178,8 @@ export {
 	ALLOWED_EXTENSIONS,
 	type AttachmentValidationResult,
 } from './utils/attachment-validator.js';
-export {
-	isNovaAgenticEnabled,
-	setNovaAgenticFlag,
-} from './services/feature-flags.js';
-export {
-	createStreamController,
-	type StreamController,
-} from './services/stream-controller.js';
+export { isNovaAgenticEnabled, setNovaAgenticFlag } from './services/feature-flags.js';
+export { createStreamController, type StreamController } from './services/stream-controller.js';
 export type {
 	NovaArtifact,
 	NovaAttachment,

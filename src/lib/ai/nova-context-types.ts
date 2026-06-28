@@ -6,7 +6,24 @@
  * re-exports everything from this file, so existing consumers are unaffected.
  */
 
-export type NovaContextAttachmentKind = 'project' | 'file';
+export type NovaContextAttachmentKind = 'project' | 'file' | 'entity';
+export type NovaContextEntityKind =
+	| 'chapter'
+	| 'scene'
+	| 'beat'
+	| 'character'
+	| 'characterRelationship'
+	| 'location'
+	| 'loreEntry'
+	| 'plotThread'
+	| 'timelineEvent'
+	| 'storyFrame'
+	| 'act'
+	| 'arc'
+	| 'milestone'
+	| 'writingStyle'
+	| 'systemPrompt'
+	| 'chatInstruction';
 
 export interface NovaContextFileInput {
 	id: string;
@@ -34,6 +51,8 @@ export interface NovaContextRequestPayload {
 	mode?: NovaContextMode;
 	requestedScopes?: string[];
 	entityHints?: string[];
+	pinnedEntityIds?: string[];
+	excludedEntityIds?: string[];
 }
 
 export interface NovaContextTruncationEntry {
@@ -67,7 +86,19 @@ export interface NovaContextIncludedFileItem {
 	sizeBytes: number;
 }
 
-export type NovaContextIncludedItem = NovaContextIncludedProjectItem | NovaContextIncludedFileItem;
+export interface NovaContextIncludedEntityItem {
+	kind: 'entity';
+	id: string;
+	projectId: string;
+	entityType: NovaContextEntityKind;
+	label: string;
+	inclusion: 'pinned';
+}
+
+export type NovaContextIncludedItem =
+	| NovaContextIncludedProjectItem
+	| NovaContextIncludedFileItem
+	| NovaContextIncludedEntityItem;
 
 export interface NovaContextResponsePayload {
 	contextText: string;

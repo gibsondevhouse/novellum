@@ -2,13 +2,13 @@
 title: Context Sidebar Drawer Component
 slug: part-001-context-sidebar-drawer
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-context-drawer-ui
-started_at: ~
-completed_at: ~
-estimated_duration: undefined
+started_at: 2026-06-28
+completed_at: 2026-06-28
+estimated_duration: 2d
 ---
 
 ## Objective
@@ -36,15 +36,18 @@ Design context visualisation drawer displaying token estimates and overrides.
 **Create:**
 
 - `src/modules/nova/components/ContextSidebarDrawer.svelte`
+- `src/modules/nova/stores/context-control.svelte.ts`
 
 **Update:**
 
-- `src/modules/nova/components/NovaMessageLog.svelte`
+- `src/modules/nova/components/NovaPanel.svelte`
+- `src/modules/nova/index.ts`
+- `tests/nova/context-sidebar-drawer.test.ts`
 
 ## Acceptance Criteria
 
-- [ ] Token bar visual changes correctly.
-- [ ] Pins toggle chips state.
+- [x] Token bar visual changes correctly.
+- [x] Pins toggle chips state.
 
 ## Edge Cases
 

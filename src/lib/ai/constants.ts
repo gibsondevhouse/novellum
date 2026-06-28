@@ -173,6 +173,8 @@ export const OUTPUT_FORMAT_DESCRIPTIONS: Record<string, string> = {
 		'Respond with the scene prose first, then append a fenced ```json block (the sidecar) containing ONLY a JSON object with: sceneId, chapterId, povCharacterId (string|null), wordCount, usedCanonRefs (object with characterIds/locationIds/factionIds/loreEntryIds arrays), uncertainties, continuityRisks. Do not include any text after the closing fence.',
 	json_author_revision_pack:
 		'Return a JSON object with an `issues[]` array. Each issue must have: severity, type, evidenceSpan, problemExplanation, minimalFix, deeperRewriteOption, requiresCanonDecision, relatedEntityIds, approvalChecklist.',
+	json_outline_beats:
+		'Return a JSON object with sceneId and beats[]. Each beat must have order, title, type, summary, purpose, and stages[]. Each stage must have order, title, purpose, and status.',
 	json_worldbuild_domain_personae:
 		'Return a JSON object with arrays: individuals[], factions[], relationships[]. Each individual requires a name field; each faction requires a name field.',
 	json_worldbuild_domain_atlas:

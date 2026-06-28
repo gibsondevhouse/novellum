@@ -37,4 +37,5 @@ export type {
 
 // Components
 export { default as HierarchyNavigator } from './components/HierarchyNavigator.svelte';
+export { default as BeatOutlineNodes } from './components/BeatOutlineNodes.svelte';
 export { default as OutlineDetailCard } from './components/OutlineDetailCard.svelte';

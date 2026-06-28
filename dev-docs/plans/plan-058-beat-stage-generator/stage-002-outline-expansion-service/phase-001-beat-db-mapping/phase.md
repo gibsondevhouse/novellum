@@ -2,7 +2,7 @@
 title: Beat Database Mappings
 slug: phase-001-beat-db-mapping
 phase_number: 1
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-002-outline-expansion-service
 parts:
@@ -18,12 +18,12 @@ Extend outline service to map beat/stage sequences to local SQLite databases.
 
 | #   | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Beat DB Mapping Service](part-001-beat-db-mapping-service/part.md) | `draft` | — | 2d |
+| 001 | [Beat DB Mapping Service](part-001-beat-db-mapping-service/part.md) | `review` | Codex | 2d |
 
 ## Acceptance Criteria
 
-- [ ] All parts reach `complete`
-- [ ] Materializer inserts beats inside one transaction block.
+- [x] All parts reach `review`
+- [x] Materializer inserts beats inside one transaction block.
 
 ## Notes
 

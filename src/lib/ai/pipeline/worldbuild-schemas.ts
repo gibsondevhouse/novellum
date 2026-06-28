@@ -144,6 +144,38 @@ const timelineEventDraftSchema = z
 	})
 	.strict();
 
+const beatStageStatusSchema = z
+	.enum(['planned', 'in_progress', 'completed'])
+	.optional()
+	.default('planned');
+
+export const outlineBeatStageSchema = z
+	.object({
+		order: z.coerce.number().int().min(0).max(20),
+		title: trimmedString,
+		purpose: trimmedString,
+		status: beatStageStatusSchema,
+	})
+	.strict();
+
+export const outlineBeatSchema = z
+	.object({
+		order: z.coerce.number().int().min(0).max(20),
+		title: trimmedString,
+		type: trimmedString,
+		summary: trimmedString,
+		purpose: trimmedString,
+		stages: z.array(outlineBeatStageSchema).min(1).max(3),
+	})
+	.strict();
+
+export const outlineBeatPlanSchema = z
+	.object({
+		sceneId: trimmedString,
+		beats: z.array(outlineBeatSchema).min(1).max(5),
+	})
+	.strict();
+
 export const worldbuildDomainPersonaeSchema = z
 	.object({
 		individuals: z.array(characterDraftSchema).optional().default([]),
@@ -275,6 +307,9 @@ export type WorldbuildDomainAtlas = z.infer<typeof worldbuildDomainAtlasSchema>;
 export type WorldbuildDomainArchive = z.infer<typeof worldbuildDomainArchiveSchema>;
 export type WorldbuildDomainThreads = z.infer<typeof worldbuildDomainThreadsSchema>;
 export type WorldbuildDomainChronicles = z.infer<typeof worldbuildDomainChroniclesSchema>;
+export type OutlineBeatStage = z.infer<typeof outlineBeatStageSchema>;
+export type OutlineBeat = z.infer<typeof outlineBeatSchema>;
+export type OutlineBeatPlan = z.infer<typeof outlineBeatPlanSchema>;
 
 export type WorldbuildSchemaByOutputFormat = {
 	json_worldbuild_premise: typeof worldbuildPremiseSchema;
@@ -286,6 +321,7 @@ export type WorldbuildSchemaByOutputFormat = {
 	json_worldbuild_domain_archive: typeof worldbuildDomainArchiveSchema;
 	json_worldbuild_domain_threads: typeof worldbuildDomainThreadsSchema;
 	json_worldbuild_domain_chronicles: typeof worldbuildDomainChroniclesSchema;
+	json_outline_beats: typeof outlineBeatPlanSchema;
 };
 
 export const WORLDBUILD_SCHEMA_BY_OUTPUT_FORMAT: WorldbuildSchemaByOutputFormat = {
@@ -298,4 +334,5 @@ export const WORLDBUILD_SCHEMA_BY_OUTPUT_FORMAT: WorldbuildSchemaByOutputFormat 
 	json_worldbuild_domain_archive: worldbuildDomainArchiveSchema,
 	json_worldbuild_domain_threads: worldbuildDomainThreadsSchema,
 	json_worldbuild_domain_chronicles: worldbuildDomainChroniclesSchema,
+	json_outline_beats: outlineBeatPlanSchema,
 };

@@ -89,6 +89,18 @@ export const PROMPT_SEEDS: Record<string, PromptScaffold> = {
 		],
 		outputFormat: 'json_author_revision_pack'
 	},
+	'vibe-outline.beats': {
+		role: 'You are a scene-structure planner decomposing approved scene summaries into paragraph-level narrative beats.',
+		task: 'Turn one scene synopsis into 3 to 5 chronological beats, each with 1 to 3 concrete planning stages that describe how the beat should progress.',
+		constraints: [
+			'Do not write manuscript prose.',
+			'Do not change the scene outcome, POV, location, or canon facts supplied in context.',
+			'Every beat must cause a clear shift in information, tension, choice, or emotional state.',
+			'Keep stages actionable enough for later drafting, but do not prescribe exact sentences.',
+			'Do not create more than five beats for a single scene.'
+		],
+		outputFormat: 'json_outline_beats'
+	},
 	'worldbuilding.generate.personae': {
 		role: 'You are a canon-assembly assistant building Personae (characters, factions, lineages) for a fiction project.',
 		task: 'Generate a structured proposal of individuals, factions, and lineages that fit the established premise and world context.',

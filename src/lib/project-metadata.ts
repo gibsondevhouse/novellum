@@ -32,6 +32,17 @@ export type MetadataScope = 'scene' | 'chapter' | 'project' | 'pipeline';
 type PipelineOperation = 'upsert' | 'review' | 'accept' | 'reject';
 
 const BASE = '/api/db/project-metadata';
+export const NOVA_CONTEXT_OVERRIDES_METADATA_KEY = 'nova-context-overrides.v1';
+
+export interface NovaContextOverrideMetadata {
+	pinnedEntityIds: string[];
+	excludedEntityIds: string[];
+}
+
+export const EMPTY_NOVA_CONTEXT_OVERRIDES: NovaContextOverrideMetadata = {
+	pinnedEntityIds: [],
+	excludedEntityIds: [],
+};
 
 function isBrowser(): boolean {
 	return typeof window !== 'undefined' && typeof fetch !== 'undefined';
@@ -116,6 +127,65 @@ export async function setProjectMetadata<T>(
 	} catch {
 		/* swallow — best-effort */
 	}
+}
+
+function normalizeMetadataIds(value: unknown): string[] {
+	if (!Array.isArray(value)) return [];
+	const seen = new Set<string>();
+	const ids: string[] = [];
+	for (const item of value) {
+		if (typeof item !== 'string') continue;
+		const id = item.trim();
+		if (!id || seen.has(id)) continue;
+		seen.add(id);
+		ids.push(id);
+	}
+	return ids;
+}
+
+export function normalizeNovaContextOverrides(value: unknown): NovaContextOverrideMetadata {
+	if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+		return { ...EMPTY_NOVA_CONTEXT_OVERRIDES };
+	}
+	const record = value as Partial<NovaContextOverrideMetadata>;
+	const excludedEntityIds = normalizeMetadataIds(record.excludedEntityIds);
+	const excluded = new Set(excludedEntityIds);
+	const pinnedEntityIds = normalizeMetadataIds(record.pinnedEntityIds).filter(
+		(id) => !excluded.has(id),
+	);
+
+	return {
+		pinnedEntityIds,
+		excludedEntityIds,
+	};
+}
+
+export async function loadNovaContextOverrides(
+	projectId: string,
+	sceneId: string,
+): Promise<NovaContextOverrideMetadata> {
+	const value = await getProjectMetadata<unknown>(
+		projectId,
+		'scene',
+		sceneId,
+		NOVA_CONTEXT_OVERRIDES_METADATA_KEY,
+		EMPTY_NOVA_CONTEXT_OVERRIDES,
+	);
+	return normalizeNovaContextOverrides(value);
+}
+
+export async function saveNovaContextOverrides(
+	projectId: string,
+	sceneId: string,
+	value: NovaContextOverrideMetadata,
+): Promise<void> {
+	await setProjectMetadata(
+		projectId,
+		'scene',
+		sceneId,
+		NOVA_CONTEXT_OVERRIDES_METADATA_KEY,
+		normalizeNovaContextOverrides(value),
+	);
 }
 
 async function mutatePipelineCheckpoint(

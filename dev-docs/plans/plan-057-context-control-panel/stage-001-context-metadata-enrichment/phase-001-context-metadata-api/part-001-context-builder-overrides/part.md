@@ -2,13 +2,13 @@
 title: Context Builder Overrides Service
 slug: part-001-context-builder-overrides
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-context-metadata-api
-started_at: ~
-completed_at: ~
-estimated_duration: undefined
+started_at: 2026-06-28
+completed_at: 2026-06-28
+estimated_duration: 2d
 ---
 
 ## Objective
@@ -28,8 +28,10 @@ Extend context API schemas to support manual client override lists.
 
 ## Implementation Steps
 
-1. Update context-builder.ts.
-2. Add Zod parser parameters.
+1. Update the Nova context request contract.
+2. Add HTTP parser parameters for pin/exclude arrays.
+3. Apply server-side exclusion filtering before context rendering.
+4. Render pinned entities before implicit context.
 
 ## Files
 
@@ -39,13 +41,18 @@ Extend context API schemas to support manual client override lists.
 
 **Update:**
 
-- `src/lib/ai/context-builder.ts`
-- `src/lib/ai/types.ts`
+- `src/lib/ai/nova-context-types.ts`
+- `src/lib/server/nova/context.ts`
+- `src/lib/server/nova/context-renderers.ts`
+- `src/routes/api/nova/context/http.ts`
+- `dev-docs/03-ai/context-engine.md`
+- `tests/ai/nova-context.test.ts`
+- `tests/sqlite/nova-context-route.test.ts`
 
 ## Acceptance Criteria
 
-- [ ] Context builder filters matching override lists.
-- [ ] Pinned files are positioned correctly.
+- [x] Context builder filters matching override lists.
+- [x] Pinned entities are positioned correctly.
 
 ## Edge Cases
 

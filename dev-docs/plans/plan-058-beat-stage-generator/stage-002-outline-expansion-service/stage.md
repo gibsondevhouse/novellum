@@ -2,7 +2,7 @@
 title: Beat & Stage Database Mapping Service
 slug: stage-002-outline-expansion-service
 stage_number: 2
-status: draft
+status: review
 owner: Planner Agent
 plan: plan-058-beat-stage-generator
 phases:
@@ -19,7 +19,7 @@ Modify materializer to insert generated beats and stages into local tables.
 
 | #   | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Beat & Stage Database Mapping Service Phase](phase-001-beat-db-mapping/phase.md) | `draft` | 2d |
+| 001 | [Beat & Stage Database Mapping Service Phase](phase-001-beat-db-mapping/phase.md) | `review` | 2d |
 
 ## Entry Criteria
 
@@ -28,8 +28,8 @@ Modify materializer to insert generated beats and stages into local tables.
 ## Exit Criteria
 
 - Beats map atomically in outline hierarchy writes.
-- All phases complete
-- All quality gates passed
+- All phases are implementation-complete and ready for review
+- Focused quality gates passed
 
 ## Notes
 

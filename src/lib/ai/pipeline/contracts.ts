@@ -14,7 +14,11 @@ export type OutlineLayer = (typeof OUTLINE_HIERARCHY)[number];
 
 export type StageLifecycleStatus = 'planned' | 'in_progress' | 'completed';
 export type ArtifactLifecycleStatus = 'draft' | 'review' | 'accepted' | 'rejected';
-export type PipelineFamily = 'vibe-worldbuild' | 'vibe-worldbuild-domain' | 'vibe-author';
+export type PipelineFamily =
+	| 'vibe-worldbuild'
+	| 'vibe-worldbuild-domain'
+	| 'vibe-author'
+	| 'vibe-outline';
 
 export interface PipelineTaskContract {
 	key: string;

@@ -7,15 +7,18 @@
 -->
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
 	import { page } from '$app/state';
 	import { novaPanel } from '../stores/nova-panel.svelte.js';
 	import { novaSession } from '../stores/nova-session.svelte.js';
+	import { contextControl } from '../stores/context-control.svelte.js';
 	import { aiSession } from '../services/ai-session-service.svelte.js';
 	import { sendNovaChat } from '../services/chat-service.js';
 	import { classifyNovaError } from '../utils/classify-nova-error.js';
 	import { deriveRouteContext } from '$lib/navigation-state.js';
 	import EmptyStatePanel from '$lib/components/ui/EmptyStatePanel.svelte';
 	import ContextDisclosurePill from './ContextDisclosurePill.svelte';
+	import ContextSidebarDrawer from './ContextSidebarDrawer.svelte';
 	import NovaMessageLog from './NovaMessageLog.svelte';
 	import NovaComposer from './NovaComposer.svelte';
 	import NovaAuthorDraftEngine from './NovaAuthorDraftEngine.svelte';
@@ -47,6 +50,7 @@
 	let panelWidth = $state<number>(readStoredPanelWidth());
 	let isCompactViewport = $state(false);
 	let isResizing = $state(false);
+	let contextDrawerOpen = $state(false);
 
 	let activeResizePointerId: number | null = null;
 	let resizeStartX = 0;
@@ -66,7 +70,9 @@
 		}),
 	);
 	const isEditorRoute = $derived(routeContext.workspace === 'editor');
-	const isChapterRoute = $derived(routeContext.workspace === 'arcs' && Boolean(routeContext.activeChapterId));
+	const isChapterRoute = $derived(
+		routeContext.workspace === 'arcs' && Boolean(routeContext.activeChapterId),
+	);
 	const hasSubheader = $derived(
 		routeContext.workspace === 'world-building' || isEditorRoute || isChapterRoute,
 	);
@@ -103,6 +109,9 @@
 		return null;
 	});
 	const novaErrorType = $derived(novaError ? classifyNovaError(novaError) : null);
+	const contextOverrideCount = $derived(
+		contextControl.pinnedEntityIds.length + contextControl.excludedEntityIds.length,
+	);
 
 	function queueStarterPrompt(prompt: string): void {
 		if (onQuickPrompt) {
@@ -284,6 +293,10 @@
 		}
 	});
 
+	$effect(() => {
+		void contextControl.loadForScene(projectId, activeSceneId);
+	});
+
 	// Push the app shell content column out of the way when the panel is open.
 	// AppShell reads --nova-panel-open-offset via padding-right so the main
 	// content flexes rather than being overlaid. Compact viewport keeps overlay.
@@ -336,16 +349,45 @@
 				type="button"
 				class="nova-close"
 				aria-label="Close Nova"
-				onclick={() => novaPanel.close()}
-			>×</button>
+				onclick={() => novaPanel.close()}>×</button
+			>
 		</header>
 
 		{#if keyConfigured}
 			<div class="nova-session-tray" aria-label="Context disclosure">
 				{#if aiLoading}
-					<span class="nova-checking-dot" aria-label="Checking AI configuration…" title="Checking AI configuration…"></span>
+					<span
+						class="nova-checking-dot"
+						aria-label="Checking AI configuration…"
+						title="Checking AI configuration…"
+					></span>
 				{/if}
 				<ContextDisclosurePill />
+				<button
+					type="button"
+					class="nova-context-toggle"
+					class:is-active={contextDrawerOpen}
+					aria-label="Open AI context controls"
+					aria-expanded={contextDrawerOpen}
+					aria-haspopup="dialog"
+					title="AI context controls"
+					onclick={() => {
+						contextDrawerOpen = !contextDrawerOpen;
+					}}
+				>
+					<SlidersHorizontal size={14} aria-hidden="true" />
+					<span>Context</span>
+					{#if contextOverrideCount > 0}
+						<strong>{contextOverrideCount}</strong>
+					{/if}
+				</button>
+				<ContextSidebarDrawer
+					{projectId}
+					open={contextDrawerOpen}
+					onClose={() => {
+						contextDrawerOpen = false;
+					}}
+				/>
 			</div>
 		{/if}
 
@@ -361,11 +403,7 @@
 				</EmptyStatePanel>
 			{:else}
 				{#if hasProjectContext && (isEditorRoute || isChapterRoute)}
-					<NovaAuthorDraftEngine
-						projectId={projectId}
-						activeChapterId={activeChapterId}
-						activeSceneId={activeSceneId}
-					/>
+					<NovaAuthorDraftEngine {projectId} {activeChapterId} {activeSceneId} />
 				{/if}
 				{#if messages.length === 0}
 					<div class="nova-greeting">
@@ -419,13 +457,12 @@
 		min-width: var(--nova-panel-width-min);
 		display: flex;
 		flex-direction: column;
-		background:
-			linear-gradient(
-				180deg,
-				color-mix(in srgb, var(--color-surface-ground) 90%, var(--color-surface-overlay)) 0%,
-				var(--color-surface-ground) 56%,
-				color-mix(in srgb, var(--color-surface-ground) 88%, var(--color-surface-base)) 100%
-			);
+		background: linear-gradient(
+			180deg,
+			color-mix(in srgb, var(--color-surface-ground) 90%, var(--color-surface-overlay)) 0%,
+			var(--color-surface-ground) 56%,
+			color-mix(in srgb, var(--color-surface-ground) 88%, var(--color-surface-base)) 100%
+		);
 		border-left: 1px solid color-mix(in srgb, var(--color-brass) 44%, var(--nova-panel-border));
 		box-shadow: var(--shadow-nova-panel);
 		z-index: 50;
@@ -482,6 +519,7 @@
 	}
 
 	.nova-session-tray {
+		position: relative;
 		flex-shrink: 0;
 		display: flex;
 		align-items: center;
@@ -489,6 +527,46 @@
 		padding: var(--space-1) var(--space-3) var(--space-2);
 		background: color-mix(in srgb, var(--color-surface-ground) 86%, var(--color-surface-overlay));
 		border-bottom: 1px solid var(--color-border-subtle);
+	}
+
+	.nova-context-toggle {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-1);
+		margin-left: auto;
+		padding: var(--space-1) var(--space-2);
+		border: 1px solid var(--color-border-subtle);
+		border-radius: var(--radius-sm);
+		background: color-mix(in srgb, var(--color-surface-ground) 84%, var(--color-surface-overlay));
+		color: var(--color-text-secondary);
+		font-size: var(--text-xs);
+		line-height: var(--leading-tight);
+		cursor: pointer;
+	}
+
+	.nova-context-toggle:hover,
+	.nova-context-toggle.is-active {
+		border-color: color-mix(in srgb, var(--color-candle) 28%, var(--color-border-default));
+		background: color-mix(in srgb, var(--color-surface-overlay) 76%, var(--color-candle) 24%);
+		color: var(--color-text-primary);
+	}
+
+	.nova-context-toggle:focus-visible {
+		outline: none;
+		box-shadow: var(--focus-ring);
+	}
+
+	.nova-context-toggle strong {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: var(--space-4);
+		height: var(--space-4);
+		border-radius: var(--radius-full);
+		background: var(--color-candle);
+		color: var(--color-ink);
+		font-size: 10px;
+		line-height: 1;
 	}
 
 	.nova-panel[data-viewport-state='constrained'] .nova-session-tray,

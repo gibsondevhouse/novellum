@@ -2,10 +2,10 @@
 title: Brainstorm Agent
 slug: plan-043-brainstorm-agent
 version: 1.0.0
-status: in-progress
+status: review
 owner: Planner Agent
 created: 2026-06-04
-last_updated: 2026-06-25
+last_updated: 2026-06-28
 target_completion: TBD
 stages:
   - stage-001-agent-contract
@@ -51,30 +51,30 @@ worldbuilding context or saved as reference notes.
 
 ## Stages
 
-| # | Stage | Status | Est. Duration |
-| --- | --- | --- | --- |
-| 001 | [Agent Contract & Prompt](stage-001-agent-contract/stage.md) | `review` | 1d |
-| 002 | [Nova UI Integration](stage-002-nova-ui/stage.md) | `review` | 1.5d |
-| 003 | [Accept Flow & Worldbuild Hookup](stage-003-accept-flow/stage.md) | `draft` | 1d |
-| 004 | [Tests, Docs & Quality Gates](stage-004-qa-docs/stage.md) | `draft` | 0.5d |
+| #   | Stage                                                             | Status   | Est. Duration |
+| --- | ----------------------------------------------------------------- | -------- | ------------- |
+| 001 | [Agent Contract & Prompt](stage-001-agent-contract/stage.md)      | `review` | 1d            |
+| 002 | [Nova UI Integration](stage-002-nova-ui/stage.md)                 | `review` | 1.5d          |
+| 003 | [Accept Flow & Worldbuild Hookup](stage-003-accept-flow/stage.md) | `review` | 1d            |
+| 004 | [Tests, Docs & Quality Gates](stage-004-qa-docs/stage.md)         | `review` | 0.5d          |
 
 ## Quality Gates
 
-All stages must pass the following gates before the plan is marked `complete`:
+All stages must pass the following gates before the plan is handed to the Reviewer Agent:
 
-- [ ] **lint** — zero lint errors
-- [ ] **lint:css** — zero CSS lint errors
-- [ ] **typecheck** — zero type errors
-- [ ] **tests** — all tests pass, new agent tests included
-- [ ] **check:tokens** — zero token violations
-- [ ] **manual_qa** — seed → brainstorm → accept → worldbuild context prefill path verified
+- [x] **lint** — zero lint errors
+- [x] **lint:css** — zero CSS lint errors
+- [x] **typecheck** — zero type errors
+- [x] **tests** — all tests pass, new agent tests included
+- [x] **check:tokens** — zero token violations
+- [x] **browser_qa** — seed → brainstorm → accept → worldbuild context prefill path verified
 
 ## Risks & Mitigations
 
-| Risk | Likelihood | Mitigation |
-| --- | --- | --- |
-| Brainstorm output schema is too freeform to reliably parse | medium | Constrain to a strict JSON schema; use structured outputs if provider supports it |
-| Accepted seeds create duplicate worldbuilding entities | low | Accept inserts into a staging/pending state, not directly into canonical entities |
+| Risk                                                       | Likelihood | Mitigation                                                                        |
+| ---------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------- |
+| Brainstorm output schema is too freeform to reliably parse | medium     | Constrain to a strict JSON schema; use structured outputs if provider supports it |
+| Accepted seeds create duplicate worldbuilding entities     | low        | Accept inserts into a staging/pending state, not directly into canonical entities |
 
 ## Notes
 

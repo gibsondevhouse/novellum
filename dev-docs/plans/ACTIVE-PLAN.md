@@ -6,10 +6,12 @@
 
 ## Current
 
-- [plan-043-brainstorm-agent](./plan-043-brainstorm-agent/plan.md) — Brainstorm Agent. Stages 001 and 002 are in `review`; Stage 003 Accept Flow & Worldbuild Hookup is next. Status: `in-progress`.
+- [plan-058-beat-stage-generator](./plan-058-beat-stage-generator/plan.md) — Beat & Stage Generator. Stages 001-002 are in `review`; Stage 003 Beat Outline Tree UI Components is next. Status: `in-progress`.
 
 ## Pending review
 
+- [plan-043-brainstorm-agent](./plan-043-brainstorm-agent/plan.md) — Brainstorm Agent. Stages 001-004 are in `review`; quality gates, docs, and browser QA evidence are ready for Reviewer Agent evaluation. Status: `review`.
+- [plan-057-context-control-panel](./plan-057-context-control-panel/plan.md) — AI Context Control Panel. Stages 001-004 are in `review`; quality gates, docs, and full-test evidence are ready for Reviewer Agent evaluation. Status: `review`.
 - [plan-053-worldbuilding-outline-review-flow-closure](./plan-053-worldbuilding-outline-review-flow-closure/plan.md) — Worldbuilding and Outline Review Flow Closure. Proposal review, generation execution state, outline review polish, persistence error cleanup, docs sync, and final automated evidence are ready for Reviewer Agent evaluation. Status: `review`.
 - [plan-052-pipeline-nova-editor-trust-closure](./plan-052-pipeline-nova-editor-trust-closure/plan.md) — Pipeline, Nova, and Editor Trust Closure. Implementation evidence and automated gates are ready for Reviewer Agent evaluation. Status: `review`.
 - [plan-051-governed-ai-controller-runtime](./plan-051-governed-ai-controller-runtime/plan.md) — Governed AI Controller Runtime. Central controller runtime, policy guard, context builder, workflow registry, model gateway, output validation, artifact lifecycle, run logging, existing route audit wrappers, docs, and quality gates are ready for Reviewer Agent evaluation. Moved to review 2026-06-15.
@@ -35,7 +37,7 @@
 - [plan-037-agentic-worldbuild-scan](./plan-037-agentic-worldbuild-scan/plan.md) — Agentic worldbuild scan + review-gated proposal flow. Closed 2026-05-31 with all 5 stages complete; scan execution wired 2026-06-01. Scan contract, provider-backed proposal generation, proposal schema, pending notification UI, atomic accept/reject, 73 new tests. Quality gates: check (0 errors), test (209 files / 1546 tests), tokens (0 violations). Pre-existing lint and lint:css errors documented.
 - [plan-036-context-priority-generation](./plan-036-context-priority-generation/plan.md) — Context-priority worldbuilding generation with typed target/avoid hints, expanded character draft field coverage, and faction/lineage extension. Closed 2026-05-30 (PR #26 merge).
 - [plan-035-fix-json-double-encoding](./plan-035-fix-json-double-encoding/plan.md) — GeneratedEntityModal JSON hardening and double-encoding fix for world-building draft saves. Closed 2026-05-30 (PR #25 merge).
-- [plan-034-world-building-workflow-refactor](./plan-034/plan.md) — World Building Workflow Refactor. Stage 001 (Foundation Refactor) complete. Stages 002–004 pending.
+- [plan-034-world-building-workflow-refactor](./plan-034/plan.md) — World Building Workflow Refactor. Generation pipeline, UI integration, guardrails, and polish closed 2026-05-30 via PR #27.
 - [plan-032-worldbuilding-generation-engine](./plan-032-worldbuilding-generation-engine/plan.md) — Worldbuilding Generation Engine + Help Disclosure. Closed 2026-05-29. Proactive one-click entity generation (character / faction / realm / landmark / lore-entry / plot-thread / timeline-event) with review modal; help-disclosure toggles on all worldbuilding landing pages; AppShell transition token fix. Quality gates: `pnpm check` (0 errors), `pnpm lint` (clean), `pnpm lint:css` (clean), `pnpm test` (194 files / 1359 tests), `pnpm check:tokens` (0 violations).
 - [plan-031-nova-vscode-copilot-parity](./plan-031-nova-vscode-copilot-parity/plan.md) — Nova VS Code Copilot Parity. Closed 2026-05-28 with all 5 stages complete. Compact sidepanel, Ask/Write/Agent modes, real attachments, bounded agentic tool loop (MAX_AGENT_STEPS=8), source-contract tests. Quality gates: `pnpm check` (0 errors), `pnpm lint` (clean), `pnpm lint:css` (clean), `pnpm test` (194 files / 1358 tests), `pnpm check:tokens` (0 violations). Visual test waived on same basis as plan-030.
 - [plan-030-nova-production-refactor](./plan-030-nova-production-refactor/plan.md) —

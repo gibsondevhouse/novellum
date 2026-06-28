@@ -2,12 +2,12 @@
 title: Accept Logic
 slug: part-001-accept-logic
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-review-accept
-started_at: ~
-completed_at: ~
+started_at: 2026-06-28
+completed_at: 2026-06-28
 estimated_duration: 0.5d
 ---
 
@@ -47,7 +47,7 @@ accepted seeds for use in worldbuilding.
 
 **Create:**
 
-- `src/lib/stores/brainstorm-staging.store.ts`
+- `src/lib/stores/brainstorm-staging.store.svelte.ts`
 
 **Update:**
 
@@ -56,13 +56,13 @@ accepted seeds for use in worldbuilding.
 
 ## Acceptance Criteria
 
-- [ ] Staging store created with add/remove/clear methods
-- [ ] Accept/reject buttons render on each proposal
-- [ ] Clicking accept adds seed to staging store
-- [ ] Clicking reject removes seed from view (or keeps in list but marks rejected)
-- [ ] Clear button empties staging store
-- [ ] UI state reflects accepted/rejected status
-- [ ] `pnpm check` passes with zero errors
+- [x] Staging store created with add/remove/clear methods
+- [x] Accept/reject buttons render on each proposal
+- [x] Clicking accept adds seed to staging store
+- [x] Clicking reject removes seed from view (or keeps in list but marks rejected)
+- [x] Clear button empties staging store
+- [x] UI state reflects accepted/rejected status
+- [x] `pnpm check` passes with zero errors
 
 ## Edge Cases
 

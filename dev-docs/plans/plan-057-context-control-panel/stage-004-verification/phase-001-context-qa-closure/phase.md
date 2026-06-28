@@ -2,7 +2,7 @@
 title: Context Panel Verification
 slug: phase-001-context-qa-closure
 phase_number: 1
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-004-verification
 parts:
@@ -18,13 +18,13 @@ Run context boundary tests and check type parameters.
 
 | #   | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Context Overrides Test Suite](part-001-context-overrides-tests/part.md) | `draft` | — | 1d |
+| 001 | [Context Overrides Test Suite](part-001-context-overrides-tests/part.md) | `review` | Codex | 1d |
 
 ## Acceptance Criteria
 
-- [ ] All parts reach `complete`
-- [ ] Zero type check warnings.
-- [ ] Quality checks pass.
+- [x] All parts reach `review`
+- [x] Zero type check warnings.
+- [x] Quality checks pass.
 
 ## Notes
 

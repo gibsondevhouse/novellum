@@ -18,6 +18,7 @@ import { resolveTask } from '$lib/ai/task-resolver.js';
 import type { AiContext, AiTask, AIRequestPayload, UiContext } from '$lib/ai/types.js';
 import { getSelectedModel } from '$lib/stores/model-selection.svelte.js';
 import { sceneIntent } from '$lib/stores/scene-intent.svelte.js';
+import { contextControl, type ContextControlEntity } from '../stores/context-control.svelte.js';
 import { novaSession } from '../stores/nova-session.svelte.js';
 import { outlineGenerationState } from '../stores/outline-generation-state.svelte.js';
 import { buildRagContext } from './context-hooks.js';
@@ -109,6 +110,56 @@ function buildAttachmentContext(attachments: NovaAttachment[]): string {
 
 	if (sections.length === 0) return '';
 	return `\n\n---\n# User-Attached Context\n${sections.join('\n').trim()}`;
+}
+
+function filterExcludedRows<T extends { id: string }>(rows: T[] | undefined, excludedIds: ReadonlySet<string>): T[] {
+	if (!rows || excludedIds.size === 0) return rows ?? [];
+	return rows.filter((row) => !excludedIds.has(row.id));
+}
+
+function applyContextOverrides(aiContext: AiContext, excludedEntityIds: readonly string[]): AiContext {
+	const excludedIds = new Set(excludedEntityIds);
+	if (excludedIds.size === 0) return aiContext;
+
+	return {
+		...aiContext,
+		characters: filterExcludedRows(aiContext.characters, excludedIds),
+		locations: filterExcludedRows(aiContext.locations, excludedIds),
+		loreEntries: filterExcludedRows(aiContext.loreEntries, excludedIds),
+		plotThreads: filterExcludedRows(aiContext.plotThreads, excludedIds),
+		timelineEvents: filterExcludedRows(aiContext.timelineEvents, excludedIds),
+		factions: filterExcludedRows(aiContext.factions, excludedIds),
+	};
+}
+
+function contextOverrideKindLabel(kind: ContextControlEntity['kind']): string {
+	if (kind === 'loreEntry') return 'Lore';
+	return kind.charAt(0).toUpperCase() + kind.slice(1);
+}
+
+function buildContextOverrideContext(
+	pinnedEntities: readonly ContextControlEntity[],
+	excludedEntityIds: readonly string[],
+): string {
+	if (pinnedEntities.length === 0 && excludedEntityIds.length === 0) return '';
+
+	const lines: string[] = [];
+	if (pinnedEntities.length > 0) {
+		lines.push('Pinned entities the author explicitly wants included:');
+		for (const entity of pinnedEntities) {
+			lines.push(`- [${contextOverrideKindLabel(entity.kind)}:${entity.id}] ${entity.label}`);
+			if (entity.summary?.trim()) lines.push(`  ${entity.summary.trim()}`);
+		}
+	}
+
+	if (excludedEntityIds.length > 0) {
+		if (lines.length > 0) lines.push('');
+		lines.push(
+			`Explicitly excluded entity IDs: ${excludedEntityIds.join(', ')}. Do not use those entities as grounding facts.`,
+		);
+	}
+
+	return `\n\n---\n# User Context Overrides\n${lines.join('\n')}`;
 }
 
 function parseMissingProjectFields(warnings: string[]): string[] {
@@ -261,6 +312,9 @@ export async function sendNovaChat(input: SendChatInput): Promise<void> {
 		aiContext = { ...aiContext, sceneIntent: intentSnapshot };
 	}
 
+	const contextOverrideSnapshot = contextControl.getSnapshot();
+	aiContext = applyContextOverrides(aiContext, contextOverrideSnapshot.excludedEntityIds);
+
 	const contextItemCount =
 		(aiContext.project ? 1 : 0) +
 		(aiContext.storyFrames?.length ?? 0) +
@@ -279,7 +333,11 @@ export async function sendNovaChat(input: SendChatInput): Promise<void> {
 	});
 
 	const attachmentContext = buildAttachmentContext(currentAttachments);
-	const systemPrompt = buildPrompt(task, aiContext) + attachmentContext;
+	const overrideContext = buildContextOverrideContext(
+		contextControl.pinnedEntities,
+		contextOverrideSnapshot.excludedEntityIds,
+	);
+	const systemPrompt = buildPrompt(task, aiContext) + overrideContext + attachmentContext;
 
 	const streaming = novaSession.beginStream('nova');
 	const signal = novaSession.getSignal(streaming.id);

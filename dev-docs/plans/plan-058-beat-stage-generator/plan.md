@@ -2,10 +2,10 @@
 title: Beat & Stage Generator
 slug: plan-058-beat-stage-generator
 version: 1.0.0
-status: draft
+status: in-progress
 owner: Planner Agent
 created: 2026-06-25
-last_updated: 2026-06-25
+last_updated: 2026-06-28
 target_completion: 2026-08-12
 stages:
   - stage-001-beat-schema-prompts
@@ -40,8 +40,8 @@ Bridge the gap between scene summaries and scene drafts by implementing the Beat
 
 | #   | Stage | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Beat Prompts and Schemas](stage-001-beat-schema-prompts/stage.md) | `draft` | 1d |
-| 002 | [Beat & Stage Database Mapping Service](stage-002-outline-expansion-service/stage.md) | `draft` | 2d |
+| 001 | [Beat Prompts and Schemas](stage-001-beat-schema-prompts/stage.md) | `review` | 1d |
+| 002 | [Beat & Stage Database Mapping Service](stage-002-outline-expansion-service/stage.md) | `review` | 2d |
 | 003 | [Beat Outline Tree UI Components](stage-003-beat-view-editor/stage.md) | `draft` | 2d |
 | 004 | [Verification & Quality Gate Closure](stage-004-verification/stage.md) | `draft` | 1d |
 

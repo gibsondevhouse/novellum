@@ -8,6 +8,7 @@
 -->
 <script lang="ts">
 	import { GhostButton } from '$lib/components/ui/index.js';
+	import { brainstormStaging } from '$lib/stores/brainstorm-staging.store.svelte.js';
 	import type { EntityKind } from '../services/worldbuilding-generation-service.js';
 	import type { GenerationContextPayload } from '../services/generation-context.js';
 
@@ -53,6 +54,13 @@
 	let targets = $state<string[]>([]);
 	let manualInput = $state('');
 	let nameInputEl = $state<HTMLInputElement | null>(null);
+	let appliedBrainstormSeedIds = $state<string[]>([]);
+
+	const brainstormSeeds = $derived(brainstormStaging.getSeedsForEntityKind(entityKind));
+	const brainstormContext = $derived(brainstormStaging.buildGenerationContext(entityKind));
+	const duplicateBrainstormNames = $derived(
+		brainstormStaging.getDuplicateTitlesForEntityKind(entityKind, existingNames),
+	);
 
 	$effect(() => {
 		nameInputEl?.focus();
@@ -71,8 +79,34 @@
 					})
 			: Promise.resolve();
 		void fetchPromise
-			.catch(() => { existingNames = []; })
-			.finally(() => { loading = false; });
+			.catch(() => {
+				existingNames = [];
+			})
+			.finally(() => {
+				loading = false;
+			});
+	});
+
+	$effect(() => {
+		const unappliedSeeds = brainstormSeeds.filter(
+			(seed) => !appliedBrainstormSeedIds.includes(seed.proposal.id),
+		);
+		if (unappliedSeeds.length === 0) return;
+
+		let nextTargets = targets;
+		for (const seed of unappliedSeeds) {
+			const title = seed.proposal.title.trim();
+			if (!title) continue;
+			const lower = title.toLowerCase();
+			if (!nextTargets.some((target) => target.toLowerCase() === lower)) {
+				nextTargets = [...nextTargets, title];
+			}
+		}
+		targets = nextTargets;
+		appliedBrainstormSeedIds = [
+			...appliedBrainstormSeedIds,
+			...unappliedSeeds.map((seed) => seed.proposal.id),
+		];
 	});
 
 	function addTarget(name: string): void {
@@ -88,6 +122,21 @@
 		targets = targets.filter((t) => t !== name);
 	}
 
+	function removeBrainstormSeed(proposalId: string, title: string): void {
+		brainstormStaging.removeSeed(proposalId);
+		removeTarget(title);
+		appliedBrainstormSeedIds = appliedBrainstormSeedIds.filter((id) => id !== proposalId);
+	}
+
+	function clearBrainstormPrefill(): void {
+		const seedTitles = new Set(
+			brainstormSeeds.map((seed) => seed.proposal.title.trim().toLowerCase()),
+		);
+		brainstormStaging.clearEntitySeeds(entityKind);
+		targets = targets.filter((target) => !seedTitles.has(target.toLowerCase()));
+		appliedBrainstormSeedIds = [];
+	}
+
 	function handleManualKeydown(e: KeyboardEvent): void {
 		if (e.key === 'Enter') {
 			e.preventDefault();
@@ -96,13 +145,20 @@
 	}
 
 	function buildContext(): GenerationContextPayload | undefined {
-		if (targets.length === 0) return undefined;
+		if (targets.length === 0 && !brainstormContext?.note) return undefined;
+		const brainstormTargetNames = new Set(
+			brainstormSeeds.map((seed) => seed.proposal.title.trim().toLowerCase()),
+		);
+		const hints = targets.map((name) => ({
+			name,
+			intent: 'target' as const,
+			source: brainstormTargetNames.has(name.toLowerCase())
+				? ('brainstorm' as const)
+				: ('manual' as const),
+		}));
 		return {
-			hints: targets.map((name) => ({
-				name,
-				intent: 'target' as const,
-				source: 'manual' as const,
-			})),
+			...(brainstormContext?.note ? { note: brainstormContext.note } : {}),
+			...(hints.length > 0 ? { hints } : {}),
 		};
 	}
 
@@ -134,11 +190,7 @@
 
 <svelte:window onkeydown={handleWindowKeydown} />
 
-<div
-	class="pregen-backdrop"
-	role="presentation"
-	onclick={handleBackdropClick}
-></div>
+<div class="pregen-backdrop" role="presentation" onclick={handleBackdropClick}></div>
 
 <div
 	class="pregen-dialog"
@@ -159,6 +211,53 @@
 			</div>
 		{:else}
 			<div class="pregen-input-section">
+				{#if brainstormSeeds.length > 0}
+					<div class="pregen-brainstorm" data-testid="worldbuild-brainstorm-prefill">
+						<div class="pregen-brainstorm__header">
+							<div>
+								<span class="pregen-brainstorm__label">Accepted Brainstorm seeds</span>
+								<p class="pregen-brainstorm__copy">
+									These staged seeds will guide generation but will not enter canon until you save a
+									reviewed draft.
+								</p>
+							</div>
+							<button
+								type="button"
+								class="pregen-brainstorm__clear"
+								onclick={clearBrainstormPrefill}
+								data-testid="worldbuild-brainstorm-clear"
+							>
+								Clear prefill
+							</button>
+						</div>
+						<ul class="pregen-brainstorm__list" aria-label="Accepted Brainstorm seeds">
+							{#each brainstormSeeds as seed (seed.proposal.id)}
+								<li class="pregen-brainstorm__seed">
+									<div>
+										<span class="pregen-brainstorm__seed-title">{seed.proposal.title}</span>
+										<span class="pregen-brainstorm__seed-target"
+											>{seed.seedTarget.replace(/_/g, ' ')}</span
+										>
+									</div>
+									<button
+										type="button"
+										class="pregen-brainstorm__remove"
+										aria-label="Remove {seed.proposal.title} from prefill"
+										onclick={() => removeBrainstormSeed(seed.proposal.id, seed.proposal.title)}
+									>
+										×
+									</button>
+								</li>
+							{/each}
+						</ul>
+						{#if duplicateBrainstormNames.length > 0}
+							<p class="pregen-brainstorm__warning" role="alert">
+								Possible duplicate: {duplicateBrainstormNames.join(', ')} already exists in this project.
+							</p>
+						{/if}
+					</div>
+				{/if}
+
 				<label class="pregen-input-label" for="pregen-name-input">
 					Name specific {entityLabel.toLowerCase()} to generate profiles for
 				</label>
@@ -192,8 +291,8 @@
 									type="button"
 									class="pregen-target-remove"
 									aria-label="Remove {name}"
-									onclick={() => removeTarget(name)}
-								>×</button>
+									onclick={() => removeTarget(name)}>×</button
+								>
 							</li>
 						{/each}
 					</ul>
@@ -220,6 +319,7 @@
 			class="pregen-generate-btn"
 			disabled={loading}
 			onclick={handleSubmit}
+			data-testid="worldbuild-pregen-generate"
 		>
 			{generateLabel}
 		</button>
@@ -330,6 +430,104 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-2);
+	}
+
+	.pregen-brainstorm {
+		display: grid;
+		gap: var(--space-2);
+		padding: var(--space-3);
+		border: 1px solid color-mix(in srgb, var(--color-candle) 35%, var(--color-border-subtle));
+		border-radius: var(--radius-md);
+		background: color-mix(in srgb, var(--color-candle) 7%, var(--color-surface-overlay));
+	}
+
+	.pregen-brainstorm__header,
+	.pregen-brainstorm__seed {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: var(--space-2);
+	}
+
+	.pregen-brainstorm__label,
+	.pregen-brainstorm__seed-title {
+		color: var(--color-text-primary);
+		font-size: var(--text-xs);
+		font-weight: var(--font-weight-semibold);
+	}
+
+	.pregen-brainstorm__copy,
+	.pregen-brainstorm__warning {
+		margin: var(--space-1) 0 0;
+		color: var(--color-text-muted);
+		font-size: var(--text-xs);
+		line-height: var(--leading-normal);
+	}
+
+	.pregen-brainstorm__warning {
+		color: var(--color-warning);
+	}
+
+	.pregen-brainstorm__list {
+		display: grid;
+		gap: var(--space-1);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.pregen-brainstorm__seed {
+		padding: var(--space-2);
+		border: 1px solid var(--color-border-subtle);
+		border-radius: var(--radius-sm);
+		background: var(--color-surface-ground);
+	}
+
+	.pregen-brainstorm__seed div {
+		display: grid;
+		gap: var(--space-1);
+		min-width: 0;
+	}
+
+	.pregen-brainstorm__seed-title {
+		overflow-wrap: anywhere;
+	}
+
+	.pregen-brainstorm__seed-target {
+		color: var(--color-text-muted);
+		font-size: var(--text-xs);
+		text-transform: capitalize;
+	}
+
+	.pregen-brainstorm__clear,
+	.pregen-brainstorm__remove {
+		border: 1px solid var(--color-border-subtle);
+		border-radius: var(--radius-sm);
+		background: var(--color-surface-ground);
+		color: var(--color-text-secondary);
+		font: inherit;
+		font-size: var(--text-xs);
+		cursor: pointer;
+	}
+
+	.pregen-brainstorm__clear {
+		flex-shrink: 0;
+		padding: var(--space-1) var(--space-2);
+	}
+
+	.pregen-brainstorm__remove {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: var(--space-5);
+		height: var(--space-5);
+		padding: 0;
+	}
+
+	.pregen-brainstorm__clear:hover,
+	.pregen-brainstorm__remove:hover {
+		border-color: var(--color-border-default);
+		color: var(--color-text-primary);
 	}
 
 	.pregen-input-label {

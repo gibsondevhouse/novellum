@@ -76,7 +76,12 @@ interface GenerateRequestBody {
 // ── Provider loading (mirrors /api/ai/+server.ts) ──────────────────────────
 
 type LoadResult =
-	| { kind: 'ok'; provider: ReturnType<typeof createOpenRouterProvider>; apiKey: string; modelOverride?: string }
+	| {
+			kind: 'ok';
+			provider: ReturnType<typeof createOpenRouterProvider>;
+			apiKey: string;
+			modelOverride?: string;
+	  }
 	| { kind: 'mock' }
 	| { kind: 'no_creds' };
 
@@ -126,7 +131,10 @@ function compactText(value: string | null | undefined, maxChars = 120): string {
 	return typeof value === 'string' ? value.trim().slice(0, maxChars) : '';
 }
 
-function loadExistingEntityContext(projectId: string, entityKind: EntityKind): ExistingEntityContext {
+function loadExistingEntityContext(
+	projectId: string,
+	entityKind: EntityKind,
+): ExistingEntityContext {
 	try {
 		if (entityKind === 'character') {
 			const rows = db
@@ -227,11 +235,11 @@ function loadExistingEntityContext(projectId: string, entityKind: EntityKind): E
 					 LIMIT 10`,
 				)
 				.all(projectId) as Array<{
-					name: string;
-					realmId: string;
-					purpose: string;
-					activityType: string;
-				}>;
+				name: string;
+				realmId: string;
+				purpose: string;
+				activityType: string;
+			}>;
 			return {
 				names: rows.map((row) => row.name).filter(Boolean),
 				summaries: rows
@@ -337,14 +345,10 @@ const ENTITY_SCHEMA: Record<EntityKind, string> = {
 	lineage:
 		'{"name":"string","lineageType":"string","summary":"string","origin":"string","regionHomeland":"string","currentStatus":"string","foundingOrigin":"string","inheritedValues":"string"}',
 	realm: '{"name":"string","description":"string","realmType":"string","tags":["string"]}',
-	landmark:
-		'{"name":"string","description":"string","realmId":"string | null","tags":["string"]}',
-	'lore-entry':
-		'{"title":"string","category":"string","content":"string","tags":["string"]}',
-	'plot-thread':
-		'{"title":"string","description":"string","status":"string"}',
-	'timeline-event':
-		'{"title":"string","description":"string","date":"string"}',
+	landmark: '{"name":"string","description":"string","realmId":"string | null","tags":["string"]}',
+	'lore-entry': '{"title":"string","category":"string","content":"string","tags":["string"]}',
+	'plot-thread': '{"title":"string","description":"string","status":"string"}',
+	'timeline-event': '{"title":"string","description":"string","date":"string"}',
 };
 
 function buildSystemPrompt(
@@ -371,9 +375,7 @@ function buildSystemPrompt(
 			? '\nFor realmType, use one of: physical, metaphysical, political, hybrid.'
 			: '';
 	const landmarkGuidance =
-		entityKind === 'landmark'
-			? '\nFor realmId, use null when no parent realm is known yet.'
-			: '';
+		entityKind === 'landmark' ? '\nFor realmId, use null when no parent realm is known yet.' : '';
 	const lineageGuidance =
 		entityKind === 'lineage'
 			? '\nTreat a lineage as a dynasty/house/bloodline with inherited social consequence. Do not output character-sheet prose.'
@@ -383,13 +385,11 @@ function buildSystemPrompt(
 			? '\nFor character fields `coreDesire`, `fear`, `contradiction`, `strength`, `flaw`, `storyRole`, `externalGoal`, `internalNeed`, `stakes`, `voiceSummary`, and `speechPattern`, return concrete, story-specific values (not placeholders).'
 			: '';
 	const targetNames =
-		generationContext?.hints
-			?.filter((hint) => hint.intent === 'target')
-			.map((hint) => hint.name) ?? [];
+		generationContext?.hints?.filter((hint) => hint.intent === 'target').map((hint) => hint.name) ??
+		[];
 	const avoidNames =
-		generationContext?.hints
-			?.filter((hint) => hint.intent === 'avoid')
-			.map((hint) => hint.name) ?? [];
+		generationContext?.hints?.filter((hint) => hint.intent === 'avoid').map((hint) => hint.name) ??
+		[];
 
 	// Cap targets to requested count so we don't ask for more than we generate
 	const cappedTargetNames = targetNames.slice(0, count as number);
@@ -397,13 +397,13 @@ function buildSystemPrompt(
 
 	const targetRule =
 		cappedTargetNames.length > 0
-			? `\n- You MUST generate a profile for each of these named characters (use their exact names as-is, do NOT rename them): ${cappedTargetNames.join(', ')}.`
+			? `\n- You MUST generate a profile for each of these named ${label}(s) (use their exact names as-is, do NOT rename them): ${cappedTargetNames.join(', ')}.`
 			: '';
 	const remainingRule =
 		cappedTargetNames.length > 0 && remainingCount > 0
-			? `\n- The remaining ${remainingCount} character(s) may be newly invented to fit the story world.`
+			? `\n- The remaining ${remainingCount} ${label}(s) may be newly invented to fit the story world.`
 			: cappedTargetNames.length > 0 && remainingCount === 0
-				? `\n- Only generate profiles for the targeted characters above — do not invent additional ones.`
+				? `\n- Only generate profiles for the targeted ${label}(s) above — do not invent additional ones.`
 				: '';
 	const avoidRule =
 		avoidNames.length > 0
@@ -579,9 +579,9 @@ export const POST: RequestHandler = async ({ request }) => {
 	const promptContextNote = buildPromptContextNote(normalizedGenerationContext);
 
 	// Load project
-	const project = db
-		.prepare(`SELECT * FROM projects WHERE id = ?`)
-		.get(projectId) as Project | undefined;
+	const project = db.prepare(`SELECT * FROM projects WHERE id = ?`).get(projectId) as
+		| Project
+		| undefined;
 
 	if (!project) {
 		error(404, 'Project not found');
@@ -596,7 +596,11 @@ export const POST: RequestHandler = async ({ request }) => {
 	if (providerResult.kind === 'no_creds') return noCredsResponse();
 
 	if (providerResult.kind === 'mock') {
-		const mockValidation = validateGeneratedDrafts(mockDrafts(entityKind, count), entityKind, count);
+		const mockValidation = validateGeneratedDrafts(
+			mockDrafts(entityKind, count),
+			entityKind,
+			count,
+		);
 		return json({
 			drafts: mockValidation.ok ? mockValidation.drafts : mockDrafts(entityKind, count),
 			entityKind,

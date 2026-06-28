@@ -1,6 +1,6 @@
 # Novellum Agent Ecosystem
 
-> Last verified: 2026-06-16
+> Last verified: 2026-06-28
 
 Novellum is built around a dual-layer agent architecture. Rather than relying on a single general-purpose AI, the system delegates tasks to specialized, focused agents.
 
@@ -44,14 +44,14 @@ Located in `.github/agents/`, these agents are designed to be invoked via the Ge
 
 ### The Meta-Agent Roster
 
-| Agent Name | Role | Core Responsibility |
-| :--- | :--- | :--- |
-| **Planner** | `planner.agent.md` | Orchestrates multi-tier development plans (Plan -> Stage -> Phase -> Part), interprets user requests, and manages the `dev-docs/plans/` directory. |
-| **Reviewer** | `reviewer.agent.md` | Ensures code quality, enforces the strict vertical domain modular boundaries (`eslint-plugin-boundaries`), and validates PRs/commits. |
+| Agent Name    | Role                 | Core Responsibility                                                                                                                                                          |
+| :------------ | :------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Planner**   | `planner.agent.md`   | Orchestrates multi-tier development plans (Plan -> Stage -> Phase -> Part), interprets user requests, and manages the `dev-docs/plans/` directory.                           |
+| **Reviewer**  | `reviewer.agent.md`  | Ensures code quality, enforces the strict vertical domain modular boundaries (`eslint-plugin-boundaries`), and validates PRs/commits.                                        |
 | **Architect** | `architect.agent.md` | Senior layout architect and structural systems lead. Owns route shells, layout composition, shell contracts, structural primitives, SvelteKit routing, and state management. |
-| **Stylist** | `stylist.agent.md` | Senior UI stylist, design system steward, and component quality lead. Owns design tokens, accessibility, interaction states, dark theme, motion, and visual polish. |
-| **Backend** | `backend.agent.md` | Server-side logic owner. Manages the SQLite database via `/api/db/*`, API routes, and data persistence layers. |
-| **AI** | `ai.agent.md` | Manages the internal Prompt System, Context Engine logic, and OpenRouter integration. |
+| **Stylist**   | `stylist.agent.md`   | Senior UI stylist, design system steward, and component quality lead. Owns design tokens, accessibility, interaction states, dark theme, motion, and visual polish.          |
+| **Backend**   | `backend.agent.md`   | Server-side logic owner. Manages the SQLite database via `/api/db/*`, API routes, and data persistence layers.                                                               |
+| **AI**        | `ai.agent.md`        | Manages the internal Prompt System, Context Engine logic, and OpenRouter integration.                                                                                        |
 
 **Developer Workflow:** Use the `planner` to break down a feature request, then delegate specific implementation tasks to the `architect` (layout/structure), `stylist` (styling/components), `backend`, or `ai` agents, finally using the `reviewer` to ensure the work meets project standards.
 
@@ -63,18 +63,19 @@ Located in `src/lib/ai/`, these agents power the features that authors interact 
 
 ### The Functional Roster
 
-Status legend: **Shipped** = available in the app today. **Planned** = scoped, not yet implemented.
+Status legend: **Shipped** = available in the app today. **Review-ready** = implemented in the active plan and pending Reviewer Agent sign-off. **Planned** = scoped, not yet implemented.
 
-| Agent | Status | Purpose | Triggers & Use Cases | Output |
-| :--- | :--- | :--- | :--- | :--- |
-| **ContinuityAgent** | Shipped | Detects inconsistencies in the story. | Running checks against timeline, lore, and character traits. | Structured issue/warning list. |
-| **EditAgent** | Shipped | Improves clarity, flow, and prose quality. | Sentence refinement, developmental editing. | Line edit suggestions. |
-| **RewriteAgent** | Shipped | Provides alternative versions of existing text. | Adjusting pacing, shifting tone. | Multiple text options. |
-| **StyleAgent** | Shipped | Ensures stylistic consistency. | Tone alignment, voice consistency checks. | Rewrite suggestions based on tone. |
+| Agent               | Status       | Purpose                                                       | Triggers & Use Cases                                                                         | Output                                                                                                   |
+| :------------------ | :----------- | :------------------------------------------------------------ | :------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------- |
+| **BrainstormAgent** | Review-ready | Turns an author seed idea into structured creative proposals. | Nova brainstorm sessions, early concept exploration, and review-gated worldbuilding prefill. | `BrainstormSession` JSON with premise variants, thematic threads, genre hooks, and protagonist sketches. |
+| **ContinuityAgent** | Shipped      | Detects inconsistencies in the story.                         | Running checks against timeline, lore, and character traits.                                 | Structured issue/warning list.                                                                           |
+| **EditAgent**       | Shipped      | Improves clarity, flow, and prose quality.                    | Sentence refinement, developmental editing.                                                  | Line edit suggestions.                                                                                   |
+| **RewriteAgent**    | Shipped      | Provides alternative versions of existing text.               | Adjusting pacing, shifting tone.                                                             | Multiple text options.                                                                                   |
+| **StyleAgent**      | Shipped      | Ensures stylistic consistency.                                | Tone alignment, voice consistency checks.                                                    | Rewrite suggestions based on tone.                                                                       |
 
-> **Cut from V1 (2026-05-13, plan-025):** `BrainstormAgent`, `OutlineAgent`, `DraftAgent`, and `SummaryAgent` were previously listed as Planned. They were never wired to a parser and have been removed from the V1 task-resolver surface. Re-introducing any of them is a new feature plan, not a follow-up.
+> **Cut from V1 (2026-05-13, plan-025):** `OutlineAgent`, `DraftAgent`, and `SummaryAgent` remain removed from the V1 task-resolver surface because they were never wired to a parser. `BrainstormAgent` was reintroduced under plan-043 as a review-gated Nova/worldbuilding feature and is pending Reviewer Agent sign-off.
 
-Shipped agents live under `src/lib/ai/<agent>-agent.ts`. See [dev-docs/03-ai/agents-map.md](./dev-docs/03-ai/agents-map.md) for the canonical breakdown.
+Runtime agent modules live under `src/lib/ai/<agent>-agent.ts`. See [dev-docs/03-ai/agents-map.md](./dev-docs/03-ai/agents-map.md) for the canonical breakdown.
 
 ---
 
@@ -87,11 +88,12 @@ User Action -> Context Engine -> Prompt Builder -> Model Router -> OpenRouter
 ```
 
 ### Prompt Engineering Standards
+
 Every prompt generated by the `PromptBuilder` must strictly adhere to this format:
 
 1.  **ROLE**: Defines the agent's identity (e.g., "You are the Novellum ContinuityAgent").
 2.  **TASK**: A clear, single-responsibility objective.
-3.  **CONTEXT**: Highly scoped, serialized JSON data (e.g., *only* the current scene and active characters).
+3.  **CONTEXT**: Highly scoped, serialized JSON data (e.g., _only_ the current scene and active characters).
 4.  **CONSTRAINTS**: Explicit negative bounds (e.g., "Do not invent facts outside the provided context").
 5.  **OUTPUT FORMAT**: A strict schema definition (usually JSON) that the parser expects.
 
@@ -111,11 +113,13 @@ Every prompt generated by the `PromptBuilder` must strictly adhere to this forma
 
 Agents are designed to be composable. When designing complex features, chain them together rather than creating a "do-everything" agent.
 
-*Example: "Fix a Scene" Workflow*
+_Example: "Fix a Scene" Workflow_
+
 1.  **ContinuityAgent** analyzes the scene and outputs a list of conflicts.
 2.  **RewriteAgent** takes the scene text AND the conflicts list as context, outputting a corrected draft.
 3.  **EditAgent** performs a final stylistic polish on the output.
 
 ### Guardrails & Safety
--   **No Silent Edits**: Agents must never auto-apply changes to the user's manuscript. They generate *suggestions* or *drafts* that the user must explicitly accept.
--   **Context Discipline**: Do not send the entire manuscript to an agent. Use the `ContextEngine` to dynamically build the minimum required context (e.g., `scene_plus_adjacent` policy).
+
+- **No Silent Edits**: Agents must never auto-apply changes to the user's manuscript. They generate _suggestions_ or _drafts_ that the user must explicitly accept.
+- **Context Discipline**: Do not send the entire manuscript to an agent. Use the `ContextEngine` to dynamically build the minimum required context (e.g., `scene_plus_adjacent` policy).

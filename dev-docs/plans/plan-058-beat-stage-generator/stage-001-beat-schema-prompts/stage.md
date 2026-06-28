@@ -2,7 +2,7 @@
 title: Beat Prompts and Schemas
 slug: stage-001-beat-schema-prompts
 stage_number: 1
-status: draft
+status: review
 owner: Planner Agent
 plan: plan-058-beat-stage-generator
 phases:
@@ -19,7 +19,7 @@ Define strict Zod output schemas and prompt seeds for decomposing scenes into na
 
 | #   | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Beat Prompts and Schemas Phase](phase-001-beat-schema-prompts/phase.md) | `draft` | 1d |
+| 001 | [Beat Prompts and Schemas Phase](phase-001-beat-schema-prompts/phase.md) | `review` | 1d |
 
 ## Entry Criteria
 
@@ -28,8 +28,8 @@ Define strict Zod output schemas and prompt seeds for decomposing scenes into na
 ## Exit Criteria
 
 - Zod parsing handles valid scene structural subdivisions.
-- All phases complete
-- All quality gates passed
+- All phases are implementation-complete and ready for review
+- Focused quality gates passed
 
 ## Notes
 

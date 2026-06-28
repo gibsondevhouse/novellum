@@ -17,6 +17,7 @@
 		PipelineHierarchyLayer,
 		PipelineHierarchyPath,
 	} from '$modules/outline/services/seven-layer-outline.js';
+	import BeatOutlineNodes from './BeatOutlineNodes.svelte';
 
 	let {
 		arcs,
@@ -112,6 +113,10 @@
 	function itemKey(column: SevenLayerNavigatorColumn, rowId: string): string {
 		return `${column.layer}:${rowId}`;
 	}
+
+	function beatsForScene(sceneId: string): Beat[] {
+		return beats.filter((beat) => beat.sceneId === sceneId);
+	}
 </script>
 
 <div class="hierarchy-navigator" aria-label="Outline hierarchy navigator">
@@ -149,6 +154,14 @@
 										<span class="layer-item__meta">{row.meta}</span>
 									{/if}
 								</button>
+								{#if column.layer === 'scene'}
+									<BeatOutlineNodes
+										sceneId={row.id}
+										beats={beatsForScene(row.id)}
+										selectedBeatId={selectionPath.beatId}
+										onSelectBeat={onSelectBeat}
+									/>
+								{/if}
 							</li>
 						{/each}
 					</ul>

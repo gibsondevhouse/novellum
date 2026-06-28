@@ -57,6 +57,8 @@ describe('nova context route', () => {
 				},
 			],
 			prompt: 'hello',
+			pinnedEntityIds: ['char-1', ''],
+			excludedEntityIds: ['lore-1'],
 		});
 
 		expect(normalized).toEqual({
@@ -71,7 +73,21 @@ describe('nova context route', () => {
 				},
 			],
 			prompt: 'hello',
+			pinnedEntityIds: ['char-1'],
+			excludedEntityIds: ['lore-1'],
 		});
+	});
+
+	it('rejects invalid override arrays', async () => {
+		const response = await buildNovaContextHttpResponse(
+			{
+				projectIds: ['proj-1'],
+				files: [],
+				pinnedEntityIds: ['char-1', 42],
+			},
+			database,
+		);
+		expect(response.status).toBe(400);
 	});
 
 	it('returns 400 for invalid payload', async () => {
@@ -91,9 +107,14 @@ describe('nova context route', () => {
 		);
 
 		expect(response.status).toBe(200);
-		const body = (await response.json()) as { contextText: string; includedItems: Array<{ kind: string }> };
+		const body = (await response.json()) as {
+			contextText: string;
+			includedItems: Array<{ kind: string }>;
+		};
 		expect(body.contextText).toContain('# Project: Route Project');
-		expect(body.includedItems).toEqual([{ kind: 'project', projectId: 'proj-1', label: 'Route Project' }]);
+		expect(body.includedItems).toEqual([
+			{ kind: 'project', projectId: 'proj-1', label: 'Route Project' },
+		]);
 	});
 
 	it('handles file-only context request', async () => {
@@ -143,7 +164,10 @@ describe('nova context route', () => {
 		);
 
 		expect(response.status).toBe(200);
-		const body = (await response.json()) as { contextText: string; includedItems: Array<{ kind: string }> };
+		const body = (await response.json()) as {
+			contextText: string;
+			includedItems: Array<{ kind: string }>;
+		};
 		expect(body.contextText).toContain('# Project: Route Project');
 		expect(body.contextText).toContain('## File: memo.csv');
 		expect(body.includedItems.map((item) => item.kind)).toEqual(['project', 'file']);
@@ -167,7 +191,10 @@ describe('nova context route', () => {
 		);
 
 		expect(response.status).toBe(200);
-		const body = (await response.json()) as { warnings: string[]; includedItems: Array<{ kind: string }> };
+		const body = (await response.json()) as {
+			warnings: string[];
+			includedItems: Array<{ kind: string }>;
+		};
 		expect(body.includedItems).toEqual([]);
 		expect(body.warnings.some((warning) => warning.includes('book.pdf'))).toBe(true);
 	});

@@ -6,6 +6,7 @@
 -->
 <script lang="ts">
 	import { GhostButton } from '$lib/components/ui/index.js';
+	import { brainstormStaging } from '$lib/stores/brainstorm-staging.store.svelte.js';
 	import {
 		startGeneration,
 		isGenerating,
@@ -31,14 +32,11 @@
 	// Disabled when any generation is running, not just for this entity kind
 	const disabled = $derived(busy);
 	const isThisKindGenerating = $derived(busy && activeKind === entityKind);
+	const brainstormSeedCount = $derived(brainstormStaging.getSeedsForEntityKind(entityKind).length);
 
 	const displayLabel = $derived(
 		label ??
-			(isThisKindGenerating
-				? 'Generating…'
-				: count === 1
-					? '✦ Generate'
-					: `✦ Suggest ${count}`),
+			(isThisKindGenerating ? 'Generating…' : count === 1 ? '✦ Generate' : `✦ Suggest ${count}`),
 	);
 
 	let dialogOpen = $state(false);
@@ -47,7 +45,7 @@
 
 	function handleClick(): void {
 		if (disabled) return;
-		if (DIALOG_ENTITY_KINDS.has(entityKind)) {
+		if (DIALOG_ENTITY_KINDS.has(entityKind) || brainstormSeedCount > 0) {
 			dialogOpen = true;
 		} else {
 			void startGeneration(projectId, entityKind, count);

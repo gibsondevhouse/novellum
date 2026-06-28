@@ -2,7 +2,7 @@
 title: Context Override API Payload Integration
 slug: phase-001-context-metadata-api
 phase_number: 1
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-001-context-metadata-enrichment
 parts:
@@ -16,14 +16,14 @@ Extend server queries to support client pinning and exclusion arrays.
 
 ## Parts
 
-| #   | Part | Status | Assigned To | Est. Duration |
-| --- | --- | --- | --- | --- |
-| 001 | [Context Builder Overrides Service](part-001-context-builder-overrides/part.md) | `draft` | — | 2d |
+| #   | Part                                                                            | Status   | Assigned To | Est. Duration |
+| --- | ------------------------------------------------------------------------------- | -------- | ----------- | ------------- |
+| 001 | [Context Builder Overrides Service](part-001-context-builder-overrides/part.md) | `review` | Codex       | 2d            |
 
 ## Acceptance Criteria
 
-- [ ] All parts reach `complete`
-- [ ] RAG query builders filter metadata lists correctly.
+- [x] All parts reach `review`
+- [x] RAG query builders filter metadata lists correctly.
 
 ## Notes
 

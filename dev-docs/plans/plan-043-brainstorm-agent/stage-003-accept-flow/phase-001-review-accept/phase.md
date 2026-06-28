@@ -2,7 +2,7 @@
 title: Review & Accept Logic
 slug: phase-001-review-accept
 phase_number: 1
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-003-accept-flow
 parts:
@@ -17,17 +17,17 @@ that holds accepted seeds for later use in worldbuilding.
 
 ## Parts
 
-| # | Part | Status | Assigned To | Est. Duration |
-| --- | --- | --- | --- | --- |
-| 001 | [Accept Logic](part-001-accept-logic/part.md) | `draft` | — | 0.5d |
+| #   | Part                                          | Status   | Assigned To | Est. Duration |
+| --- | --------------------------------------------- | -------- | ----------- | ------------- |
+| 001 | [Accept Logic](part-001-accept-logic/part.md) | `review` | Codex       | 0.5d          |
 
 ## Acceptance Criteria
 
 - [ ] All parts reach `complete` status
-- [ ] Accept/reject buttons render on proposals
-- [ ] Accepted seeds stored in staging area
-- [ ] Seeds can be cleared or individually removed
-- [ ] UI updates to show accepted state
+- [x] Accept/reject buttons render on proposals
+- [x] Accepted seeds stored in staging area
+- [x] Seeds can be cleared or individually removed
+- [x] UI updates to show accepted state
 
 ## Notes
 

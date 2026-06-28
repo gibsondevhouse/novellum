@@ -1,18 +1,20 @@
 # Context Engine
 
-> Last verified: 2026-06-16 (plan-048 frontend coherence)
+> Last verified: 2026-06-28 (plan-057 context override API)
 
 The Context Engine selects the **minimum viable context** for an AI task. Hallucination reduction at Novellum is mostly a context-discipline problem, not a prompt-tuning problem.
 
 ## Files
 
-| File | Purpose |
-| --- | --- |
-| [context-engine.ts](../../src/lib/ai/context-engine.ts) | Defines scoping policies. |
-| [context-builder.ts](../../src/lib/ai/context-builder.ts) | Materializes a context payload from a policy + project state. |
-| [context-files.ts](../../src/lib/ai/context-files.ts) | Optional file-based context (e.g., user-supplied notes). |
+| File                                                                                       | Purpose                                                                                                      |
+| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| [context-engine.ts](../../src/lib/ai/context-engine.ts)                                    | Defines scoping policies.                                                                                    |
+| [context-builder.ts](../../src/lib/ai/context-builder.ts)                                  | Legacy scene context helper retained for older consumers.                                                    |
+| [context-files.ts](../../src/lib/ai/context-files.ts)                                      | Optional file-based context (e.g., user-supplied notes).                                                     |
+| [nova/context.ts](../../src/lib/server/nova/context.ts)                                    | Materializes Nova session context from attached projects/files and client context controls.                  |
+| [nova/context-renderers.ts](../../src/lib/server/nova/context-renderers.ts)                | Deterministically renders project graphs, pinned entities, attached files, and truncation metadata.          |
 | [outline-context-sufficiency.ts](../../src/lib/ai/pipeline/outline-context-sufficiency.ts) | Pure gate for deciding whether project/worldbuilding context is strong enough to request outline generation. |
-| [serializer.ts](../../src/lib/ai/serializer.ts) | JSON serialization with deterministic key ordering. |
+| [serializer.ts](../../src/lib/ai/serializer.ts)                                            | JSON serialization with deterministic key ordering.                                                          |
 
 ## Scoping policies
 
@@ -82,6 +84,40 @@ Nova uses the same route contract to classify its visible surface:
 
 This keeps context disclosure and review-gated generation prompts aligned with
 the workspace the author is actually viewing.
+
+## Nova Manual Context Overrides (plan-057)
+
+`POST /api/nova/context` accepts optional `pinnedEntityIds` and `excludedEntityIds`
+arrays alongside `projectIds`, `files`, `mode`, `requestedScopes`, and `entityHints`.
+
+Manual override rules:
+
+- Empty strings are ignored and duplicate ids are deduped by the server builder.
+- Invalid override shapes are rejected with `400`.
+- `excludedEntityIds` wins over `pinnedEntityIds` when the same id appears in both arrays.
+- Excluded ids are removed from supported project graph rows and structured id references
+  before context rendering.
+- Pinned entities are surfaced in a dedicated `# Pinned Context` block before the implicit
+  project context and are also reported as `includedItems` with `kind: "entity"` and
+  `inclusion: "pinned"`.
+- Non-existent pinned ids are dropped silently so stale client state cannot break context
+  assembly.
+
+This first pass supports explicit pinning for the entity classes currently needed by the
+context control panel foundation: characters, locations, lore entries, plot threads, timeline
+events, scenes, and chapters. It does not change RAG/vector ranking; it only applies
+deterministic include/exclude overrides at the request context materialization layer.
+
+The Nova sidebar persists manual overrides per active scene through the project metadata store:
+
+- Scope: `scene`
+- Owner id: active scene id
+- Key: `nova-context-overrides.v1`
+- Value: `{ pinnedEntityIds: string[], excludedEntityIds: string[] }`
+
+The context-control store reloads this value when the active scene route changes. Nova chat applies
+exclusions to the structured prompt context and adds registered pinned entity summaries to the
+system prompt under `# User Context Overrides`.
 
 ## Outline Generation Sufficiency (plan-040)
 

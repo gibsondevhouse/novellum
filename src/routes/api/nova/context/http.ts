@@ -51,6 +51,8 @@ export function normalizeNovaContextRequest(body: unknown): NovaContextRequestPa
 	const modeRaw = body.mode;
 	const requestedScopesRaw = body.requestedScopes;
 	const entityHintsRaw = body.entityHints;
+	const pinnedEntityIdsRaw = body.pinnedEntityIds;
+	const excludedEntityIdsRaw = body.excludedEntityIds;
 
 	if (!Array.isArray(projectIdsRaw)) return null;
 	if (!Array.isArray(filesRaw)) return null;
@@ -66,6 +68,10 @@ export function normalizeNovaContextRequest(body: unknown): NovaContextRequestPa
 	if (requestedScopes === null) return null;
 	const entityHints = normalizeStringArray(entityHintsRaw);
 	if (entityHints === null) return null;
+	const pinnedEntityIds = normalizeStringArray(pinnedEntityIdsRaw);
+	if (pinnedEntityIds === null) return null;
+	const excludedEntityIds = normalizeStringArray(excludedEntityIdsRaw);
+	if (excludedEntityIds === null) return null;
 
 	const projectIds = projectIdsRaw
 		.filter((value): value is string => typeof value === 'string')
@@ -86,6 +92,8 @@ export function normalizeNovaContextRequest(body: unknown): NovaContextRequestPa
 		...(mode !== undefined ? { mode } : {}),
 		...(requestedScopes.length > 0 ? { requestedScopes } : {}),
 		...(entityHints.length > 0 ? { entityHints } : {}),
+		...(pinnedEntityIds.length > 0 ? { pinnedEntityIds } : {}),
+		...(excludedEntityIds.length > 0 ? { excludedEntityIds } : {}),
 	};
 }
 

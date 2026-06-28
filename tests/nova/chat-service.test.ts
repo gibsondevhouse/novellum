@@ -48,6 +48,7 @@ buildRagContextMock.mockResolvedValue({
 
 import { sendNovaChat } from '$modules/nova/services/chat-service.js';
 import { novaSession } from '$modules/nova/stores/nova-session.svelte.js';
+import { contextControl } from '$modules/nova/stores/context-control.svelte.js';
 import { setNovaAgenticFlag } from '$modules/nova/services/feature-flags.js';
 import {
 	clearTools,
@@ -76,6 +77,7 @@ describe('sendNovaChat', () => {
 			checkpointId: 'outline-checkpoint-1',
 		});
 		novaSession.clear();
+		contextControl.unbind();
 	});
 
 	it('appends user message + streams assistant content to completion', async () => {
@@ -258,6 +260,79 @@ describe('sendNovaChat', () => {
 		expect(systemPrompt).toContain('Logline: A scout races a civil war to save her brother.');
 		expect(systemPrompt).toContain('Synopsis: A full synopsis goes here.');
 		expect(systemPrompt).toContain('working conversation');
+	});
+
+	it('applies context control overrides to the chat prompt', async () => {
+		contextControl.registerEntities([
+			{
+				id: 'char-pin',
+				kind: 'character',
+				label: 'Pinned Cartographer',
+				summary: 'Knows which maps are forged.',
+			},
+		]);
+		contextControl.hydrate({
+			pinnedEntityIds: ['char-pin'],
+			excludedEntityIds: ['char-exclude'],
+		});
+		buildRagContextMock.mockResolvedValueOnce({
+			aiContext: {
+				policy: 'worldbuilding_scope',
+				scene: null,
+				adjacentScenes: [],
+				chapter: null,
+				beats: [],
+				characters: [
+					{
+						id: 'char-keep',
+						projectId: 'p1',
+						name: 'Kept Character',
+						role: 'ally',
+						traits: ['steady'],
+						bio: '',
+						goals: '',
+						arc: '',
+						createdAt: '',
+						updatedAt: '',
+					},
+					{
+						id: 'char-exclude',
+						projectId: 'p1',
+						name: 'Do Not Use',
+						role: 'rival',
+						traits: ['stale'],
+						bio: '',
+						goals: '',
+						arc: '',
+						createdAt: '',
+						updatedAt: '',
+					},
+				],
+				locations: [],
+				loreEntries: [],
+				plotThreads: [],
+				project: null,
+			},
+			contextText: '',
+			includedScopes: ['characters'],
+			warnings: [],
+		});
+		streamCompleteMock.mockReturnValueOnce(yieldChunks(['ok']));
+
+		await sendNovaChat({
+			prompt: 'Use the pinned context.',
+			projectId: 'p1',
+			activeSceneId: null,
+			activeChapterId: null,
+		});
+
+		const [payload] = streamCompleteMock.mock.calls[0];
+		const systemPrompt = payload.messages[0].content;
+		expect(systemPrompt).toContain('Kept Character');
+		expect(systemPrompt).not.toContain('Do Not Use');
+		expect(systemPrompt).toContain('# User Context Overrides');
+		expect(systemPrompt).toContain('[Character:char-pin] Pinned Cartographer');
+		expect(systemPrompt).toContain('Explicitly excluded entity IDs: char-exclude');
 	});
 
 	it('blocks project-dependent generation when no project is open', async () => {

@@ -1,5 +1,7 @@
 import { decodeJson } from '$lib/server/db/index.js';
 import type {
+	NovaContextAttachmentKind,
+	NovaContextEntityKind,
 	NovaContextFileInput,
 	NovaContextMode,
 	NovaContextTruncationEntry,
@@ -54,7 +56,7 @@ function formatList(values: string[]): string {
 function truncateValue(
 	value: string,
 	maxChars: number,
-	source: 'project' | 'file',
+	source: NovaContextAttachmentKind,
 	sourceId: string,
 	field: string,
 	collector: TruncationCollector | null,
@@ -95,6 +97,163 @@ function filterByHints<T>(
 	return filtered.length > 0 ? filtered : rows;
 }
 
+function appendPinnedEntityLine(
+	lines: string[],
+	entityType: NovaContextEntityKind,
+	id: string,
+	label: string,
+	details: string[],
+): void {
+	const safeLabel = label.trim() || id;
+	lines.push(`- [${entityType}:${id}] ${safeLabel}`);
+	for (const detail of details) {
+		if (detail.trim()) lines.push(`  ${detail}`);
+	}
+}
+
+function appendPinnedContextBlock(
+	lines: string[],
+	graph: ProjectGraph,
+	caps: ContextCaps,
+	collector: TruncationCollector | null,
+	pinnedEntityIds?: ReadonlySet<string>,
+): void {
+	if (!pinnedEntityIds || pinnedEntityIds.size === 0) return;
+
+	const pinnedLines: string[] = [];
+	const projectId = graph.project.id;
+	const isPinned = (id: string): boolean => pinnedEntityIds.has(id);
+
+	for (const character of graph.characters.filter((row) => isPinned(row.id))) {
+		const bio = truncateValue(
+			character.bio,
+			caps.characterBio,
+			'entity',
+			character.id,
+			`character:${character.id}.bio`,
+			collector,
+		);
+		appendPinnedEntityLine(pinnedLines, 'character', character.id, character.name, [
+			`projectId: ${projectId}`,
+			`role: ${character.role || 'n/a'}`,
+			`tags: ${formatList(decodeStringArray(character.tags))}`,
+			bio ? `bio: ${bio}` : '',
+		]);
+	}
+
+	for (const location of graph.locations.filter((row) => isPinned(row.id))) {
+		const description = truncateValue(
+			location.description,
+			caps.locationDescription,
+			'entity',
+			location.id,
+			`location:${location.id}.description`,
+			collector,
+		);
+		appendPinnedEntityLine(pinnedLines, 'location', location.id, location.name, [
+			`projectId: ${projectId}`,
+			`kind: ${location.kind || 'n/a'}`,
+			`tags: ${formatList(decodeStringArray(location.tags))}`,
+			description ? `description: ${description}` : '',
+		]);
+	}
+
+	for (const lore of graph.loreEntries.filter((row) => isPinned(row.id))) {
+		const content = truncateValue(
+			lore.content,
+			caps.loreContent,
+			'entity',
+			lore.id,
+			`lore:${lore.id}.content`,
+			collector,
+		);
+		appendPinnedEntityLine(pinnedLines, 'loreEntry', lore.id, lore.title, [
+			`projectId: ${projectId}`,
+			`category: ${lore.category || 'n/a'}`,
+			`tags: ${formatList(decodeStringArray(lore.tags))}`,
+			content ? `content: ${content}` : '',
+		]);
+	}
+
+	for (const thread of graph.plotThreads.filter((row) => isPinned(row.id))) {
+		const description = truncateValue(
+			thread.description,
+			caps.plotDescription,
+			'entity',
+			thread.id,
+			`plotThread:${thread.id}.description`,
+			collector,
+		);
+		appendPinnedEntityLine(pinnedLines, 'plotThread', thread.id, thread.title, [
+			`projectId: ${projectId}`,
+			`status: ${thread.status || 'n/a'}`,
+			description ? `description: ${description}` : '',
+		]);
+	}
+
+	for (const event of graph.timelineEvents.filter((row) => isPinned(row.id))) {
+		const description = truncateValue(
+			event.description,
+			caps.timelineDescription,
+			'entity',
+			event.id,
+			`timelineEvent:${event.id}.description`,
+			collector,
+		);
+		appendPinnedEntityLine(pinnedLines, 'timelineEvent', event.id, event.title, [
+			`projectId: ${projectId}`,
+			`date: ${event.date || 'n/a'}`,
+			description ? `description: ${description}` : '',
+		]);
+	}
+
+	for (const scene of graph.scenes.filter((row) => isPinned(row.id))) {
+		const summary = truncateValue(
+			scene.summary,
+			caps.sceneSummary,
+			'entity',
+			scene.id,
+			`scene:${scene.id}.summary`,
+			collector,
+		);
+		const content = truncateValue(
+			scene.content,
+			caps.sceneContent,
+			'entity',
+			scene.id,
+			`scene:${scene.id}.content`,
+			collector,
+		);
+		appendPinnedEntityLine(pinnedLines, 'scene', scene.id, scene.title, [
+			`projectId: ${projectId}`,
+			`chapterId: ${scene.chapterId}`,
+			summary ? `summary: ${summary}` : '',
+			content ? `content: ${content}` : '',
+		]);
+	}
+
+	for (const chapter of graph.chapters.filter((row) => isPinned(row.id))) {
+		const summary = truncateValue(
+			chapter.summary,
+			caps.chapterSummary,
+			'entity',
+			chapter.id,
+			`chapter:${chapter.id}.summary`,
+			collector,
+		);
+		appendPinnedEntityLine(pinnedLines, 'chapter', chapter.id, chapter.title, [
+			`projectId: ${projectId}`,
+			`order: ${chapter.order}`,
+			summary ? `summary: ${summary}` : '',
+		]);
+	}
+
+	if (pinnedLines.length === 0) return;
+	lines.push(`# Pinned Context: ${graph.project.title}`);
+	lines.push(...pinnedLines);
+	lines.push('');
+}
+
 function appendProjectBlock(
 	lines: string[],
 	graph: ProjectGraph,
@@ -119,12 +278,26 @@ function appendProjectBlock(
 	maybeLine(
 		lines,
 		'logline',
-		truncateValue(graph.project.logline, caps.projectLogline, 'project', projectId, 'project.logline', collector),
+		truncateValue(
+			graph.project.logline,
+			caps.projectLogline,
+			'project',
+			projectId,
+			'project.logline',
+			collector,
+		),
 	);
 	maybeLine(
 		lines,
 		'synopsis',
-		truncateValue(graph.project.synopsis, caps.projectSynopsis, 'project', projectId, 'project.synopsis', collector),
+		truncateValue(
+			graph.project.synopsis,
+			caps.projectSynopsis,
+			'project',
+			projectId,
+			'project.synopsis',
+			collector,
+		),
 	);
 	maybeLine(lines, 'stylePresetId', graph.project.stylePresetId);
 	maybeLine(lines, 'lastOpenedAt', graph.project.lastOpenedAt);
@@ -327,7 +500,9 @@ function appendProjectBlock(
 			);
 			lines.push(`- [${thread.id}] status=${thread.status || 'n/a'} title="${thread.title}"`);
 			lines.push(`  relatedSceneIds: ${formatList(decodeStringArray(thread.relatedSceneIds))}`);
-			lines.push(`  relatedCharacterIds: ${formatList(decodeStringArray(thread.relatedCharacterIds))}`);
+			lines.push(
+				`  relatedCharacterIds: ${formatList(decodeStringArray(thread.relatedCharacterIds))}`,
+			);
 			if (description) lines.push(`  description: ${description}`);
 		}
 	}
@@ -346,7 +521,9 @@ function appendProjectBlock(
 			);
 			lines.push(`- [${event.id}] date=${event.date || 'n/a'} title="${event.title}"`);
 			lines.push(`  relatedSceneIds: ${formatList(decodeStringArray(event.relatedSceneIds))}`);
-			lines.push(`  relatedCharacterIds: ${formatList(decodeStringArray(event.relatedCharacterIds))}`);
+			lines.push(
+				`  relatedCharacterIds: ${formatList(decodeStringArray(event.relatedCharacterIds))}`,
+			);
 			if (description) lines.push(`  description: ${description}`);
 		}
 	}
@@ -483,7 +660,9 @@ function appendProjectBlock(
 				`systemPrompt:${prompt.id}.content`,
 				collector,
 			);
-			lines.push(`- [${prompt.id}] name="${prompt.name}" default=${prompt.isDefault ? 'yes' : 'no'}`);
+			lines.push(
+				`- [${prompt.id}] name="${prompt.name}" default=${prompt.isDefault ? 'yes' : 'no'}`,
+			);
 			if (content) lines.push(`  content: ${content}`);
 		}
 
@@ -525,12 +704,26 @@ function appendProjectSummaryBlock(
 	maybeLine(
 		lines,
 		'logline',
-		truncateValue(graph.project.logline, caps.projectLogline, 'project', projectId, 'project.logline', collector),
+		truncateValue(
+			graph.project.logline,
+			caps.projectLogline,
+			'project',
+			projectId,
+			'project.logline',
+			collector,
+		),
 	);
 	maybeLine(
 		lines,
 		'synopsis',
-		truncateValue(graph.project.synopsis, caps.projectSynopsis, 'project', projectId, 'project.synopsis', collector),
+		truncateValue(
+			graph.project.synopsis,
+			caps.projectSynopsis,
+			'project',
+			projectId,
+			'project.synopsis',
+			collector,
+		),
 	);
 	maybeLine(lines, 'updatedAt', graph.project.updatedAt);
 
@@ -552,9 +745,30 @@ function appendProjectSummaryBlock(
 	const frame = graph.storyFrames[0];
 	if (frame) {
 		lines.push(`## Story Frame`);
-		const premise = truncateValue(frame.premise, caps.storyFrame, 'project', projectId, `storyFrame:${frame.id}.premise`, collector);
-		const theme = truncateValue(frame.theme, caps.storyFrame, 'project', projectId, `storyFrame:${frame.id}.theme`, collector);
-		const toneNotes = truncateValue(frame.toneNotes, caps.storyFrame, 'project', projectId, `storyFrame:${frame.id}.toneNotes`, collector);
+		const premise = truncateValue(
+			frame.premise,
+			caps.storyFrame,
+			'project',
+			projectId,
+			`storyFrame:${frame.id}.premise`,
+			collector,
+		);
+		const theme = truncateValue(
+			frame.theme,
+			caps.storyFrame,
+			'project',
+			projectId,
+			`storyFrame:${frame.id}.theme`,
+			collector,
+		);
+		const toneNotes = truncateValue(
+			frame.toneNotes,
+			caps.storyFrame,
+			'project',
+			projectId,
+			`storyFrame:${frame.id}.toneNotes`,
+			collector,
+		);
 		if (premise) lines.push(`- premise: ${premise}`);
 		if (theme) lines.push(`- theme: ${theme}`);
 		if (toneNotes) lines.push(`- toneNotes: ${toneNotes}`);
@@ -590,6 +804,7 @@ export function renderContextText(
 		mode?: NovaContextMode;
 		scopes?: ReadonlySet<string>;
 		entityHints?: string[];
+		pinnedEntityIds?: ReadonlySet<string>;
 	} = {},
 ): RenderResult {
 	const entries: NovaContextTruncationEntry[] = [];
@@ -599,6 +814,7 @@ export function renderContextText(
 	const lines: string[] = [];
 	const mode = options.mode ?? 'full';
 	for (const graph of graphs) {
+		appendPinnedContextBlock(lines, graph, caps, collector, options.pinnedEntityIds);
 		if (mode === 'summary') {
 			appendProjectSummaryBlock(lines, graph, caps, collector);
 		} else if (mode === 'targeted') {

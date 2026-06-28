@@ -2,7 +2,7 @@
 title: Sidebar Context Drawer UI
 slug: phase-001-context-drawer-ui
 phase_number: 1
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-002-sidebar-context-pill
 parts:
@@ -16,15 +16,15 @@ Design a sliding token analysis list with pinning toggle chips.
 
 ## Parts
 
-| #   | Part | Status | Assigned To | Est. Duration |
-| --- | --- | --- | --- | --- |
-| 001 | [Context Sidebar Drawer Component](part-001-context-sidebar-drawer/part.md) | `draft` | — | 2d |
+| #   | Part                                                                        | Status        | Assigned To | Est. Duration |
+| --- | --------------------------------------------------------------------------- | ------------- | ----------- | ------------- |
+| 001 | [Context Sidebar Drawer Component](part-001-context-sidebar-drawer/part.md) | `review`      | Codex       | 2d            |
 
 ## Acceptance Criteria
 
-- [ ] All parts reach `complete`
-- [ ] Token metrics display dynamically.
-- [ ] Drawer controls update Svelte state.
+- [x] All parts reach `review`
+- [x] Token metrics display dynamically.
+- [x] Drawer controls update Svelte state.
 
 ## Notes
 

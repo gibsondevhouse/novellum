@@ -2,7 +2,7 @@
 title: Beat Prompt Templates & Schemas
 slug: phase-001-beat-schema-prompts
 phase_number: 1
-status: draft
+status: review
 owner: Planner Agent
 stage: stage-001-beat-schema-prompts
 parts:
@@ -18,12 +18,12 @@ Create Zod parsers and prompts mapping scenes into pacing nodes.
 
 | #   | Part | Status | Assigned To | Est. Duration |
 | --- | --- | --- | --- | --- |
-| 001 | [Beat Schema Prompts Definition](part-001-beat-schema-prompts-definition/part.md) | `draft` | — | 1d |
+| 001 | [Beat Schema Prompts Definition](part-001-beat-schema-prompts-definition/part.md) | `review` | Codex | 1d |
 
 ## Acceptance Criteria
 
-- [ ] All parts reach `complete`
-- [ ] Zod parses array structures of narrative beats.
+- [x] All parts reach `review`
+- [x] Zod parses array structures of narrative beats.
 
 ## Notes
 

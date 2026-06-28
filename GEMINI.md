@@ -31,20 +31,26 @@ Novellum is an AI-assisted novel production system designed to be integrated wit
 The project is organized into two distinct layers: the **Meta-Agent Layer** (for development) and the **Product Agent Layer** (for user features).
 
 ### 1. Meta-Agent Layer (`.github/`)
+
 This directory houses critical configuration and definitions for the Gemini CLI and its development agents.
+
 - **`agents/`**: Defines specialized AI agents for development tasks (Planner, Reviewer, Architect, Stylist, Backend, AI).
 - **`skills/`**: Reusable modules or capabilities for dev-agents (e.g., `ai-context/`, `svelte5-runes/`, `modular-boundaries/`).
 - **`instructions/`**, **`prompts/`**, **`workflows/`**: High-level guidance for agent interactions.
 
 ### 2. Product Agent Layer (`src/lib/ai/`)
+
 Runtime agents that power the Novellum application features.
+
 - **Shipped agents**: `ContinuityAgent`, `EditAgent`, `RewriteAgent`, `StyleAgent`.
 - **Cut from internal V1 (2026-05-13, plan-025):** `BrainstormAgent`, `OutlineAgent`, `DraftAgent`, `SummaryAgent` were declared TaskTypes but never wired to a parser. Re-introducing any is a new feature plan (see plan-040 for Outline). See [`AGENTS.md`](./AGENTS.md).
 - **Infrastructure**: `ContextEngine`, `PromptBuilder`, `ModelRouter`, `OpenRouterClient` (streaming HTTP via the `/api/ai` proxy).
 - **See also**: [`AGENTS.md`](./AGENTS.md) for the dual-layer agent reference.
 
 ### 3. Documentation & Planning (`dev-docs/`)
+
 The canonical developer reference. New IA (2026-05):
+
 - `01-project/` — overview, roadmap, **journey** (chronological history).
 - `02-architecture/` — system, frontend, backend, routing, data-model, modular-boundaries, tauri-shell.
 - `03-ai/` — pipeline, agents-map, context-engine, prompt-system.
@@ -55,11 +61,14 @@ The canonical developer reference. New IA (2026-05):
 ## Development Conventions and Workflow
 
 ### Modular Architecture
+
 Functionality is organized by **vertical domain slices** (e.g., `project`, `world-building`, `outline`, `editor`, `continuity`).
+
 - **Strict Boundaries**: Import boundaries are enforced via ESLint (`eslint-plugin-boundaries`) to prevent cross-module leakage.
 - **Rules**: Every module owns its components, services, and stores. Read `dev-docs/modular-boundaries.md` before coding.
 
 ### Technical Stack Standards
+
 - **Svelte 5 Runes**: All new UI components MUST use `$state`, `$derived`, and `.svelte.ts` patterns. Old Svelte 4 patterns are deprecated.
 - **Linearization UI**: All UI components must adhere to the Linear-inspired UI design system. Use `SurfaceCard`, `SurfacePanel`, `SectionHeader`, and standard buttons (`PrimaryButton`, `GhostButton`). Use `--space-*` tokens for all layout.
 - **SQLite Persistence**: The primary data store is a server-side SQLite database accessed via `/api/db/*`. Dexie is used only for legacy migration and portability snapshots.
@@ -75,11 +84,11 @@ Functionality is organized by **vertical domain slices** (e.g., `project`, `worl
 
 ### Environment Variables
 
-| Variable | Default | Description |
-| --- | --- | --- |
-| `NOVELLUM_DB_PATH` | `./novellum.db` | File path for the SQLite database |
-| `NOVELLUM_APP_DATA_DIR` | `~/.novellum` | Directory for the credential secure store |
-| `NOVELLUM_AI_MOCK` | `0` | When `1`, `/api/ai` returns mock responses |
+| Variable                | Default         | Description                                |
+| ----------------------- | --------------- | ------------------------------------------ |
+| `NOVELLUM_DB_PATH`      | `./novellum.db` | File path for the SQLite database          |
+| `NOVELLUM_APP_DATA_DIR` | `~/.novellum`   | Directory for the credential secure store  |
+| `NOVELLUM_AI_MOCK`      | `0`             | When `1`, `/api/ai` returns mock responses |
 
 > AI provider credentials are no longer read from environment variables.
 > They are stored server-side via the credential service (see
@@ -106,7 +115,7 @@ Functionality is organized by **vertical domain slices** (e.g., `project`, `worl
 
 ## Current Focus (Active Plans)
 
-Active plan: **No active implementation plan**. **Plan-053 (Worldbuilding and Outline Review Flow Closure)**, **Plan-052 (Pipeline, Nova, and Editor Trust Closure)**, **Plan-051 (Governed AI Controller Runtime)**, and **Plan-048 (Frontend Coherence)** are in `review` pending plan-level Reviewer Agent evaluation. Do not mark any of these plans complete until reviewer sign-off is real.
+Active plan: **plan-058-beat-stage-generator**. Stages 001-002 are in `review`; Stage 003 Beat Outline Tree UI Components is next. Plan-057 (AI Context Control Panel) is in `review` with full quality-gate evidence. **Plan-043 (Brainstorm Agent)**, **Plan-057 (AI Context Control Panel)**, **Plan-053 (Worldbuilding and Outline Review Flow Closure)**, **Plan-052 (Pipeline, Nova, and Editor Trust Closure)**, **Plan-051 (Governed AI Controller Runtime)**, and **Plan-048 (Frontend Coherence)** are in `review` pending plan-level Reviewer Agent evaluation. Do not mark any of these plans complete until reviewer sign-off is real.
 
 Phase 4 release engineering remains deferred/blocked by external prerequisites: Apple Developer ID, Windows signing certificate, notarization setup, and final brand artwork.
 
@@ -132,10 +141,15 @@ To ensure system stability and logical dependency management, execute pending pl
     - [x] **Plan-052 (Pipeline, Nova, and Editor Trust Closure)**: Wire silent Nova artifact actions to durable review-gated behavior, persist revision acknowledgements, clean internal metadata/copy, and remove misleading pre-release chrome. (Implementation complete 2026-06-15; pending Reviewer Agent sign-off)
     - [x] **Plan-053 (Worldbuilding and Outline Review Flow Closure)**: Surface persisted worldbuilding proposals, connect generation controls to truthful execution state, polish outline review metadata, and clean worldbuilding persistence errors. (Implementation complete 2026-06-16; pending Reviewer Agent sign-off)
 
-5.  **Phase 4: Release Engineering**
+5.  **Phase 3.75: Context Controls**
+    - [ ] **Plan-057 (AI Context Control Panel)**: Surface context contents and add pin/exclude grounding controls. Stages 001-004 are in review pending Reviewer Agent evaluation.
+    - [ ] **Plan-058 (Beat & Stage Generator)**: Next active implementation plan.
+
+6.  **Phase 4: Release Engineering**
     - [ ] **Release Engineering**: Code signing, notarization, brand icons, and production smoke tests. Blocked on external signing/certificate/artwork procurement.
 
 ## Planning Standards
+
 - Define the required plan hierarchy: Plan -> Stage -> Phase -> Part.
 - Require YAML frontmatter in every plan artifact.
 - Require measurable acceptance criteria per part.
@@ -144,6 +158,7 @@ To ensure system stability and logical dependency management, execute pending pl
 - Follow [`.github/instructions/plan-conventions.instructions.md`](./.github/instructions/plan-conventions.instructions.md) for any edits under `dev-docs/plans/**`.
 
 ## Development Paths
+
 - Path 1: UI and interaction model evolution.
 - Path 2: Service-layer and state architecture hardening.
 - Path 3: Domain feature deepening and workflow parity.
@@ -151,6 +166,7 @@ To ensure system stability and logical dependency management, execute pending pl
 - Path 5: Observability, reliability, and model-budget optimization.
 
 ## Vulnerabilities and Fragilities
+
 - **Type Safety**: `pnpm check` is clean as of Plan-053 implementation review. Keep running it before plan closure.
 - **Visual Drift**: Pre-existing cross-surface snapshot drift in Playwright tests. Impact: Unreliable visual regression testing. Detection: `pnpm run test:visual`.
 - **Linting**: `pnpm lint:css` and changed-file ESLint are clean as of Plan-053 implementation review. Full `pnpm lint` currently fails on an unrelated baseline in `src/routes/api/author-draft/checkpoints/stage-inline/+server.ts` (`usedCanonRefsValue` unused); treat new warnings/errors as regressions and do not conflate them with that baseline.
@@ -159,6 +175,7 @@ To ensure system stability and logical dependency management, execute pending pl
 - **`+server.ts` export discipline**: ESLint restricts to handlers / `config` / `_`-prefixed exports. Helpers must live in sibling files.
 
 ## Plan Completion and Continuity Checklist
+
 - [ ] All plan parts marked complete with evidence links.
 - [ ] Required quality gates passed.
 - [ ] Documentation mirror synchronized.
@@ -168,6 +185,7 @@ To ensure system stability and logical dependency management, execute pending pl
 - [ ] Next candidate plan identified and queued.
 
 Continuity rule:
+
 - When all checklist items are checked, revise planning artifacts to keep delivery flowing:
   - Mark completed work as closed or archived.
   - Promote or generate the next highest-priority plan.

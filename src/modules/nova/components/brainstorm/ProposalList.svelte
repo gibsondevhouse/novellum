@@ -17,7 +17,7 @@
 		premiseVariants.length +
 			thematicThreads.length +
 			genreHooks.length +
-			protagonistSketches.length
+			protagonistSketches.length,
 	);
 </script>
 
@@ -51,7 +51,7 @@
 				</header>
 				<div class="proposal-list__grid">
 					{#each premiseVariants as proposal (proposal.id)}
-						<ProposalCard {proposal} />
+						<ProposalCard {proposal} sessionSeedIdea={session.seedIdea} />
 					{/each}
 				</div>
 			</section>
@@ -63,7 +63,7 @@
 				</header>
 				<div class="proposal-list__grid">
 					{#each thematicThreads as proposal (proposal.id)}
-						<ProposalCard {proposal} />
+						<ProposalCard {proposal} sessionSeedIdea={session.seedIdea} />
 					{/each}
 				</div>
 			</section>
@@ -75,7 +75,7 @@
 				</header>
 				<div class="proposal-list__grid">
 					{#each genreHooks as proposal (proposal.id)}
-						<ProposalCard {proposal} />
+						<ProposalCard {proposal} sessionSeedIdea={session.seedIdea} />
 					{/each}
 				</div>
 			</section>
@@ -87,7 +87,7 @@
 				</header>
 				<div class="proposal-list__grid">
 					{#each protagonistSketches as proposal (proposal.id)}
-						<ProposalCard {proposal} />
+						<ProposalCard {proposal} sessionSeedIdea={session.seedIdea} />
 					{/each}
 				</div>
 			</section>
@@ -200,5 +200,4 @@
 		font-size: var(--text-xs);
 		line-height: var(--leading-normal);
 	}
-
 </style>

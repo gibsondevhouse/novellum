@@ -2,7 +2,7 @@
 title: Context Visualization Drawer UI
 slug: stage-002-sidebar-context-pill
 stage_number: 2
-status: draft
+status: review
 owner: Planner Agent
 plan: plan-057-context-control-panel
 phases:
@@ -17,9 +17,9 @@ Build sidebar list displaying token estimates, implicit items, and toggle states
 
 ## Phases
 
-| #   | Phase | Status | Est. Duration |
-| --- | --- | --- | --- |
-| 001 | [Context Visualization Drawer UI Phase](phase-001-context-drawer-ui/phase.md) | `draft` | 2d |
+| #   | Phase                                                                         | Status        | Est. Duration |
+| --- | ----------------------------------------------------------------------------- | ------------- | ------------- |
+| 001 | [Context Visualization Drawer UI Phase](phase-001-context-drawer-ui/phase.md) | `review`      | 2d            |
 
 ## Entry Criteria
 
@@ -29,8 +29,8 @@ Build sidebar list displaying token estimates, implicit items, and toggle states
 
 - Dynamic token indicators refresh correctly.
 - Interactive toggle chips work.
-- All phases complete
-- All quality gates passed
+- All phases are implementation-complete and ready for review
+- Focused quality gates passed
 
 ## Notes
 

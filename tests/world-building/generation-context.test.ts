@@ -13,16 +13,33 @@ describe('generation-context helpers', () => {
 			hints: [
 				{ name: 'Oayara', intent: 'target', source: 'title' },
 				{ name: 'Ash Court', intent: 'avoid', source: 'manual' },
+				{ name: 'False Coast', intent: 'target', source: 'brainstorm' },
 			],
 		});
 
 		expect(normalized).toBeTruthy();
-		expect(normalized?.hints).toHaveLength(2);
+		expect(normalized?.hints).toHaveLength(3);
 		expect(normalized?.hints?.[0]).toMatchObject({
 			name: 'Oayara',
 			intent: 'target',
 			source: 'title',
 		});
+		expect(normalized?.hints?.[2]).toMatchObject({
+			name: 'False Coast',
+			intent: 'target',
+			source: 'brainstorm',
+		});
+	});
+
+	it('keeps longer brainstorm context notes intact for prompt grounding', () => {
+		const note = `Accepted Brainstorm seeds:\n${'A'.repeat(500)}\n${'B'.repeat(500)}`;
+		const normalized = normalizeGenerationContext({
+			note,
+			hints: [{ name: 'False Coast', intent: 'target', source: 'brainstorm' }],
+		});
+
+		expect(normalized?.note?.length).toBeGreaterThan(900);
+		expect(normalized?.note).toContain('Accepted Brainstorm seeds');
 	});
 
 	it('normalizes legacy targets and avoids arrays', () => {

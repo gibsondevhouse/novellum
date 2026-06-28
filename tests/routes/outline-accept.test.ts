@@ -293,6 +293,35 @@ function createTwoSceneCheckpoint(): OutlineDraftCheckpointRecord {
 	return checkpoint;
 }
 
+function createBeatCheckpoint(): OutlineDraftCheckpointRecord {
+	const checkpoint = createCheckpoint('review');
+	const scene = checkpoint.draft.arcs[0]!.acts[0]!.chapters[0]!.scenes[0]!;
+	scene.beats = [
+		{
+			order: 0,
+			title: 'Ledger refusal',
+			type: 'obstacle',
+			summary: 'The courier refuses to hand over the ledger.',
+			purpose: 'Create an immediate negotiation barrier.',
+			stages: [
+				{
+					order: 0,
+					title: 'Demand proof',
+					purpose: 'Clarify what the courier wants before yielding.',
+					status: 'planned',
+				},
+				{
+					order: 1,
+					title: 'Raise the stakes',
+					purpose: 'Connect the refusal to the conspiracy threat.',
+					status: 'in_progress',
+				},
+			],
+		},
+	];
+	return checkpoint;
+}
+
 function insertCheckpoint(checkpoint: OutlineDraftCheckpointRecord): void {
 	dbState.database
 		.prepare(
@@ -437,6 +466,63 @@ describe('POST /api/outline/checkpoints/[checkpointId]/accept', () => {
 			immediateObstacle: 'The faction courier refuses to hand it over.',
 			turningPoint: 'The ledger contains the protagonist name.',
 		});
+	});
+
+	it('materializes generated beats and stages inside the acceptance transaction', async () => {
+		insertCheckpoint(createBeatCheckpoint());
+
+		const response = await postAccept(acceptBody('proj-1'));
+
+		expect(response.status).toBe(200);
+		const body = (await response.json()) as {
+			checkpoint: OutlineDraftCheckpointRecord;
+			materialization: { counts: Record<string, number> };
+		};
+		expect(body.checkpoint.acceptance?.materializedCounts).toMatchObject({
+			beats: 1,
+			stages: 2,
+		});
+		expect(body.materialization.counts).toMatchObject({
+			beats: 1,
+			stages: 2,
+		});
+		expect(countRows('beats')).toBe(1);
+		expect(countRows('stages')).toBe(2);
+
+		const beat = dbState.database
+			.prepare('SELECT id, sceneId, arcId, title, type, notes FROM beats WHERE projectId = ?')
+			.get('proj-1') as {
+			id: string;
+			sceneId: string;
+			arcId: string;
+			title: string;
+			type: string;
+			notes: string;
+		};
+		expect(beat).toMatchObject({
+			id: 'beat:scene-proj-1:0',
+			sceneId: 'scene-proj-1',
+			arcId: 'arc-proj-1',
+			title: 'Ledger refusal',
+			type: 'obstacle',
+		});
+		expect(beat.notes).toContain('Purpose: Create an immediate negotiation barrier.');
+
+		const stages = dbState.database
+			.prepare('SELECT beatId, title, status FROM stages WHERE projectId = ? ORDER BY "order" ASC')
+			.all('proj-1') as Array<{ beatId: string; title: string; status: string }>;
+		expect(stages).toEqual([
+			{
+				beatId: 'beat:scene-proj-1:0',
+				title: 'Demand proof',
+				status: 'planned',
+			},
+			{
+				beatId: 'beat:scene-proj-1:0',
+				title: 'Raise the stakes',
+				status: 'in_progress',
+			},
+		]);
 	});
 
 	it('materializes only selected outline nodes while preserving required parents', async () => {

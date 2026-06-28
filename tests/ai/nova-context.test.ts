@@ -353,7 +353,9 @@ describe('buildNovaContext', () => {
 
 		const result = buildNovaContext(database, payload);
 
-		expect(result.includedItems).toEqual([{ kind: 'project', projectId: 'proj-a', label: 'Project A' }]);
+		expect(result.includedItems).toEqual([
+			{ kind: 'project', projectId: 'proj-a', label: 'Project A' },
+		]);
 		expect(result.contextText).toContain('# Project: Project A');
 		expect(result.contextText).toContain('## Chapters (1)');
 		expect(result.contextText).toContain('## Scenes (1)');
@@ -386,7 +388,11 @@ describe('buildNovaContext', () => {
 		const secondProjectIndex = result.contextText.indexOf('# Project: Project A');
 		expect(firstProjectIndex).toBeGreaterThanOrEqual(0);
 		expect(secondProjectIndex).toBeGreaterThan(firstProjectIndex);
-		expect(result.includedItems[0]).toEqual({ kind: 'project', projectId: 'proj-b', label: 'Project B' });
+		expect(result.includedItems[0]).toEqual({
+			kind: 'project',
+			projectId: 'proj-b',
+			label: 'Project B',
+		});
 	});
 
 	it('applies compression and hard trim when context budget is very small', () => {
@@ -408,8 +414,12 @@ describe('buildNovaContext', () => {
 		expect(result.truncationReport.compressionPasses).toBe(1);
 		expect(result.truncationReport.finalHardTrimApplied).toBe(true);
 		expect(result.truncationReport.entries.length).toBeGreaterThan(0);
-		expect(result.warnings).toContain('Context exceeded the standard budget and was compressed before sending.');
-		expect(result.warnings).toContain('Context still exceeded limits after compression and was hard-trimmed.');
+		expect(result.warnings).toContain(
+			'Context exceeded the standard budget and was compressed before sending.',
+		);
+		expect(result.warnings).toContain(
+			'Context still exceeded limits after compression and was hard-trimmed.',
+		);
 		expect(result.contextText.length).toBeLessThanOrEqual(4_000);
 	});
 
@@ -439,10 +449,80 @@ describe('buildNovaContext', () => {
 		expect(result.contextText).toContain('# Attached Files');
 		expect(result.contextText).toContain('## File: notes.md');
 		expect(result.contextText).not.toContain('## File: draft.pdf');
-		expect(result.includedItems.some((item) => item.kind === 'file' && item.id === 'file-1')).toBe(true);
-		expect(result.includedItems.some((item) => item.kind === 'file' && item.id === 'file-2')).toBe(false);
+		expect(result.includedItems.some((item) => item.kind === 'file' && item.id === 'file-1')).toBe(
+			true,
+		);
+		expect(result.includedItems.some((item) => item.kind === 'file' && item.id === 'file-2')).toBe(
+			false,
+		);
 		expect(
-			result.warnings.some((warning) => warning.includes('draft.pdf') && warning.includes('not supported yet')),
+			result.warnings.some(
+				(warning) => warning.includes('draft.pdf') && warning.includes('not supported yet'),
+			),
 		).toBe(true);
+	});
+
+	it('renders pinned entities before implicit targeted context', () => {
+		seedProjectGraph(database, 'proj-a', 'Project A');
+
+		const result = buildNovaContext(database, {
+			projectIds: ['proj-a'],
+			files: [],
+			mode: 'targeted',
+			requestedScopes: ['characters'],
+			pinnedEntityIds: ['proj-a-loc-1'],
+		});
+
+		const pinnedIndex = result.contextText.indexOf('# Pinned Context: Project A');
+		const projectIndex = result.contextText.indexOf('# Project: Project A');
+		expect(pinnedIndex).toBeGreaterThanOrEqual(0);
+		expect(projectIndex).toBeGreaterThan(pinnedIndex);
+		expect(result.contextText).toContain('[location:proj-a-loc-1] City');
+		expect(result.contextText).toContain('description: Location description');
+		expect(result.contextText).toContain('## Characters (1)');
+		expect(result.contextText).not.toContain('## Locations (');
+		expect(result.includedItems).toContainEqual({
+			kind: 'entity',
+			id: 'proj-a-loc-1',
+			projectId: 'proj-a',
+			entityType: 'location',
+			label: 'City',
+			inclusion: 'pinned',
+		});
+	});
+
+	it('filters excluded entities and structured references out of context text', () => {
+		seedProjectGraph(database, 'proj-a', 'Project A');
+
+		const result = buildNovaContext(database, {
+			projectIds: ['proj-a'],
+			files: [],
+			excludedEntityIds: ['proj-a-char-1'],
+		});
+
+		expect(result.contextText).toContain('## Characters (0)');
+		expect(result.contextText).not.toContain('name="Hero"');
+		expect(result.contextText).not.toContain('Character biography');
+		expect(result.contextText).not.toContain('proj-a-rel-1');
+		expect(result.contextText).not.toContain('characterIds: proj-a-char-1');
+		expect(result.contextText).not.toContain('relatedCharacterIds: proj-a-char-1');
+	});
+
+	it('lets excluded entity IDs override pinned IDs', () => {
+		seedProjectGraph(database, 'proj-a', 'Project A');
+
+		const result = buildNovaContext(database, {
+			projectIds: ['proj-a'],
+			files: [],
+			pinnedEntityIds: ['proj-a-loc-1'],
+			excludedEntityIds: ['proj-a-loc-1'],
+		});
+
+		expect(result.contextText).not.toContain('# Pinned Context');
+		expect(result.contextText).toContain('## Locations (0)');
+		expect(result.includedItems.some((item) => item.kind === 'entity')).toBe(false);
+		expect(result.warnings).toContain(
+			'Excluded context overrides took precedence over pinned IDs: proj-a-loc-1.',
+		);
 	});
 });

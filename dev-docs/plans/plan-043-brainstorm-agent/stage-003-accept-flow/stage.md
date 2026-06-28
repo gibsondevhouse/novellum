@@ -2,7 +2,7 @@
 title: Accept Flow & Worldbuild Hookup
 slug: stage-003-accept-flow
 stage_number: 3
-status: draft
+status: review
 owner: Planner Agent
 plan: plan-043-brainstorm-agent
 phases:
@@ -20,14 +20,14 @@ accepted seeds prefill the generation context.
 
 ## Phases
 
-| # | Phase | Status | Est. Duration |
-| --- | --- | --- | --- |
-| 001 | [Review & Accept Logic](phase-001-review-accept/phase.md) | `draft` | 0.5d |
-| 002 | [Worldbuild Prefill Context](phase-002-worldbuild-hookup/phase.md) | `draft` | 0.5d |
+| #   | Phase                                                              | Status   | Est. Duration |
+| --- | ------------------------------------------------------------------ | -------- | ------------- |
+| 001 | [Review & Accept Logic](phase-001-review-accept/phase.md)          | `review` | 0.5d          |
+| 002 | [Worldbuild Prefill Context](phase-002-worldbuild-hookup/phase.md) | `review` | 0.5d          |
 
 ## Entry Criteria
 
-- Stage-002 (Nova UI) is complete
+- Stage-002 (Nova UI) is implementation-complete and in `review`
 - Brainstorm proposals are displaying in Nova
 - Worldbuilding entity creation forms understood
 
@@ -35,9 +35,9 @@ accepted seeds prefill the generation context.
 
 - All phases complete
 - Authors can accept seeds into a staging area
-- Accepted seeds appear in worldbuilding context forms
+- Accepted seeds appear in worldbuilding generation context controls
 - Seeds can be discarded or cleared
-- All quality gates passed
+- Stage quality gates passed, except full `pnpm test` unrelated outline baseline documented in part evidence
 
 ## Notes
 

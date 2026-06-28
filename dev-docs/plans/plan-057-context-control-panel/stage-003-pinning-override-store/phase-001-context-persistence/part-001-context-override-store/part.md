@@ -2,13 +2,13 @@
 title: Context Override Metadata Store
 slug: part-001-context-override-store
 part_number: 1
-status: draft
+status: review
 owner: Planner Agent
-assigned_to: —
+assigned_to: Codex
 phase: phase-001-context-persistence
-started_at: ~
-completed_at: ~
-estimated_duration: undefined
+started_at: 2026-06-28
+completed_at: 2026-06-28
+estimated_duration: 1d
 ---
 
 ## Objective
@@ -43,8 +43,8 @@ Persist overrides settings in project metadata configurations.
 
 ## Acceptance Criteria
 
-- [ ] Overrides persist across reloads.
-- [ ] Scene changes refresh values.
+- [x] Overrides persist across reloads.
+- [x] Scene changes refresh values.
 
 ## Edge Cases
 

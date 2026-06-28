@@ -191,6 +191,73 @@ describe('buildOutlineMaterializationMap', () => {
 		});
 	});
 
+	it('maps scene beat plans into beat and stage rows', () => {
+		const draft = createDraft();
+		const scene = draft.arcs[1]!.acts[1]!.chapters[0]!.scenes[0]!;
+		scene.beats = [
+			{
+				order: 1,
+				title: 'Reversal',
+				type: 'reversal',
+				summary: 'The keeper recognizes Iri.',
+				purpose: 'Turn a locked-door problem into a public accusation.',
+				stages: [
+					{
+						order: 1,
+						title: 'Public accusation',
+						purpose: 'Force Iri to flee with incomplete proof.',
+						status: 'in_progress',
+					},
+					{
+						order: 0,
+						title: 'Recognition',
+						purpose: 'Reveal that the keeper knows Iri from the ledger.',
+						status: 'planned',
+					},
+				],
+			},
+			{
+				order: 0,
+				title: 'Archive lock',
+				type: 'obstacle',
+				summary: 'The archive door blocks the first tactic.',
+				purpose: 'Establish the immediate barrier.',
+				stages: [
+					{
+						order: 0,
+						title: 'Token demand',
+						purpose: 'Make the access rule concrete.',
+						status: 'planned',
+					},
+				],
+			},
+		];
+
+		const map = buildOutlineMaterializationMap(draft, { nowIso: now });
+
+		expect(map.beats.map((beat) => beat.id)).toEqual(['beat:scene-one:0', 'beat:scene-one:1']);
+		expect(map.beats[0]).toMatchObject({
+			sceneId: 'scene-one',
+			arcId: 'arc-early',
+			projectId: 'project-1',
+			title: 'Archive lock',
+			type: 'obstacle',
+			order: 0,
+			notes: 'The archive door blocks the first tactic.\n\nPurpose: Establish the immediate barrier.',
+		});
+		expect(map.stages.map((stage) => stage.id)).toEqual([
+			'stage:beat:scene-one:0:0',
+			'stage:beat:scene-one:1:0',
+			'stage:beat:scene-one:1:1',
+		]);
+		expect(map.stages[2]).toMatchObject({
+			beatId: 'beat:scene-one:1',
+			title: 'Public accusation',
+			status: 'in_progress',
+		});
+		expect(map.counts).toMatchObject({ beats: 2, stages: 3 });
+	});
+
 	it('emits scene intent metadata for plan-038 draft context compatibility', () => {
 		const map = buildOutlineMaterializationMap(createDraft(), { nowIso: now });
 		const sceneRows = map.sceneIntentMetadata.filter((row) => row.ownerId === 'scene-one');

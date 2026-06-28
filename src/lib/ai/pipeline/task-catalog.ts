@@ -16,6 +16,7 @@ export const PIPELINE_TASK_KEYS = {
 	AUTHOR_OUTLINE: 'vibe-author.outline',
 	AUTHOR_SCENE_DRAFT: 'vibe-author.scene-draft',
 	AUTHOR_REVISION_PACK: 'vibe-author.revision-pack',
+	OUTLINE_BEATS: 'vibe-outline.beats',
 } as const;
 
 export type PipelineTaskKey = (typeof PIPELINE_TASK_KEYS)[keyof typeof PIPELINE_TASK_KEYS];
@@ -143,6 +144,15 @@ export const PIPELINE_TASK_CATALOG: Readonly<Record<PipelineTaskKey, PipelineTas
 		outputFormat: 'json_author_revision_pack',
 		role: 'You are the Novellum Vibe-Author Revision Pack Agent.',
 	},
+	[PIPELINE_TASK_KEYS.OUTLINE_BEATS]: {
+		key: PIPELINE_TASK_KEYS.OUTLINE_BEATS,
+		family: 'vibe-outline',
+		stage: 'beats',
+		target: 'scene',
+		contextPolicy: 'scene_plus_adjacent',
+		outputFormat: 'json_outline_beats',
+		role: 'You are the Novellum Vibe-Outline Beat Planning Agent.',
+	},
 };
 
 export const PIPELINE_TASK_DISPLAY_LABELS: Readonly<Record<PipelineTaskKey, string>> = {
@@ -159,6 +169,7 @@ export const PIPELINE_TASK_DISPLAY_LABELS: Readonly<Record<PipelineTaskKey, stri
 	[PIPELINE_TASK_KEYS.AUTHOR_OUTLINE]: 'Author outline',
 	[PIPELINE_TASK_KEYS.AUTHOR_SCENE_DRAFT]: 'Scene draft',
 	[PIPELINE_TASK_KEYS.AUTHOR_REVISION_PACK]: 'Revision pack',
+	[PIPELINE_TASK_KEYS.OUTLINE_BEATS]: 'Scene beat plan',
 };
 
 function titleCaseToken(token: string): string {
@@ -221,6 +232,7 @@ export const PIPELINE_TASK_FAMILIES = {
 		PIPELINE_TASK_KEYS.AUTHOR_SCENE_DRAFT,
 		PIPELINE_TASK_KEYS.AUTHOR_REVISION_PACK,
 	] as const,
+	'vibe-outline': [PIPELINE_TASK_KEYS.OUTLINE_BEATS] as const,
 } as const;
 
 export function getPipelineTaskDefinition(key: string): PipelineTaskDefinition | null {

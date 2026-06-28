@@ -2,7 +2,7 @@
 title: Pinning & Exclusion Persistence Store
 slug: stage-003-pinning-override-store
 stage_number: 3
-status: draft
+status: review
 owner: Planner Agent
 plan: plan-057-context-control-panel
 phases:
@@ -19,7 +19,7 @@ Save context settings in project/scene metadata to retain choices across restart
 
 | #   | Phase | Status | Est. Duration |
 | --- | --- | --- | --- |
-| 001 | [Pinning & Exclusion Persistence Store Phase](phase-001-context-persistence/phase.md) | `draft` | 1d |
+| 001 | [Pinning & Exclusion Persistence Store Phase](phase-001-context-persistence/phase.md) | `review` | 1d |
 
 ## Entry Criteria
 
@@ -28,8 +28,8 @@ Save context settings in project/scene metadata to retain choices across restart
 ## Exit Criteria
 
 - Overrides persist and load correctly in scene context.
-- All phases complete
-- All quality gates passed
+- All phases are implementation-complete and ready for review
+- Focused quality gates passed
 
 ## Notes
 

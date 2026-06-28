@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { BrainstormSession as BrainstormSessionData } from '$lib/ai/types.js';
+	import { brainstormStaging } from '$lib/stores/brainstorm-staging.store.svelte.js';
 	import BrainstormInput from './BrainstormInput.svelte';
 	import ProposalList from './ProposalList.svelte';
 
@@ -20,7 +21,7 @@
 		error = null,
 		showInput = true,
 		showProposalList = true,
-		onSubmit
+		onSubmit,
 	}: Props = $props();
 
 	const statusMessage = $derived.by(() => {
@@ -29,9 +30,16 @@
 		if (session) return 'Brainstorm proposals are ready for review.';
 		return 'No brainstorm proposals generated yet.';
 	});
+	const acceptedCount = $derived(brainstormStaging.acceptedSeeds.length);
+	const rejectedCount = $derived(brainstormStaging.rejectedProposalIds.length);
+	const hasDecisions = $derived(acceptedCount > 0 || rejectedCount > 0);
 
 	function handleSubmit(seedIdea: string): void {
 		onSubmit?.(seedIdea);
+	}
+
+	function clearStaging(): void {
+		brainstormStaging.clear();
 	}
 </script>
 
@@ -45,17 +53,32 @@
 			<p class="brainstorm-session__eyebrow">Brainstorm Agent</p>
 			<h2>Seed proposals</h2>
 		</div>
-		<span class="brainstorm-session__state" data-loading={loading}>
-			{loading ? 'Running' : session ? 'Review ready' : 'Idle'}
-		</span>
+		<div class="brainstorm-session__header-actions">
+			{#if hasDecisions}
+				<span
+					class="brainstorm-session__staging"
+					data-testid="nova-brainstorm-staging-count"
+					aria-label="{acceptedCount} accepted seeds and {rejectedCount} discarded seeds"
+				>
+					{acceptedCount} accepted · {rejectedCount} discarded
+				</span>
+				<button
+					type="button"
+					class="brainstorm-session__clear"
+					onclick={clearStaging}
+					data-testid="nova-brainstorm-clear"
+				>
+					Clear
+				</button>
+			{/if}
+			<span class="brainstorm-session__state" data-loading={loading}>
+				{loading ? 'Running' : session ? 'Review ready' : 'Idle'}
+			</span>
+		</div>
 	</header>
 
 	{#if showInput}
-		<BrainstormInput
-			{initialSeedIdea}
-			busy={loading}
-			onSubmit={handleSubmit}
-		/>
+		<BrainstormInput {initialSeedIdea} busy={loading} onSubmit={handleSubmit} />
 	{/if}
 
 	<div
@@ -88,6 +111,14 @@
 		flex-wrap: wrap;
 	}
 
+	.brainstorm-session__header-actions {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: var(--space-1);
+		flex-wrap: wrap;
+	}
+
 	.brainstorm-session__header h2,
 	.brainstorm-session__header p,
 	.brainstorm-session__status {
@@ -116,6 +147,27 @@
 		color: var(--color-text-secondary);
 		font-size: var(--text-xs);
 		font-weight: var(--font-weight-semibold);
+	}
+
+	.brainstorm-session__staging,
+	.brainstorm-session__clear {
+		padding: var(--space-1) var(--space-2);
+		border: 1px solid var(--color-border-subtle);
+		border-radius: var(--radius-sm);
+		background: var(--color-surface-ground);
+		color: var(--color-text-secondary);
+		font-size: var(--text-xs);
+		font-weight: var(--font-weight-semibold);
+	}
+
+	.brainstorm-session__clear {
+		cursor: pointer;
+		font-family: inherit;
+	}
+
+	.brainstorm-session__clear:hover {
+		border-color: var(--color-border-default);
+		color: var(--color-text-primary);
 	}
 
 	.brainstorm-session__state[data-loading='true'] {

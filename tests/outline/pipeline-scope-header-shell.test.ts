@@ -24,7 +24,7 @@ const outlinePageSource = readFileSync(OUTLINE_PAGE_PATH, 'utf-8');
 
 describe('pipeline scope header shell source contract', () => {
 	it('renders active layer/path summary and readiness state in OutlineSummaryBar', () => {
-		expect(summaryBarSource).toContain('Current Layer: {currentLayerLabel}');
+		expect(summaryBarSource).toContain('Focus: {currentLayerLabel}');
 		expect(summaryBarSource).toContain("pathSegments.join(' / ')");
 		expect(summaryBarSource).toContain('data-readiness={readiness}');
 		expect(summaryBarSource).toContain('readinessLabel');
@@ -34,7 +34,9 @@ describe('pipeline scope header shell source contract', () => {
 		expect(summaryBarSource).toContain('{#if showStageActions}');
 		expect(summaryBarSource).toContain('data-testid="stage-action-region"');
 		expect(summaryBarSource).toContain('aria-label="Run stage orchestration"');
-		expect(outlinePageSource).toContain('const showStageActionRegion = $derived(Boolean(selectedStage));');
+		expect(outlinePageSource).toContain(
+			'const showStageActionRegion = $derived(Boolean(selectedStage));',
+		);
 		expect(outlinePageSource).toContain('showStageActions={showStageActionRegion}');
 	});
 
